@@ -1,0 +1,298 @@
+<template lang="">       
+    <div>          
+      <!-- Products Modal -->
+    <div class="modal fade" id="customerModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content"> 
+           <div class="card">
+            <div class="card-body min-vh-100">
+               <div class="row gx-2">
+                   <div class="col-lg-3">
+                       <div class="form-floating col-12 mb-2">
+                           <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchCustomer" placeholder="Code" class="form-control form-control-sm">
+                           <label for="search_by_code" class="small ms-2">Code</label>
+                       </div>
+                       <div class="form-floating col-12 mb-2">
+                           <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchCustomer" placeholder="Description" class="form-control form-control-sm">
+                           <label for="search_by_name" class="small ms-2">Name</label>
+                       </div> 
+                       <div class="form-floating col-12 mb-2">
+                        <input type="search" id="search_by_address" v-model="search_by_address" @keyup="searchCustomer" placeholder="Address" class="form-control form-control-sm">
+                        <label for="search_by_address" class="small ms-2">Address</label>
+                    </div> 
+                        <div class="row">
+                               <div class="col-4"><button class="btn btn-sm text-success" @click="updateCustomer">Update
+                                   <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
+                               </button></div>
+                               <div class="col-4"><button class="btn btn-sm text-dark" @click="clearSearch">Clear</button></div>
+                               <div class="col-4"><button class="btn btn-sm text-danger" data-bs-dismiss="modal">Close</button></div>
+
+                        </div>                                                                                                           
+                   </div>                        
+                   <div class="col-lg-9">
+                       <div class="card">
+                           <div class="card-body p-0 table-responsive">
+                               <table class="table table-bordered table-hover mb-0">
+                                   <tbody class="small">
+                                       <tr class="text-center table-secondary" style="cursor: context-menu;">
+                                           <td @click="sortCustomers('code')"><i class="fa-solid fa-sort"></i> Code</td>
+                                           <td @click="sortCustomers('name')"><i class="fa-solid fa-sort"></i> Name</td>
+                                           <td @click="sortCustomers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
+                                           <td @click="sortCustomers('address')"><i class="fa-solid fa-sort"></i> Address</td>
+                                           <td @click="sortCustomers('created_at')"><i class="fa-solid fa-sort"></i> Date</td>
+                                       </tr>
+                                     
+                                       
+                                       <tr class="text-center" data-bs-dismiss="modal" @click="setCustomer(p)" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id">                                         
+                                           <td :class="{'table-secondary': sort_item ==='code'}" >
+                                                {{p.code}}
+                                            </td>
+                                           <td :class="{'table-secondary': sort_item ==='name'}">
+                                                {{p.name}}
+                                           </td>
+                                           <td :class="{'table-secondary': sort_item ==='phone'}">
+                                                {{p.phone}}
+                                           </td>
+                                           <td :class="{'table-secondary': sort_item ==='address'}">
+                                                {{p.address}}
+                                           </td>
+                                           <td :class="{'table-secondary': sort_item ==='created_at'}">{{showTime(p.created_at)}}</td>
+                                       </tr>
+                                   </tbody>
+                               </table>
+                               <div v-if="isLoading">
+                                <div colspan="5">
+                                    <div class="d-flex justify-content-center my-5">
+                                        <div class="spinner-border text-primary"  role="status">
+                                          <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>                               
+                           </div>
+                       </div>
+                   </div>
+               </div>
+               </div>
+           </div>
+           </div>
+           </div>
+           </div>
+   </div>   
+    
+   </template>
+   <script>
+   import PageHeader from "@/views/partials/PageHeader.vue"
+    import { useVuelidate  } from '@vuelidate/core'
+import { required, email ,helpers} from '@vuelidate/validators'
+   import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
+   import db from '@/firebase/firestore'
+   export default {
+       components: {
+               PageHeader
+       },   
+  
+       data(){
+           return{
+            code :"",
+            name:"",
+            phone:"",
+            address:'',
+            created_at:"",
+               customers : [],
+               isLoading: false,
+               sortBy:"asc",
+               sort_item:"",
+               search_by_code:"",
+               search_by_name:"",
+               search_by_address:"",
+               customersData:[],
+               editItem:{},
+               isUpdating:false,
+               isSaving:false,
+               msg : {
+                   type :"",
+                   info :"",
+               }
+           }
+       },
+       created() {     
+           if(this.user !==null){
+               this.isLoading=true;
+               this.fetchCustomer();
+           }
+       },
+       mounted() {
+        //const name=document.getElementById("name");
+        //name.focus();
+        this.code= new Date().getTime()
+        this.created_at=new Date().toISOString().substr(0, 10)
+       },
+       computed:{
+           user(){
+               return this.$store.getters.user;
+           }
+       },
+       watch:{
+           user(data){
+               if(data !==null){
+                   this.isLoading=true;
+                   this.fetchCustomer();
+               }
+           },
+           msg:{
+               handler(val){
+                   if(val.type){
+                       setTimeout(()=>{
+                           this.msg.type="";
+                           this.msg.info="";
+                       }, 5000)
+                   }
+               },deep:true
+           }
+       },
+       methods:{
+            setCustomer(p){
+                this.$emit("setCustomer", p)
+            },
+           clearSearch(){
+               this.search_by_code="";
+               this.search_by_name="";
+               this.search_by_address="";
+               this.searchCustomer();
+           },
+           searchCustomer(){
+               this.customers=[];
+               if(this.search_by_code){
+                   this.customers=this.customersData.filter((f)=>f.code===Number(this.search_by_code))
+               }else 
+               if(this.search_by_name){
+                   this.customers=this.customersData.filter((f)=>{
+                       return f.name.toLowerCase().includes(this.search_by_name.toLowerCase())
+                   })
+               }else 
+               if(this.search_by_address){
+                   this.customers=this.customersData.filter((f)=>{
+                       return f.address.toLowerCase().includes(this.search_by_address.toLowerCase())
+                   })
+               }else{
+                   this.customers= this.customersData.filter((p, i)=>{
+                              if(i < 20){
+                                  return p;
+                              }
+                          }) 
+               }
+           },
+           sortCustomers(sort){   
+               this.customers=[];
+               this.sort_item=sort;
+               if(this.sortBy=="asc"){
+                   this.sortBy="desc"
+                   this.customers=this.customersData.sort((a,b)=>{
+                       const item_a=a.name.toUpperCase();
+                       const item_b=b.name.toUpperCase();
+                       const com_a=a.address.toUpperCase();
+                       const com_b=b.address.toUpperCase();
+                       const date_a=new Date(a.created_at.toDate()).getTime();
+                       const date_b=new Date(b.created_at.toDate()).getTime();
+                       switch(sort){
+                           case "phone":
+                               return a.phone - b.phone;
+                           break;
+                           case "name":
+                             return item_a < item_b ? 1 : -1;
+                           break;
+                           case "code":
+                               return a.code - b.code;
+                           break;
+                           case "address":
+                           return com_a < com_b ? 1 : -1;
+                           break;
+                           case "created_at":
+                              return  date_a - date_b;
+                           break;
+                       }
+                   })
+               }else{
+                   this.sortBy="asc"
+                   this.customers=this.customersData.sort((a,b)=>{
+                       const item_a=a.name.toUpperCase();
+                       const item_b=b.name.toUpperCase();
+                       const com_a=a.address.toUpperCase();
+                       const com_b=b.address.toUpperCase();
+                       const date_a=new Date(a.created_at.toDate()).getTime();
+                       const date_b=new Date(b.created_at.toDate()).getTime();
+                       switch(sort){
+                           case "phone":
+                               return a.phone + b.phone;
+                           break;
+                           case "name":
+                               return item_a < item_b ? -1 : 1;
+                           break;
+                           case "code":
+                               return a.code + b.code;
+                           break;
+                           case "address":
+                               return com_a < com_b ? -1 : 1;
+                           break;
+                           case "created_at":
+                              return  date_a + date_b;
+                           break;
+                       }
+                   })
+               }            
+           },
+           
+           async fetchCustomer(){                    
+               const query_url = query(collection(db, "customers"), where("uid", "==", this.user.uid), orderBy("created_at", "desc"));
+               const snapShot=await getDocs(query_url)           
+               if(snapShot._snapshot.docChanges.length <=0){
+                   this.msg.type='error' 
+                   this.msg.info='Oops..., something went wrong!'
+                   this.isLoading=false;
+                   this.isUpdating=false;
+                   return false;
+               }
+               const default_customer={
+                    id: 123456789,
+                    name: "Default Customer",
+                    code: 123456789,
+                    phone: "09xxxxxxxxx",
+                    address: "",
+                    created_at: Timestamp.fromDate(new Date())
+               }
+               let customers=[default_customer];
+               snapShot && snapShot.forEach((doc) => {         
+                   let cus = {
+                       id: doc.id,
+                       uid: doc.data().uid,
+                       name: doc.data().name,
+                       address : doc.data().address,
+                       created_at: doc.data().created_at,
+                       phone : doc.data().phone,
+                       code : doc.data().code,                                
+                   };                                
+                   customers.push(cus);                           
+                               
+               });
+               this.customers=[];
+               this.customersData=customers;
+               this.customers=customers;
+               this.isLoading=false;
+               this.isUpdating=false;
+              // this.$store.dispatch("setcustomers", this.customers)
+          } ,
+          showTime(t){
+            const date=t.toDate()
+            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
+            return formattedDate;
+        }
+       },
+       
+   }
+   </script>
+   <style lang="">
+       
+   </style>
+  
