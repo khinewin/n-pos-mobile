@@ -226,7 +226,7 @@ export default {
                 voucher_no: this.voucher_no,
                 created_at: Timestamp.fromDate(new Date(this.created_at)),           
                 products : this.storeItems,
-                uid : this.user.uid,
+                user : {uid: this.user.uid, email: this.user.email},
                 total_retail_amount:this.total_retail_amount,
                 total_whole_sale_amount:this.total_whole_sale_amount,   
                 total_pur_amount:this.total_pur_amount,         

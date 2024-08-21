@@ -43,7 +43,8 @@
                                         <tbody class="small text-center">
                                             <tr class="table-secondary">
                                                 <td>Voucher no.</td>
-                                                <td>Opening date</td>                                    
+                                                <td>Opening date</td>   
+                                                <td>User</td>                                 
                                             </tr>
                                             <tr v-if="isLoading">
                                                 <td colspan="3">
@@ -57,6 +58,7 @@
                                             <tr v-if="stocks.length > 0" v-for="p in stocks" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal" style="cursor: context-menu;">
                                                 <td>{{p.voucher_no}}</td>
                                                 <td>{{showTime(p.created_at)}}</td>
+                                                <td>{{removeAfterAt(p.user.email)}}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -115,6 +117,10 @@ export default {
      
    },
    methods:{
+    removeAfterAt(email) {
+        const parts = email.split('@');
+        return parts[0];
+    },
        updatestocks(){
                 this.isUpdating=true;
                this.fetchStocks();

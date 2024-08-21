@@ -46,7 +46,7 @@ const router = createRouter({
       path: '/sale',
       name: 'Sale',     
       component: Sale,
-      meta : {title: "N-POS | Sales"}
+      meta : {title: "N-POS | Sale"}
 
     },
     {

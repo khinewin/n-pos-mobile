@@ -3,7 +3,7 @@ const stocks=(arr)=>{
     arr.forEach((doc) => {         
         let stock = {
             id: doc.id,
-            uid: doc.data().uid,
+            user: doc.data().user,
             voucher_no: doc.data().voucher_no,
             created_at : doc.data().created_at,          
             products : doc.data().products,    

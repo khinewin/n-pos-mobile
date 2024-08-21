@@ -7,7 +7,7 @@
                     <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print</button>
                 </div>                
                 <div class="col-sm-2 d-grid">
-                        <button @click="goEdit" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                        <button @click="goEdit" class="btn btn-sm" :class="{'disabled': !voucher_no || stock_user.uid !== user.uid}"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
                 </div>
                 <div class="col-sm-2 d-grid">
                         <router-link :to="{name : 'NewOpeningStocks'}" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New</router-link>
@@ -133,7 +133,8 @@ export default {
         return{       
             id:"",
             voucher_no:"", 
-            created_at:"",         
+            created_at:"",        
+            stock_user:{},
             store_item: {},
             storeItems: [],
             total_retail_amount:0,
@@ -168,19 +169,8 @@ export default {
         // Pass the element id here
          await this.$htmlToPaper('printMe');
         }, 
-        goEdit(){
-            const stockItem={
-                    id: this.id,
-                    voucher_no:this.voucher_no, 
-                    created_at:this.created_at,
-                    store_item: this.store_item,
-                    storeItems: this.storeItems,
-                    total_retail_amount:this.total_retail_amount,
-                    total_whole_sale_amount:this.total_whole_sale_amount,
-                    total_pur_amount: this.total_pur_amount
-            }
-            this.$store.dispatch("setStockItem", stockItem)
-            this.$router.push({name: 'EditOpeningStocks', params: {id: this.id}})
+        goEdit(){           
+            this.$router.push({name: 'EditOpeningStocks', params: {id: this.voucher_no}})
         },
         closeOpeningStock(){
           this.id="";
@@ -196,6 +186,7 @@ export default {
         setCode(p){           
           //  const created_date=this.showTime(p.created_at)
             this.id=p.id;
+            this.stock_user=p.user;
             this.voucher_no=p.voucher_no;
             this.created_at=p.created_at//new Date(created_date).toISOString().substr(0, 10);
             this.storeItems=p.products;

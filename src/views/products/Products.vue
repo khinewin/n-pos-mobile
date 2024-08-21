@@ -59,7 +59,7 @@
                                             <input placeholder="Description"  :class="{'border-danger' : v$.item_name.$errors.length}"  type="text" v-model="item_name" class="form-control-plaintext  text-center">
                                         </td>
                                         <td>
-                                            <input placeholder="Item per package"  :class="{'border-danger' : v$.item_per_package.$errors.length}"  type="number" v-model="item_per_package" class="form-control-plaintext  text-center">
+                                            <input placeholder="IPP"  :class="{'border-danger' : v$.item_per_package.$errors.length}"  type="number" v-model="item_per_package" class="form-control-plaintext  text-center">
                                         </td>
                                         <td colspan="2">
                                             <input placeholder="Qty" disabled type="number"  class="form-control-plaintext text-center">

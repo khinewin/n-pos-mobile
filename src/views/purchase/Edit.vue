@@ -129,6 +129,7 @@ import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/purchase/ProductModal.vue'
 import SupplierModal from '@/views/modals/purchase/SupplierModal.vue'
 import Footer from '@/views/partials/Footer.vue'
+import * as ss from "@/lib/snapshot/purchases"
 
 export default {
     components: {
@@ -180,17 +181,12 @@ export default {
     computed:{
         user(){
             return this.$store.getters.user;
-        },    
-        purchaseItem(){
-            return  this.$store.getters.purchaseItem;
-        }
+        },       
       
     },
-   mounted() {
-        if(Object.keys(this.purchaseItem).length <=0){
-            this.$router.push({name: "Purchase"})
-        }
-        this.setPurchaseItem();
+   created() {
+    this.voucher_no=this.$route.params.id;
+     this.fetchPurchase();
    },
    watch:{
     msg:{
@@ -225,12 +221,10 @@ export default {
         setExpDate(id){
             this.editItem.exp_date=Timestamp.fromDate(new Date(this.editItem.tmp_exp_date))
         },
-        setPurchaseItem(){            
-            const p=this.purchaseItem;
-            const pur_date=this.editShowTime(p.pur_date)
+        setPurchaseItem(p){            
+                const pur_date=this.editShowTime(p.pur_date)
                 this.voucher_no=p.voucher_no;
                 this.pur_date=pur_date//new Date(this.showTime(p.pur_date)).toISOString().substr(0, 10)
-                //this.supplier_name=p.supplier.name;
                 this.supplier=p.supplier;
                 this.total_amount=p.total_amount;
                 this.total_discount=p.total_discount;
@@ -244,12 +238,18 @@ export default {
                     return s.old_pur_qty=s.pur_qty;
                 })
         },
+        async fetchPurchase(){
+            const query_url = query(collection(db, "purchases"), where("voucher_no", "==", Number(this.voucher_no)));
+            const snapShot=await getDocs(query_url)
+            const purchase=ss.purchases(snapShot);      
+            this.setPurchaseItem(purchase[0])
+            this.isLoading=false;
+        },
    
         setSupplier(s){
             this.supplier_name=s.name;
             this.supplier=s;
-        },
-      
+        },     
      
         setEdit(i){
             const item=this.storePurchase[i];
@@ -323,7 +323,7 @@ export default {
                 pur_date: Timestamp.fromDate(new Date(this.pur_date)),
                 supplier: this.supplier,
                 products : this.storePurchase,
-                uid : this.user.uid,
+                user : {uid: this.user.uid, email: this.user.email},
                 total_amount:this.total_amount,
                 total_discount:this.total_discount,
                 total_price:this.total_price,
@@ -357,7 +357,7 @@ export default {
                     await deleteDoc(saveDocument) //if no items delete document;
                     this.clearItems();
             }else{
-                    await setDoc(saveDocument, voucher) //save on purchases
+                    await updateDoc(saveDocument, voucher) //save on purchases
             }     
       
             this.msg.type="success";

@@ -3,7 +3,7 @@ const sales=(arr)=>{
     arr.forEach((doc) => {         
         let sale = {
             id: doc.id,
-            uid: doc.data().uid,
+            user: doc.data().user,
             voucher_no: doc.data().voucher_no,
             sale_date : doc.data().sale_date,
             products : doc.data().products,    

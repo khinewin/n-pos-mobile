@@ -56,13 +56,15 @@
                                                 <td>Voucher no.</td>
                                                 <td>Name</td>
                                                 <td>Phone</td>
-                                                <td>Sale date</td>                                    
+                                                <td>Sale date</td>
+                                                <td>User</td>                                    
                                             </tr>                                
                                             <tr v-if="sales.length > 0" v-for="s in sales" :key="s.id" @click="setCode(s)" data-bs-dismiss="modal" style="cursor: context-menu;">
                                                 <td class="text-center">{{s.voucher_no}}</td>
                                                 <td>{{s.customer.name}}</td>
                                                 <td class="text-center">{{s.customer.phone}}</td>
                                                 <td class="text-center">{{showTime(s.sale_date)}}</td>
+                                                <td>{{removeAfterAt(s.user.email)}}</td>
                                             </tr>
                                         </tbody>
                                     </table>   
@@ -90,6 +92,8 @@
 <script>
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
+import * as ss from "@/lib/snapshot/sales"
+import * as hp from '@/lib/helper'
 export default {
    sross:['storeSale'],
    data(){
@@ -168,26 +172,8 @@ export default {
      
     async fetchSales(){
        const query_url = query(collection(db, "sales"), orderBy("sale_date", "desc"));
-       const shapShot=await getDocs(query_url)
-       let saleItems=[];
-       shapShot.forEach((doc) => {         
-           let sale = {
-               id: doc.id,
-               uid: doc.data().uid,
-               voucher_no: doc.data().voucher_no,
-               sale_date : doc.data().sale_date,
-               products : doc.data().products,    
-                charges: doc.data().charges,
-                pay:doc.data().pay,
-                discount: doc.data().discount,
-                refunds: doc.data().refunds,
-                total_amount:doc.data().total_amount,
-                sale_type: doc.data().sale_type,
-                customer : doc.data().customer,
-           };                
-                           
-           saleItems.push(sale);      
-       });
+       const snapShot=await getDocs(query_url)
+       const saleItems=ss.sales(snapShot);      
        this.sales=[];
        this.sales=saleItems;
        this.salesData=saleItems;
@@ -197,11 +183,12 @@ export default {
      
       } ,
       showTime(t){
-           const date=t.toDate()
-           const ostions = { year: 'numeric', month: 'numeric', day: 'numeric' };
-           const formattedDate = new Intl.DateTimeFormat('en-UK', ostions).format(date);
-           return formattedDate;
+           return hp.showTime(t)
        },
+     removeAfterAt(email) {
+        const parts = email.split('@');
+        return parts[0];
+    }
    }
    
 }

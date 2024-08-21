@@ -273,7 +273,7 @@ export default {
                 pur_date: Timestamp.fromDate(new Date(this.pur_date)),
                 supplier: this.supplier,
                 products : this.storePurchase,
-                uid : this.user.uid,
+                user : {uid: this.user.uid, email: this.user.email},
                 total_amount:this.total_amount,
                 total_discount:this.total_discount,
                 total_price:this.total_price,

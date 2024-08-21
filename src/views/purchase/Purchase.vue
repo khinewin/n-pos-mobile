@@ -8,7 +8,7 @@
                     <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print</button>
                 </div>   
                 <div class="col-sm-2 d-grid">
-                    <button @click="goEdit" class='btn btn-sm' :disabled="!voucher_no"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                    <button @click="goEdit" class='btn btn-sm' :disabled="!voucher_no || pur_user.uid !==  user.uid"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
                 </div>
                 <div class="col-sm-2 d-grid">
                     <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#purchaseModal"><i class="fa-solid fa-folder-tree"></i> Browse</button>
@@ -127,6 +127,7 @@ export default {
             supplier : "",
             supplier_name:"",
             products:[],
+            pur_user:{},
             total_amount:0,
             total_discount:0,
             extra_discount:0,
@@ -164,21 +165,8 @@ export default {
             this.extra_discount=0
             this.total_price=0
         },
-        goEdit(){
-            const purchaseItem={
-                id:this.id,
-                voucher_no:this.voucher_no, 
-                pur_date:this.pur_date,
-                supplier_name : this.supplier_name,
-                supplier:this.supplier,
-                products:this.products,
-                total_amount:this.total_amount,
-                total_discount:this.total_discount,
-                extra_discount:this.extra_discount,
-                total_price:this.total_price,
-            }
-            this.$store.dispatch("setPurchaseItem", purchaseItem)
-            this.$router.push({name: "EditPurchase", params: {id:this.id}})
+        goEdit(){           
+            this.$router.push({name: "EditPurchase", params: {id:this.voucher_no}})
         },
         setCode(p){
             this.id=p.id;
@@ -186,7 +174,7 @@ export default {
             this.pur_date=p.pur_date;
             this.supplier_name=`${p.supplier.name} (${p.supplier.company})`;
             this.supplier=p.supplier;
-            
+            this.pur_user=p.user;
            // this.products=p.products;
            this.products=p.products.map((p)=>{
                return {

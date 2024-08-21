@@ -5,7 +5,7 @@
          <div class="modal-content">               
            <div>
                <div class="card min-vh-100">
-                   <div class="card-body py-3 px-1">
+                   <div class="card-body p-2">
                     <div class="row g-1 m-0">
                         <div class="col-lg-3">                                                         
                                 <div class="card shadow">
@@ -36,7 +36,7 @@
                                             </div>
                                         </div>
                                        </div>
-                                </div>
+                                
                                 <div class="row">
                                         <div class="col-4 d-grid">
                                             <button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
@@ -51,6 +51,7 @@
                                             <button class="btn btn-sm text-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                                         </div>
                                 </div>
+                                </div>
                             </div>                                                                                                              
                         </div>
                         <div class="col-lg-9">
@@ -62,11 +63,13 @@
                                                 <td>Voucher no.</td>
                                                 <td>Pur date</td>                                    
                                                 <td>Supplier</td>
+                                                <td>User</td>
                                             </tr>                                
                                             <tr v-if="purchases.length > 0" v-for="p in purchases" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal" aria-label="Close" style="cursor: context-menu;">
                                                 <td class="text-center">{{p.voucher_no}}</td>
                                                 <td class="text-center">{{showTime(p.pur_date)}}</td>
                                                 <td>{{p.supplier.name}} ({{p.supplier.company}})</td>
+                                                <td>{{removeAfterAt(p.user.email)}}</td>
                                             </tr>
                                         </tbody>
                                     </table>   
@@ -94,6 +97,8 @@
 <script>
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
+import * as hp from "@/lib/helper"
+import * as ss from "@/lib/snapshot/purchases"
 export default {
    props:['storePurchase'],
    data(){
@@ -178,25 +183,7 @@ export default {
     async fetchPurchase(){
        const query_url = query(collection(db, "purchases"),  orderBy("pur_date", "desc"));
        const snapShot=await getDocs(query_url)
-       let purchases=[];
-       snapShot.forEach((doc) => {         
-           let purchase = {
-               id: doc.id,
-               uid: doc.data().uid,
-               voucher_no: doc.data().voucher_no,
-               pur_date : doc.data().pur_date,
-               supplier: doc.data().supplier,
-               products : doc.data().products,    
-               total_amount:doc.data().total_amount,
-               total_discount: doc.data().total_discount,
-               extra_discount: doc.data().extra_discount,
-               total_price:doc.data().total_price,     
-               exp_date: doc.data().exp_date,                                       
-           };                
-                           
-           purchases.push(purchase);      
-                       
-       });
+       const purchases=ss.purchases(snapShot);      
        this.purchasesData=purchases;
      //  this.$store.dispatch("setProducts", products)
        this.isLoading=false;
@@ -204,11 +191,12 @@ export default {
        this.searchPurchases();
       } ,
       showTime(t){
-           const date=t.toDate()
-           const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-           const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-           return formattedDate;
+          return hp.showTime(t)
        },
+       removeAfterAt(email) {
+        const parts = email.split('@');
+        return parts[0];
+    }
    }
    
 }

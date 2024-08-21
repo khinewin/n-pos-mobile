@@ -292,7 +292,7 @@ export default {
                 voucher_no: this.voucher_no,
                 sale_date: Timestamp.fromDate(new Date(this.sale_date)),
                 products : this.saleItems,
-                uid : this.user.uid,
+                user : {uid: this.user.uid, email: this.user.email},
                 total_amount:this.total_amount,
                 discount:this.discount,
                 charges:this.charges,

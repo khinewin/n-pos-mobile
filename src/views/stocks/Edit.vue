@@ -103,6 +103,8 @@ import { required, email ,helpers} from '@vuelidate/validators'
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query, increment} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/purchase/ProductModal.vue'
+import * as ss from "@/lib/snapshot/stocks"
+
 export default {
     components: {
         PageHeader, ProductModal
@@ -119,6 +121,7 @@ export default {
     },
     data(){
         return{       
+            id:"",
             voucher_no:"", 
             created_at:"",         
             purchase_item: {},
@@ -132,51 +135,41 @@ export default {
                 type :"",
                 info :"",
             }
-
         }
     },
     mounted() {
-        if(Object.keys(this.stockItem).length <=0){
-            this.$router.push({name: "OpeningStocks"})
-        }else{
-            this.setItem();
-        }
-        this.created_at=new Date(this.showEditTime(this.created_at)).toISOString().substr(0, 10)
-    },
-  
+        this.voucher_no=this.$route.params.id;
+        this.fetchStock();
+    },  
     computed:{
         user(){
             return this.$store.getters.user;
-        },    
-        stockItem(){
-            return this.$store.getters.stockItem;
-        }
-      
+        },        
     },
     watch:{
-       editItem(data){
-           
+       editItem(data){           
        }
-    },
-    created() {     
-      
-        this.voucher_no=new Date().getTime();
-        this.created_at=new Date().toISOString().substr(0, 10)
-    },
-    
+    },   
     methods:{
         setExpDate(id){
             this.editItem.exp_date=Timestamp.fromDate(new Date(this.editItem.tmp_exp_date))
         },
-        setItem(){
-            const item=this.stockItem;
+        setItem(item){
             this.id=item.id;
             this.voucher_no=item.voucher_no;
-            this.created_at=item.created_at;
-            this.storeItems=item.storeItems;
+            this.created_at=this.showEditTime(item.created_at);
+            this.storeItems=item.products;
             this.total_retail_amount=item.total_retail_amount;
             this.total_whole_sale_amount=item.total_whole_sale_amount;
             this.total_pur_amount=item.total_pur_amount;
+        },
+        async fetchStock(){
+            const query_url = query(collection(db, "openingStocks"), where("voucher_no", "==", Number(this.voucher_no)));
+            const snapShot=await getDocs(query_url)
+            const stocks=ss.stocks(snapShot);
+            console.log(stocks)
+            this.setItem(stocks[0])
+            this.isLoading=false;
         },
         setEdit(i){
             const item=this.storeItems[i];
@@ -228,7 +221,7 @@ export default {
                 voucher_no: this.voucher_no,
                 created_at: Timestamp.fromDate(new Date(this.created_at)),           
                 products : this.storeItems,
-                uid : this.user.uid,
+                user : {uid: this.user.uid, email:this.user.email},
                 total_retail_amount:this.total_retail_amount,
                 total_whole_sale_amount:this.total_whole_sale_amount,         
                 total_pur_amount: this.total_pur_amount,   
@@ -246,20 +239,14 @@ export default {
                  })    
             })
             this.msg.type="success";
-            this.msg.info="Opening stocks update successful."          
+            this.msg.info="Opening stocks update successful."         
              
             this.isLoading=false;
           
             this.v$.$reset()
         },
        
-        
-       showTime(t){
-            const date=t.toDate()
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-            return formattedDate;
-        },
+     
         showEditTime(t){
             const date=t.toDate()
           //  const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
