@@ -3,7 +3,7 @@ const products=(snapShot)=>{
     snapShot.forEach((doc) => {         
         let product = {
             id: doc.id,
-            uid: doc.data().uid,
+            user: doc.data().user,
             item_name: doc.data().item_name,
             retail_price : doc.data().retail_price,
             whole_sale_price: doc.data().whole_sale_price,

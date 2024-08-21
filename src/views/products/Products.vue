@@ -220,7 +220,7 @@ export default {
             const dataCollection=collection(db, "products", )
             const code_no=this.code_no ? this.code_no : new Date().getTime()
             const data={
-                uid: this.user.uid,
+                user: {uid:this.user.uid, email:this.user.email},
                 item_name: this.item_name, 
                 code_no : code_no,
                 item_per_package: Number(this.item_per_package),

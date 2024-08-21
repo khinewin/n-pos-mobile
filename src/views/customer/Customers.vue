@@ -207,7 +207,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
             const created_at=Timestamp.fromDate(date);
             const dataCollection=collection(db, "customers", )
             const data={
-                uid: this.user.uid,
+                user: {uid:this.user.uid, email:this.user.email},
                 name: this.name, 
                 code : this.code,
                 phone: this.phone,
@@ -336,7 +336,8 @@ import { required, email ,helpers} from '@vuelidate/validators'
            
            async fetchCustomer(){                    
                const query_url = query(collection(db, "customers"), orderBy("created_at", "desc"));
-               const snapShot=await getDocs(query_url)           
+               const snapShot=await getDocs(query_url)    
+               this.customers=[];       
                if(snapShot._snapshot.docChanges.length <=0){
                    this.msg.type='error' 
                    this.msg.info='Oops..., something went wrong!'
@@ -345,7 +346,6 @@ import { required, email ,helpers} from '@vuelidate/validators'
                    return false;
                }   
                const customers=ss.customers(snapShot);           
-               this.customers=[];
                this.customersData=customers;
                this.customers=customers;
                this.isLoading=false;

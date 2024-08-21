@@ -2,7 +2,7 @@ const suppliers=(arr)=>{
     let supplierItems=[];
     arr.forEach((doc) => {         
         let product = {
-            id: doc.id,
+            user: doc.user,
             uid: doc.data().uid,
             name: doc.data().name,
             company : doc.data().company,
