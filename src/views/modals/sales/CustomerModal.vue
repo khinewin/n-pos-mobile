@@ -2,36 +2,52 @@
     <div>          
       <!-- Products Modal -->
     <div class="modal fade" id="customerModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
           <div class="modal-content"> 
            <div class="card">
-            <div class="card-body min-vh-100">
-               <div class="row gx-2">
+            <div class="card-body p-2 min-vh-100">
+               <div class="row g-1">
                    <div class="col-lg-3">
-                       <div class="form-floating col-12 mb-2">
-                           <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchCustomer" placeholder="Code" class="form-control form-control-sm">
-                           <label for="search_by_code" class="small ms-2">Code</label>
-                       </div>
-                       <div class="form-floating col-12 mb-2">
-                           <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchCustomer" placeholder="Description" class="form-control form-control-sm">
-                           <label for="search_by_name" class="small ms-2">Name</label>
-                       </div> 
-                       <div class="form-floating col-12 mb-2">
-                        <input type="search" id="search_by_address" v-model="search_by_address" @keyup="searchCustomer" placeholder="Address" class="form-control form-control-sm">
-                        <label for="search_by_address" class="small ms-2">Address</label>
-                    </div> 
-                        <div class="row">
-                               <div class="col-4"><button class="btn btn-sm text-success" @click="updateCustomer">Update
-                                   <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
-                               </button></div>
-                               <div class="col-4"><button class="btn btn-sm text-dark" @click="clearSearch">Clear</button></div>
-                               <div class="col-4"><button class="btn btn-sm text-danger" data-bs-dismiss="modal">Close</button></div>
-
-                        </div>                                                                                                           
+                       <div class="card shadow">
+                        <div class="card-body p-2 small">
+                            <div class="row g-1">
+                                <div class="col-md-4 col-lg-12">
+                                    <div class="form-floating">
+                                        <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchCustomer" placeholder="Code" class="form-control form-control-sm">
+                                        <label for="search_by_code" class="small">Code</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-lg-12">
+                                    <div class="form-floating">
+                                        <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchCustomer" placeholder="Description" class="form-control form-control-sm">
+                                        <label for="search_by_name" class="small">Name</label>
+                                    </div> 
+                                </div>
+                                <div class="col-md-4 col-lg-12">
+                                    <div class="form-floating">
+                                        <input type="search" id="search_by_address" v-model="search_by_address" @keyup="searchCustomer" placeholder="Address" class="form-control form-control-sm">
+                                         <label for="search_by_address" class="small">Address</label>
+                                </div>
+                                </div> 
+                            </div>
+                             <div class="row">
+                                <div class="col-4" d-grid><button class="btn btn-sm text-dark" @click="clearSearch">
+                                    <i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
+                                </div>
+                                <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateCustomer">
+                                    <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
+                                    <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
+                                </button></div>
+                                <div class="col-4 d-grid"><button class="btn btn-sm text-dark" data-bs-dismiss="modal">
+                                    <i class="fa-solid fa-circle-xmark"></i> Close</button>
+                                </div>     
+                             </div> 
+                        </div>
+                       </div>                                                                                                          
                    </div>                        
                    <div class="col-lg-9">
-                       <div class="card">
-                           <div class="card-body p-0 table-responsive">
+                       <div class="card shadow">
+                           <div class="card-body p-2 table-responsive">
                                <table class="table table-bordered table-hover mb-0">
                                    <tbody class="small">
                                        <tr class="text-center table-secondary" style="cursor: context-menu;">
@@ -43,7 +59,7 @@
                                        </tr>
                                      
                                        
-                                       <tr class="text-center" data-bs-dismiss="modal" @click="setCustomer(p)" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id">                                         
+                                       <tr class="" data-bs-dismiss="modal" @click="setCustomer(p)" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id" style="cursor:context-menu">                                         
                                            <td :class="{'table-secondary': sort_item ==='code'}" >
                                                 {{p.code}}
                                             </td>
@@ -152,6 +168,10 @@ import { required, email ,helpers} from '@vuelidate/validators'
            }
        },
        methods:{
+            updateCustomer(){
+                this.isUpdating=true;
+                this.fetchCustomer();
+            },
             setCustomer(p){
                 this.$emit("setCustomer", p)
             },
@@ -244,7 +264,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
            },
            
            async fetchCustomer(){                    
-               const query_url = query(collection(db, "customers"), where("uid", "==", this.user.uid), orderBy("created_at", "desc"));
+               const query_url = query(collection(db, "customers"), orderBy("created_at", "desc"));
                const snapShot=await getDocs(query_url)           
                if(snapShot._snapshot.docChanges.length <=0){
                    this.msg.type='error' 

@@ -1,0 +1,18 @@
+const stocks=(arr)=>{
+    let stockItems=[];
+    arr.forEach((doc) => {         
+        let stock = {
+            id: doc.id,
+            uid: doc.data().uid,
+            voucher_no: doc.data().voucher_no,
+            created_at : doc.data().created_at,          
+            products : doc.data().products,    
+            total_retail_amount:doc.data().total_retail_amount,
+            total_whole_sale_amount: doc.data().total_whole_sale_amount,     
+            total_pur_amount: doc.data().total_pur_amount,                                     
+        };                                          
+        stockItems.push(stock);                           
+    });
+    return stockItems;
+}
+export {stocks}

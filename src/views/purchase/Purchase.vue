@@ -4,27 +4,26 @@
         <PurchaseModal @setCode="setCode"/>           
         <div class="container-fluid my-2 ">
             <div class="row mb-2 justify-content-end">
-                <div class="col-lg-2">
+                <div class="col-sm-2 d-grid">
+                    <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print</button>
+                </div>   
+                <div class="col-sm-2 d-grid">
                     <button @click="goEdit" class='btn btn-sm' :disabled="!voucher_no"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
                 </div>
-                <div class="col-lg-2">
+                <div class="col-sm-2 d-grid">
                     <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#purchaseModal"><i class="fa-solid fa-folder-tree"></i> Browse</button>
                 </div>
-                <div class="col-lg-2">
-                    <div>
+                <div class="col-sm-2 d-grid">
                         <router-link :to="{name : 'AddPurchase'}" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New</router-link>
-                    </div>
                 </div>
-                <div class="col-lg-2">
-                    <div>
+                <div class="col-sm-2 d-grid">
                         <button class="btn btn-sm" :disabled="!voucher_no" @click="closeVoucher"><i class="fa-solid fa-circle-xmark"></i> Close</button>
-                    </div>
                 </div>
             </div>
-            <div>
-                <div class="table-responsive">
-                    <div class="row justify-content-end mb-3">
-                    <div class="col-lg-4">
+            <div class="card shadow" id="printMe">
+                <div class=" card-body p-2 table-responsive">
+                    <div class="row justify-content-end mb-2">
+                    <div class="col-sm-6 col-lg-4">
                         <table class="table mb-0 table-borderless">
                             <tbody>
                                 <tr>
@@ -49,9 +48,9 @@
                       </table>
                     </div>
                 </div>                 
-                   <table class="table table-bordered  table-hover">
+                   <table class="table table-bordered mb-0 table-hover">
                         <tbody>
-                            <tr class="small text-center fw-bold table-secondary">
+                            <tr class="text-center fw-bold table-secondary">
                                 <td class="col-1">Code</td>
                                 <td class="col-2">Desc</td>
                                 <td class="col-1">Exp. date</td>
@@ -64,17 +63,17 @@
                                 <td class="col-1">Discount</td>
                                 <td class="col-1">Price</td>
                             </tr>
-                            <tr class="small text-center" v-if="products.length > 0" v-for="st in products" :key="st.id">
+                            <tr class="" v-if="products.length > 0" v-for="st in products" :key="st.id">
                                 <td class="">{{st.code_no}}</td>
                                 <td class="">{{st.item_name}}</td>
-                                <td class="">                                   
+                                <td class="text-center">                                   
                                      <span v-if="st.exp_date">{{showTime(st.exp_date)}}</span>
                                 </td>
-                                <td class="">{{st.pur_qty}}</td>
-                                <td class="">{{st.pur_price}}</td>
-                                <td class="">{{st.dis_qty}}</td>
-                                <td class="">{{st.dis_percent}}</td>
-                                <td class="">{{st.dis_amount}}</td>
+                                <td class="text-center">{{st.pur_qty}}</td>
+                                <td class="text-end">{{st.pur_price}}</td>
+                                <td class="text-center">{{st.dis_qty}}</td>
+                                <td class="text-center">{{st.dis_percent}}</td>
+                                <td class="text-end">{{st.dis_amount}}</td>
                                 <td class="text-end">{{st.amount}}</td>
                                 <td class="text-end">{{st.discount}}</td>
                                 <td class="text-end">{{st.price}}</td>
@@ -113,6 +112,7 @@ import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, q
 import db from '@/firebase/firestore'
 import PurchaseModal from '@/views/modals/purchase/PurchaseModal.vue'
 import Footer from '@/views/partials/Footer.vue'
+import * as hp from "@/lib/helper.js"
 
 export default {
     components: {
@@ -148,6 +148,10 @@ export default {
     },
  
     methods:{     
+        async print () {
+        // Pass the element id here
+        await this.$htmlToPaper('printMe');
+        },
         closeVoucher(){
             this.id="";    
             this.voucher_no=""; 
@@ -199,10 +203,7 @@ export default {
         },
         
        showTime(t){
-            const date=t.toDate()
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-            return formattedDate;
+            return hp.showTime(t)
         }
                     
     }

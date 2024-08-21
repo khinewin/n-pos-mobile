@@ -13,19 +13,15 @@
                                     <td v-if="sale_price"> Retail price</td>
                                     <td v-if="sale_price"> Wholesale price</td>
                                     <td  v-if="pur_price"> Pur price</td>
-                                </tr>
-                                                       
-                                <tr class="text-center" v-if="reports.length > 0"  v-for="(p, i) in reports" :key="p.id" >
-                                    
-                                    <td >{{p.code_no}}</td>
+                                </tr>                                                       
+                                <tr class="" v-if="reports.length > 0"  v-for="(p, i) in reports" :key="p.id" >                                    
+                                    <td class="text-center">{{p.code_no}}</td>
                                     <td >{{p.item_name}}</td>
-                                    <td >{{p.qty}}</td>
-                                    <td>{{Math.floor(p.qty / p.item_per_package)}} x {{Math.floor(p.qty % p.item_per_package)}}</td>                                        
-
-                                    <td v-if="sale_price">{{p.retail_price}}</td>
-                                    <td v-if="sale_price">{{p.whole_sale_price}}</td>
-                                    <td v-if="pur_price">{{p.pur_price}}</td>
-                                
+                                    <td class="text-center">{{p.qty}}</td>
+                                    <td class="text-center">{{Math.floor(p.qty / p.item_per_package)}} x {{Math.floor(p.qty % p.item_per_package)}}</td>                                        
+                                    <td v-if="sale_price" class="text-end">{{p.retail_price}}</td>
+                                    <td v-if="sale_price" class="text-end">{{p.whole_sale_price}}</td>
+                                    <td v-if="pur_price" class="text-end">{{p.pur_price}}</td>                                
                                 </tr>
                             </tbody>
                         </table>
@@ -47,6 +43,7 @@
 <script>
     import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore'
     import db from '@/firebase/firestore'
+    import * as lib from "@/lib/snapshot/products"
     export default {
     props: ['sale_price','pur_price',],
     data(){
@@ -76,7 +73,28 @@
     },
     methods: {
         async fetchProducts(){                    
-            const query_url = query(collection(db, "products"), where("uid", "==", this.user.uid), orderBy("created_at", "desc"));
+            const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
+            const snapShot=await getDocs(query_url)           
+            if(snapShot._snapshot.docChanges.length <=0){
+                this.msg.type='error' 
+                this.msg.info='Oops..., something went wrong!'
+                this.isLoading=false;
+                this.isUpdating=false;
+                return false;
+            }                             
+           else{
+                const products=lib.products(snapShot)
+                this.products=[];
+                this.reports=products;
+                this.isLoading=false;
+           }
+           
+       } ,
+       
+        
+        /*
+        async fetchProducts(){                    
+            const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
             const snapShot=await getDocs(query_url)           
             if(snapShot._snapshot.docChanges.length <=0){
                 this.msg.type='error' 
@@ -107,6 +125,7 @@
             this.reports=products;
             this.isLoading=false;
        } ,
+        */
     }
 }
 </script>

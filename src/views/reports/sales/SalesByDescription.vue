@@ -3,8 +3,8 @@
         <div class="row">                 
             <div class="col-12">
                     <table class="table table-bordered border-dark table-hover">
-                        <tbody class="text-center small" v-if="reports.length > 0">    
-                            <tr class="fw-bold">
+                        <tbody class="" v-if="reports.length > 0">    
+                            <tr class="fw-bold text-center">
                                 <td>Code</td>
                                 <td>Description</td>
                                 <td colspan="2">Qty</td>
@@ -15,31 +15,31 @@
                                 <td>Profit</td>
                             </tr>                        
                                 <tr v-for="s in reports" :key="s.code_no">
-                                    <td>{{s.code_no}}</td>
+                                    <td class="text-center">{{s.code_no}}</td>
                                     <td>{{s.item_name}}</td>
-                                    <td>{{s.sale_qty}}</td>
-                                    <td>
+                                    <td class="text-center">{{s.sale_qty}}</td>
+                                    <td class="text-center">
                                          {{Math.floor(s.sale_qty / s.item_per_package)}} x  {{Math.floor(s.sale_qty % s.item_per_package)}}
                                     </td>
-                                    <td>{{s.sale_price}}</td>
-                                    <td>{{s.pur_price}}</td>
-                                    <td>{{s.sale_amount}}</td>                                   
-                                    <td>{{s.pur_amount}}</td>
-                                    <td>{{s.item_profit}}</td>
+                                    <td class="text-end">{{s.sale_price}}</td>
+                                    <td  class="text-end">{{s.pur_price}}</td>
+                                    <td  class="text-end">{{s.sale_amount}}</td>                                   
+                                    <td  class="text-end">{{s.pur_amount}}</td>
+                                    <td  class="text-end">{{s.profit}}</td>
                                 </tr>
                                 <tr>                              
                                     <td class="fw-bold text-end" colspan="6">Total</td>
-                                    <td class="text-center">{{grand_total}}</td>
-                                    <td class="text-center">{{pur_total}}</td>
-                                    <td class="text-center">{{net_profit}}</td>
+                                    <td class="text-end">{{sale_amount}}</td>
+                                    <td class="text-end">{{pur_amount}}</td>
+                                    <td class="text-end">{{profit_amount}}</td>
                                 </tr>
                                 <tr>
                                     <td colspan="8" class="text-end fw-bold">Discount</td>
-                                    <td>{{discount}}</td>
+                                    <td class="text-end">{{discount}}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="8" class="text-end fw-bold">Net profit</td>
-                                    <td>{{net_profit-discount}}</td>
+                                    <td colspan="8" class="text-end fw-bold">Gross profit</td>
+                                    <td class="text-end">{{profit_amount-discount}}</td>
                                 </tr>
                         </tbody>
                     </table>
@@ -59,6 +59,7 @@
 <script>
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
+import * as gb from "@/lib/helper.js"
 
 export default {
     props:['fromDate', 'toDate', 'customer_code'],
@@ -72,7 +73,9 @@ export default {
           //  current_month:[],
             salesData:[],
             grand_total:"",
-            pur_total:"",
+            total_sale_amount:0,
+            total_pur_amount:0,
+            total_profit:0,
             net_profit:"",
             discount:"",
             isLoading:false,
@@ -127,72 +130,66 @@ export default {
         goBack(){
             this.$router.go(-1)
         },
-        /*
-        createMonthArray(){
-            let date = new Date();
-            let firstDay = new Date(date.getFullYear(), date.getMonth(),1).getDate();
-            let lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-            let monthArray=[];
-            for(let i=1; i<=lastDay; i++){
-                monthArray.push(new Date(date.getFullYear(), date.getMonth(), i))
-            }
-            this.current_month=monthArray;
-        },
-        */
+      
         displayReports(){       
             let sales=[]
             this.salesData.map((res)=>{
                     res.products.map((data)=>{
                         sales.push(data)
                     })
-            })
-           const res1=Object.entries(Object.groupBy(sales, s=>s.item_name))
-           const res2=res1.map((m_res)=>{
-                       return m_res[1].reduce((accu, cur)=>{
-                            const item= {
-                                item_name : accu.item_name,
-                                code_no: accu.code_no,
-                                sale_qty: accu.sale_qty + cur.sale_qty,
-                                sale_price: Math.floor((accu.sale_price + cur.sale_price) /2),
-                                sale_amount: accu.sale_amount + cur.sale_amount,
-                                item_per_package: accu.item_per_package,
-                                pur_price:Math.floor((accu.pur_price + cur.pur_price) /2),     
-                                              
-                            }                              
-                            return item;                     
-                        })
-                       
+            })          
+            const res1=Object.entries(gb.gb_item_name_sale_price(sales))   
+          // const res1=Object.entries(Object.groupBy(sales, s=>s.item_name))
+           const res2=res1.map((res)=>{
+                let item={
+                    item_name: res[0],
+                    sale_qty : 0,
+                    code_no:"",
+                    sale_price:0,
+                    pur_price:0,
+                    sale_amount:0,
+                    pur_amount:0,
+                    profit: 0,
+                    item_per_package:0
+                }                
+                res[1].map((ren)=>{
+                    item.item_per_package=ren.item_per_package;
+                    item.sale_qty += ren.sale_qty;
+                    item.code_no=ren.code_no;
+                    item.sale_price=ren.sale_price;
+                    item.pur_price=ren.pur_price;
+                    item.pur_amount +=ren.pur_price * ren.sale_qty;
+                    item.sale_amount += ren.sale_amount;
+                    item.profit += ren.sale_amount - (ren.pur_price * ren.sale_qty);
                 })
-                const res3=res2.map((res)=>{
-                    return {
-                        ...res,
-                        pur_amount : res.pur_price * res.sale_qty,
-                        item_profit : res.sale_amount - (res.pur_price * res.sale_qty)
-                    }
+                return item;
+           }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)
+
+                let sale_amount=0;
+                let pur_amount=0;
+                let profit_amount=0;
+                res2.map((res)=>{
+                    sale_amount += res.sale_amount;
+                    pur_amount += res.pur_amount;
+                    profit_amount += res.profit;
                 })
-              const grand_total=res3.reduce((accu, cur)=>accu + cur.sale_amount, 0)
-              const pur_total=res3.reduce((accu, cur)=>accu + cur.pur_amount, 0 )
-              this.grand_total=grand_total;
-              this.pur_total=pur_total;
-              this.net_profit=grand_total - pur_total;
-              this.reports=res3;
+                this.sale_amount=sale_amount;
+                this.pur_amount=pur_amount;
+                this.profit_amount=profit_amount;
+
+              this.reports=[...res2];
         
         },
-        showTime(t){
-            const date=t.toDate()
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-            return formattedDate;
-        },
+       
         async fetchSales(){
             const from_date=Timestamp.fromDate(new Date(this.fromDate))
             const to_date=Timestamp.fromDate(new Date(this.toDate))
            let query_url="";
             if(this.customer_code){
-            query_url = query(collection(db, "sales"), where("uid", "==", this.user.uid), 
+            query_url = query(collection(db, "sales"),  
             where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), where("customer.code", "==", Number(this.customer_code)), orderBy("sale_date", "desc"));
            }else{
-             query_url = query(collection(db, "sales"), where("uid", "==", this.user.uid), 
+             query_url = query(collection(db, "sales"),  
             where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date", "desc"));
            }
             const shapShot=await getDocs(query_url)
@@ -212,9 +209,8 @@ export default {
                     refunds: doc.data().refunds,
                     total_amount:doc.data().total_amount,
                     sale_type: doc.data().sale_type,
-                    customer : doc.data().customer,   
-                        
-                };               
+                    customer : doc.data().customer,                       
+                };   
                                 
                 saleItems.push(sale);      
             });

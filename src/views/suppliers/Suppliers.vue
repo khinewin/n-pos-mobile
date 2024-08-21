@@ -3,7 +3,7 @@
            <PageHeader page-title="Suppliers" page-code="suppliers" :msg-type="msg.type" :msg-info="msg.info"/>
            <div class="container-fluid my-2">
                <div class="row mb-2 justify-content-end">                            
-                <div class="col-lg-2 d-grid">
+                <div class="col-sm-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveSupplier">
                         <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
@@ -12,22 +12,24 @@
                </div>
            </div>
            <div class="container-fluid my-2">
-               <div class="row gx-2">
+               <div class="row g-2">
                    <div class="col-lg-3">
                       <div class="card shadow">
                         <div class="card-body p-2">
-                            <div class="form-floating col-12 mb-2">
-                                <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchSuppliers" placeholder="Code" class="form-control form-control-sm">
-                                <label for="search_by_code" class="small ms-2">Code</label>
+                            <div class="row g-2">
+                                <div class="form-floating col-sm-4 col-lg-12">
+                                    <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchSuppliers" placeholder="Code" class="form-control form-control-sm">
+                                    <label for="search_by_code" class="small">Code</label>
+                                </div>
+                                <div class="form-floating col-sm-4 col-lg-12">
+                                    <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchSuppliers" placeholder="Description" class="form-control form-control-sm">
+                                    <label for="search_by_name" class="small">Name</label>
+                                </div> 
+                                <div class="form-floating col-sm-4 col-lg-12">
+                                    <input type="search" id="search_by_company" v-model="search_by_company" @keyup="searchSuppliers" placeholder="Company" class="form-control form-control-sm">
+                                    <label for="search_by_company" class="small">Company</label>
+                                 </div> 
                             </div>
-                            <div class="form-floating col-12 mb-2">
-                                <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchSuppliers" placeholder="Description" class="form-control form-control-sm">
-                                <label for="search_by_name" class="small ms-2">Name</label>
-                            </div> 
-                            <div class="form-floating col-12 mb-2">
-                             <input type="search" id="search_by_company" v-model="search_by_company" @keyup="searchSuppliers" placeholder="Company" class="form-control form-control-sm">
-                             <label for="search_by_company" class="small ms-2">Company</label>
-                         </div> 
                              <div class="row">
                                     <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="searchSuppliers"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
                                     <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
@@ -42,7 +44,7 @@
                        <div class="card shadow">
                            <div class="card-body p-2 table-responsive">
                                <table class="table table-bordered table-hover mb-0">
-                                   <tbody class="small">
+                                   <tbody class="">
                                        <tr class="text-center table-secondary" style="cursor: context-menu;">
                                            <td colspan="2" @click="sortSuppliers('code')"><i class="fa-solid fa-sort"></i> Code</td>
                                            <td @click="sortSuppliers('name')"><i class="fa-solid fa-sort"></i> Name</td>
@@ -72,19 +74,19 @@
                                             <td>
                                                 <a class="text-danger" href="#!" @click="removeSupplier(i, p)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                             </td>
-                                           <td :class="{'table-secondary': sort_item ==='code'}" >
+                                           <td :class="{'table-secondary': sort_item ==='code'}" class="pt-2">
                                                 {{p.code}}
                                             </td>
-                                           <td :class="{'table-secondary': sort_item ==='name'}">
+                                           <td :class="{'table-secondary': sort_item ==='name'}" class="p-0">
                                                 <input type="text" class="form-control-plaintext text-center m-0" v-model="p.name">
                                            </td>
-                                           <td :class="{'table-secondary': sort_item ==='phone'}">
+                                           <td :class="{'table-secondary': sort_item ==='phone'}" class="p-0">
                                             <input type="text" class="form-control-plaintext text-center  m-0" v-model="p.phone">
                                            </td>
-                                           <td :class="{'table-secondary': sort_item ==='company'}">
+                                           <td :class="{'table-secondary': sort_item ==='company'}" class="p-0">
                                             <input type="text" class="form-control-plaintext text-center m-0" v-model="p.company">
                                            </td>
-                                           <td :class="{'table-secondary': sort_item ==='created_at'}">{{showTime(p.created_at)}}</td>
+                                           <td :class="{'table-secondary': sort_item ==='created_at'}" class="pt-2">{{showTime(p.created_at)}}</td>
                                        </tr>
                                    </tbody>
                                </table>
@@ -111,6 +113,8 @@
 import { required, email ,helpers} from '@vuelidate/validators'
    import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
    import db from '@/firebase/firestore'
+   import * as lib from '@/lib/snapshot/suppliers'
+   import * as hp from '@/lib//helper'
    export default {
        components: {
                PageHeader
@@ -272,7 +276,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                this.suppliers=[];
                this.sort_item=sort;
                if(this.sortBy=="asc"){
-                   this.sortBy="desc"
+                   this.sortBy="desc"                   
                    this.suppliers=this.suppliersData.sort((a,b)=>{
                        const item_a=a.name.toUpperCase();
                        const item_b=b.name.toUpperCase();
@@ -299,7 +303,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                        }
                    })
                }else{
-                   this.sortBy="asc"
+                   this.sortBy="asc"                  
                    this.suppliers=this.suppliersData.sort((a,b)=>{
                        const item_a=a.name.toUpperCase();
                        const item_b=b.name.toUpperCase();
@@ -324,12 +328,13 @@ import { required, email ,helpers} from '@vuelidate/validators'
                               return  date_a + date_b;
                            break;
                        }
-                   })
+                     })
+                       
                }            
            },
            
            async fetchSuppliers(){                    
-               const query_url = query(collection(db, "suppliers"), where("uid", "==", this.user.uid), orderBy("created_at", "desc"));
+               const query_url = query(collection(db, "suppliers"), orderBy("created_at", "desc"));
                const snapShot=await getDocs(query_url)           
                if(snapShot._snapshot.docChanges.length <=0){
                    this.msg.type='error' 
@@ -338,22 +343,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                    this.isUpdating=false;
                    return false;
                }
-   
-               let suppliers=[];
-               snapShot && snapShot.forEach((doc) => {         
-                   let product = {
-                       id: doc.id,
-                       uid: doc.data().uid,
-                       name: doc.data().name,
-                       purchase_price : doc.data().purchase_price,
-                       company : doc.data().company,
-                       created_at: doc.data().created_at,
-                       phone : doc.data().phone,
-                       code : doc.data().code,                                
-                   };                                
-                   suppliers.push(product);                           
-                               
-               });
+               const suppliers=lib.suppliers(snapShot);   
                this.suppliers=[];
                this.suppliersData=suppliers;
                this.suppliers=suppliers;
@@ -362,11 +352,8 @@ import { required, email ,helpers} from '@vuelidate/validators'
               // this.$store.dispatch("setsuppliers", this.suppliers)
           } ,
           showTime(t){
-            const date=t.toDate()
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-            return formattedDate;
-        }
+            return hp.showTime(t)
+         }
        },
        
    }

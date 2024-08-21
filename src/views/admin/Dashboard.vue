@@ -1,91 +1,71 @@
 <template lang="">        
-
     <div>           
         <PageHeader page-title="Dashboard" page-code="dashboard"/>
-    </div>   
- 
+        <div class="container-fluid my-2">
+            <div class="row mb-2">
+                <div class="col-12">
+                    <div class="card shadow border-0 border-bottom border-3 border-primary">
+                        <div class="card-body">
+                                <div class="row">
+                                    <div class="col-3 text-center h1"><i class="fa-solid fa-user-check"></i></div>
+                                    <div class="col-9">
+                                        <div class="small fw-lighter mb-2">Welcome</div>
+                                        <div class="card-text" v-if="user !==null">{{user.email}}</div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           <SalesSession />
+           <PurchaseSession />
+           <div class="row g-1 mt-2">           
+            <div class="col-sm-2 col-lg-2 d-grid">
+                <router-link class="btn" :to="{name : 'Sale'}" ><i class="fa-solid fa-cash-register"></i> Sale</router-link>
+            </div>
+            <div class="col-sm-2 col-lg-2 d-grid">
+                <router-link class="btn" :to="{name : 'Purchase'}"><i class="fa-solid fa-cart-shopping"></i> Purchase</router-link>
+            </div>
+            <div class="col-sm-2 col-lg-2 d-grid">
+                <router-link class="btn" :to="{name : 'OpeningStocks'}"><i class="fa-solid fa-money-bill-trend-up"></i> Stocks</router-link>
+            </div>
+            <div class="col-sm-2 col-lg-2 d-grid">
+                <router-link class="btn" :to="{name : 'Suppliers'}"><i class="fa-solid fa-person-walking-luggage"></i> Suppliers</router-link>
+            </div>
+            <div class="col-sm-2 col-lg-2 d-grid">
+                <router-link class="btn" :to="{name : 'Customers'}"><i class="fa-solid fa-users"></i> Customers</router-link>
+            </div>
+            <div class="col-sm-2 col-lg-2  d-grid">
+                <router-link :to="{name: 'Reports'}" class="btn"><i class="fa-solid fa-chart-pie"></i> Reports</router-link>
+            </div>
+           </div>
+           <div class="row mt-2 g-2">
+            <div class="col-lg-6">
+                <SalesChart />
+            </div>
+            <div class="col-lg-6">
+                <PurchaseChart />
+            </div>
+           </div>
+        </div>
+    </div>    
 </template>
 <script>
 import PageHeader from "@/views/partials/PageHeader.vue"
-export default {
-    components: {
-        PageHeader
-    },
-    computed:{
-        user(){
-            return this.$store.getters.user;
-        }
-    },
-    methods:{
-        /*
-        async getSalesHistory(){
-            const query_url = query(collection(db, "products"), where("uid", "==", this.user.uid));
-            const snapShot=await getDocs(query_url)
-            let sales_history=[];
-            snapShot.forEach((doc) => {         
-              doc.data().history.sales.map((res)=>{
-                    sales_history.push(res)
-              })                            
-                            
-            });
-          
-            console.log(sales_history)
-            
-        },
-       async getProducts(){
-        const query_url = query(collection(db, "products"), where("uid", "==", this.user.uid));
-        const snapShot=await getDocs(query_url)
-        let products=[];
-        snapShot.forEach((doc) => {         
-            let product = {
-                                id: doc.id,
-                                uid: doc.data().uid,
-                                item_name: doc.data().name,
-                                regular_sale_price : doc.data().regular_sale_price,
-                                whole_sale_price: doc.data().whole_sale_price,
-                                qty : doc.data().qty,
-                                created_at : doc.data().created_at,
-                                code_no : doc.data().code_no,
-                            };
-                            products.push(product);                             
-                        
-         });
-         console.log(products)
-       } ,
+import SalesSession from "@/views/admin/SalesSession.vue"
+import PurchaseSession from "@/views/admin/PurchaseSession.vue"
+import SalesChart from "@/views/admin/SalesChart.vue"
+import PurchaseChart from "@/views/admin/PurchaseChart.vue"
 
-       async saveProduct(){       
-            const save_time=Timestamp.fromDate(new Date());
-            const dataCollection=collection(db, "products", )
-            const code_no=this.code_no ? this.code_no : new Date().getTime()
-            const data={
-                uid: this.user.uid,
-                item_name: "Yum Yum kw", 
-                code_no : code_no,
-                packing_format: 10,
-                qty : 35,
-                regular_sale_price: 2000,
-                whole_sale_price: 1900,
-                created_at : save_time,
-                history : {
-                    purchase : [
-                        { qty : 50, pur_price: 1500, pur_date:  save_time, item_name : "Yum Yum kw", code_no : code_no }
-                    ],
-                    sales:[
-                        { qty : 5, whole_sale_price: 1900, sale_date:  save_time, item_name : "Yum Yum kw", code_no : code_no},
-                        { qty : 10, regular_sale_price: 2000, sale_date:  save_time, item_name : "Yum Yum kw", code_no : code_no}
-                    ]
-                }
+ export default{
+     components:{
+        SalesSession,PageHeader,PurchaseSession,SalesChart, PurchaseChart
+     },
+     computed:{
+            user(){
+                return this.$store.getters.user ? this.$store.getters.user : null;
             }
-            const result=await addDoc(dataCollection, data);
-            if(result){
-                console.log("success")
-            }else{
-                console.log("failed")
-            }
-               
-        }
-            */
-    }
+        },
 }
 </script>
 <style lang="">

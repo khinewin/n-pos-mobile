@@ -1,105 +1,116 @@
 <template lang="">
-    <div class="container" id="printMe">
-        <div class="row justify-content-end">           
-            <div class="col-lg-12">
-                <table class="table mb-0 table-borderless">
-                    <tbody class="small">  
-                        <tr>
-                            <td class="text-end col-10 p-0">Voucher no. :</td>
-                            <td class="col-2 p-0 ps-2">
-                                {{sale.voucher_no}}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="text-end p-0">Date :</td>
-                            <td class="p-0 ps-2">
-                                {{showTime(sale.sale_date)}}
-                            </td>
-                        </tr>                                          
-                        <tr>
-                            <td class="text-end p-0">Name :</td>
-                            <td class="p-0 ps-2">
-                                {{sale.customer.name}}
-                            </td>
-                        </tr>      
-                        <tr>
-                            <td class="text-end p-0">Phone :</td>
-                            <td class="p-0 ps-2">
-                                {{sale.customer.phone}}
-                            </td>
-                        </tr>                                               
-                    </tbody>
-              </table>
+    <div class="container-fluid px-4">
+        <div class="row">
+            <div class="col-12">
+                   <h4 class="text-center"> Printing with N-POS</h4>
             </div>
-            <table class="table table-bordered table-hover border-dark">
+        </div>
+    <div class="row justify-content-end small" >   
+        <div class="col-6">
+            <table class="table mb-0 table-borderless">
+                <tbody class="small">  
+                    <tr>
+                        <td class="col-4 pb-0 fw-bold">Voucher no. <span class="float-end">:</span></td>
+                        <td class="col-8  ps-2 pb-0" style="border-bottom: 1px dotted;">
+                            {{data.voucher_no}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="pb-0 fw-bold">Date <span class="float-end">:</span></td>
+                        <td class=" ps-2 pb-0" style="border-bottom: 1px dotted;">
+                           <span>{{showPrintTime(data.sale_date)}}</span>
+                        </td>
+                    </tr>       
+                </tbody>
+            </table>
+        </div>        
+        <div class="col-6">                    
+            <table class="table mb-0 table-borderless">
+                <tbody class="small">                                     
+                    <tr>
+                        <td class="  col-4 pb-0 fw-bold">Name <span class="float-end">:</span></td>
+                        <td class=" ps-2 col-8 pb-0" style="border-bottom: 1px dotted;">
+                            {{data.customer.name}}
+                        </td>
+                    </tr>      
+                    <tr>
+                        <td class="pb-0 fw-bold">Phone <span class="float-end">:</span></td>
+                        <td class=" ps-2 pb-0" style="border-bottom: 1px dotted;">
+                            {{data.customer.phone}}
+                        </td>
+                    </tr>                                               
+                </tbody>
+          </table>
+        </div>
+        <div class="col-12">
+            <table class="table table-bordered table-hover border-dark mt-2 mb-0">
                 <tbody class="small">
                     <tr class="text-center fw-bold">
-                        <td class="col-3 p-0 py-1">Description</td>
-                        <td class="col-2  p-0 py-1">Qty</td>
-                        <td class="col-2  p-0 py-1">Price</td>
-                        <td class="col-2  p-0 py-1">Amount</td>
+                        <td class="col-1">No.</td>
+                        <td class="col-8">Description</td>
+                        <td class="col-1">Qty</td>
+                        <td class="col-1">Price</td>
+                        <td class="col-1">Amount</td>
                     </tr>
-                    <tr class="text-center" v-if="sale.saleItems.length > 0" v-for="(s, i) in sale.saleItems" :key="s.id" >                        
-                        <td class=" p-0 py-1">{{s.item_name}}</td>
-                        <td class=" p-0 py-1">
-                            {{s.qty}}
+                    <tr class="" v-if="data.saleItems.length > 0" v-for="(s, i) in data.saleItems" :key="s.id" >   
+                        <td class="text-center">{{i+1}}</td>                     
+                        <td class="">{{s.item_name}}</td>
+                        <td class="text-center">
+                            {{s.sale_qty}}
                         </td>
-                        <td class=" p-0 py-1">{{s.sale_price}}</td>
-                        <td class=" p-0 py-1">{{s.sale_amount}}</td>
-                    </tr>  
+                        <td class="text-end">{{s.sale_price}}</td>
+                        <td class="text-end">{{s.sale_amount}}</td>
+                    </tr>                        
+              
                     <tr>
-                        <td colspan="3 py-1" class="text-end  p-0 py-1 pe-2">Total amount</td>
-                        <td class="text-center  p-0 py-1">{{sale.total_amount}}</td>
+                        <td colspan="4" class="text-end col-6 pe-2 " style="border-bottom-style: hidden;">Total amount</td>
+                        <td class="text-end col-6">{{data.total_amount}}</td>
                     </tr>                     
                     <tr>
-                        <td colspan="3 py-1" class="text-end  p-0 py-1  pe-2" >Discount</td>
-                        <td class="text-center  p-0 py-1">
-                            {{sale.discount}}
+                        <td colspan="4" class="text-end pe-2 " style="border-bottom-style: hidden;">Discount</td>
+                        <td class="text-end">
+                            {{data.discount}}
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="3" class="text-end  p-0 py-1  pe-2">Charges</td>
-                        <td class="text-center  p-0 py-1">{{sale.charges}}</td>
+                        <td colspan="4" class="text-end pe-2 " style="border-bottom-style: hidden;">Charges</td>
+                        <td class="text-end">{{data.charges}}</td>
                     </tr>
                     <tr >
-                        <td colspan="3" class="text-end  p-0 py-1  pe-2">Pay</td>
-                        <td class="text-center  p-0 py-1">
-                            {{sale.pay}}
+                        <td colspan="4" class="text-end  pe-2 " style="border-bottom-style: hidden;">Pay</td>
+                        <td class="text-end">
+                            {{data.pay}}
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="3" class="text-end  p-0 py-1  pe-2">Refunds</td>
-                        <td class="text-center  p-0 py-1">
-                            {{sale.refunds}}
+                        <td colspan="4" class="text-end  pe-2 " >Refunds</td>
+                        <td class="text-end ">
+                            {{data.refunds}}
                         </td>
+                    </tr>                           
+                </tbody>
+          </table>
+          <table>
+                <tbody>
+                    <tr>
+                        <td></td>
                     </tr>
                 </tbody>
           </table>
         </div>
+      
     </div>
+</div>
 </template>
 <script>
+import {Timestamp, collection, addDoc, doc, increment,  updateDoc} from 'firebase/firestore'
+
 export default {
-    data () {
-    return {
-      output: null
-    }
-  },
-    mounted() {
-        this.print();
-    },
-    computed:{
-        sale(){
-            return this.$store.getters.printSale;
-        }
-    },
+    props: ['data'],
     methods:{
-        async print () {
-        // Pass the element id here
-        await this.$htmlToPaper('printMe');
-        },
-        showTime(t){
-            const date=t.toDate()
+        showPrintTime(t){
+            const newT=Timestamp.fromDate(new Date(t))
+            const date=newT.toDate()
             const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
             const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
             return formattedDate;

@@ -96,24 +96,22 @@
 <script>
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
-
+import * as hp from "@/lib/helper.js"
+import * as ss from "@/lib/snapshot/purchases"
 export default {
     props:['fromDate', 'toDate', 'voucher_no', 'supplier'],
     components: {
     },
   
     data(){
-        return{       
-           
+        return{                 
             reports:[],
-          //  current_month:[],
             purchaseData:[],
             isLoading:false,
             msg : {
                 type :"",
                 info :"",
-            },        
-
+            },       
         }
     },
    
@@ -162,46 +160,27 @@ export default {
         },   
       
         showTime(t){
-            const date=t.toDate()
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-            return formattedDate;
+           return hp.showTime(t)
         },
         async fetchPurchase(){
             const from_date=Timestamp.fromDate(new Date(this.fromDate))
             const to_date=Timestamp.fromDate(new Date(this.toDate))
-           // console.log(from_date, to_date)
            let query_url="";
            if(this.voucher_no){
-             query_url = query(collection(db, "purchases"), where("uid", "==", this.user.uid), 
+             query_url = query(collection(db, "purchases"), 
             where("voucher_no", "==", Number(this.voucher_no)));
            }else if(this.supplier){
-            query_url = query(collection(db, "purchases"), where("uid", "==", this.user.uid), 
+            query_url = query(collection(db, "purchases"), 
             where("supplier.code", "==", Number(this.supplier)));
            }else{
-             query_url = query(collection(db, "purchases"), where("uid", "==", this.user.uid), 
+             query_url = query(collection(db, "purchases"), 
             where("pur_date", ">=", from_date), where("pur_date", "<=", to_date), orderBy("pur_date", "desc"));
            }           
-            const shapShot=await getDocs(query_url)
-            let purchaseItems=[];
-            shapShot.forEach((doc) => {         
-                let pur = {
-                    id: doc.id,
-                    uid: doc.data().uid,
-                    voucher_no: doc.data().voucher_no,
-                    products : doc.data().products,
-                    pur_date:doc.data().pur_date,
-                    supplier: doc.data().supplier,                
-                    total_discount: doc.data().total_discount,
-                    total_amount:doc.data().total_amount,
-                    total_price: doc.data().total_price,
-                    extra_discount: doc.data().extra_discount,
-                };               
-                                
-                purchaseItems.push(pur);      
-            });
-        this.reports=purchaseItems;
-        this.isLoading=false;
+            const snapShot=await getDocs(query_url)
+            const purchaseItems=ss.purchases(snapShot);
+           
+            this.reports=purchaseItems;
+            this.isLoading=false;
         }
     }
 }

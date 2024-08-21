@@ -5,54 +5,69 @@
           <div class="modal-content">               
             <div>
                 <div class="card min-vh-100">
-                    <div class="card-body">                                             
-                        <div class="row">
+                    <div class="card-body p-2">                                             
+                        <div class="row g-1">
                             <div class="col-lg-4">
-                                <div class="row g-1 m-2">
-                                    <div class="mb-2">
-                                            <input type="number" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control">
+                                <div class="card  shadow">
+                                    <div class="card-body p-2 small">
+                                        <div class="row g-1">
+                                            <div class="col-md-6 col-lg-12">
+                                                <div class="form-floating">
+                                                    <input type="number" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control form-control-sm">
+                                                    <label for="search_by_code" class="small">Code</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-lg-12">
+                                                <div class="form-floating">
+                                                    <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Description" class="form-control form-control-sm">
+                                                    <label for="search_by_item_name" class="small">Description</label>
+                                                </div> 
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-4 d-grid">
+                                                <button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
+                                            </div>
+                                            <div class="col-4 d-grid">
+                                                <button class="btn btn-sm text-dark" @click="updateProducts">
+                                                    <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
+                                                    <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
+                                                </button>
+                                            </div>
+                                            <div class="col-4 d-grid">
+                                                <button class="btn btn-sm text-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                                            </div>
+                                        </div>   
                                     </div>
-                                    <div class="mb-2">
-                                            <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Description" class="form-control">
-                                    </div> 
-                                </div>                                  
-                                <div class="row">
-                                    <div class="col-4">
-                                        <button class="btn text-dark" @click="clearSearch">Clear</button>
-                                    </div>
-                                    <div class="col-4">
-                                        <button class="btn text-primary" @click="updateProducts">Update
-                                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
-                                        </button>
-                                    </div>
-                                    <div class="col-4">
-                                        <button class="btn text-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                                    </div>
-                                </div>                                   
+                                </div>                                
                             </div>
                             <div class="col-lg-8 table-responsive">
-                                <table class="table table-bordered table-hover">
-                                    <tbody class="small text-center">
-                                        <tr class="table-secondary text-center">
-                                            <td>Code</td>
-                                            <td>Description</td>
-                                            <td colspan="2">Qty</td>
-                                            <td>Created date</td>
-                                        </tr>                                      
-                                        <tr class="text-center" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"   style="cursor:context-menu">
-                                            <td>{{p.code_no}}</td>
-                                            <td>{{p.item_name}}</td>
-                                            <td>{{p.qty}}</td>
-                                            <td>{{Math.floor(p.qty % p.item_per_package)}} x {{Math.floor(p.qty / p.item_per_package)}}</td>
-                                            <td>{{showTime(p.created_at)}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <div v-if="isLoading">
-                                    <div colspan="5">
-                                        <div class="d-flex justify-content-center my-5">
-                                            <div class="spinner-border text-primary"  role="status">
-                                              <span class="visually-hidden">Loading...</span>
+                                <div class="card shadow">
+                                    <div class="card-body p-2">
+                                        <table class="table table-bordered mb-0 table-hover">
+                                            <tbody class="small">
+                                                <tr class="table-secondary text-center">
+                                                    <td>Code</td>
+                                                    <td>Description</td>
+                                                    <td colspan="2">Qty</td>
+                                                    <td>Created date</td>
+                                                </tr>                                      
+                                                <tr class="" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"   style="cursor:context-menu">
+                                                    <td class="text-center">{{p.code_no}}</td>
+                                                    <td>{{p.item_name}}</td>
+                                                    <td class="text-center">{{p.qty}}</td>
+                                                    <td class="text-center">{{Math.floor(p.qty % p.item_per_package)}} x {{Math.floor(p.qty / p.item_per_package)}}</td>
+                                                    <td class="text-center">{{showTime(p.created_at)}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div v-if="isLoading">
+                                            <div colspan="5">
+                                                <div class="d-flex justify-content-center my-5">
+                                                    <div class="spinner-border text-primary"  role="status">
+                                                      <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -69,38 +84,29 @@
       <!--end modal-->
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query} from 'firebase/firestore'
+import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
-export default {
-   
+import * as lib from "@/lib/snapshot/products"
+import * as hp  from "@/lib/helper"
+export default {   
     props:['storePurchase'],
     data(){
         return{
             products:[],
             productsData: [],
-
             search_by_code:"",
             search_by_item_name:"",
             isUpdating:false,
-
             isLoading:false,
         }
-    },
-   
+    },   
     mounted() {
         const myModalEl = document.getElementById('searchCode')
         myModalEl.addEventListener('show.bs.modal', event => {
                 const search_by_code=document.getElementById("search_by_code");
                 setTimeout(()=>{
                     search_by_code.focus();
-                }, 500)
-                /*
-               if(this.storePurchase.length <=0){
-                    this.products=[]
-                    this.fetchProducts();
-                 }  
-                    */
-                     
+                }, 500)              
         })
     },
     created(){
@@ -108,8 +114,7 @@ export default {
                 this.isLoading=true; 
                 this.fetchProducts();                 
         }
-    },
-   
+    },   
     computed:{
         user(){
             return this.$store.getters.user;
@@ -174,35 +179,18 @@ export default {
                         return f.item_name.toLowerCase().includes(this.search_by_item_name.toLowerCase())
                 })
             }else{
-                    this.products= this.productsData.filter((p, i)=>{
-                            if(i < 20){
-                                return p;
-                            }
-                        })                                     
+                this.products= this.productsData.filter((p, i)=>{
+                    if(i < 20){
+                        return p;
+                     }
+                 })                                                         
             }
         },
       
         async fetchProducts(){
-        const query_url = query(collection(db, "products"), where("uid", "==", this.user.uid));
+        const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
         const snapShot=await getDocs(query_url)
-        let products=[];
-        snapShot.forEach((doc) => {         
-            let product = {
-                id: doc.id,
-                uid: doc.data().uid,
-                item_name: doc.data().item_name,
-                retail_price : doc.data().retail_price,
-                whole_sale_price: doc.data().whole_sale_price,
-                pur_price:doc.data().pur_price,
-                qty : doc.data().qty,
-                created_at : doc.data().created_at,
-                code_no : doc.data().code_no,           
-                item_per_package: doc.data().item_per_package, 
-                          
-            };                                
-            products.push(product);      
-                        
-        });
+        const products=lib.products(snapShot)       
         this.productsData=products;
         this.$store.dispatch("setProducts", products)
         this.isLoading=false;
@@ -210,10 +198,7 @@ export default {
         this.searchProducts();
        } ,
        showTime(t){
-            const date=t.toDate()
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-            return formattedDate;
+            return hp.showTime(t)
         },
     }
     

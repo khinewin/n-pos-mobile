@@ -2,7 +2,10 @@
     <div>           
         <PageHeader page-title="Stocks" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid my-2">
-            <div class="row mb-2 justify-content-end">                
+            <div class="row mb-2 justify-content-end">
+                <div class="col-sm-2 d-grid">
+                    <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print</button>
+                </div>                
                 <div class="col-sm-2 d-grid">
                         <button @click="goEdit" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
                 </div>
@@ -16,11 +19,11 @@
                         <button @click="closeOpeningStock" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                 </div>
             </div>
-            <div class="card shadow">
+            <div class="card shadow" id="printMe">
                 <div class="card-body p-2">
                     <form @submit.prevent="saveStocks">
                         <div class="row justify-content-end mb-2">
-                            <div class="col-lg-4">
+                            <div class="col-sm-6 col-lg-4">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
@@ -42,7 +45,7 @@
                         </div>
                         <table class="table table-bordered mb-0  table-hover">
                             <tbody>
-                                <tr class="small text-center fw-bold table-secondary">
+                                <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
                                     <td class="col-2">Desc</td>
                                     <td class="col-1" colspan="2">Qty</td>                                   
@@ -53,46 +56,44 @@
                                     <td class="col-1">Pur price</td>
                                     <td class="col-1">Pur amount</td>
                                 </tr>
-                                <tr class="small text-center"v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id">
-                                    <td class="">
-                                        <div class="">
+                                <tr class=""v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id">
+                                    <td class="text-center">
                                             {{st.code_no}}                                           
-                                        </div>                                    
                                     </td>
-                                    <td class="">{{st.item_name}}</td>
-                                    <td class="">                                      
+                                    <td class="text-center">{{st.item_name}}</td>
+                                    <td class="text-center">                                      
                                          <span>{{st.qty}}</span>
                                     </td>
-                                    <td class="">
-                                        {{Math.floor(st.qty / st.item_per_package)}} x   {{Math.floor(st.qty % st.item_per_package)}}
+                                    <td class="text-center">
+                                        {{Math.floor(st.qty / st.item_per_package)}} x {{Math.floor(st.qty % st.item_per_package)}}
                                     </td>
-                                    <td class="">                                      
+                                    <td class="text-end">                                      
                                          <span>{{st.retail_price}}</span>
                                     </td>
-                                    <td class="">                                      
+                                    <td class="text-end">                                      
                                         <span>{{st.retail_amount}}</span>
                                    </td>
-                                    <td class="">                                      
+                                    <td class="text-end">                                      
                                          <span>{{st.whole_sale_price}}</span>
                                     </td>
-                                    <td class="">                                      
+                                    <td class="text-end">                                      
                                         <span>{{st.whole_sale_amount}}</span>
                                    </td>
-                                   <td class="">                                      
+                                   <td class="text-end">                                      
                                     <span>{{st.pur_price}}</span>
                                </td>
-                               <td class="">                                      
+                               <td class="text-end">                                      
                                    <span>{{st.pur_amount}}</span>
                               </td>
                                  
                                 </tr>
                                 <tr class="small">
                                     <td colspan="5" class="text-end fw-bold">Total</td>
-                                    <td class="text-center">{{total_retail_amount}}</td>
+                                    <td class="text-end">{{total_retail_amount}}</td>
                                     <td class="text-end fw-bold">Total</td>
-                                    <td class="text-center">{{total_whole_sale_amount}}</td>
+                                    <td class="text-end">{{total_whole_sale_amount}}</td>
                                     <td class="text-end fw-bold">Total</td>
-                                    <td class="text-center">{{total_pur_amount}}</td>
+                                    <td class="text-end">{{total_pur_amount}}</td>
                                 </tr>                                                                                         
                             </tbody>
                         </table>                                                                                                                    
@@ -112,6 +113,8 @@ import { required, email ,helpers} from '@vuelidate/validators'
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query, increment} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import StocksModal from '@/views/modals/stocks/StocksModal.vue'
+import * as hp from "@/lib/helper.js"
+import * as ss from "@/lib/snapshot/stocks"
 export default {
     components: {
         PageHeader, StocksModal
@@ -160,7 +163,11 @@ export default {
       
     },
     
-    methods:{     
+    methods:{    
+        async print () {
+        // Pass the element id here
+         await this.$htmlToPaper('printMe');
+        }, 
         goEdit(){
             const stockItem={
                     id: this.id,
@@ -195,14 +202,10 @@ export default {
             this.total_retail_amount=p.total_retail_amount;
             this.total_whole_sale_amount=p.total_whole_sale_amount
             this.total_pur_amount=p.total_pur_amount
-        },
-     
+        },    
         
        showTime(t){
-            const date=t.toDate()
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-            return formattedDate;
+            return hp.showTime(t)
         },
                     
     }

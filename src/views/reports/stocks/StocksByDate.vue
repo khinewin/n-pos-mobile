@@ -4,44 +4,44 @@
         <div class="row">                 
             <div class="col-12">
                     <table class="table table-bordered border-dark table-hover">
-                        <tbody class="text-center small" v-if="reports.length > 0">                            
+                        <tbody class="" v-if="reports.length > 0">                            
                             <tr v-for="r in reports" :key="r[0]">
                                 <td class="col-1">{{r[0]}}</td>
                                 <td  class="p-0 col-11">
-                                    <table class="table table-bordered mb-0 border-dark table-hover">
-                                        <thead>
+                                    <table class="table table-bordered mb-0 border-dark table-hover" style="border-style: hidden;">
+                                        <thead class="text-center">
                                             <tr class="fw-bold">
-                                                <td style="border-bottom: 2px solid black;">Code</td>
-                                                <td style="border-bottom: 2px solid black;">Description</td>
-                                                <td style="border-bottom: 2px solid black;" colspan="2">Qty</td>
-                                                <td style="border-bottom: 2px solid black;">Retail price</td>
-                                                <td style="border-bottom: 2px solid black;">Wholesale price</td>
-                                                <td style="border-bottom: 2px solid black;">Pur price</td>
-                                                <td style="border-bottom: 2px solid black;">Retail amount</td>
-                                                <td style="border-bottom: 2px solid black;">Wholesale amount</td>
-                                                <td style="border-bottom: 2px solid black;">Pur amount</td>
+                                                <td>Code</td>
+                                                <td>Description</td>
+                                                <td colspan="2">Qty</td>
+                                                <td>RT price</td>
+                                                <td>WS price</td>
+                                                <td>Pur price</td>
+                                                <td>RT amount</td>
+                                                <td>WS amount</td>
+                                                <td>Pur amount</td>
                                             </tr>
                                         </thead>
                                         <tbody>                                            
                                             <tr v-for="item in r[1]" :key="item.code_no">
-                                                <td class="">{{item.code_no}}</td>
-                                                <td class="">{{item.item_name}}</td>
-                                                <td class="">{{item.qty}}</td>
-                                                <td class="">
+                                                <td class="col-1 text-center">{{item.code_no}}</td>
+                                                <td class="col-3">{{item.item_name}}</td>
+                                                <td class="col-1 text-center">{{item.qty}}</td>
+                                                <td class="col-1 text-center">
                                                     {{Math.floor(item.qty / item.item_per_package)}} x   {{Math.floor(item.qty % item.item_per_package)}}
                                                 </td>
-                                                <td class="">{{item.retail_price}}</td>
-                                                <td class="">{{item.whole_sale_price}}</td>
-                                                <td class="">{{item.pur_price}}</td>
-                                                <td class="">{{item.retail_amount}}</td>
-                                                <td class="">{{item.whole_sale_amount}}</td>
-                                                <td class="">{{item.pur_amount}}</td>
+                                                <td class="col-1 text-end">{{item.retail_price}}</td>
+                                                <td class="col-1 text-end">{{item.whole_sale_price}}</td>
+                                                <td class="col-1 text-end">{{item.pur_price}}</td>
+                                                <td class="col-1 text-end">{{item.retail_amount}}</td>
+                                                <td class="col-1 text-end">{{item.whole_sale_amount}}</td>
+                                                <td class="col-1 text-end">{{item.pur_amount}}</td>
                                             </tr>
                                             <tr>
                                                 <td colspan="7" class="text-end fw-bold">Total</td>
-                                                <td class="text-center">{{r[2].retail_amount}}</td>
-                                                <td class="text-center">{{r[2].whole_sale_amount}}</td>
-                                                <td class="text-center">{{r[2].pur_amount}}</td>
+                                                <td class="text-end">{{r[2].retail_amount}}</td>
+                                                <td class="text-end">{{r[2].whole_sale_amount}}</td>
+                                                <td class="text-end">{{r[2].pur_amount}}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -66,12 +66,12 @@
 <script>
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
-
+import * as hp from "@/lib/helper"
+import * as ss from "@/lib/snapshot/stocks"
 export default {
     props:['fromDate', 'toDate'],
     components: {
-    },
-  
+    },  
     data(){
         return{       
            
@@ -135,75 +135,51 @@ export default {
             let stocks=[]
             this.stocksData.map((res)=>{            
                     res.products.map((data)=>{
-                        stocks.push({...data, date_group : this.showTime(res.created_at)})
+                        stocks.push({...data, group_date : this.showTime(res.created_at)})
                     })
-            })
-            const gbd=Object.entries(Object.groupBy(stocks, res=>{
-                return res.date_group;
-            }))
-           const gbc=gbd.map((res)=>{
-                const res1=Object.entries(Object.groupBy(res[1], data=>{
-                        return data.item_name;
-                }))
-                const res2=res1.map((m_res)=>{
-                       return m_res[1].reduce((accu, cur)=>{
-                            return {
-                                item_name : accu.item_name,
-                                code_no: accu.code_no,
-                                item_per_package: accu.item_per_package,
-                                
-                                qty: accu.qty + cur.qty,
-                                pur_price: accu.pur_price + cur.pur_price,
-                                retail_price: accu.retail_price + cur.retail_price,
-                                whole_sale_price: accu.whole_sale_price,
-                                pur_amount : accu.pur_amount + cur.pur_amount,
-                                retail_amount : accu.retail_amount + cur.retail_amount,
-                                whole_sale_amount : accu.whole_sale_amount + cur.whole_sale_amount,
-                            }
-                        })
+            })             
+            const gbd=Object.entries(hp.gb_date(stocks))
+            const gbc=gbd.map((res)=>{
+                const res1=Object.entries(hp.gb_item_name_retail_price(res[1]))   
+                const res2=res1.map((ren)=>{
+                let item={item_name:ren[0], code_no:0, item_per_package:0, qty:0, pur_price:0, pur_amount:0, retail_price:0, retail_amount:0, whole_sale_price:0, whole_sale_amount:0}
+                ren[1].map((rep)=>{
+                    item.code_no=rep.code_no;
+                    item.item_per_package=rep.item_per_package;
+                    item.qty += rep.qty;
+                    item.pur_price =rep.pur_price;
+                    item.pur_amount +=rep.pur_amount;
+                    item.retail_price =rep.retail_price;
+                    item.retail_amount +=rep.retail_amount;
+                    item.whole_sale_price =rep.whole_sale_price;
+                    item.whole_sale_amount += rep.whole_sale_amount;
                 })
-                const res3=res2.reduce((accu, cur)=>{
-                    return {
-                        retail_amount : accu.retail_amount + cur.retail_amount,
-                        whole_sale_amount : accu.whole_sale_amount + cur.whole_sale_amount,
-                        pur_amount : accu.pur_amount + cur.pur_amount
-                    }
+                return item;
+                }).sort((a,b)=>a.code_no - b.code_no)
+                let res3={retail_amount:0, whole_sale_amount:0, pur_amount:0}
+                res2.map((res)=>{
+                    res3.retail_amount += res.retail_amount;
+                    res3.whole_sale_amount += res.whole_sale_amount;
+                    res3.pur_amount += res.pur_amount;
                 })
-                const newData=[res[0],  [...res2],res3]               
-                return newData;                             
-           })           
-           this.reports=gbc;
-        
+                const newData=[res[0],  [...res2],res3]   
+                return newData
+            })          
+           this.reports=gbc;        
         },
         showTime(t){
-            const date=t.toDate()
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-            return formattedDate;
+            return hp.showTime(t)
         },
         async fetchStocks(){
             const from_date=Timestamp.fromDate(new Date(this.fromDate))
             const to_date=Timestamp.fromDate(new Date(this.toDate))
-           // console.log(from_date, to_date)
-            const query_url = query(collection(db, "openingStocks"), where("uid", "==", this.user.uid), 
+            const query_url = query(collection(db, "openingStocks"), 
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
             const shapShot=await getDocs(query_url)
-            let stockItems=[];
-            shapShot.forEach((doc) => {         
-                let stock = {
-                    id: doc.id,
-                    uid: doc.data().uid,
-                    voucher_no: doc.data().voucher_no,
-                    created_at : doc.data().created_at,
-                    products : doc.data().products,   
-                       
-                };               
-                                
-                stockItems.push(stock);      
-            });
-        this.stocksData=stockItems;
-        this.displayReports();
-        this.isLoading=false;
+            const stockItems=ss.stocks(shapShot);           
+            this.stocksData=stockItems;
+            this.displayReports();
+            this.isLoading=false;
         }
     }
 }

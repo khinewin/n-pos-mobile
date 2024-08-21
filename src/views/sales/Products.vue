@@ -1,6 +1,5 @@
 <template lang="">
-    <!-- Products  -->
-  
+    <!-- Products  -->  
                <div class="card shadow">
                    <div class="card-body p-2">                                             
                         <div class="row gx-2 mb-2">
@@ -8,21 +7,22 @@
                                 <button class="btn text-dark btn-sm" @click="searchProducts"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button>
                             </div>
                             <div class="col-4 mb-2 d-grid">
-                                <button :disabled="isBtnLoading" class="btn text-dark btn-sm" @click="updateProducts"><i class="fa-solid fa-retweet"></i> Update   
+                                <button :disabled="isBtnLoading" class="btn text-dark btn-sm" @click="updateProducts">
+                                        <span v-if="!isBtnLoading"><i class="fa-solid fa-retweet"></i> Update   </span>
                                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isBtnLoading"></span>
                                 </button>
                             </div>                                       
                             <div class="col-4 mb-2 d-grid">
                                     <button class="btn btn-sm " @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
                             </div>                    
-                            <div class="mb-2 col-lg-6">
-                                    <input type="number" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control">
+                            <div class="mb-2 col-sm-6">
+                                    <input type="number" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control form-control-sm">
                             </div>
-                            <div class="mb-2 col-lg-6">
-                                    <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Description" class="form-control">
+                            <div class="mb-2 col-sm-6">
+                                    <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Description" class="form-control form-control-sm">
                             </div>                                                                                                                                           
                         </div>
-                          <div class="row my-5" v-if="isLoading">
+                          <div class="row" v-if="isLoading">
                             <div class="col-lg-12">
                                     <div class="d-flex justify-content-center ">
                                         <div class="spinner-border text-primary"  role="status">
@@ -52,21 +52,19 @@
 <script>
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
+import * as ss from "@/lib/snapshot/products"
 export default {  
     props:['saleItems'],
    data(){
        return{
            products:[],
            productsData: [],
-
            search_by_code:"",
            search_by_item_name:"",
-
            isLoading:false,
            isBtnLoading:false,
        }
-   },
-  
+   },  
    mounted() {
         const search_by_code=document.getElementById("search_by_code")
         search_by_code.focus();
@@ -76,16 +74,11 @@ export default {
                 this.isLoading=true;
                this.fetchProducts();                 
        }
-   },
-  
+   },  
    computed:{
        user(){
            return this.$store.getters.user;
-       },
-      /* storeProducts(){
-           return this.$store.getters.products;
-       }
-           */
+       },     
    },
    watch:{       
        user(data){
@@ -98,14 +91,13 @@ export default {
             handler(newVal){
                 if(Object.keys(newVal).length <=0){
                     setTimeout(()=>{
+                        this.isBtnLoading=true;
                         this.fetchProducts();
-                    }, 300)
+                    }, 1000)
                 }
             },
             deep: true,
-       },
-       
-     
+       },       
    },
    methods:{
        updateProducts(){
@@ -123,7 +115,6 @@ export default {
        },
        onPaste(){            
            setTimeout(()=>{
-               //this.searchProducts()  
                this.setCodeOnPaste();             
            }, 100)
        },
@@ -150,45 +141,18 @@ export default {
                            }
                     })                                     
            }
-       },
-     
+       },     
        async fetchProducts(){
-      // this.isLoading=true;    
-       const query_url = query(collection(db, "products"), where("uid", "==", this.user.uid));
+       const query_url = query(collection(db, "products"))
        const snapShot=await getDocs(query_url)
-       let products=[];
-       snapShot.forEach((doc) => {         
-           let product = {
-               id: doc.id,
-               uid: doc.data().uid,
-               item_name: doc.data().item_name,
-               retail_price : doc.data().retail_price,
-               whole_sale_price: doc.data().whole_sale_price,
-               qty : doc.data().qty,
-               created_at : doc.data().created_at,
-               code_no : doc.data().code_no,           
-               item_per_package: doc.data().item_per_package, 
-               pur_price: doc.data().pur_price,
-                         
-           };                                
-           products.push(product);      
-                       
-       });
+       const products=ss.products(snapShot);     
        this.products=[];
        this.productsData=products;
        this.products=products;
-       this.$store.dispatch("setProducts", products)
        this.isLoading=false;
        this.isBtnLoading=false;
-      } ,
-      showTime(t){
-           const date=t.toDate()
-           const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-           const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-           return formattedDate;
-       },
-   }
-   
+      } ,    
+   }   
 }
 </script>
 <style lang="">

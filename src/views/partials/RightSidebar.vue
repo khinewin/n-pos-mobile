@@ -8,7 +8,7 @@
           </div>
           <div class="offcanvas-body ">      
             <ul class="list-group small ">
-              <li class="list-group-item bg-secondary-subtle border-0">
+              <li class="list-group-item bg-secondary-subtle border-0" data-bs-dismiss="offcanvas" aria-label="Close">
                 <router-link class="nav-link" :to="{name : 'Profile'}"><i class="fa-solid fa-id-card-clip"></i> Profile</router-link>
               </li>
               <li class="list-group-item bg-secondary-subtle border-0" >

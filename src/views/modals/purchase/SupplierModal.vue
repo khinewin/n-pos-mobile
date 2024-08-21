@@ -1,193 +1,286 @@
 <template lang="">
     <!-- Products Modal -->
     <div class="modal fade" id="searchSupplier" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-       <div class="modal-dialog modal-lg">
-         <div class="modal-content">               
-           <div>
-               <div class="card min-vh-100">
-                   <div class="card-body p-0">
-                       
-                       <div class="row g-2 m-2">
-                           <div class="col-lg-5">
-                                   <input type="search" v-model="search_by_code" @keypress.enter="searchSupplier" placeholder="Code" class="form-control">
-                           </div>
-                           <div class="col-lg-5">
-                                   <input type="search" v-model="search_by_name" @keyup="searchSupplier" placeholder="Name" class="form-control">
-                           </div>
-                           <div class="col-lg-1">
-                               <button class="btn text-dark" @click="clearSearch">Clear</button>
-                           </div>
-                           <div class="col-lg-1">
-                               <button class="btn text-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                           </div>
-                       </div>
-                 
-                           <ul class="list-group list-group-flush">
-                                   <li class="list-group-item list-group-item-action bg-secondary-subtle">
-                                       <div class="row">
-                                           <div class="col-lg-3">
-                                                   <div class="small fw-lighter ">Code</div>
-                                           </div>
-                                           <div class="col-lg-3">
-                                                   <div class="small fw-lighter ">Name</div>
-                                           </div>
-                                           <div class="col-lg-2">
-                                                   <div class="small fw-lighter">Phone</div>
-                                           </div>
-                                           <div class="col-lg-4">
-                                               <div class="small fw-lighter">Company</div>
-                                            </div>
-                                           
+       <div class="modal-dialog modal-xl">
+         <div class="modal-content min-vh-100 p-2">               
+            <div class="row g-1">
+                <div class="col-lg-3">
+                   <div class="card shadow">
+                     <div class="card-body p-2">
+                        <div class="row g-1">
+                            <div class="col-md-4 col-lg-12">
+                                <div class="form-floating">
+                                    <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchSuppliers" placeholder="Code" class="form-control form-control-sm">
+                                    <label for="search_by_code" class="small">Code</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-12">
+                                <div class="form-floating ">
+                                    <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchSuppliers" placeholder="Description" class="form-control form-control-sm">
+                                    <label for="search_by_name" class="small ">Name</label>
+                                </div> 
+                            </div>
+                            <div class="col-md-4 col-lg-12">
+                                <div class="form-floating ">
+                                    <input type="search" id="search_by_company" v-model="search_by_company" @keyup="searchSuppliers" placeholder="Company" class="form-control form-control-sm">
+                                    <label for="search_by_company" class="small">Company</label>
+                                </div> 
+                            </div>
+                        </div>
+                          <div class="row">
+                            <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
+                            <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
+                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
+                                </button>
+                            </div>
+                            <div class="col-4 d-grid">
+                                <button class="btn btn-sm text-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                            </div>
+                          </div> 
+                     </div>
+                   </div>                                                                                                          
+                </div>                        
+                <div class="col-lg-9">
+                    <div class="card shadow">
+                        <div class="card-body p-2 table-responsive">
+                            <table class="table table-bordered table-hover mb-0">
+                                <tbody>
+                                    <tr class="text-center table-secondary" style="cursor: context-menu;">
+                                        <td @click="sortSuppliers('code')"><i class="fa-solid fa-sort"></i> Code</td>
+                                        <td @click="sortSuppliers('name')"><i class="fa-solid fa-sort"></i> Name</td>
+                                        <td @click="sortSuppliers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
+                                        <td @click="sortSuppliers('company')"><i class="fa-solid fa-sort"></i> Company</td>
+                                        <td @click="sortSuppliers('created_at')"><i class="fa-solid fa-sort"></i> Date</td>
+                                    </tr>
+                                   
+                                    <tr style="cursor: context-menu;" class="" v-if="suppliers.length > 0"  v-for="(p, i) in suppliers" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal">                                         
+                                        <td :class="{'table-secondary': sort_item ==='code'}" >
+                                             {{p.code}}
+                                         </td>
+                                        <td :class="{'table-secondary': sort_item ==='name'}">
+                                            {{p.name}}
+                                        </td>
+                                        <td :class="{'table-secondary': sort_item ==='phone'}" class="text-center">
+                                            {{p.phone}}
+                                        </td>
+                                        <td :class="{'table-secondary': sort_item ==='company'}">
+                                            {{p.company}}
+                                        </td>
+                                        <td :class="{'table-secondary': sort_item ==='created_at'}">{{showTime(p.created_at)}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div v-if="isLoading">
+                             <div colspan="5">
+                                 <div class="d-flex justify-content-center my-5">
+                                     <div class="spinner-border text-primary"  role="status">
+                                       <span class="visually-hidden">Loading...</span>
+                                     </div>
                                    </div>
-                                   </li>
-                                
-                                   <li class="list-group-item" v-if="isLoading">
-                                       <div class="d-flex justify-content-center my-5">
-                                           <div class="spinner-border text-primary"  role="status">
-                                             <span class="visually-hidden">Loading...</span>
-                                           </div>
-                                         </div>
-                                   </li>
-                            
-                                   <li v-if="suppliers.length > 0" class="list-group-item list-group-item-action" v-for="p in suppliers" :key="p.id" >
-                                           <div class="row" @click="setCode(p)" data-bs-dismiss="modal" style="cursor: context-menu;">
-                                                   <div class="col-lg-3 small">
-                                                           <div>{{p.code}}</div>
-                                                   </div>
-                                                   <div class="col-lg-3 small">
-                                                           <div>{{p.name}}</div>
-                                                   </div>
-                                                   <div class="col-lg-2 small">
-                                                           <div>{{p.phone}}</div>
-                                                   </div>
-                                                   <div class="col-lg-4 small">
-                                                       <div>{{p.company}}</div>
-                                                   </div>
-                                           </div>
-                                   </li>
-                           </ul>
-                   </div>
-               </div>
-           </div>
+                                 </div>
+                             </div>                               
+                        </div>
+                    </div>
+                </div>
+            </div>
          </div>
        </div>
      </div>
      <!--end modal-->
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query} from 'firebase/firestore'
-import db from '@/firebase/firestore'
-export default {
-   data(){
-       return{
-           suppliers:[],
-           suppliersData: [],
-
-           search_by_code:"",
-           search_by_name:"",
-
-           isLoading:false,
-       }
-   },
-  
-   mounted() {
-        const myModalEl = document.getElementById('searchSupplier')
-        myModalEl.addEventListener('show.bs.modal', event => {
-            if(this.suppliersData.length <=0){
-                this.fetchSupplier();
-            }
-            this.searchSupplier();
-        })
-    },
-   created(){
-       if(this.user !==null){
-           if(this.storeSuppliers.length > 0){
-               this.suppliersData=this.storeSuppliers;
-           }else{
-               this.fetchSupplier();
-           }            
-       }
-   },
-   computed:{
-       user(){
-           return this.$store.getters.user;
-       },
-       storeSuppliers(){
-           return this.$store.getters.suppliers;
-       }
-   },
-   watch:{
-       user(data){
-               if(data !==null){
-                   if(this.storeSuppliers.length > 0){
-                   this.suppliersData=this.storeSuppliers;
-               }else{
-                   this.fetchSupplier();
-               }
-           }
-       }
-   },
-   methods:{
-       setCode(p){
-           this.$emit("setCode", p)
-           this.clearSearch();
-       },
-       clearSearch(){
-           this.search_by_code="";
-           this.search_by_name="";
-           this.searchSupplier();
-       },
-       searchSupplier(){
-           if(this.search_by_code){
-               this.suppliers=this.suppliersData.filter((f)=>{
-                       return f.code===this.search_by_code;
-               })
-           }else if(this.search_by_name){
-               this.suppliers=this.suppliersData.filter((f)=>{
-                       return f.name.toLowerCase().includes(this.search_by_name.toLowerCase())
-               })
-           }else{
-                   this.suppliers= this.suppliersData.filter((p, i)=>{
-                           if(i < 20){
-                               return p;
-                           }
-                     })                                     
-           }
-       },
+    import PageHeader from "@/views/partials/PageHeader.vue"
+     import { useVuelidate  } from '@vuelidate/core'
+ import { required, email ,helpers} from '@vuelidate/validators'
+    import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
+    import db from '@/firebase/firestore'
+    export default {
+        components: {
+                PageHeader
+        },
      
-       async fetchSupplier(){
-       this.isLoading=true;    
-       const query_url = query(collection(db, "suppliers"), where("uid", "==", this.user.uid));
-       const snapShot=await getDocs(query_url)
-       let suppliers=[];
-       snapShot.forEach((doc) => {         
-           let supplier = {
-               id: doc.id,
-               uid: doc.data().uid,
-               name: doc.data().name,          
-               phone : doc.data().phone,
-               company : doc.data().company,           
-               code: doc.data().code, 
-                         
-           };                                
-           suppliers.push(supplier);      
-                       
-       });
-       this.suppliersData=suppliers;
-       this.$store.dispatch("setSupplier", suppliers)
-       this.isLoading=false;
-       this.searchSupplier();
-      } ,
-      showTime(t){
-           const date=t.toDate()
-           const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-           const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-           return formattedDate;
-       },
-   }
-   
-}
-</script>
+        data(){
+            return{         
+                suppliers : [],
+                isLoading: false,
+                sortBy:"asc",
+                sort_item:"",
+                search_by_code:"",
+                search_by_name:"",
+                search_by_company:"",
+                suppliersData:[],
+                editItem:{},
+                isUpdating:false,
+                msg : {
+                    type :"",
+                    info :"",
+                }
+            }
+        },
+        created() {     
+            if(this.user !==null){
+                this.isLoading=true;
+                this.fetchSuppliers();
+            }
+        },
+      
+        computed:{
+            user(){
+                return this.$store.getters.user;
+            }
+        },
+        watch:{
+            user(data){
+                if(data !==null){
+                    this.isLoading=true;
+                    this.fetchSuppliers();
+                }
+            },
+            msg:{
+                handler(val){
+                    if(val.type){
+                        setTimeout(()=>{
+                            this.msg.type="";
+                            this.msg.info="";
+                        }, 5000)
+                    }
+                },deep:true
+            }
+        },
+        methods:{      
+            setCode(p){
+                this.$emit("setCode", p)
+            },
+            clearSearch(){
+                this.search_by_code="";
+                this.search_by_name="";
+                this.search_by_company="";
+                this.searchSuppliers();
+            },
+            searchSuppliers(){
+                this.suppliers=[];
+                if(this.search_by_code){
+                    this.suppliers=this.suppliersData.filter((f)=>f.code===Number(this.search_by_code))
+                }else 
+                if(this.search_by_name){
+                    this.suppliers=this.suppliersData.filter((f)=>{
+                        return f.name.toLowerCase().includes(this.search_by_name.toLowerCase())
+                    })
+                }else 
+                if(this.search_by_company){
+                    this.suppliers=this.suppliersData.filter((f)=>{
+                        return f.company.toLowerCase().includes(this.search_by_company.toLowerCase())
+                    })
+                }else{
+                    this.suppliers= this.suppliersData.filter((p, i)=>{
+                               if(i < 20){
+                                   return p;
+                               }
+                           }) 
+                }
+            },
+            sortSuppliers(sort){   
+                this.suppliers=[];
+                this.sort_item=sort;
+                if(this.sortBy=="asc"){
+                    this.sortBy="desc"
+                    this.suppliers=this.suppliersData.sort((a,b)=>{
+                        const item_a=a.name.toUpperCase();
+                        const item_b=b.name.toUpperCase();
+                        const com_a=a.company.toUpperCase();
+                        const com_b=b.company.toUpperCase();
+                        const date_a=new Date(a.created_at.toDate()).getTime();
+                        const date_b=new Date(b.created_at.toDate()).getTime();
+                        switch(sort){
+                            case "phone":
+                                return a.phone - b.phone;
+                            break;
+                            case "name":
+                              return item_a < item_b ? 1 : -1;
+                            break;
+                            case "code":
+                                return a.code - b.code;
+                            break;
+                            case "company":
+                            return com_a < com_b ? 1 : -1;
+                            break;
+                            case "created_at":
+                               return  date_a - date_b;
+                            break;
+                        }
+                    })
+                }else{
+                    this.sortBy="asc"
+                    this.suppliers=this.suppliersData.sort((a,b)=>{
+                        const item_a=a.name.toUpperCase();
+                        const item_b=b.name.toUpperCase();
+                        const com_a=a.company.toUpperCase();
+                        const com_b=b.company.toUpperCase();
+                        const date_a=new Date(a.created_at.toDate()).getTime();
+                        const date_b=new Date(b.created_at.toDate()).getTime();
+                        switch(sort){
+                            case "phone":
+                                return a.phone + b.phone;
+                            break;
+                            case "name":
+                                return item_a < item_b ? -1 : 1;
+                            break;
+                            case "code":
+                                return a.code + b.code;
+                            break;
+                            case "company":
+                                return com_a < com_b ? -1 : 1;
+                            break;
+                            case "created_at":
+                               return  date_a + date_b;
+                            break;
+                        }
+                    })
+                }            
+            },
+            
+            async fetchSuppliers(){                    
+                const query_url = query(collection(db, "suppliers"), orderBy("created_at", "desc"));
+                const snapShot=await getDocs(query_url)           
+                if(snapShot._snapshot.docChanges.length <=0){
+                    this.msg.type='error' 
+                    this.msg.info='Oops..., something went wrong!'
+                    this.isLoading=false;
+                    this.isUpdating=false;
+                    return false;
+                }
+    
+                let suppliers=[];
+                snapShot && snapShot.forEach((doc) => {         
+                    let product = {
+                        id: doc.id,
+                        uid: doc.data().uid,
+                        name: doc.data().name,
+                        company : doc.data().company,
+                        created_at: doc.data().created_at,
+                        phone : doc.data().phone,
+                        code : doc.data().code,                                
+                    };                                
+                    suppliers.push(product);                           
+                                
+                });
+                this.suppliers=[];
+                this.suppliersData=suppliers;
+                this.suppliers=suppliers;
+                this.isLoading=false;
+                this.isUpdating=false;
+               // this.$store.dispatch("setsuppliers", this.suppliers)
+           } ,
+           showTime(t){
+             const date=t.toDate()
+             const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+             const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
+             return formattedDate;
+         }
+        },
+        
+    }
+    </script>
 <style lang="">
    
 </style>

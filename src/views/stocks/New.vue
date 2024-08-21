@@ -17,7 +17,7 @@
                 <div class="card-body p-2">
                     <form @submit.prevent="saveStocks">
                         <div class="row justify-content-end">
-                            <div class="col-lg-4">
+                            <div class="col-sm-6 col-lg-4">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
@@ -50,7 +50,7 @@
                         </div>
                         <table class="table table-bordered  mb-0 table-hover">
                             <tbody>
-                                <tr class="small text-center fw-bold table-secondary">
+                                <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
                                     <td class="col-2">Desc</td>
                                     <td class="col-1">Qty</td>                                   
@@ -61,44 +61,43 @@
                                     <td class="col-1">Pur price</td>
                                     <td class="col-1">Pur amount</td>
                                 </tr>
-                                <tr class="small text-center"v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id" @mouseenter="setEdit(i)"  @keypress.enter="calEdit(i)" @mouseleave="calEdit(i)">
-                                    <td class="">
+                                <tr class="" v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id" @mouseenter="setEdit(i)"  @keypress.enter="calEdit(i)" @mouseleave="calEdit(i)">
+                                    <td class="text-center">
                                         <div class="position-relative">
                                             {{st.code_no}}                                           
                                             <a class="text-danger position-absolute top-0 start-0 translate-middle p-2" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                         </div>                                    
                                     </td>
                                     <td class="">{{st.item_name}}</td>
-                                    <td class="">
+                                    <td class="text-center">
                                             <input   type="number"  v-model="st.qty" class="form-control-plaintext form-control-sm text-center"  placeholder="Qty">
-                                    </td>
-                                  
+                                    </td>                                  
                                     <td class="">
                                             <input  type="number"  v-model="st.retail_price" class="form-control-plaintext form-control-sm text-center" placeholder="0">                                    
                                     </td>
-                                    <td class="">                                       
+                                    <td class="text-end">                                       
                                          <span>{{st.retail_amount}}</span>
                                     </td>
                                     <td class="">
                                             <input  type="number"  v-model="st.whole_sale_price" class="form-control-plaintext form-control-sm text-center" placeholder="0">                                        
                                     </td>
-                                    <td class="">                                    
+                                    <td class="text-end">                                    
                                          <span>{{st.whole_sale_amount}}</span>
                                     </td>
                                     <td class="">
                                             <input  type="number"  v-model="st.pur_price" class="form-control-plaintext form-control-sm text-center" placeholder="0">                                       
                                     </td>
-                                    <td class="">                                    
+                                    <td class="text-end">                                    
                                          <span>{{st.pur_amount}}</span>
                                     </td>                                 
                                 </tr>
                                 <tr class="small">
                                     <td colspan="4" class="text-end fw-bold">Total</td>
-                                    <td class="text-center">{{total_retail_amount}}</td>
+                                    <td class="text-end">{{total_retail_amount}}</td>
                                     <td  class="text-end fw-bold">Total</td>
-                                    <td class="text-center">{{total_whole_sale_amount}}</td>
+                                    <td class="text-end">{{total_whole_sale_amount}}</td>
                                     <td  class="text-end fw-bold">Total</td>
-                                    <td class="text-center">{{total_pur_amount}}</td>
+                                    <td class="text-end">{{total_pur_amount}}</td>
                                 </tr>                                                                                         
                             </tbody>
                         </table>                                                                                                                    
@@ -150,7 +149,6 @@ export default {
                 type :"",
                 info :"",
             }
-
         }
     },
   
@@ -263,7 +261,7 @@ export default {
 
         async insertAllitem(){     
             this.isAddAllLoading=true;            
-            const query_url = query(collection(db, "products"), where("uid", "==", this.user.uid), orderBy("created_at", "desc"));
+            const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
             const snapShot=await getDocs(query_url)           
             if(snapShot._snapshot.docChanges.length <=0){
                 this.msg.type='error' 

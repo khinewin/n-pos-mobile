@@ -1,9 +1,9 @@
 <template lang="">
     <div>           
         <PageHeader page-title="Reports" page-code="reports" :msg-type="msg.type" :msg-info="msg.info" />        
-            <div class="container my-2">
-            <div class="row">
-                <div class="col-6">
+            <div class="container-fluid my-2">
+            <div class="row g-2">
+                <div class="col-sm-6">
                     <div class="card  shadow">
                         <div class="card-body p-2 rounded small">
                             <div class="form-floating mb-2">
@@ -39,7 +39,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-6">
+                <div class="col-sm-6">
                     <div class="card shadow">
                         <div class="card-body p-2 small report">                                                                                      
                             <ul class="list-group">

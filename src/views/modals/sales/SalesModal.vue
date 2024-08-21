@@ -4,64 +4,79 @@
        <div class="modal-dialog modal-xl">
          <div class="modal-content">               
            <div>
-               <div class="card min-vh-100">
-                   <div class="card-body sy-3 sx-1">
+               <div class="min-vh-100">
+                   <div class="p-2">
                     <div class="row g-1 m-0">
-                        <div class="col-4">                                                         
-                                <div class="row">
-                                        <div class="form-floating col-12 mb-2">
-                                            <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchSales" placeholder="Voucher no." class="form-control form-control-sm">
-                                            <label for="search_by_voucher_no" class="small ms-2">Voucher no.</label>
-                                        </div>
-                                        <div class="form-floating col-12 mb-2">
-                                            <input type="date" v-model="search_by_from_sale_date" @change="searchSales" placeholder="From sur date" class="form-control">
-                                            <label for="search_by_from_sale_date" class="small ms-2">From  date</label>
-                                        </div>
-                                        <div class="form-floating  mb-2">
-                                            <input type="date" v-model="search_by_to_sale_date" @change="searchSales" placeholder="To sur date" class="form-control">
-                                            <label for="search_by_to_sale_date" class="small ms-2">To  date</label>
-                                        </div>                                      
-                                </div>
-                                <div class="row">
-                                        <div class="col-4">
-                                            <button class="btn text-dark" @click="clearSearch">Clear</button>
-                                        </div>
-                                        <div class="col-4">
-                                            <button class="btn text-primary" @click="updateSales">Update
-                                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
-                                            </button>
-                                        </div>
-                                        <div class="col-4">
-                                            <button class="btn text-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                                        </div>
-                                </div>
-                                                                                                              
-                        </div>
-                        <div class="col-8 table-ressonsive">
-                            <table class="table table-bordered table-hover m-0">
-                                <tbody class="small text-center">
-                                    <tr class="table-secondary">
-                                        <td>Voucher no.</td>
-                                        <td colspan="2">Customer</td>
-                                        <td>Sale date</td>                                    
-                                    </tr>                                
-                                    <tr v-if="sales.length > 0" v-for="s in sales" :key="s.id" @click="setCode(s)" data-bs-dismiss="modal" style="cursor: context-menu;">
-                                        <td>{{s.voucher_no}}</td>
-                                        <td>{{s.customer.name}}</td>
-                                        <td>{{s.customer.phone}}</td>
-                                        <td>{{showTime(s.sale_date)}}</td>
-                                    </tr>
-                                </tbody>
-                            </table>   
-                            <div v-if="isLoading">
-                                <div colspan="5">
-                                    <div class="d-flex justify-content-center my-5">
-                                        <div class="spinner-border text-primary"  role="status">
-                                          <span class="visually-hidden">Loading...</span>
-                                        </div>
+                        <div class="col-lg-3">                                                         
+                                <div class="card shadow">
+                                    <div class="card-body p-2">
+                                        <div class="row g-1">
+                                           <div class="col-md-4 col-lg-12">
+                                            <div class="form-floating">
+                                                <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchSales" placeholder="Voucher no." class="form-control form-control-sm">
+                                                <label for="search_by_voucher_no" class="small">Voucher no.</label>
+                                            </div>
+                                           </div>
+                                           <div class="col-md-4 col-lg-12">
+                                            <div class="form-floating">
+                                                <input type="date" v-model="search_by_from_sale_date" @change="searchSales" placeholder="From sur date" class="form-control form-control-sm">
+                                                <label for="search_by_from_sale_date" class="small ">From  date</label>
+                                            </div>
+                                           </div>
+                                           <div class="col-md-4 col-lg-12">
+                                            <div class="form-floating">
+                                                <input type="date" v-model="search_by_to_sale_date" @change="searchSales" placeholder="To sur date" class="form-control form-control-sm">
+                                                <label for="search_by_to_sale_date" class="small ">To  date</label>
+                                            </div>
+                                           </div>                                      
                                     </div>
+                                    <div class="row">
+                                            <div class="col-4 d-grid">
+                                                <button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
+                                            </div>
+                                            <div class="col-4 d-grid">
+                                                <button class="btn btn-sm text-dark" @click="updateSales">
+                                                    <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
+                                                    <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
+                                                </button>
+                                            </div>
+                                            <div class="col-4 d-grid">
+                                                <button class="btn btn-sm text-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                                            </div>
+                                    </div>
+                                    </div>
+                                </div>                                                                                                              
+                        </div>
+                        <div class="col-lg-9 table-ressonsive">
+                            <div class="card shadow">
+                                <div class="card-body p-2">
+                                    <table class="table table-bordered table-hover m-0">
+                                        <tbody>
+                                            <tr class="table-secondary text-center">
+                                                <td>Voucher no.</td>
+                                                <td>Name</td>
+                                                <td>Phone</td>
+                                                <td>Sale date</td>                                    
+                                            </tr>                                
+                                            <tr v-if="sales.length > 0" v-for="s in sales" :key="s.id" @click="setCode(s)" data-bs-dismiss="modal" style="cursor: context-menu;">
+                                                <td class="text-center">{{s.voucher_no}}</td>
+                                                <td>{{s.customer.name}}</td>
+                                                <td class="text-center">{{s.customer.phone}}</td>
+                                                <td class="text-center">{{showTime(s.sale_date)}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>   
+                                    <div v-if="isLoading">
+                                        <div colspan="5">
+                                            <div class="d-flex justify-content-center my-5">
+                                                <div class="spinner-border text-primary"  role="status">
+                                                  <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>  
                                 </div>
-                            </div>                        
+                            </div>                      
                         </div>
                     </div>                                                                                     
                    </div>
@@ -152,7 +167,7 @@ export default {
        },
      
     async fetchSales(){
-       const query_url = query(collection(db, "sales"), where("uid", "==", this.user.uid), orderBy("sale_date", "desc"));
+       const query_url = query(collection(db, "sales"), orderBy("sale_date", "desc"));
        const shapShot=await getDocs(query_url)
        let saleItems=[];
        shapShot.forEach((doc) => {         

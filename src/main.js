@@ -19,6 +19,7 @@ library.add(fas, far, fab)
 dom.watch();
 
 import VueHtmlToPaper from 'vue-html-to-paper';
+
 const options = {
     name: '_blank',
     specs: [
@@ -28,7 +29,6 @@ const options = {
     ],
     styles: [
       'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
-      
     ],
     timeout: 100, // default timeout before the print window appears
     autoClose: true, // if false, the window will not close after printing
@@ -36,7 +36,6 @@ const options = {
   }
 
 const app = createApp(App)
-
 app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(store)
 app.use(router)

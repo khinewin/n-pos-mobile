@@ -3,13 +3,14 @@
     <LeftSidebar />
     <Navbar />  
     <div class="container-fluid">
-        <div class="row">           
-            <div class="col-12 pt-3 pb-2 bg-secondary-subtle">
+        <span v-if="msgType" class="fixed-top alert" role="alert" :class="[msgType=='success' ? 'alert-success' : 'alert-danger']">{{msgInfo}}</span>
+        <div class="row bg-secondary-subtle pt-3 pb-1">           
+            <div class="col-12  pt-1 bg-secondary-subtle">
                    <LeftMenuBtn />
                   <span class="h5 ms-3"> 
-                    {{pageTitle}} <span class="float-end me-2" :class="[msgType=='success' ? 'text-success' : 'text-danger']">{{msgInfo}}</span>
+                    {{pageTitle}} 
                 </span>
-            </div>            
+            </div>
         </div>
     </div>     
     <RightSidebar />
@@ -25,6 +26,12 @@ export default {
     props: ['pageTitle', 'pageCode', 'msgType', 'msgInfo'],
     components : {
         LeftMenuBtn, RightSidebar, LeftSidebar, Navbar
+    },
+    methods:{
+     
+    },
+    watch:{
+        
     }
 }
 </script>

@@ -43,41 +43,41 @@
                                     <td class="col-1">Wholesale amount</td>
                                     <td class="col-1">Pur amount</td>
                                 </tr>
-                                <tr class="small text-center"v-if="stock.products.length > 0" v-for="(st, i) in stock.products" :key="st.id">
-                                    <td class="">                                       
+                                <tr class=""v-if="stock.products.length > 0" v-for="(st, i) in stock.products" :key="st.id">
+                                    <td class="text-center">                                       
                                             {{st.code_no}}                                                                                                          
                                     </td>                                   
                                     <td class="">{{st.item_name}}</td>
-                                    <td class="">                                      
+                                    <td class="text-center">                                      
                                         <span>{{st.qty}}</span>
                                     </td>
-                                    <td class="">
+                                    <td class="text-center">
                                         {{Math.floor(st.qty / st.item_per_package)}} x   {{Math.floor(st.qty % st.item_per_package)}}
                                     </td>                                
-                                    <td class="">                                      
+                                    <td class="text-end">                                      
                                         <span>{{st.retail_price}}</span>
                                     </td>
-                                    <td class="">                                      
+                                    <td class="text-end">                                      
                                         <span>{{st.whole_sale_price}}</span>
                                     </td>
-                                    <td class="">                                      
+                                    <td class="text-end">                                      
                                         <span>{{st.pur_price}}</span>
                                     </td>
-                                    <td class="">                                      
+                                    <td class="text-end">                                      
                                         <span>{{st.retail_amount}}</span>
                                     </td>
-                                    <td class="">                                      
+                                    <td class="text-end">                                      
                                         <span>{{st.whole_sale_amount}}</span>
                                     </td>
-                                    <td class="">                                      
+                                    <td class="text-end">                                      
                                         <span>{{st.pur_amount}}</span>
                                     </td>                                                                
                                 </tr>
                                 <tr class="small">
                                     <td colspan="7" class="text-end fw-bold">Total</td>
-                                    <td class="text-center">{{stock.total_retail_amount}}</td>
-                                    <td class="text-center">{{stock.total_whole_sale_amount}}</td>
-                                    <td class="text-center">{{stock.total_pur_amount}}</td>
+                                    <td class="text-end">{{stock.total_retail_amount}}</td>
+                                    <td class="text-end">{{stock.total_whole_sale_amount}}</td>
+                                    <td class="text-end">{{stock.total_pur_amount}}</td>
                                 </tr>                                                                                         
                             </tbody>
                         </table>                                     
@@ -90,28 +90,24 @@
 <script>
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
-
+import * as hp from "@/lib/helper"
+import * as ss from "@/lib/snapshot/stocks"
 export default {
     props:['fromDate', 'toDate', 'voucher_no'],
     components: {
-    },
-  
+    },  
     data(){
-        return{       
-           
+        return{                 
             reports:[],
-          //  current_month:[],
             salesData:[],
             grand_total:"",
             isLoading:false,
             msg : {
                 type :"",
                 info :"",
-            },        
-
+            },       
         }
-    },
-   
+    },   
     mounted() {    
             if(this.user !==null){
                 this.isLoading=true;
@@ -154,42 +150,22 @@ export default {
     methods:{
         goBack(){
             this.$router.go(-1)
-        },
-    
-      
+        },       
         showTime(t){
-            const date=t.toDate()
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-            return formattedDate;
+            return hp.showTime(t)
         },
         async fetchStocks(){
             const from_date=Timestamp.fromDate(new Date(this.fromDate))
             const to_date=Timestamp.fromDate(new Date(this.toDate))
-           // console.log(from_date, to_date)
             let query_url="";
             if(this.voucher_no){
-                query_url = query(collection(db, "openingStocks"), where("uid", "==", this.user.uid), where("voucher_no", "==", Number(this.voucher_no)))
+                query_url = query(collection(db, "openingStocks"),  where("voucher_no", "==", Number(this.voucher_no)))
             }else{
-             query_url = query(collection(db, "openingStocks"), where("uid", "==", this.user.uid), 
+             query_url = query(collection(db, "openingStocks"),  
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
             }
-            const shapShot=await getDocs(query_url)
-            let stockItems=[];            
-            shapShot.forEach((doc) => {       
-                let stock = {
-                    id: doc.id,
-                    uid: doc.data().uid,
-                    voucher_no: doc.data().voucher_no,
-                    created_at : doc.data().created_at,
-                    products : doc.data().products,           
-                    total_pur_amount: doc.data().total_pur_amount,
-                    total_retail_amount: doc.data().total_retail_amount,
-                    total_whole_sale_amount: doc.data().total_whole_sale_amount,             
-                };                                        
-                stockItems.push(stock);      
-            });         
-           
+            const snapShot=await getDocs(query_url)
+            const stockItems=ss.stocks(snapShot);                     
             this.reports=stockItems;
             this.isLoading=false;
         }

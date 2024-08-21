@@ -4,47 +4,47 @@
         <div class="row">                 
             <div class="col-12">
                     <table class="table table-bordered border-dark table-hover">
-                        <tbody class="text-center small" v-if="reports.length > 0">                            
+                        <tbody class="" v-if="reports.length > 0">                            
                             <tr v-for="r in reports" :key="r[0]">
-                                <td class="col-1">{{r[0]}}</td>
+                                <td class="col-1 text-center">{{r[0]}}</td>
                                 <td class="p-0 col-11">
-                                    <table class="table table-bordered border-dark table-hover mb-0">
+                                    <table class="table table-bordered border-dark table-hover mb-0" style="border-style: hidden;">
                                         <tbody>
                                             <tr v-for="res in r[1]">
-                                                    <td class="col-1">{{res[0]}}</td>
+                                                    <td class="col-1 text-center">{{res[0]}}</td>
                                                     <td class="p-0 col-11">
-                                                        <table class="table table-bordered mb-0 border-dark table-hover mb-0">
+                                                        <table class="table table-bordered mb-0 border-dark table-hover mb-0" style="border-style: hidden;">
                                                             <thead>
-                                                                <tr class="fw-bold">
-                                                                    <td class="col-2" style="border-bottom: 2px solid black;">Code</td>
-                                                                    <td class="col-2" style="border-bottom: 2px solid black;">Description</td>
-                                                                    <td class="col-2" style="border-bottom: 2px solid black;" colspan="2">Qty</td>
-                                                                    <td class="col-1" style="border-bottom: 2px solid black;">Item price</td>
-                                                                    <td class="col-1" style="border-bottom: 2px solid black;">Amount</td>
-                                                                    <td class="col-2" style="border-bottom: 2px solid black;" colspan="3">Discount</td>                                              
-                                                                    <td class="col-2" style="border-bottom: 2px solid black;">Price</td>
+                                                                <tr class="fw-bold text-center">
+                                                                    <td class="col-2">Code</td>
+                                                                    <td class="col-3">Description</td>
+                                                                    <td class="col-2" colspan="2">Qty</td>
+                                                                    <td class="col-1">Item price</td>
+                                                                    <td class="col-1">Amount</td>
+                                                                    <td class="col-2" colspan="3">Discount</td>                                              
+                                                                    <td class="col-2">Price</td>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>                                            
                                                                 <tr v-for="item in res[1]" :key="item.code_no">
-                                                                    <td >{{item.code_no}}</td>
+                                                                    <td class="text-center">{{item.code_no}}</td>
                                                                     <td >{{item.item_name}}</td>
-                                                                    <td >{{item.pur_qty}}</td>
-                                                                    <td >
+                                                                    <td class="text-center">{{item.pur_qty}}</td>
+                                                                    <td class="text-center">
                                                                         {{Math.floor(item.pur_qty / item.item_per_package)}} x {{Math.floor(item.pur_qty % item.item_per_package)}}
                                                                     </td>
-                                                                    <td >{{item.pur_price}}</td>
-                                                                    <td >{{item.amount}}</td>
-                                                                    <td>{{item.dis_qty}}</td>
-                                                                    <td >{{item.dis_percent}}</td>
-                                                                    <td >{{item.dis_amount}}</td>
-                                                                    <td >{{item.price}}</td>
+                                                                    <td class="text-end">{{item.pur_price}}</td>
+                                                                    <td class="text-end">{{item.amount}}</td>
+                                                                    <td class="text-center">{{item.dis_qty}}</td>
+                                                                    <td class="text-center">{{item.dis_percent}}</td>
+                                                                    <td class="text-end">{{item.dis_amount}}</td>
+                                                                    <td class="text-end">{{item.price}}</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td colspan="5" class="text-end fw-bold">Total</td>
-                                                                    <td class="text-center">{{res.amount}}</td>
-                                                                    <td colspan="3 text-center">{{res.discount}}</td>                                                
-                                                                    <td>{{res.price}}</td>
+                                                                    <td class="text-end">{{res[2].amount}}</td>
+                                                                    <td colspan="3" class="text-end">{{res[2].discount}}</td>                                                
+                                                                    <td class="text-end">{{res[2].price}}</td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -89,17 +89,16 @@
 <script>
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
-
+import * as hp from "@/lib/helper.js"
+import * as ss from "@/lib/snapshot/purchases"
 export default {
     props:['fromDate', 'toDate', 'supplier'],
     components: {
     },
   
     data(){
-        return{       
-           
+        return{                  
             reports:[],
-          //  current_month:[],
             purchaseData:[],
             total_amount:0,
             total_price:0,
@@ -109,11 +108,9 @@ export default {
             msg : {
                 type :"",
                 info :"",
-            },        
-
+            },       
         }
-    },
-   
+    },   
     mounted() {    
             if(this.user !==null){
                 this.isLoading=true;
@@ -168,7 +165,7 @@ export default {
                     res.products.map((data)=>{
                         purchase.push({...data,
                             supplier_code: res.supplier.code,
-                             supplier : `${res.supplier.name} (${res.supplier.company})`, 
+                             group_supplier : `${res.supplier.name} (${res.supplier.company})`, 
                              supplier_name: res.supplier.name,
                              supplier_company :res.supplier.company,
                              supplier_phone: res.supplier.phone,
@@ -178,78 +175,63 @@ export default {
                        })
             })
            
-            const gbd=Object.entries(Object.groupBy(purchase, res=>{
-                return res.supplier              
-            }))          
+            const gbs=Object.entries(hp.gb_supplier(purchase))       
+            const data=gbs.map((res)=>{
+                const supplier_name=res[0]
+                const gbd=Object.entries(hp.gb_date(res[1])) 
+                const gbc=gbd.map((ren)=>{
+                    const date=ren[0];
+                    const res1=Object.entries(hp.gb_item_name_pur_price(ren[1]))
+                    const res2=res1.map((rep)=>{
+                        let item={item_name: rep[0], code_no:"", discount:0, pur_qty:0, pur_price:0, amount:0, item_per_package:0, price:0, dis_qty:0, dis_amount:0, dis_percent:0}
+                        rep[1].map((r)=>{
+                            item.code_no=r.code_no;
+                            item.pur_qty += r.pur_qty;
+                            item.amount += r.amount;
+                            item.pur_price = r.pur_price;
+                            item.item_per_package=r.item_per_package;
+                            item.price += r.price;
+                            item.dis_qty += r.dis_qty;
+                            item.dis_percent += r.dis_percent;
+                            item.dis_amount += r.dis_amount;
+                            item.discount += r.discount;
+                        })
+                        return item;                    
 
-           const gbc=gbd.map((res)=>{
-                const res1=Object.entries(Object.groupBy(res[1], data=>{
-                        return data.group_date;
-                }))           
-              
-               const res2=res1.map((rep)=>{
-                    let amount=0;
-                    let price=0;
-                    let discount=0;
-                    rep[1].map((rep2)=>{
-                            amount += rep2.amount;
-                            price += rep2.price;
-                            discount += rep2.discount
-                    })
-                 
-                    return {...rep, amount, price, discount}
-               })
-                const newData=[res[0], [...res2]]    
-                return newData;                             
-           })
-           
-           this.reports=gbc;        
+                    }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)
+                    const res3={amount: 0, price:0, discount:0}
+                    res2.map((ren)=>{
+                        res3.amount += ren.amount;
+                        res3.discount += ren.discount;
+                        res3.price += ren.price;
+                    })    
+                    return [date, res2, res3];
+                })
+                return [supplier_name, gbc];                     
+            })
+           // console.log(data)
+            this.reports=data;
         },
         showTime(t){
-            const date=t.toDate()
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-            return formattedDate;
+           return hp.showTime(t)
         },
         async fetchPurchase(){
             const from_date=Timestamp.fromDate(new Date(this.fromDate))
             const to_date=Timestamp.fromDate(new Date(this.toDate))
-           // console.log(from_date, to_date)
            let query_url=""
            if(this.supplier){
-            query_url = query(collection(db, "purchases"), where("uid", "==", this.user.uid), 
+            query_url = query(collection(db, "purchases"), 
             where("supplier.code", "==", Number(this.supplier)));
            }else{
-            query_url = query(collection(db, "purchases"), where("uid", "==", this.user.uid), 
+            query_url = query(collection(db, "purchases"), 
             where("pur_date", ">=", from_date), where("pur_date", "<=", to_date), orderBy("pur_date", "desc"));
            }             
-            const shapShot=await getDocs(query_url)
-            let purchaseItems=[];
-            shapShot.forEach((doc) => {         
-                let purchase = {
-                    id: doc.id,
-                    uid: doc.data().uid,
-                    voucher_no: doc.data().voucher_no,
-                   // sale_date : doc.data().sale_date,
-                    products : doc.data().products,    
-                    pur_date:doc.data().pur_date,
-                    supplier: doc.data().supplier,
-                      //  charges: doc.data().charges,
-                     //   pay:doc.data().pay,
-                    total_discount: doc.data().total_discount,
-                     //   refunds: doc.data().refunds,
-                    total_amount:doc.data().total_amount,
-                    total_price: doc.data().total_price,
-                    extra_discount: doc.data().extra_discount,
-                     //   sale_type: doc.data().sale_type,
-                       // customer : doc.data().customer,
-                };               
-                                
-                purchaseItems.push(purchase);      
-            });
-        this.purchaseData=purchaseItems;
-        this.displayReports();
-        this.isLoading=false;
+            const snapShot=await getDocs(query_url)
+            let purchaseItems=ss.purchases(snapShot);
+         
+            this.purchaseData=purchaseItems;
+            this.displayReports();
+            this.isLoading=false;
         }
     }
 }

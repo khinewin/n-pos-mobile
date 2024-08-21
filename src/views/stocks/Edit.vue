@@ -17,7 +17,7 @@
                 <div class="card-body p-2">
                     <form @submit.prevent="saveStocks">
                         <div class="row justify-content-end">
-                            <div class="col-lg-4">
+                            <div class="col-sm-6 col-lg-4">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
@@ -39,7 +39,7 @@
                         <button  type="button" :class="{'text-danger':v$.storeItems.$errors.length > 0}"  class="btn btn-sm"   data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i></button>
                         <table class="table table-bordered  mb-0 table-hover">
                             <tbody>
-                                <tr class="small text-center fw-bold table-secondary">
+                                <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
                                     <td class="col-2">Desc</td>
                                     <td class="col-1">Qty</td>                                   
@@ -50,41 +50,40 @@
                                     <td class="col-1">Pur price</td>
                                     <td class="col-1">Pur amount</td>
                                 </tr>
-                                <tr class="small text-center"v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id" @mouseenter="setEdit(i)"  @keypress.enter="calEdit(i)" @mouseleave="calEdit(i)">
-                                    <td class="pt-2">
+                                <tr class="" v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id" @mouseenter="setEdit(i)"  @keypress.enter="calEdit(i)" @mouseleave="calEdit(i)">
+                                    <td class="text-center pt-2">
                                             {{st.code_no}}                                           
                                     </td>
                                     <td class="pt-2">{{st.item_name}}</td>
-                                    <td class="">
+                                    <td class="p-0">
                                             <input   type="number"  v-model="st.qty" class="form-control-plaintext  text-center"  placeholder="Qty">
-                                    </td>
-                                  
-                                    <td class="">
+                                    </td>                                  
+                                    <td class="p-0">
                                             <input  type="number"  v-model="st.retail_price" class="form-control-plaintext text-center" placeholder="0">                                     
                                     </td>
-                                    <td class="pt-2">                                       
+                                    <td class="text-end pt-2">                                       
                                          <span>{{st.retail_amount}}</span>
                                     </td>
-                                    <td class="">
+                                    <td class="p-0">
                                             <input  type="number"  v-model="st.whole_sale_price" class="form-control-plaintext text-center" placeholder="0">                                        
                                     </td>
-                                    <td class="pt-2">                                    
+                                    <td class="text-end pt-2">                                    
                                          <span>{{st.whole_sale_amount}}</span>
                                     </td>  
-                                    <td class="">
+                                    <td class="p-0">
                                         <input  type="number"  v-model="st.pur_price" class="form-control-plaintext text-center" placeholder="0">                                        
                                     </td>
-                                    <td class="pt-2">                                    
+                                    <td class="text-end pt-2">                                    
                                         <span>{{st.pur_amount}}</span>
                                     </td>                                 
                                 </tr>
                                 <tr class="small">
                                     <td colspan="4" class="text-end fw-bold">Total</td>
-                                    <td class="text-center">{{total_retail_amount}}</td>
+                                    <td class="text-end">{{total_retail_amount}}</td>
                                     <td  class="text-end fw-bold">Total</td>
-                                    <td class="text-center">{{total_whole_sale_amount}}</td>
+                                    <td class="text-end">{{total_whole_sale_amount}}</td>
                                     <td  class="text-end fw-bold">Total</td>
-                                    <td class="text-center">{{total_pur_amount}}</td>
+                                    <td class="text-end">{{total_pur_amount}}</td>
                                 </tr>                                                                                         
                             </tbody>
                         </table>                                                                                                                    

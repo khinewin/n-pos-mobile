@@ -3,40 +3,37 @@
         <PageHeader page-title="New purchase" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid my-2">
             <div class="row mb-2 justify-content-end">                
-                <div class="col-lg-2">
-                    <div>
-                        <button type="button" @click="savePurchase" class="btn btn-sm" :disabled="isLoading"><i class="fa-solid fa-hard-drive"></i> Save
+                <div class="col-sm-2 d-grid">
+                        <button type="button" @click="savePurchase" class="btn btn-sm" :disabled="isLoading">
+                            <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
-                    </div>
                 </div>
-                <div class="col-lg-2">
-                    <div>
+                <div class="col-sm-2 d-grid">
                         <router-link :to="{name : 'Purchase'}" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> Close</router-link>
-                    </div>
                 </div>
             </div>
-            <div>
-                <div>
+            <div class="card shadow">
+                <div  class="card-body p-2">
                     <form @submit.prevent="savePurchase">
                         <div class="row justify-content-end">
-                            <div class="col-lg-4">
+                            <div class="col-sm-6 col-lg-4">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4">Voucher no. :</td>
+                                            <td class="text-end col-4 p-2">Voucher no. :</td>
                                             <td class="col-8 py-0">
                                                 <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end">Pur date :</td>
+                                            <td class="text-end pt-2">Pur date :</td>
                                             <td class="py-0">
                                                 <input type="date" :class="{'border-0 border-bottom border-danger' : v$.pur_date.$errors.length > 0}"  v-model="pur_date" class="form-control-plaintext border-bottom" id="pur_date" placeholder="Date">                                                
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end">Supplier :</td>
+                                            <td class="text-end pt-2">Supplier :</td>
                                             <td class="py-0">
                                                 <input type="text" :class="{'border-0 border-bottom border-danger' : v$.supplier.name.$errors.length > 0}"  v-model="supplier.name" data-bs-toggle="modal" data-bs-target="#searchSupplier"  class="form-control-plaintext border-bottom">                                                
                                             </td>
@@ -46,68 +43,48 @@
                             </div>
                         </div>
                         <button  type="button" :class="{'text-danger':v$.storePurchase.$errors.length > 0}"  class="btn btn-sm"   data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i></button>
-                        <table class="table table-bordered  table-hover">
+                        <table class="table table-bordered mb-0  table-hover">
                             <tbody>
                                 <tr class="small text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
-                                    <td class="col-2">Desc</td>
+                                    <td class="col-1">Desc</td>
                                     <td class="col-1">Qty</td>
                                     <td class="col-1">Exp. date</td>                                    
                                     <td class="col-1">Item price</td>                                    
-                                    <td class="col-1">D(Qty)</td>
-                                    <td class="col-1">D(%)</td>
-                                    <td class="col-1">D($)</td>
+                                    <td class="col-1" colspan="3">Discount</td>                                    
                                     <td class="col-1">Amount</td>
                                     <td class="col-1">Discount</td>
                                     <td class="col-1">Price</td>
                                 </tr>
-                                <tr class="small text-center"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase" :key="st.id" @mouseenter="setEdit(i)"  @keypress.enter="calEdit(i)" @mouseleave="calEdit(i)">
-                                    <td class="">
+                                <tr class="small"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase" :key="st.id" @mouseenter="setEdit(i)"  @keypress.enter="calEdit(i)" @mouseleave="calEdit(i)">
+                                    <td class="pt-2">
                                         <div class="position-relative">
                                             <a class="text-danger position-absolute top-50 start-0 translate-middle p-2" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                             {{st.code_no}}                                           
                                         </div>                                    
                                     </td>
-                                    <td class="">{{st.item_name}}</td>
+                                    <td class="pt-2">{{st.item_name}}</td>
                                     <td class="">
-                                        <span  >
-                                            <input   type="number"  v-model="st.pur_qty" class="form-control-plaintext form-control-sm text-center"  placeholder="Qty">
-                                         </span>
-                                       
+                                            <input   type="number"  v-model="st.pur_qty" class="form-control-plaintext  text-center"  placeholder="Qty">                                      
                                     </td>
                                     <td class="">
-                                        <span  >
-                                            <input @change="setExpDate(st.id)"  type="date"  v-model="st.tmp_exp_date" class="form-control-plaintext form-control-sm text-center"  placeholder="Exp. date">
-                                         </span>
-                                     
+                                            <input @change="setExpDate(st.id)"  type="date"  v-model="st.tmp_exp_date" class="form-control-plaintext text-center"  placeholder="Exp. date">                                   
                                     </td>
                                     <td class="">
-                                        <span >
-                                            <input  type="number"  v-model="st.pur_price" class="form-control-plaintext form-control-sm text-center" placeholder="Price">
-                                         </span>
-                                        
+                                            <input  type="number"  v-model="st.pur_price" class="form-control-plaintext  text-center" placeholder="Price">                                        
                                     </td>
                                     <td class="">
-                                        <span >
-                                            <input  type="number"  v-model="st.dis_qty" class="form-control-plaintext form-control-sm text-center" placeholder="0">
-                                         </span>
-                                       
+                                            <input  type="number"  v-model="st.dis_qty" class="form-control-plaintext  text-center" placeholder="0">                                       
                                     </td>
                                     <td class="">
-                                        <span  >
-                                            <input  type="number"  v-model="st.dis_percent" class="form-control-plaintext form-control-sm text-center" placeholder="0">
-                                         </span>
-                                       
+                                            <input  type="number"  v-model="st.dis_percent" class="form-control-plaintext  text-center" placeholder="0">                                       
                                     </td>
                                     <td class="">
-                                        <span >
-                                            <input  type="number"  v-model="st.dis_amount" class="form-control-plaintext form-control-sm text-center" placeholder="0">
-                                         </span>
-                                       
+                                            <input  type="number"  v-model="st.dis_amount" class="form-control-plaintext text-center" placeholder="0">                                       
                                     </td>
-                                    <td class="text-end">{{st.amount}}</td>
-                                    <td class="text-end">{{st.discount}}</td>
-                                    <td class="text-end">{{st.price}}</td>
+                                    <td class="text-end pt-2">{{st.amount}}</td>
+                                    <td class="text-end pt-2">{{st.discount}}</td>
+                                    <td class="text-end pt-2">{{st.price}}</td>
                                 </tr>
                                 <tr class="small">
                                     <td colspan="10" class="text-end">Amount</td>
@@ -118,9 +95,9 @@
                                     <td class="text-end ">{{total_discount}}</td>
                                 </tr>
                                 <tr class="small">
-                                    <td colspan="10" class="text-end">Extra discount</td>
+                                    <td colspan="10" class="text-end pt-2">Extra discount</td>
                                     <td class="text-end">
-                                        <input  type="number" @keyup="calTotal"  v-model="extra_discount" class="form-control-plaintext form-control-sm text-end" placeholder="0">
+                                        <input  type="number" @keyup="calTotal"  v-model="extra_discount" class="form-control-plaintext  text-end" placeholder="0">
                                     </td>
                                 </tr>
                                 <tr class="small">
@@ -329,15 +306,7 @@ export default {
             this.extra_discount=0
             this.v$.$reset()
         },
-       
-        
-       showTime(t){
-            const date=t.toDate()
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-            return formattedDate;
-        },
-                    
+           
     }
 }
 </script>

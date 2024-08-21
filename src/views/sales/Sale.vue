@@ -17,7 +17,7 @@
                     <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#salesModal"><i class="fa-solid fa-folder-tree"></i> Browse</button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                    <button :disabled="saleItems.length <=0" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print"></i> Print</button>
+                    <button :disabled="saleItems.length <=0 || isNewSale" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print</button>
                 </div>
                 <div class="col-sm-2 d-grid">
                         <button type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length <=0 || !isNewSale"><i class="fa-solid fa-hard-drive"></i> Save
@@ -36,9 +36,9 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="card shadow">
-                        <div class="card-body">
+                        <div class="card-body p-2">
                             <div class="row justify-content-end mb-2">
-                                <div class="col-lg-6">
+                                <div class="col-sm-6">
                                     <table class="table mb-0 table-borderless small">
                                         <thead class="small">
                                             <tr>
@@ -57,7 +57,7 @@
                                         </thead>
                                   </table>
                                 </div>
-                                <div class="col-lg-6">
+                                <div class="col-sm-6">
                                     <table class="table mb-0 table-borderless small">
                                         <thead class="small">                                           
                                             <tr>
@@ -92,44 +92,42 @@
                                             <td class="col-2">Price</td>
                                             <td class="col-2">Amount</td>
                                         </tr>
-                                        <tr class="text-center" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(i)" @mouseleave="saveEdit" >
-                                            <td class="position-relative">
+                                        <tr class="" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(i)" @mouseleave="saveEdit" >
+                                            <td class="position-relative pt-2 text-center">
                                                 <span v-if="isNewSale">
                                                     <a  class="text-danger position-absolute top-50 start-0 translate-middle p-2" href="#!" @click="removeSaleItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                                 </span>
                                                 {{s.code_no}}</td>
-                                            <td>{{s.item_name}}</td>
-                                            <td>
-                                                <span>
-                                                    <input :disabled="!isNewSale" :max="s.qty"min="1" @keypress.enter="saveEdit" @change="saveEdit"   type="number" class="form-control form-control-plaintext form-control-sm text-center" v-model="s.sale_qty">
-                                                </span>
+                                            <td class="pt-2">{{s.item_name}}</td>
+                                            <td class="p-0">
+                                                <input :disabled="!isNewSale" :max="s.qty"min="1" @keypress.enter="saveEdit" @change="saveEdit" @keyup="saveEdit"   type="number" class="form-control-plaintext  text-center" v-model="s.sale_qty">
                                             </td>
-                                            <td>{{s.sale_price}}</td>
-                                            <td>{{s.sale_amount}}</td>
+                                            <td class="pt-2 text-end">{{s.sale_price}}</td>
+                                            <td class="pt-2 text-end">{{s.sale_amount}}</td>
                                         </tr>  
                                         <tr>
                                             <td colspan="4" class="text-end">Total amount</td>
-                                            <td class="text-center">{{total_amount}}</td>
+                                            <td class="text-end">{{total_amount}}</td>
                                         </tr>                     
                                         <tr>
-                                            <td colspan="4" class="text-end" >Discount</td>
-                                            <td class="text-center">
-                                                <input :disabled="!isNewSale"  type="number" @keypress.enter="calDiscount"  @change="calDiscount" @mouseleave="calDiscount" v-model="discount" class="form-control-plaintext text-center form-control-sm">
+                                            <td colspan="4" class="text-end pt-2" >Discount</td>
+                                            <td class="text-end p-0">
+                                                <input @click="setInput" @mouseleave="setInput" :disabled="!isNewSale"  type="number" @keypress.enter="calDiscount"  @change="calDiscount" @keyup="calDiscount" v-model="discount" class="form-control-plaintext text-end m-0">
                                             </td>
                                         </tr>
                                         <tr>
                                             <td colspan="4" class="text-end">Charges</td>
-                                            <td class="text-center">{{charges}}</td>
+                                            <td class="text-end">{{charges}}</td>
                                         </tr>
-                                        <tr @mouseleave="calPay">
-                                            <td colspan="4" class="text-end">Pay</td>
-                                            <td class="text-center">
-                                                <input :disabled="!isNewSale" @keypress.enter="calPay" @change="calPay" type="number" v-model="pay" class="form-control-plaintext text-center form-control-sm">
+                                        <tr>
+                                            <td colspan="4" class="text-end pt-2">Pay</td>
+                                            <td class="text-end p-0">
+                                                <input @click="setInput" @mouseleave="setInput" :disabled="!isNewSale" @keypress.enter="calPay" @change="calPay" @keyup="calPay" type="number" v-model="pay" class="form-control-plaintext text-end m-0">
                                             </td>
                                         </tr>
                                         <tr>
                                             <td colspan="4" class="text-end">Refunds</td>
-                                            <td class="text-center">
+                                            <td class="text-end">
                                                 {{refunds}}
                                             </td>
                                         </tr>
@@ -143,107 +141,8 @@
         <SalesModal @setCode="setOldCode" />
         <CustomerModal @setCustomer="setCustomer" />
         <!--Pritn item start-->
-        <div class="container-fluid d-none" id="printMe" v-if="saleItems.length > 0" >
-            <div class="container-fluid px-4">
-                <div class="row">
-                    <div class="col-12">
-                           <h4 class="text-center"> Printing with N-POS</h4>
-                    </div>
-                </div>
-            <div class="row justify-content-end small" >   
-                <div class="col-6">
-                    <table class="table mb-0 table-borderless">
-                        <tbody class="small">  
-                            <tr>
-                                <td class="col-4 pb-0 fw-bold">Voucher no. <span class="float-end">:</span></td>
-                                <td class="col-8  ps-2 pb-0" style="border-bottom: 1px dotted;">
-                                    {{voucher_no}}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="pb-0 fw-bold">Date <span class="float-end">:</span></td>
-                                <td class=" ps-2 pb-0" style="border-bottom: 1px dotted;">
-                                   <span>{{showPrintTime(sale_date)}}</span>
-                                </td>
-                            </tr>       
-                        </tbody>
-                    </table>
-                </div>        
-                <div class="col-6">                    
-                    <table class="table mb-0 table-borderless">
-                        <tbody class="small">                                     
-                            <tr>
-                                <td class="  col-4 pb-0 fw-bold">Name <span class="float-end">:</span></td>
-                                <td class=" ps-2 col-8 pb-0" style="border-bottom: 1px dotted;">
-                                    {{customer.name}}
-                                </td>
-                            </tr>      
-                            <tr>
-                                <td class="pb-0 fw-bold">Phone <span class="float-end">:</span></td>
-                                <td class=" ps-2 pb-0" style="border-bottom: 1px dotted;">
-                                    {{customer.phone}}
-                                </td>
-                            </tr>                                               
-                        </tbody>
-                  </table>
-                </div>
-                <div class="col-12">
-                    <table class="table table-bordered table-hover border-dark mt-2 mb-0">
-                        <tbody class="small">
-                            <tr class="text-center fw-bold">
-                                <td class="col-4  py-1">Description</td>
-                                <td class="col-4   py-1">Qty</td>
-                                <td class="col-2   py-1">Price</td>
-                                <td class="col-2   py-1">Amount</td>
-                            </tr>
-                            <tr class="text-center" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" >                        
-                                <td class="py-1">{{s.item_name}}</td>
-                                <td class="  py-1">
-                                    {{s.sale_qty}}
-                                </td>
-                                <td class="  py-1">{{s.sale_price}}</td>
-                                <td class="  py-1">{{s.sale_amount}}</td>
-                            </tr>                        
-                      
-                            <tr>
-                                <td colspan="3" class="text-end col-6  py-1 pe-2 " style="border-bottom-style: hidden;">Total amount</td>
-                                <td class="text-center col-6   py-1">{{total_amount}}</td>
-                            </tr>                     
-                            <tr>
-                                <td colspan="3" class="text-end  py-1  pe-2 " style="border-bottom-style: hidden;">Discount</td>
-                                <td class="text-center   py-1">
-                                    {{discount}}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="3" class="text-end   py-1  pe-2 " style="border-bottom-style: hidden;">Charges</td>
-                                <td class="text-center   py-1">{{charges}}</td>
-                            </tr>
-                            <tr >
-                                <td colspan="3" class="text-end   py-1  pe-2 " style="border-bottom-style: hidden;">Pay</td>
-                                <td class="text-center  py-1">
-                                    {{pay}}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="3" class="text-end   py-1  pe-2 " >Refunds</td>
-                                <td class="text-center   py-1">
-                                    {{refunds}}
-                                </td>
-                            </tr>                           
-                        </tbody>
-                  </table>
-                  <table>
-                        <tbody>
-                            <tr>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                  </table>
-                </div>
-              
-            </div>
-        </div>
+        <div class="d-none" id="printMe" v-if="saleItems.length > 0" >
+                <Print :data="printData" />
         </div>
         <!-- print item end-->
     </div>
@@ -257,9 +156,10 @@ import db from '@/firebase/firestore'
 import Products from "@/views/sales/Products.vue"
 import SalesModal from "@/views/modals/sales/SalesModal.vue"
 import CustomerModal from "@/views/modals/sales/CustomerModal.vue"
+import Print from "@/views/sales/Print.vue"
 export default {
     components: {
-        PageHeader, Products,SalesModal,CustomerModal
+        PageHeader, Products,SalesModal,CustomerModal,Print
     },
     setup () {
         return { v$: useVuelidate() }
@@ -314,7 +214,7 @@ export default {
                     setTimeout(()=>{
                         this.msg.type="";
                         this.msg.info="";
-                    }, 10000)
+                    }, 3000)
                 }
             },deep:true
         }
@@ -322,16 +222,38 @@ export default {
     computed:{
         user(){
             return this.$store.getters.user;
+        },
+        printData(){
+            return{
+                voucher_no: this.voucher_no,
+                customer: this.customer,
+                saleItems: this.saleItems,
+                sale_date:this.sale_date,
+                total_amount:this.total_amount,
+                discount:this.discount,
+                charges:this.charges,
+                pay:this.pay,
+                refunds:this.refunds,
+            }
         }
     },
     methods:{
+        setInput(e){
+           if(e.target.value==0){
+                e.target.value=""
+           }
+           if(e.target.value==""){
+                e.target.value=0;
+           }
+        },
         async print () {
         // Pass the element id here
          await this.$htmlToPaper('printMe');
          this.clearSaleItem();
         },
         printSale(){         
-            this.print();      
+           this.print();      
+           this.clearSaleItem();
         },
         changeCustomer(){
            this.setCustomer(this.customerData)
@@ -499,17 +421,19 @@ export default {
         updateStoringItem(){
           this.saleItems= this.saleItems.map((f)=>{
                 if(f.id ===this.store_item.id){
-                    return {...f, sale_qty : f.sale_qty + 1, sale_amount : f.sale_price * (f.sale_qty + 1)}
+                    return {...f, sale_qty : f.sale_qty + 1,
+                         sale_amount : f.sale_price * (f.sale_qty + 1),
+                         pur_amount : f.pur_price * (f.sale_qty + 1),
+                        }
                 }else{
                     return {...f}
                 }
             })
             this.calTotal();
         },
-        calDiscount(){
+        calDiscount(){           
             this.calTotal();
             this.charges=this.total_amount - this.discount;
-            this.calPay();
         },
         calPay(){
             this.refunds=this.pay - this.charges;
@@ -524,13 +448,7 @@ export default {
             const formattedDate = new Date(date).toISOString().substr(0, 10)
             return formattedDate;
         },
-        showPrintTime(t){
-            const newT=Timestamp.fromDate(new Date(t))
-            const date=newT.toDate()
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-            return formattedDate;
-        },
+      
     },
     
 }

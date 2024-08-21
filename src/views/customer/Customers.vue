@@ -12,22 +12,24 @@
                </div>
            </div>
            <div class="container-fluid my-2">
-               <div class="row gx-2">
+               <div class="row g-2">
                    <div class="col-lg-3">
                        <div class="card shadow ">
                             <div class="card-body p-2">
-                                <div class="form-floating col-12 mb-2">
-                                    <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchCustomer" placeholder="Code" class="form-control form-control-sm">
-                                    <label for="search_by_code" class="small ms-2">Code</label>
+                                <div class="row g-2">
+                                    <div class="form-floating col-sm-4 col-lg-12 ">
+                                        <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchCustomer" placeholder="Code" class="form-control form-control-sm">
+                                        <label for="search_by_code" class="small ">Code</label>
+                                    </div>
+                                    <div class="form-floating col-sm-4 col-lg-12 ">
+                                        <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchCustomer" placeholder="Description" class="form-control form-control-sm">
+                                        <label for="search_by_name" class="small ">Name</label>
+                                    </div> 
+                                    <div class="form-floating col-sm-4 col-lg-12 ">
+                                        <input type="search" id="search_by_address" v-model="search_by_address" @keyup="searchCustomer" placeholder="Address" class="form-control form-control-sm">
+                                        <label for="search_by_address" class="small ">Address</label>
+                                    </div> 
                                 </div>
-                                <div class="form-floating col-12 mb-2">
-                                    <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchCustomer" placeholder="Description" class="form-control form-control-sm">
-                                    <label for="search_by_name" class="small ms-2">Name</label>
-                                </div> 
-                                <div class="form-floating col-12 mb-2">
-                                 <input type="search" id="search_by_address" v-model="search_by_address" @keyup="searchCustomer" placeholder="Address" class="form-control form-control-sm">
-                                 <label for="search_by_address" class="small ms-2">Address</label>
-                             </div> 
                                  <div class="row">
                                         <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="searchCustomer"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
                                         <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateCustomer">
@@ -52,40 +54,40 @@
                                            <td @click="sortCustomers('created_at')"><i class="fa-solid fa-sort"></i> Date</td>
                                        </tr>
                                        <tr>
-                                            <td class="" colspan="2">
+                                            <td class="p-0" colspan="2">
                                                 <input type="text" v-model="code" class="form-control-plaintext text-center" id="code" placeholder="Code">                                                                                       
                                             </td>
-                                            <td class="">
+                                            <td class="p-0">
                                                 <input type="text" v-model="name" :class="{'border-danger' : v$.name.$errors.length}" class="form-control-plaintext text-center" id="name" placeholder="Name">                                               
                                             </td>
-                                            <td class="">
+                                            <td class="p-0">
                                                 <input type="tel" v-model="phone"  :class="{'border-danger' : v$.phone.$errors.length}"  class="form-control-plaintext text-center" id="phone" placeholder="Phone">                                            
                                             </td>
-                                            <td class="">
+                                            <td class="p-0">
                                                 <input type="text" v-model="address"  :class="{'border-danger' : v$.address.$errors.length}"  class="form-control-plaintext text-center" id="address" placeholder="Address">                                              
                                             </td>
-                                            <td class="">
+                                            <td class="p-0">
                                                 <input type="date" v-model="created_at"    class="form-control-plaintext text-center" id="company" placeholder="Date">                                              
                                             </td>
                                         </tr>
                                        
                                        <tr class="text-center" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id" @mouseenter="setEdit(i)" @mouseleave="saveEdit" @keypress.enter="saveEdit">
-                                            <td>
+                                            <td class="pt-2">
                                                 <a class="text-danger" href="#!" @click="removeCustomer(i, p)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                             </td>
-                                           <td :class="{'table-secondary': sort_item ==='code'}" >
+                                           <td :class="{'table-secondary': sort_item ==='code'}" class="pt-2">
                                                 {{p.code}}
                                             </td>
-                                           <td :class="{'table-secondary': sort_item ==='name'}">
+                                           <td :class="{'table-secondary': sort_item ==='name'}" class="p-0">
                                                 <input type="text" class="form-control-plaintext text-center   m-0" v-model="p.name">
                                            </td>
-                                           <td :class="{'table-secondary': sort_item ==='phone'}">
+                                           <td :class="{'table-secondary': sort_item ==='phone'}" class="p-0">
                                             <input type="text" class="form-control-plaintext text-center  m-0" v-model="p.phone">
                                            </td>
-                                           <td :class="{'table-secondary': sort_item ==='address'}">
+                                           <td :class="{'table-secondary': sort_item ==='address'}" class="p-0">
                                             <input type="text" class="form-control-plaintext text-center m-0" v-model="p.address">
                                            </td>
-                                           <td :class="{'table-secondary': sort_item ==='created_at'}">{{showTime(p.created_at)}}</td>
+                                           <td :class="{'table-secondary': sort_item ==='created_at'}" class="pt-2">{{showTime(p.created_at)}}</td>
                                        </tr>
                                    </tbody>
                                </table>
@@ -112,6 +114,8 @@
 import { required, email ,helpers} from '@vuelidate/validators'
    import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
    import db from '@/firebase/firestore'
+   import * as hp from "@/lib/helper"
+   import * as ss from "@/lib/snapshot/customers"
    export default {
        components: {
                PageHeader
@@ -331,7 +335,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
            },
            
            async fetchCustomer(){                    
-               const query_url = query(collection(db, "customers"), where("uid", "==", this.user.uid), orderBy("created_at", "desc"));
+               const query_url = query(collection(db, "customers"), orderBy("created_at", "desc"));
                const snapShot=await getDocs(query_url)           
                if(snapShot._snapshot.docChanges.length <=0){
                    this.msg.type='error' 
@@ -339,23 +343,8 @@ import { required, email ,helpers} from '@vuelidate/validators'
                    this.isLoading=false;
                    this.isUpdating=false;
                    return false;
-               }
-   
-               let customers=[];
-               snapShot && snapShot.forEach((doc) => {         
-                   let cus = {
-                       id: doc.id,
-                       uid: doc.data().uid,
-                       name: doc.data().name,
-                       purchase_price : doc.data().purchase_price,
-                       address : doc.data().address,
-                       created_at: doc.data().created_at,
-                       phone : doc.data().phone,
-                       code : doc.data().code,                                
-                   };                                
-                   customers.push(cus);                           
-                               
-               });
+               }   
+               const customers=ss.customers(snapShot);           
                this.customers=[];
                this.customersData=customers;
                this.customers=customers;
@@ -364,10 +353,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
               // this.$store.dispatch("setcustomers", this.customers)
           } ,
           showTime(t){
-            const date=t.toDate()
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-            return formattedDate;
+            return hp.showTime(t)
         }
        },
        

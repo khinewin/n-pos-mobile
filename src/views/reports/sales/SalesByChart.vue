@@ -2,102 +2,122 @@
   <div class="container-fluid">
     <div class="row my-2">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header text-dark">Top 20 sales</div>
-                <div class="card-body">
-                    <div v-if="isLoading">
-                        <div colspan="5">
-                            <div class="d-flex justify-content-center my-5">
-                                <div class="spinner-border text-primary"  role="status">
-                                  <span class="visually-hidden">Loading...</span>
+            <div class="card shadow">
+                <div class="card-header text-dark">Top 10 sales item</div>
+                <div class="card-body p-0">
+                   <div class="row">
+                    <div class="col-12">
+                        <div v-if="isLoading">
+                            <div colspan="5">
+                                <div class="d-flex justify-content-center my-5">
+                                    <div class="spinner-border text-primary"  role="status">
+                                      <span class="visually-hidden">Loading...</span>
+                                    </div>
                                 </div>
                             </div>
+                        </div>   
+                        <div v-if="topSalesQty.length >1">
+                            <GChart
+                            :settings="{ packages: ['corechart', 'table', 'map'] }"
+                            type="ColumnChart"
+                            :data="topSalesQty"
+                            :options="qtyOptions"
+                        />
                         </div>
-                    </div>   
-                    <div v-if="topSalesQty.length >0">
-                        <GChart
-                        :settings="{ packages: ['corechart', 'table', 'map'] }"
-                        type="ColumnChart"
-                        :data="topSalesQty"
-                        :options="qtyOptions"
-                    />
+                        <div class="my-5 text-center" v-else >No data.</div>
                     </div>
-                </div>
+                    </div>
+                   </div>
             </div>
         </div>
     </div>
         <div class="row my-2">
             <div class="col-12">
-                <div class="card">
-                    <div class="card-header text-dark">Purchase , sales and profit amount by Date</div>
-                    <div class="card-body">
-                        <div v-if="isLoading">
-                            <div colspan="5">
-                                <div class="d-flex justify-content-center my-5">
-                                    <div class="spinner-border text-primary"  role="status">
-                                      <span class="visually-hidden">Loading...</span>
+                <div class="card shadow">
+                    <div class="card-header text-dark">Sales with purchase amount and profit by Date</div>
+                    <div class="card-body p-0">
+                      <div class="row">
+                        <div class="col-12">
+                            <div v-if="isLoading">
+                                <div colspan="5">
+                                    <div class="d-flex justify-content-center my-5">
+                                        <div class="spinner-border text-primary"  role="status">
+                                          <span class="visually-hidden">Loading...</span>
+                                        </div>
                                     </div>
                                 </div>
+                            </div>   
+                            <div v-if="products.length >1">
+                                <GChart
+                                :settings="{ packages: ['corechart', 'table', 'map'] }"
+                                type="LineChart"
+                                :data="products"
+                                :options="chartOptions"
+                            />
                             </div>
-                        </div>   
-                        <div v-if="products.length >0">
-                            <GChart
-                            :settings="{ packages: ['corechart', 'table', 'map'] }"
-                            type="ColumnChart"
-                            :data="products"
-                            :options="chartOptions"
-                        />
+                            <div class="my-5 text-center" v-else >No data.</div>
                         </div>
-                    </div>
+                        </div>
+                      </div>
                 </div>
             </div>
         </div>
-        <div class="row gx-2">
-            <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-header">Purchase, sales and profit amount by Month</div>
-                    <div class="card-body">
-                        <div v-if="isLoading">
-                            <div colspan="5">
-                                <div class="d-flex justify-content-center my-5">
-                                    <div class="spinner-border text-primary"  role="status">
-                                      <span class="visually-hidden">Loading...</span>
+        <div class="row g-2">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-header">Sales with purchase amount and profit by Month</div>
+                    <div class="card-body p-0">
+                       <div class="row">
+                        <div class="col-12">
+                            <div v-if="isLoading">
+                                <div colspan="5">
+                                    <div class="d-flex justify-content-center my-5">
+                                        <div class="spinner-border text-primary"  role="status">
+                                          <span class="visually-hidden">Loading...</span>
+                                        </div>
                                     </div>
                                 </div>
+                            </div>   
+                            <div v-if="monthlyProducts.length > 1">
+                                <GChart
+                                :settings="{ packages: ['corechart', 'table', 'map'] }"
+                                type="ColumnChart"
+                                :data="monthlyProducts"
+                                :options="monthlyChartOptions"
+                            />
                             </div>
-                        </div>   
-                        <div v-if="monthlyProducts.length > 0">
-                            <GChart
-                            :settings="{ packages: ['corechart', 'table', 'map'] }"
-                            type="ColumnChart"
-                            :data="monthlyProducts"
-                            :options="monthlyChartOptions"
-                        />
+                            <div class="my-5 text-center" v-else >No data.</div>
                         </div>
+                       </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div class="card">
+            <div class="col-md-6">
+                <div class="card shadow">
                     <div class="card-header">Sales amount by Month</div>
-                    <div class="card-body">
-                        <div v-if="isLoading">
-                            <div colspan="5">
-                                <div class="d-flex justify-content-center my-5">
-                                    <div class="spinner-border text-primary"  role="status">
-                                      <span class="visually-hidden">Loading...</span>
+                    <div class="card-body p-0">
+                      <div class="row">
+                        <div class="col-12">
+                            <div v-if="isLoading">
+                                <div colspan="5">
+                                    <div class="d-flex justify-content-center my-5">
+                                        <div class="spinner-border text-primary"  role="status">
+                                          <span class="visually-hidden">Loading...</span>
+                                        </div>
                                     </div>
                                 </div>
+                            </div>   
+                            <div v-if="monthlySalesProducts.length > 1">
+                                <GChart
+                                :settings="{ packages: ['corechart', 'table', 'map'] }"
+                                type="PieChart"
+                                :data="monthlySalesProducts"
+                                :options="monthlySalesAmountOptions"
+                            />
                             </div>
-                        </div>   
-                        <div v-if="monthlySalesProducts.length > 0">
-                            <GChart
-                            :settings="{ packages: ['corechart', 'table', 'map'] }"
-                            type="PieChart"
-                            :data="monthlySalesProducts"
-                            :options="monthlyChartOptions"
-                        />
+                            <div class="my-5 text-center" v-else >No data.</div>
                         </div>
+                      </div>
                     </div>
                 </div>
             </div>
@@ -108,14 +128,15 @@
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import { GChart } from 'vue-google-charts'
+import * as hp from "@/lib/helper"
+import * as ss from '@/lib/snapshot/sales'
 export default {
     props:['fromDate', 'toDate', 'customer_code'],
     components: {
     GChart
   },
     data(){
-        return{
-           
+        return{           
             monthlyProducts:[],
             monthlySalesProducts:[],
             products:[],
@@ -123,14 +144,18 @@ export default {
             salesMonthlyData:[],
             salesData:[],
             isLoading:false,   
-            qtyOptions: {              
+            discount:0,
+            qtyOptions: {     
                 colors : ["teal"]
             },        
             chartOptions: {              
-                colors : ["orange", "blue","green"]
+                colors : ["orange", "blue","green", "brown"]
             },
             monthlyChartOptions: {              
                 colors : ["orange", "blue","green"]
+            },
+            monthlySalesAmountOptions: {              
+                colors : ["red", "orange","yellow", "green","teal","blue"]
             }
         }
     },
@@ -166,18 +191,15 @@ export default {
             return this.$store.getters.user;
         },
     },
-
     methods:{
         monthlyReports(){
             let sales=[]
             this.salesMonthlyData.map((res)=>{                  
                     res.products.map((data)=>{
-                        sales.push({...data, month : this.monthlyShowTime(res.sale_date)})
+                        sales.push({...data, group_month : this.monthlyShowTime(res.sale_date)})
                     })
             })
-            const gbm=Object.entries(Object.groupBy(sales, res=>{
-                return res.month
-            }))             
+            const gbm=Object.entries(hp.gb_month(sales))             
             const data= gbm.map((res)=>{
                     const date=res[0];
                     let sale_amount=0;
@@ -186,8 +208,7 @@ export default {
                     res[1].map((r)=>{
                             sale_amount += r.sale_amount
                             pur_amount +=r.pur_amount;
-                            profit += r.sale_amount - r.pur_amount; 
-                        
+                            profit += r.sale_amount - r.pur_amount;                         
                     })
                    return [date, pur_amount, sale_amount, profit]
             })
@@ -214,82 +235,58 @@ export default {
             const to_date=Timestamp.fromDate(new Date(theLast))
             let query_url=""
            if(this.customer_code){
-            query_url = query(collection(db, "sales"), where("uid", "==", this.user.uid), 
+            query_url = query(collection(db, "sales"),  
             where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), where("customer.code", "==", Number(this.customer_code)), orderBy("sale_date"));
            }else{
-             query_url = query(collection(db, "sales"), where("uid", "==", this.user.uid), 
+             query_url = query(collection(db, "sales"),  
             where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date"));
             }
-            const shapShot=await getDocs(query_url)
-            let saleItems=[];
-            shapShot.forEach((doc) => {         
-                let sale = {
-                    id: doc.id,
-                    uid: doc.data().uid,
-                    voucher_no: doc.data().voucher_no,
-                    sale_date : doc.data().sale_date,
-                    products : doc.data().products,    
-                    charges: doc.data().charges,
-                    pay:doc.data().pay,
-                    discount: doc.data().discount,
-                    refunds: doc.data().refunds,
-                    total_amount:doc.data().total_amount,
-                    sale_type: doc.data().sale_type,
-                    customer : doc.data().customer,
-                };               
-                                
-                saleItems.push(sale);      
-            });
+            const snapShot=await getDocs(query_url)
+            let saleItems=ss.sales(snapShot);           
             this.salesMonthlyData=saleItems;
             this.monthlyReports();
             this.isLoading=false;
         },
         dailyReports(){
             let sales=[]
-            this.salesData.map((res)=>{                  
+            this.salesData.map((res)=>{              
                     res.products.map((data)=>{
-                        sales.push({...data, date_group : this.topQtyShowTime(res.sale_date)})
+                        sales.push({...data, group_date : this.topQtyShowTime(res.sale_date)})
                     })
             })
-            const gbd=Object.entries(Object.groupBy(sales, res=>{
-                return res.date_group
-            }))
-            //cal by date
+            const gbd=Object.entries(hp.gb_date(sales))
            const data= gbd.map((res)=>{
-                    const date=res[0];
-                    let sale_amount=0;
-                    let pur_amount=0;
-                    let profit=0;               
-                    res[1].map((r)=>{                     
-                            sale_amount += r.sale_amount
-                            pur_amount +=r.pur_amount;
-                            profit += r.sale_amount - r.pur_amount;                       
-                    })
-                   return [date, pur_amount, sale_amount, profit]
+                    let item={
+                        date : res[0],
+                        sale_amount : 0,
+                        pur_amount :0,
+                        profit: 0,
+                    }                            
+                    res[1].map((r)=>{  
+                            item.sale_amount += r.sale_amount
+                            item.pur_amount +=r.pur_amount;
+                            item.profit += (r.sale_amount - r.pur_amount);    
+                    })                    
+                   return [item.date, item.pur_amount, item.sale_amount, item.profit]
             })
-            const title=["Date", "Pur amount", "Sales amount", "Profit"]
+            const title=["Date", "Pur Amt", "Sales Amt", "Profit"]
             data.unshift(title)
             this.products=data;            
             //cal qty
-            const gbc=Object.entries(Object.groupBy(sales, res=>{
-                return res.code_no
-            }))
+            const gbc=Object.entries(hp.gb_code(sales))
             let result=[]
-            gbc.map((res)=>{
-                    const data=res[1].reduce((accu, cur)=>{
-                            return {
-                                    item_name : accu.item_name,
-                                    sale_qty : accu.sale_qty + cur.sale_qty
-                            }
-                    })  
+            gbc.map((res)=>{                
+                   let data={item_name:"", sale_qty: 0}
+                    res[1].map((ren)=>{
+                            data.item_name=ren.item_name;
+                            data.sale_qty += ren.sale_qty;
+                    })
                     result.push(data)
-                  //  return [data.item_name, data.sale_qty]
             })
             result.sort((a,b)=>a.sale_qty - b.sale_qty).reverse()
             const filterResult=result.filter((res, i)=>{
-                if(i<20) return res;
+                if(i<10) return res;
             })
-          //  console.log(filterRerult)
             const newResult=filterResult.map((res, i)=>{     
                     return [res.item_name, res.sale_qty]                          
             })            
@@ -302,44 +299,22 @@ export default {
         async fetchSalesDaily(){
             const from_date=Timestamp.fromDate(new Date(this.fromDate))
             const to_date=Timestamp.fromDate(new Date(this.toDate))
-           // console.log(from_date, to_date)
            let query_url=""
            if(this.customer_code){
-            query_url = query(collection(db, "sales"), where("uid", "==", this.user.uid), 
+            query_url = query(collection(db, "sales"),  
             where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), where("customer.code", "==", Number(this.customer_code)), orderBy("sale_date"));
            }else{
-             query_url = query(collection(db, "sales"), where("uid", "==", this.user.uid), 
+             query_url = query(collection(db, "sales"),  
             where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date"));
             }
-            const shapShot=await getDocs(query_url)
-            let saleItems=[];
-            shapShot.forEach((doc) => {         
-                let sale = {
-                    id: doc.id,
-                    uid: doc.data().uid,
-                    voucher_no: doc.data().voucher_no,
-                    sale_date : doc.data().sale_date,
-                    products : doc.data().products,    
-                    charges: doc.data().charges,
-                    pay:doc.data().pay,
-                    discount: doc.data().discount,
-                    refunds: doc.data().refunds,
-                    total_amount:doc.data().total_amount,
-                    sale_type: doc.data().sale_type,
-                    customer : doc.data().customer,
-                };               
-                                
-                saleItems.push(sale);      
-            });
-        this.salesData=saleItems;
-        this.dailyReports();
-        this.isLoading=false;
+            const snapShot=await getDocs(query_url)
+            const saleItems=ss.sales(snapShot)
+            this.salesData=saleItems;
+            this.dailyReports();
+            this.isLoading=false;
         },
         showTime(t){
-            const date=t.toDate()
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-            return formattedDate;
+            return hp.showTime(t)
         },
         topQtyShowTime(t){
             const date=t.toDate()

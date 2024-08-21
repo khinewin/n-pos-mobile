@@ -7,64 +7,80 @@
                <div class="card min-vh-100">
                    <div class="card-body py-3 px-1">
                     <div class="row g-1 m-0">
-                        <div class="col-4">                                                         
-                                <div class="row">
-                                        <div class="form-floating col-12 mb-2">
-                                            <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchPurchases" placeholder="Voucher no." class="form-control form-control-sm">
-                                            <label for="search_by_voucher_no" class="small ms-2">Voucher no.</label>
+                        <div class="col-lg-3">                                                         
+                                <div class="card shadow">
+                                    <div class="card-body p-2">
+                                       <div class="row g-1">
+                                        <div class="col-md-6 col-lg-12">
+                                            <div class="form-floating ">
+                                                <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchPurchases" placeholder="Voucher no." class="form-control form-control-sm">
+                                                <label for="search_by_voucher_no" class="small">Voucher no.</label>
+                                            </div>
                                         </div>
-                                        <div class="form-floating col-12 mb-2">
-                                            <input type="date" v-model="search_by_from_pur_date" @change="searchPurchases" placeholder="From pur date" class="form-control">
-                                            <label for="search_by_from_pur_date" class="small ms-2">From pur date</label>
+                                        <div class="col-md-6 col-lg-12">
+                                            <div class="form-floating ">
+                                                <input type="date" v-model="search_by_from_pur_date" @change="searchPurchases" placeholder="From pur date" class="form-control form-control-sm">
+                                                <label for="search_by_from_pur_date" class="small">From pur date</label>
+                                            </div>
                                         </div>
-                                        <div class="form-floating  mb-2">
-                                            <input type="date" v-model="search_by_to_pur_date" @change="searchPurchases" placeholder="To pur date" class="form-control">
-                                            <label for="search_by_to_pur_date" class="small ms-2">To pur date</label>
+                                        <div class="col-md-6 col-lg-12">
+                                            <div class="form-floating ">
+                                                <input type="date" v-model="search_by_to_pur_date" @change="searchPurchases" placeholder="To pur date" class="form-control form-control-sm">
+                                                <label for="search_by_to_pur_date" class="small">To pur date</label>
+                                            </div>
                                         </div>
-                                        <div class="form-floating  mb-2">
-                                            <input type="search" v-model="search_by_supplier" @keyup="searchPurchases" placeholder="Supplier" class="form-control">
-                                            <label for="search_by_supplier" class="small ms-2">Supplier</label>
+                                        <div class="col-md-6 col-lg-12">
+                                            <div class="form-floating ">
+                                                <input type="search" v-model="search_by_supplier" @keyup="searchPurchases" placeholder="Supplier" class="form-control form-control-sm">
+                                                <label for="search_by_supplier" class="small">Supplier</label>
+                                            </div>
                                         </div>
+                                       </div>
                                 </div>
                                 <div class="row">
-                                        <div class="col-4">
-                                            <button class="btn text-dark" @click="clearSearch">Clear</button>
+                                        <div class="col-4 d-grid">
+                                            <button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
                                         </div>
-                                        <div class="col-4">
-                                            <button class="btn text-primary" @click="updatePurchases">Update
+                                        <div class="col-4 d-grid">
+                                            <button class="btn btn-sm text-dark" @click="updatePurchases">
+                                                <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
                                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                             </button>
                                         </div>
-                                        <div class="col-4">
-                                            <button class="btn text-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                                        <div class="col-4 d-grid">
+                                            <button class="btn btn-sm text-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                                         </div>
                                 </div>
-                                                                                                              
+                            </div>                                                                                                              
                         </div>
-                        <div class="col-8 table-responsive">
-                            <table class="table table-bordered table-hover m-0">
-                                <tbody class="small text-center">
-                                    <tr class="table-secondary">
-                                        <td>Voucher no.</td>
-                                        <td>Pur date</td>                                    
-                                        <td>Supplier</td>
-                                    </tr>                                
-                                    <tr v-if="purchases.length > 0" v-for="p in purchases" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal" aria-label="Close" style="cursor: context-menu;">
-                                        <td>{{p.voucher_no}}</td>
-                                        <td>{{showTime(p.pur_date)}}</td>
-                                        <td>{{p.supplier.name}} ({{p.supplier.company}})</td>
-                                    </tr>
-                                </tbody>
-                            </table>   
-                            <div v-if="isLoading">
-                                <div colspan="5">
-                                    <div class="d-flex justify-content-center my-5">
-                                        <div class="spinner-border text-primary"  role="status">
-                                          <span class="visually-hidden">Loading...</span>
+                        <div class="col-lg-9">
+                            <div class="card shadow">
+                                <div class="card-body p-2">
+                                    <table class="table table-bordered table-hover m-0">
+                                        <tbody class="">
+                                            <tr class="table-secondary text-center">
+                                                <td>Voucher no.</td>
+                                                <td>Pur date</td>                                    
+                                                <td>Supplier</td>
+                                            </tr>                                
+                                            <tr v-if="purchases.length > 0" v-for="p in purchases" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal" aria-label="Close" style="cursor: context-menu;">
+                                                <td class="text-center">{{p.voucher_no}}</td>
+                                                <td class="text-center">{{showTime(p.pur_date)}}</td>
+                                                <td>{{p.supplier.name}} ({{p.supplier.company}})</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>   
+                                    <div v-if="isLoading">
+                                        <div colspan="5">
+                                            <div class="d-flex justify-content-center my-5">
+                                                <div class="spinner-border text-primary"  role="status">
+                                                  <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </div>   
                                 </div>
-                            </div>                          
+                            </div>                       
                         </div>
                     </div>                                                                                     
                    </div>
@@ -117,8 +133,7 @@ export default {
                     this.isLoading=true;      
                    this.fetchPurchase();           
            }
-       }
-     
+       }     
    },
    methods:{
        updatePurchases(){
@@ -130,8 +145,8 @@ export default {
            this.clearSearch();
        },
        clearSearch(){
-           this.search_by_code="";
-           this.search_by_item_name="";
+           this.search_by_voucher_no="";
+           this.search_by_supplier="";
            this.search_by_from_pur_date="";
            this.search_by_to_pur_date="";
            this.searchPurchases();
@@ -161,7 +176,7 @@ export default {
        },
      
     async fetchPurchase(){
-       const query_url = query(collection(db, "purchases"), where("uid", "==", this.user.uid), orderBy("pur_date", "desc"));
+       const query_url = query(collection(db, "purchases"),  orderBy("pur_date", "desc"));
        const snapShot=await getDocs(query_url)
        let purchases=[];
        snapShot.forEach((doc) => {         

@@ -12,24 +12,26 @@
             </div>
         </div>
         <div class="container-fluid my-2">
-            <div class="row gx-2">
+            <div class="row g-2">
                 <div class="col-lg-3">
                     <div class="card shadow">
                         <div class="card-body p-2">
-                            <div class="form-floating col-12 mb-2">
-                                <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchProducts" placeholder="Code" class="form-control form-control-sm">
-                                <label for="search_by_code" class="small ms-2">Code</label>
-                            </div>
-                            <div class="form-floating col-12 mb-2">
-                                <input type="search" id="search_by_description" v-model="search_by_description" @keyup="searchProducts" placeholder="Description" class="form-control form-control-sm">
-                                <label for="search_by_description" class="small ms-2">Description</label>
+                            <div class="row g-2">
+                                <div class="form-floating col-sm-6 col-lg-12">
+                                    <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchProducts" placeholder="Code" class="form-control form-control-sm">
+                                    <label for="search_by_code" class="small">Code</label>
+                                </div>
+                                <div class="form-floating col-sm-6 col-lg-12">
+                                    <input type="search" id="search_by_description" v-model="search_by_description" @keyup="searchProducts" placeholder="Description" class="form-control form-control-sm">
+                                    <label for="search_by_description" class="small">Description</label>
+                                </div>
                             </div> 
                              <div class="row">
-                                    <div class="col-4"><button class="btn btn-sm text-dark" @click="searchProducts"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
-                                    <div class="col-4"><button class="btn btn-sm text-dark" @click="updateProducts"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
+                                    <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="searchProducts"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
+                                    <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateProducts"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                     </button></div>
-                                    <div class="col-4"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
+                                    <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
                              </div> 
                         </div>
                     </div>                                                                                                          
@@ -38,7 +40,7 @@
                     <div class="card shadow">
                         <div class="card-body p-2 table-responsive">
                             <table class="table table-bordered table-hover mb-0">
-                                <tbody class="small">
+                                <tbody class="">
                                     <tr class="text-center table-secondary" style="cursor: context-menu;">
                                         <td colspan="2" @click="sortProducts('code_no')"><i class="fa-solid fa-sort"></i> Code</td>
                                         <td @click="sortProducts('item_name')"><i class="fa-solid fa-sort"></i> Description</td>
@@ -77,17 +79,17 @@
                                             <a class="text-danger" href="#!" @click="removeProduct(i, p)"><i class="fa-solid fa-square-minus"></i></a>                                                                                       
                                            <!-- <input type="checkbox" @change="handleSelected(p.id, $event)"> -->
                                         </td>
-                                        <td :class="{'table-secondary': sort_item ==='code_no'}">
+                                        <td :class="{'table-secondary': sort_item ==='code_no'}" class="p-0">
                                             <span>
                                                 <input type="text" class="form-control-plaintext text-center  " v-model="p.code_no">
                                             </span>
                                         </td>
-                                        <td :class="{'table-secondary': sort_item ==='item_name'}">
+                                        <td :class="{'table-secondary': sort_item ==='item_name'}" class="p-0">
                                             <span>
                                                 <input type="text" class="form-control-plaintext text-center  " v-model="p.item_name">
                                             </span>
                                         </td>
-                                        <td :class="{'table-secondary': sort_item ==='item_per_package'}">
+                                        <td :class="{'table-secondary': sort_item ==='item_per_package'}" class="p-0">
                                             <span>
                                                 <input type="number" class="form-control-plaintext text-center " v-model="p.item_per_package">
                                             </span>
@@ -97,9 +99,9 @@
                                         </td>
                                         <td :class="{'table-secondary': sort_item ==='qty'}" class="pt-2">{{Math.floor(p.qty / p.item_per_package)}} x {{Math.floor(p.qty % p.item_per_package)}} </td>                                         
 
-                                        <td :class="{'table-secondary': sort_item ==='retail_price'}" class="pt-2">{{p.retail_price}}</td>
-                                        <td :class="{'table-secondary': sort_item ==='whole_sale_price'}" class="pt-2">{{p.whole_sale_price}}</td>
-                                        <td :class="{'table-secondary': sort_item ==='pur_price'}" class="pt-2">{{p.pur_price}}</td>
+                                        <td :class="{'table-secondary': sort_item ==='retail_price'}" class="pt-2 text-end">{{p.retail_price}}</td>
+                                        <td :class="{'table-secondary': sort_item ==='whole_sale_price'}" class="pt-2 text-end">{{p.whole_sale_price}}</td>
+                                        <td :class="{'table-secondary': sort_item ==='pur_price'}" class="pt-2 text-end">{{p.pur_price}}</td>
                                     
                                     </tr>
                                 </tbody>
@@ -129,6 +131,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
 import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import Footer from '@/views/partials/Footer.vue'
+import * as ss from "@/lib/snapshot/products"
 export default {
     components: {
             PageHeader, Footer
@@ -199,33 +202,7 @@ export default {
             },deep:true
         }
     },
-    methods:{
-        /*
-        async deleteMultipleCode(){
-            const cf=confirm("Are you sure ? delete the bulk product code.")
-            if(!cf) return false;
-            this.isDeleting=true
-            this.selected_items.map(async(id)=>{                
-                const document=doc(db, "products", id)     
-                await deleteDoc(document) //if no items delete document;               
-            })     
-            this.selected_items=[];     
-            this.fetchProducts();  
-            this.msg.type="success";
-            this.msg.info="Products code delete successful"
-            this.isDeleting=false;
-        },
-        
-        handleSelected(id, $event){
-            const isChecked=$event.target.checked;
-            if(isChecked){
-                this.selected_items.push(id)
-            }else{
-                const i=this.selected_items.indexOf(id);
-                this.selected_items.splice(i, 1)
-            }
-        },
-        */
+    methods:{    
         async removeProduct(i, p){
             const cf=confirm(`Are you sure ? delete the product code : ${p.item_name} `)
             if(!cf) return false;
@@ -371,34 +348,15 @@ export default {
         },
         
         async fetchProducts(){                    
-            const query_url = query(collection(db, "products"), where("uid", "==", this.user.uid), orderBy("created_at", "desc"));
+            const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
             const snapShot=await getDocs(query_url)           
             if(snapShot._snapshot.docChanges.length <=0){
                 this.msg.type='error' 
                 this.msg.info='Oops..., something went wrong!'
                 this.isLoading=false;
                 this.isUpdating=false;
-                return false;
             }
-
-            let products=[];
-            snapShot && snapShot.forEach((doc) => {         
-                let product = {
-                    id: doc.id,
-                    uid: doc.data().uid,
-                    item_name: doc.data().item_name,
-                    purchase_price : doc.data().purchase_price,
-                    retail_price : doc.data().retail_price,
-                    whole_sale_price: doc.data().whole_sale_price,
-                    qty : doc.data().qty,
-                    created_at : doc.data().created_at,
-                    code_no : doc.data().code_no,                
-                    item_per_package: doc.data().item_per_package,
-                    pur_price:doc.data().pur_price,       
-                };                                
-                products.push(product);                           
-                            
-            });
+            const products=ss.products(snapShot);            
             this.products=[];
             this.productsData=products;
             this.products=products;
