@@ -6,7 +6,7 @@
                     <table class="table table-bordered border-dark table-hover">
                         <tbody class="" v-if="reports.length > 0">                            
                             <tr v-for="r in reports" :key="r[0]">
-                                <td class="col-1">{{r[0]}}</td>
+                                <td class="col-1 text-center">{{r[0]}}</td>
                                 <td  class="p-0 col-11">
                                     <table class="table table-bordered mb-0 border-dark table-hover" style="border-style: hidden;">
                                         <thead class="text-center">
@@ -26,9 +26,11 @@
                                             <tr v-for="item in r[1]" :key="item.code_no">
                                                 <td class="col-1 text-center">{{item.code_no}}</td>
                                                 <td class="col-3">{{item.item_name}}</td>
-                                                <td class="col-1 text-center">{{item.qty}}</td>
+                                                <td class="col-1 text-center">{{item.qty}} {{item.child_unit}}</td>
                                                 <td class="col-1 text-center">
-                                                    {{Math.floor(item.qty / item.item_per_package)}} x   {{Math.floor(item.qty % item.item_per_package)}}
+                                                   <span v-if="calQtyL(item.qty, item.item_per_package) > 0">{{calQtyL(item.qty, item.item_per_package)}} {{item.parent_unit}} </span>
+                                                    <span v-if="calQtyL(item.qty, item.item_per_package) >0 && calQtyS(item.qty, item.item_per_package) > 0"> * </span>
+                                                    <span v-if="calQtyS(item.qty, item.item_per_package)> 0">{{calQtyS(item.qty, item.item_per_package)}} {{item.child_unit}}  </span>
                                                 </td>
                                                 <td class="col-1 text-end">{{item.retail_price}}</td>
                                                 <td class="col-1 text-end">{{item.whole_sale_price}}</td>
@@ -127,6 +129,12 @@ export default {
       
     },
     methods:{
+        calQtyL(qty, ipp){
+            return hp.calQtyL(qty, ipp);
+        },
+        calQtyS(qty, ipp){
+            return hp.calQtyS(qty, ipp)
+        },
         goBack(){
             this.$router.go(-1)
         },
@@ -142,7 +150,7 @@ export default {
             const gbc=gbd.map((res)=>{
                 const res1=Object.entries(hp.gb_item_name_retail_price(res[1]))   
                 const res2=res1.map((ren)=>{
-                let item={item_name:ren[0], code_no:0, item_per_package:0, qty:0, pur_price:0, pur_amount:0, retail_price:0, retail_amount:0, whole_sale_price:0, whole_sale_amount:0}
+                let item={parent_unit:"", child_unit:"",item_name:ren[0], code_no:0, item_per_package:0, qty:0, pur_price:0, pur_amount:0, retail_price:0, retail_amount:0, whole_sale_price:0, whole_sale_amount:0}
                 ren[1].map((rep)=>{
                     item.code_no=rep.code_no;
                     item.item_per_package=rep.item_per_package;
@@ -153,6 +161,8 @@ export default {
                     item.retail_amount +=rep.retail_amount;
                     item.whole_sale_price =rep.whole_sale_price;
                     item.whole_sale_amount += rep.whole_sale_amount;
+                    item.parent_unit=rep.parent_unit;
+                    item.child_unit=rep.child_unit;
                 })
                 return item;
                 }).sort((a,b)=>a.code_no - b.code_no)

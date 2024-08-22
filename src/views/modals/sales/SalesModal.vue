@@ -54,10 +54,10 @@
                                         <tbody>
                                             <tr class="table-secondary text-center">
                                                 <td>Voucher no.</td>
-                                                <td>Name</td>
+                                                <td class="text-start">Name</td>
                                                 <td>Phone</td>
                                                 <td>Sale date</td>
-                                                <td>User</td>                                    
+                                                <td class="text-start">User</td>                                    
                                             </tr>                                
                                             <tr v-if="sales.length > 0" v-for="s in sales" :key="s.id" @click="setCode(s)" data-bs-dismiss="modal" style="cursor: context-menu;">
                                                 <td class="text-center">{{s.voucher_no}}</td>

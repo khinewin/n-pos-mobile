@@ -55,43 +55,51 @@
                                     <tbody class="">
                                         <tr class="text-center fw-bold">
                                             <td class="col-1">No.</td>
-                                            <td class="col-8">Description</td>
-                                            <td class="col-1 ">Qty</td>
-                                            <td class="col-1 ">Price</td>
+                                            <td class="col-6">Description</td>
+                                            <td class="col-2" colspan="2">Qty</td>
+                                            <td class="col-1 ">Unit price</td>
+                                            <td class="col-1">Discount</td>
                                             <td class="col-1 ">Amount</td>
                                         </tr>
                                         <tr class="" v-if="sale.products.length > 0" v-for="(s, i) in sale.products" :key="s.id" >     
                                             <td class="text-center">{{i+1}}</td>                   
                                             <td class="">{{s.item_name}}</td>
                                             <td class="text-center">
-                                                {{s.sale_qty}}
+                                                {{s.sale_qty}} {{s.child_unit}}
+                                            </td>
+                                            <td class="text-center">
+                                                <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}} {{s.parent_unit}}</span>
+                                                <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0"> * </span>
+                                                <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}} {{s.child_unit}}</span>
+
                                             </td>
                                             <td class="text-end">{{s.sale_price}}</td>
+                                            <td class="text-end">{{s.discount}}</td>
                                             <td class="text-end">{{s.sale_amount}}</td>
                                         </tr>                        
                                   
                                         <tr>
-                                            <td colspan="4" class="text-end col-6 pe-2 " style="border-bottom-style: hidden;">Total amount</td>
+                                            <td colspan="6" class="text-end col-6 pe-2 " style="border-bottom-style: hidden;">Total amount</td>
                                             <td class="text-end col-6 ">{{sale.total_amount}}</td>
                                         </tr>                     
                                         <tr>
-                                            <td colspan="4" class="text-end  pe-2 " style="border-bottom-style: hidden;">Discount</td>
+                                            <td colspan="6" class="text-end  pe-2 " style="border-bottom-style: hidden;">Discount</td>
                                             <td class="text-end ">
                                                 {{sale.discount}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="4" class="text-end   pe-2 " style="border-bottom-style: hidden;">Charges</td>
+                                            <td colspan="6" class="text-end   pe-2 " style="border-bottom-style: hidden;">Charges</td>
                                             <td class="text-end ">{{sale.charges}}</td>
                                         </tr>
                                         <tr >
-                                            <td colspan="4" class="text-end   pe-2 " style="border-bottom-style: hidden;">Pay</td>
+                                            <td colspan="6" class="text-end   pe-2 " style="border-bottom-style: hidden;">Pay</td>
                                             <td class="text-end">
                                                 {{sale.pay}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="4" class="text-end   pe-2 " >Refunds</td>
+                                            <td colspan="6" class="text-end   pe-2 " >Refunds</td>
                                             <td class="text-end ">
                                                 {{sale.refunds}}
                                             </td>
@@ -167,6 +175,12 @@ export default {
       
     },
     methods:{
+        calQtyL(qty, ipp){
+            return hp.calQtyL(qty,ipp)
+        },
+        calQtyS(qty, ipp){
+            return hp.calQtyS(qty,ipp)
+        },
         showTime(t){
             return hp.showTime(t);
         },

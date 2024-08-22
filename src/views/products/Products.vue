@@ -2,7 +2,10 @@
  <div>           
         <PageHeader page-title="Products code" page-code="products" :msg-type="msg.type" :msg-info="msg.info"/>
         <div class="container-fluid my-2">
-            <div class="row mb-2 justify-content-end">                               
+            <div class="row mb-2 justify-content-end">   
+                <div class="col-sm-2 d-grid">
+                    <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn"><i class="fa-solid fa-boxes-packing"></i> Packing size</button>
+                </div>                            
                 <div class="col-sm-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCode">
                         <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
@@ -12,7 +15,7 @@
             </div>
         </div>
         <div class="container-fluid my-2">
-            <div class="row g-2">
+            <div class="row g-1">
                 <div class="col-lg-3">
                     <div class="card shadow">
                         <div class="card-body p-2">
@@ -36,73 +39,39 @@
                         </div>
                     </div>                                                                                                          
                 </div>                        
-                <div class="col-lg-9">
+                <div class="col-lg-5">
                     <div class="card shadow">
                         <div class="card-body p-2 table-responsive">
                             <table class="table table-bordered table-hover mb-0">
                                 <tbody class="">
-                                    <tr class="text-center table-secondary" style="cursor: context-menu;">
-                                        <td colspan="2" @click="sortProducts('code_no')"><i class="fa-solid fa-sort"></i> Code</td>
-                                        <td @click="sortProducts('item_name')"><i class="fa-solid fa-sort"></i> Description</td>
-                                        <td @click="sortProducts('item_per_package')"><i class="fa-solid fa-sort"></i> IPP</td>
-                                        <td @click="sortProducts('qty')" colspan="2"><i class="fa-solid fa-sort"></i> Qty</td>
-                                        <td @click="sortProducts('retail_price')"><i class="fa-solid fa-sort"></i> Retail price</td>
-                                        <td @click="sortProducts('whole_sale_price')"><i class="fa-solid fa-sort"></i> Wholesale price</td>
-                                        <td @click="sortProducts('pur_price')"><i class="fa-solid fa-sort"></i> Pur price</td>
-
+                                    <tr class="table-secondary" style="cursor: context-menu;">
+                                        <td class="text-center" colspan="2" @click="sortProducts('code_no')"><i class="fa-solid fa-sort"></i> Code</td>
+                                        <td @click="sortProducts('item_name')"><i class="fa-solid fa-sort"></i> Description</td>                                       
                                     </tr>
                                     <tr>
                                         <td colspan="2">
                                             <input placeholder="Code"  type="text" v-model="code_no" class="form-control-plaintext  text-center">
                                         </td>
                                         <td>
-                                            <input placeholder="Description"  :class="{'border-danger' : v$.item_name.$errors.length}"  type="text" v-model="item_name" class="form-control-plaintext  text-center">
+                                            <input placeholder="Description"  :class="{'border-danger' : v$.item_name.$errors.length}"  type="text" v-model="item_name" class="form-control-plaintext ">
                                         </td>
-                                        <td>
-                                            <input placeholder="IPP"  :class="{'border-danger' : v$.item_per_package.$errors.length}"  type="number" v-model="item_per_package" class="form-control-plaintext  text-center">
-                                        </td>
-                                        <td colspan="2">
-                                            <input placeholder="Qty" disabled type="number"  class="form-control-plaintext text-center">
-                                        </td>
-                                        <td>
-                                            <input placeholder="Retail price" disabled type="number"  class="form-control-plaintext text-center">
-                                        </td>
-                                        <td>
-                                            <input placeholder="Wholesale Price" disabled type="number"  class="form-control-plaintext  text-center">
-                                        </td>
-                                        <td>
-                                            <input placeholder="Pur Price" disabled type="number"  class="form-control-plaintext  text-center">
-                                        </td>
+                                     
                                     </tr>                                   
-                                    <tr class="text-center" v-if="products.length > 0"  v-for="(p, i) in products" :key="p.id" @mouseenter="setEdit(i)" @mouseleave="saveEdit" @keypress.enter="saveEdit">
+                                    <tr class="text-center"  v-if="products.length > 0"  v-for="(p, i) in products" :key="p.id" @click="setEdit(i)"  @keypress.enter="saveEdit" :class="{'table-secondary' : editItem.id === p.id}">
                                         <td>
                                             <a class="text-danger" href="#!" @click="removeProduct(i, p)"><i class="fa-solid fa-square-minus"></i></a>                                                                                       
                                            <!-- <input type="checkbox" @change="handleSelected(p.id, $event)"> -->
                                         </td>
                                         <td :class="{'table-secondary': sort_item ==='code_no'}" class="p-0">
                                             <span>
-                                                <input type="text" class="form-control-plaintext text-center  " v-model="p.code_no">
+                                                <input type="text" class="form-control-plaintext text-center" v-model="p.code_no">
                                             </span>
                                         </td>
                                         <td :class="{'table-secondary': sort_item ==='item_name'}" class="p-0">
                                             <span>
-                                                <input type="text" class="form-control-plaintext text-center  " v-model="p.item_name">
+                                                <input type="text" class="form-control-plaintext ms-2" v-model="p.item_name">
                                             </span>
-                                        </td>
-                                        <td :class="{'table-secondary': sort_item ==='item_per_package'}" class="p-0">
-                                            <span>
-                                                <input type="number" class="form-control-plaintext text-center " v-model="p.item_per_package">
-                                            </span>
-                                        </td>
-                                        <td :class="{'table-secondary': sort_item ==='qty'}" class="pt-2">
-                                            {{p.qty}}                                           
-                                        </td>
-                                        <td :class="{'table-secondary': sort_item ==='qty'}" class="pt-2">{{Math.floor(p.qty / p.item_per_package)}} x {{Math.floor(p.qty % p.item_per_package)}} </td>                                         
-
-                                        <td :class="{'table-secondary': sort_item ==='retail_price'}" class="pt-2 text-end">{{p.retail_price}}</td>
-                                        <td :class="{'table-secondary': sort_item ==='whole_sale_price'}" class="pt-2 text-end">{{p.whole_sale_price}}</td>
-                                        <td :class="{'table-secondary': sort_item ==='pur_price'}" class="pt-2 text-end">{{p.pur_price}}</td>
-                                    
+                                        </td>                                       
                                     </tr>
                                 </tbody>
                             </table>
@@ -118,8 +87,65 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-lg-4">
+                    <div class="card shadow">
+                        <div class="card-body p-2">
+                            <table class="table table-bordered mb-0">
+                                <tbody>
+                                    <tr class="table-white">
+                                        <td colspan="3">
+                                            <div class="text-center text-primary h6 pt-2" v-if="Object.keys(editItem).length >0" >
+                                                    {{editItem.item_name}}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-info">
+                                        <td>Packing size <span class="float-end"><i class="fa-solid fa-caret-right"></i></span></td>
+                                        <td colspan="2" class="text-center">
+                                            <div class="" v-if="Object.keys(editItem).length >0" data-bs-toggle="modal" data-bs-target="#selectPackingSizeModal">
+                                                    1 {{editItem.parent_unit}} * {{editItem.item_per_package}} {{editItem.child_unit}}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-secondary">
+                                        <td>Qty</td>
+                                        <td class="text-center">
+                                            <div  v-if="Object.keys(editItem).length >0">
+                                               {{editItem.qty}} {{editItem.child_unit}}
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <div  v-if="Object.keys(editItem).length >0">
+                                                {{Math.floor(editItem.qty / editItem.item_per_package)}} {{editItem.parent_unit}} * {{Math.floor(editItem.qty % editItem.item_per_package)}}  {{editItem.child_unit}}
+                                            </div>
+                                        </td>
+                                    </tr>                                    
+                                    <tr class="table-primary">
+                                        <td>Retail price</td>
+                                        <td class="text-center">
+                                           1 {{editItem.child_unit}} {{editItem.retail_price}}
+                                        </td>
+                                        <td class="text-center">1 {{editItem.parent_unit}} {{editItem.retail_price * editItem.item_per_package}}</td>
+                                    </tr>
+                                    <tr class="table-success">
+                                        <td>Wholesale price</td>
+                                        <td colspan="" class="text-center">1 {{editItem.child_unit}} {{editItem.whole_sale_price}}</td>
+                                        <td class="text-center">1 {{editItem.parent_unit}} {{editItem.whole_sale_price * editItem.item_per_package}}</td>
+                                    </tr>      
+                                    <tr class="table-warning">
+                                        <td>Purchase price</td>
+                                        <td colspan="" class="text-center">1 {{editItem.child_unit}} {{editItem.pur_price}}</td>
+                                        <td class="text-center">1 {{editItem.parent_unit}} {{editItem.pur_price * editItem.item_per_package}}</td>
+                                    </tr>                             
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        <PackingSizeModal />
+        <SelectPackingSizeModal @setPackingSize="setPackingSize" />
         <Footer />
 </div>   
  
@@ -132,9 +158,12 @@ import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, or
 import db from '@/firebase/firestore'
 import Footer from '@/views/partials/Footer.vue'
 import * as ss from "@/lib/snapshot/products"
+import PackingSizeModal from "@/views/modals/product/PackingSize.vue";
+import SelectPackingSizeModal from "@/views/modals/product/SelectPackingSize.vue";
+
 export default {
     components: {
-            PageHeader, Footer
+            PageHeader, Footer,PackingSizeModal,SelectPackingSizeModal
     },
     setup () {
         return { v$: useVuelidate() }
@@ -142,7 +171,6 @@ export default {
     validations(){
             return {
                 item_name: {required},
-                item_per_package: {required}
             }
     },
     data(){
@@ -202,7 +230,14 @@ export default {
             },deep:true
         }
     },
-    methods:{    
+
+    methods:{   
+        setPackingSize(p){
+            this.editItem.parent_unit=p.parent_unit;
+            this.editItem.child_unit=p.child_unit;
+            this.editItem.item_per_package=p.packing;
+            this.saveEdit();
+        } ,
         async removeProduct(i, p){
             const cf=confirm(`Are you sure ? delete the product code : ${p.item_name} `)
             if(!cf) return false;
@@ -254,6 +289,8 @@ export default {
             const updateDocument=doc(db, "products", this.editItem.id)
                 await updateDoc(updateDocument, {
                     item_name : this.editItem.item_name,
+                    parent_unit: this.editItem.parent_unit,
+                    child_unit: this.editItem.child_unit,
                     item_per_package: this.editItem.item_per_package,
                     code_no: this.editItem.code_no,
                  })  
@@ -349,15 +386,15 @@ export default {
         
         async fetchProducts(){                    
             const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
-            const snapShot=await getDocs(query_url)           
+            const snapShot=await getDocs(query_url)        
+            this.products=[];   
             if(snapShot._snapshot.docChanges.length <=0){
                 this.msg.type='error' 
-                this.msg.info='Oops..., something went wrong!'
+                this.msg.info='Oops..., no data found !'
                 this.isLoading=false;
                 this.isUpdating=false;
             }
             const products=ss.products(snapShot);            
-            this.products=[];
             this.productsData=products;
             this.products=products;
             this.isLoading=false;

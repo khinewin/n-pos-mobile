@@ -5,20 +5,22 @@
                     <table class="table table-bordered border-dark table-hover">
                         <tbody class="" v-if="reports.length > 0">    
                             <tr class="fw-bold text-center">
-                                <td>Code</td>
-                                <td>Description</td>
-                                <td colspan="2">Qty</td>
-                                <td>Item price</td>
-                                <td>Amount</td>         
-                                <td colspan="4">Discount</td>                       
-                                <td>Price</td>
+                                <td class="col-1">Code</td>
+                                <td class="col-2">Description</td>
+                                <td class="col-1" colspan="2">Qty</td>
+                                <td class="col-1">Item price</td>
+                                <td class="col-1">Amount</td>         
+                                <td class="col-1" colspan="4">Discount</td>                       
+                                <td class="col-1">Price</td>
                             </tr>                        
                                 <tr v-for="s in reports[0]" :key="s.code_no">
                                     <td class="text-center">{{s.code_no}}</td>
                                     <td>{{s.item_name}}</td>
-                                    <td class="text-center">{{s.pur_qty}}</td>
-                                    <td class="text-center">
-                                        {{Math.floor(s.pur_qty / s.item_per_package)}} x {{Math.floor(s.pur_qty % s.item_per_package)}}
+                                    <td class="col-1 text-center">{{s.pur_qty}} {{s.child_unit}}</td>
+                                    <td class="col-1 text-center">
+                                       <span v-if="calQtyL(s.pur_qty, s.item_per_package) > 0">{{calQtyL(s.pur_qty, s.item_per_package)}} {{s.parent_unit}} </span>
+                                        <span v-if="calQtyL(s.pur_qty, s.item_per_package) >0 && calQtyS(s.pur_qty, s.item_per_package) > 0"> * </span>
+                                        <span v-if="calQtyS(s.pur_qty, s.item_per_package)> 0">{{calQtyS(s.pur_qty, s.item_per_package)}} {{s.child_unit}}  </span>
                                     </td>
                                     <td class="text-end">{{s.pur_price}}</td>
                                     <td class="text-end">{{s.amount}}</td>                                   
@@ -68,7 +70,7 @@
 <script>
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
-import * as gb from "@/lib/helper"
+import * as hp from "@/lib/helper"
 export default {
     props:['fromDate', 'toDate','supplier'],
     components: {
@@ -132,6 +134,12 @@ export default {
       
     },
     methods:{
+        calQtyL(qty, ipp){
+            return hp.calQtyL(qty, ipp);
+        },
+        calQtyS(qty, ipp){
+            return hp.calQtyS(qty, ipp)
+        },
         goBack(){
             this.$router.go(-1)
         },
@@ -148,9 +156,9 @@ export default {
                         purchase.push(data)
                     })
             })          
-            const res1=Object.entries(gb.gb_item_name_pur_price(purchase));           
+            const res1=Object.entries(hp.gb_item_name_pur_price(purchase));           
            const res2=res1.map((res)=>{
-                    let item={item_name: res[0], code_no:"", discount:0, pur_qty:0, pur_price:0, amount:0, item_per_package:0, price:0, dis_qty:0, dis_amount:0, dis_percent:0}
+                    let item={child_unit:"", parent_unit:"",item_name: res[0], code_no:"", discount:0, pur_qty:0, pur_price:0, amount:0, item_per_package:0, price:0, dis_qty:0, dis_amount:0, dis_percent:0}
                     res[1].map((ren)=>{
                         item.code_no=ren.code_no;
                         item.pur_qty += ren.pur_qty;
@@ -162,6 +170,8 @@ export default {
                         item.dis_percent += ren.dis_percent;
                         item.dis_amount += ren.dis_amount;
                         item.discount += ren.discount;
+                        item.child_unit =ren.child_unit;
+                        item.parent_unit=ren.parent_unit;
                     })
                     return item;
                 }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)

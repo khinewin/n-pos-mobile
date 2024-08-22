@@ -37,7 +37,9 @@
                                             <div class="card-body  small  text-center" :class="[i%2===0 ? 'bg-info' : 'bg-secondary-subtle']">
                                                     <div class="position-relative pt-2 mt-1">
                                                         <span>{{p.code_no}}</span>
-                                                        <span class="position-absolute top-0 start-50 translate-middle badge bg-success p-1" :class="{'bg-danger' : p.qty <= 5, 'bg-warning': p.qty >=6 && p.qty <=10}" style="font-size: 12px;">{{p.qty}}</span>
+                                                        <span class="position-absolute top-0 start-50 translate-middle badge bg-success p-1" :class="{'bg-danger' : p.qty <= 5, 'bg-warning': p.qty >=6 && p.qty <=10}" style="font-size: 12px;">
+                                                            {{Math.floor(p.qty / p.item_per_package)}}*{{Math.floor(p.qty % p.item_per_package)}}
+                                                        </span>
                                                     </div>
                                                     <div>{{p.item_name}}</div>
                                                     <div class="small">{{p.retail_price}}/{{p.whole_sale_price}} MMK</div>                                                    

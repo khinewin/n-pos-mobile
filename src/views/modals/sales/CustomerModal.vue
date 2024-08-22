@@ -52,7 +52,7 @@
                                    <tbody class="small">
                                        <tr class="text-center table-secondary" style="cursor: context-menu;">
                                            <td @click="sortCustomers('code')"><i class="fa-solid fa-sort"></i> Code</td>
-                                           <td @click="sortCustomers('name')"><i class="fa-solid fa-sort"></i> Name</td>
+                                           <td @click="sortCustomers('name')" class="text-start"><i class="fa-solid fa-sort"></i> Name</td>
                                            <td @click="sortCustomers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
                                            <td @click="sortCustomers('address')"><i class="fa-solid fa-sort"></i> Address</td>
                                            <td @click="sortCustomers('created_at')"><i class="fa-solid fa-sort"></i> Date</td>

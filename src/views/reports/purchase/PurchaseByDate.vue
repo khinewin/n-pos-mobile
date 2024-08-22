@@ -11,7 +11,7 @@
                                     <table class="table table-bordered mb-0 border-dark table-hover" style="border-style: hidden;">
                                         <thead>
                                             <tr class="fw-bold text-center">
-                                                <td class="col-2">Code</td>
+                                                <td class="col-1">Code</td>
                                                 <td class="col-3">Description</td>
                                                 <td class="col-2" colspan="2">Qty</td>
                                                 <td class="col-1">Item price</td>
@@ -24,9 +24,11 @@
                                             <tr v-for="item in r[1]" :key="item.code_no">
                                                 <td class="text-center">{{item.code_no}}</td>
                                                 <td >{{item.item_name}}</td>
-                                                <td class="text-center">{{item.pur_qty}}</td>
-                                                <td class="text-center">
-                                                     {{Math.floor(item.pur_qty / item.item_per_package)}} x {{Math.floor(item.pur_qty % item.item_per_package)}}
+                                                <td class="col-1 text-center">{{item.pur_qty}} {{item.child_unit}}</td>
+                                                <td class="col-1 text-center">
+                                                   <span v-if="calQtyL(item.pur_qty, item.item_per_package) > 0">{{calQtyL(item.pur_qty, item.item_per_package)}} {{item.parent_unit}} </span>
+                                                    <span v-if="calQtyL(item.pur_qty, item.item_per_package) >0 && calQtyS(item.pur_qty, item.item_per_package) > 0"> * </span>
+                                                    <span v-if="calQtyS(item.pur_qty, item.item_per_package)> 0">{{calQtyS(item.pur_qty, item.item_per_package)}} {{item.child_unit}}  </span>
                                                 </td>
                                                 <td class="text-end">{{item.pur_price}}</td>
                                                 <td class="text-end">{{item.amount}}</td>
@@ -144,6 +146,12 @@ export default {
       
     },
     methods:{
+        calQtyL(qty, ipp){
+            return hp.calQtyL(qty, ipp);
+        },
+        calQtyS(qty, ipp){
+            return hp.calQtyS(qty, ipp)
+        },
         goBack(){
             this.$router.go(-1)
         },    
@@ -164,7 +172,7 @@ export default {
            const gbc=gbd.map((res)=>{
                 const res1=Object.entries(hp.gb_item_name_pur_price(res[1]))
                 const res2=res1.map((res)=>{
-                    let item={item_name: res[0], code_no:"", discount:0, pur_qty:0, pur_price:0, amount:0, item_per_package:0, price:0, dis_qty:0, dis_amount:0, dis_percent:0}
+                    let item={child_unit:"", parent_unit:"",item_name: res[0], code_no:"", discount:0, pur_qty:0, pur_price:0, amount:0, item_per_package:0, price:0, dis_qty:0, dis_amount:0, dis_percent:0}
                     res[1].map((ren)=>{
                         item.code_no=ren.code_no;
                         item.pur_qty += ren.pur_qty;
@@ -176,6 +184,8 @@ export default {
                         item.dis_percent += ren.dis_percent;
                         item.dis_amount += ren.dis_amount;
                         item.discount += ren.discount;
+                        item.child_unit=ren.child_unit;
+                        item.parent_unit=ren.parent_unit;
                     })
                     return item;
                 }).sort((a,b)=>a.code_no - b.code_no)

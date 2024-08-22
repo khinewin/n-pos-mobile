@@ -11,6 +11,8 @@ const products=(snapShot)=>{
             created_at : doc.data().created_at,
             code_no : doc.data().code_no,                
             item_per_package: doc.data().item_per_package,
+            parent_unit: doc.data().parent_unit,
+            child_unit: doc.data().child_unit,
             pur_price:doc.data().pur_price,       
         };                                
         products.push(product);                           

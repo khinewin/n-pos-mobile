@@ -48,12 +48,12 @@
                                             {{st.code_no}}                                                                                                          
                                     </td>                                   
                                     <td class="">{{st.item_name}}</td>
-                                    <td class="text-center">                                      
-                                        <span>{{st.qty}}</span>
-                                    </td>
-                                    <td class="text-center">
-                                        {{Math.floor(st.qty / st.item_per_package)}} x   {{Math.floor(st.qty % st.item_per_package)}}
-                                    </td>                                
+                                    <td class="col-1 text-center">{{st.qty}} {{st.child_unit}}</td>
+                                    <td class="col-1 text-center">
+                                       <span v-if="calQtyL(st.qty, st.item_per_package) > 0">{{calQtyL(st.qty, st.item_per_package)}} {{st.parent_unit}} </span>
+                                        <span v-if="calQtyL(st.qty, st.item_per_package) >0 && calQtyS(st.qty, st.item_per_package) > 0"> * </span>
+                                        <span v-if="calQtyS(st.qty, st.item_per_package)> 0">{{calQtyS(st.qty, st.item_per_package)}} {{st.child_unit}}  </span>
+                                    </td>                              
                                     <td class="text-end">                                      
                                         <span>{{st.retail_price}}</span>
                                     </td>
@@ -148,6 +148,12 @@ export default {
       
     },
     methods:{
+        calQtyL(qty, ipp){
+            return hp.calQtyL(qty, ipp);
+        },
+        calQtyS(qty, ipp){
+            return hp.calQtyS(qty, ipp)
+        },
         goBack(){
             this.$router.go(-1)
         },       

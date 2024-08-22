@@ -55,10 +55,12 @@
                                 <td class="">                                   
                                      <span v-if="st.exp_date">{{showTime(st.exp_date)}}</span>
                                 </td>
-                                <td class="">{{st.pur_qty}}</td>                                
-                                <td class="">
-                                    {{Math.floor(st.pur_qty / st.item_per_package)}} x {{Math.floor(st.pur_qty % st.item_per_package)}}
-                                </td>
+                                <td class="col-1 text-center">{{st.pur_qty}} {{st.child_unit}}</td>
+                                    <td class="col-1 text-center">
+                                       <span v-if="calQtyL(st.pur_qty, st.item_per_package) > 0">{{calQtyL(st.pur_qty, st.item_per_package)}} {{st.parent_unit}} </span>
+                                        <span v-if="calQtyL(st.pur_qty, st.item_per_package) >0 && calQtyS(st.pur_qty, st.item_per_package) > 0"> * </span>
+                                        <span v-if="calQtyS(st.pur_qty, st.item_per_package)> 0">{{calQtyS(st.pur_qty, st.item_per_package)}} {{st.child_unit}}  </span>
+                                    </td>
                                 <td class="">{{st.pur_price}}</td>
                                 <td>{{st.dis_qty}}</td>
                                 <td class="">{{st.dis_percent}}</td>
@@ -155,6 +157,12 @@ export default {
       
     },
     methods:{
+        calQtyL(qty, ipp){
+            return hp.calQtyL(qty, ipp);
+        },
+        calQtyS(qty, ipp){
+            return hp.calQtyS(qty, ipp)
+        },
         goBack(){
             this.$router.go(-1)
         },   

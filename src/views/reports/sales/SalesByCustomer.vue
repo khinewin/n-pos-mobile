@@ -16,27 +16,34 @@
                                                 <td colspan="2">Qty</td>
                                                 <td>Sale price</td>
                                                 <td>Pur price</td>
+                                                <td>Discount</td>
                                                 <td>Sale amount</td>
                                                 <td>Pur amount</td>
                                                 <td>Profit</td>
                                             </tr>
                                         </thead>
                                         <tbody>                                            
-                                            <tr v-for="item in r[1]" :key="item.code_no">
-                                                <td class="col-2 text-center">{{item.code_no}}</td>
-                                                <td class="col-2">{{item.item_name}}</td>
-                                                <td class="col-1 text-center">{{item.sale_qty}}</td>
-                                                <td class="col-1 text-center">
-                                                    {{Math.floor(item.sale_qty / item.item_per_package)}} x {{Math.floor(item.sale_qty % item.item_per_package)}}  
+                                            <tr v-for="s in r[1]" :key="s.code_no">
+                                                <td class="col-1 text-center">{{s.code_no}}</td>
+                                                <td class="col-2">{{s.item_name}}</td>
+                                                <td class="text-center col-1">
+                                                    {{s.sale_qty}} {{s.child_unit}}
                                                 </td>
-                                                <td class="col-1 text-end">{{item.sale_price}}</td>
-                                                <td class="col-1 text-end">{{item.pur_price}}</td>
-                                                <td class="col-1 text-end">{{item.sale_amount}}</td>
-                                                <td class="col-1 text-end">{{item.pur_amount}}</td>
-                                                <td class="col-1 text-end">{{item.profit}}</td>
+                                                <td class="text-center col-1">
+                                                    <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}} {{s.parent_unit}}</span>
+                                                    <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0"> * </span>
+                                                    <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}} {{s.child_unit}}</span>
+    
+                                                </td>
+                                                <td class="col-1 text-end">{{s.sale_price}}</td>
+                                                <td class="col-1 text-end">{{s.pur_price}}</td>
+                                                <td class="col-1 text-end">{{s.discount}}</td>
+                                                <td class="col-1 text-end">{{s.sale_amount}}</td>
+                                                <td class="col-1 text-end">{{s.pur_amount}}</td>
+                                                <td class="col-1 text-end">{{s.profit}}</td>
                                             </tr>
                                             <tr>
-                                                <td colspan="6" class="text-end fw-bold">Total</td>
+                                                <td colspan="7" class="text-end fw-bold">Total</td>
                                                 <td class="text-end">{{r[2].sale_amount}}</td>
                                                 <td class="text-end">{{r[2].pur_amount}}</td>
                                                 <td class="text-end">{{r[2].profit_amount}}</td>
@@ -156,6 +163,12 @@ export default {
       
     },
     methods:{
+        calQtyL(qty,ipp){
+            return hp.calQtyL(qty,ipp)
+        },
+        calQtyS(qty, ipp){
+            return hp.calQtyS(qty,ipp)
+        },
         goBack(){
             this.$router.go(-1)
         },
@@ -192,7 +205,10 @@ export default {
                     sale_amount:0,
                     pur_amount:0,
                     profit: 0,
-                    item_per_package:0
+                    item_per_package:0,
+                    parent_unit:"",
+                    child_unit:"",
+                    discount:0,
                 }                
                 res[1].map((ren)=>{
                     item.item_per_package=ren.item_per_package;
@@ -203,6 +219,9 @@ export default {
                     item.pur_amount +=ren.pur_price * ren.sale_qty;
                     item.sale_amount += ren.sale_amount;
                     item.profit += ren.sale_amount - (ren.pur_price * ren.sale_qty);
+                    item.discount += ren.discount;
+                    item.parent_unit=ren.parent_unit;
+                    item.child_unit=ren.child_unit;
                 })
                 return item;
            }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)

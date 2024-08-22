@@ -47,40 +47,40 @@
                             <tbody>
                                 <tr class="small text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
-                                    <td class="col-1">Desc</td>
+                                    <td class="col-2">Descrption</td>
+                                    <td class="col-1">Exp. date</td>                                   
                                     <td class="col-1">Qty</td>
-                                    <td class="col-1">Exp. date</td>                                    
                                     <td class="col-1">Item price</td>                                    
-                                    <td class="col-1" colspan="3">Discount</td>                                    
+                                    <td class="col-2" colspan="3">Discount</td>                                    
                                     <td class="col-1">Amount</td>
                                     <td class="col-1">Discount</td>
                                     <td class="col-1">Price</td>
                                 </tr>
-                                <tr class="small"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase" :key="st.id" @mouseenter="setEdit(i)"  @keypress.enter="calEdit(i)" @mouseleave="calEdit(i)">
-                                    <td class="pt-2">
+                                <tr class="small"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase" :key="st.id" @mouseenter="setEdit(i)"  >
+                                    <td class="pt-2 text-center">
                                         <div class="position-relative">
                                             <a class="text-danger position-absolute top-50 start-0 translate-middle p-2" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                             {{st.code_no}}                                           
                                         </div>                                    
                                     </td>
                                     <td class="pt-2">{{st.item_name}}</td>
-                                    <td class="">
-                                            <input   type="number"  v-model="st.pur_qty" class="form-control-plaintext  text-center"  placeholder="Qty">                                      
+                                    <td class="p-0">
+                                        <input @change="setExpDate(st.id)"  type="date"  v-model="st.tmp_exp_date" class="form-control-plaintext text-center"  placeholder="Exp. date">                                   
                                     </td>
-                                    <td class="">
-                                            <input @change="setExpDate(st.id)"  type="date"  v-model="st.tmp_exp_date" class="form-control-plaintext text-center"  placeholder="Exp. date">                                   
+                                    <td class="p-0">
+                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.pur_qty" class="form-control-plaintext  text-center"  placeholder="Qty">                                      
+                                    </td>                                   
+                                    <td class="p-0">
+                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.pur_price" class="form-control-plaintext  text-center" placeholder="Price">                                        
                                     </td>
-                                    <td class="">
-                                            <input  type="number"  v-model="st.pur_price" class="form-control-plaintext  text-center" placeholder="Price">                                        
+                                    <td class="p-0">
+                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.dis_qty" class="form-control-plaintext  text-center" placeholder="0">                                       
                                     </td>
-                                    <td class="">
-                                            <input  type="number"  v-model="st.dis_qty" class="form-control-plaintext  text-center" placeholder="0">                                       
+                                    <td class="p-0">
+                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.dis_percent" class="form-control-plaintext  text-center" placeholder="0">                                       
                                     </td>
-                                    <td class="">
-                                            <input  type="number"  v-model="st.dis_percent" class="form-control-plaintext  text-center" placeholder="0">                                       
-                                    </td>
-                                    <td class="">
-                                            <input  type="number"  v-model="st.dis_amount" class="form-control-plaintext text-center" placeholder="0">                                       
+                                    <td class="p-0">
+                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.dis_amount" class="form-control-plaintext text-center" placeholder="0">                                       
                                     </td>
                                     <td class="text-end pt-2">{{st.amount}}</td>
                                     <td class="text-end pt-2">{{st.discount}}</td>

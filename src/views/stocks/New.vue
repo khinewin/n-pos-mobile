@@ -55,48 +55,46 @@
                                     <td class="col-2">Desc</td>
                                     <td class="col-1">Qty</td>                                   
                                     <td class="col-1">Retail price</td>
-                                    <td class="col-1">Retail amount</td>
                                     <td class="col-1">Wholesale price</td>
-                                    <td class="col-1">Wholesale amount</td>
                                     <td class="col-1">Pur price</td>
+                                    <td class="col-1">Retail amount</td>                                    
+                                    <td class="col-1">Wholesale amount</td>                                    
                                     <td class="col-1">Pur amount</td>
                                 </tr>
                                 <tr class="" v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id" @mouseenter="setEdit(i)"  @keypress.enter="calEdit(i)" @mouseleave="calEdit(i)">
-                                    <td class="text-center">
+                                    <td class="text-center pt-2">
                                         <div class="position-relative">
                                             {{st.code_no}}                                           
-                                            <a class="text-danger position-absolute top-0 start-0 translate-middle p-2" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
+                                            <a class="text-danger position-absolute top-50 start-0 translate-middle p-2" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                         </div>                                    
                                     </td>
-                                    <td class="">{{st.item_name}}</td>
-                                    <td class="text-center">
-                                            <input   type="number"  v-model="st.qty" class="form-control-plaintext form-control-sm text-center"  placeholder="Qty">
+                                    <td class="pt-2">{{st.item_name}}</td>
+                                    <td class="text-center p-0">
+                                            <input   type="number"  v-model="st.qty" class="form-control-plaintext  text-center"  placeholder="Qty">
                                     </td>                                  
-                                    <td class="">
-                                            <input  type="number"  v-model="st.retail_price" class="form-control-plaintext form-control-sm text-center" placeholder="0">                                    
+                                    <td class="p-0">
+                                            <input  type="number"  v-model="st.retail_price" class="form-control-plaintext  text-center" placeholder="0">                                    
+                                    </td>                                    
+                                    <td class="p-0">
+                                            <input  type="number"  v-model="st.whole_sale_price" class="form-control-plaintext  text-center" placeholder="0">                                        
                                     </td>
-                                    <td class="text-end">                                       
-                                         <span>{{st.retail_amount}}</span>
+                                    <td class="p-0">
+                                        <input  type="number"  v-model="st.pur_price" class="form-control-plaintext  text-center" placeholder="0">                                       
                                     </td>
-                                    <td class="">
-                                            <input  type="number"  v-model="st.whole_sale_price" class="form-control-plaintext form-control-sm text-center" placeholder="0">                                        
-                                    </td>
-                                    <td class="text-end">                                    
+                                    <td class="text-end pt-2">                                       
+                                        <span>{{st.retail_amount}}</span>
+                                   </td>
+                                    <td class="text-end pt-2">                                    
                                          <span>{{st.whole_sale_amount}}</span>
-                                    </td>
-                                    <td class="">
-                                            <input  type="number"  v-model="st.pur_price" class="form-control-plaintext form-control-sm text-center" placeholder="0">                                       
-                                    </td>
-                                    <td class="text-end">                                    
+                                    </td>                                   
+                                    <td class="text-end pt-2">                                    
                                          <span>{{st.pur_amount}}</span>
                                     </td>                                 
                                 </tr>
                                 <tr class="small">
-                                    <td colspan="4" class="text-end fw-bold">Total</td>
+                                    <td colspan="6" class="text-end fw-bold">Total</td>
                                     <td class="text-end">{{total_retail_amount}}</td>
-                                    <td  class="text-end fw-bold">Total</td>
                                     <td class="text-end">{{total_whole_sale_amount}}</td>
-                                    <td  class="text-end fw-bold">Total</td>
                                     <td class="text-end">{{total_pur_amount}}</td>
                                 </tr>                                                                                         
                             </tbody>
@@ -117,6 +115,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query, increment} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/purchase/ProductModal.vue'
+import * as ss from "@/lib/snapshot/products"
 export default {
     components: {
         PageHeader, ProductModal
@@ -273,10 +272,12 @@ export default {
             snapShot && snapShot.forEach((doc) => {         
                 let product = {
                     id: doc.id,
-                    uid: doc.data().uid,
+                    user: doc.data().user,
                     item_name: doc.data().item_name,
                     retail_price : doc.data().retail_price,
                     whole_sale_price: doc.data().whole_sale_price,
+                    parent_unit: doc.data().parent_unit,
+                    child_unit: doc.data().child_unit,
                     pur_price:doc.data().pur_price,
                     qty : doc.data().qty,
                     created_at : doc.data().created_at,

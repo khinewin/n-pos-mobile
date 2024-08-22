@@ -91,9 +91,10 @@
 <script>
     import PageHeader from "@/views/partials/PageHeader.vue"
      import { useVuelidate  } from '@vuelidate/core'
- import { required, email ,helpers} from '@vuelidate/validators'
+    import { required, email ,helpers} from '@vuelidate/validators'
     import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
     import db from '@/firebase/firestore'
+    import * as ss from '@/lib/snapshot/suppliers'
     export default {
         components: {
                 PageHeader
@@ -148,6 +149,10 @@
             }
         },
         methods:{      
+            updateSuppliers(){
+                this.isUpdating=true;
+                this.fetchSuppliers();
+            },
             setCode(p){
                 this.$emit("setCode", p)
             },
@@ -248,22 +253,8 @@
                     this.isLoading=false;
                     this.isUpdating=false;
                     return false;
-                }
-    
-                let suppliers=[];
-                snapShot && snapShot.forEach((doc) => {         
-                    let product = {
-                        id: doc.id,
-                        uid: doc.data().uid,
-                        name: doc.data().name,
-                        company : doc.data().company,
-                        created_at: doc.data().created_at,
-                        phone : doc.data().phone,
-                        code : doc.data().code,                                
-                    };                                
-                    suppliers.push(product);                           
-                                
-                });
+                }    
+                const suppliers=ss.suppliers(snapShot)
                 this.suppliers=[];
                 this.suppliersData=suppliers;
                 this.suppliers=suppliers;

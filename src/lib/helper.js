@@ -12,6 +12,13 @@ const showTime=(t)=>{
     return formattedDate;
 };
 
+const calQtyL=(qty, ipp)=>{
+    return Math.floor(qty / ipp) 
+}
+const calQtyS=(qty, ipp)=>{
+    return Math.floor(qty % ipp) 
+}
+
 
 const gb_date=groupBy(['group_date'])
 const gb_item_name_sale_price=groupBy(['item_name', 'sale_price'])
@@ -33,5 +40,7 @@ export   {
     gb_supplier,
     gb_item_name_retail_price,
     gb_item_name_pur_price,
-    gb_exp_date
+    gb_exp_date,
+    calQtyL,
+    calQtyS,
     };

@@ -18,9 +18,11 @@
                                 <tr v-for="item in reports" :key="item.code_no">
                                     <td class="text-center">{{item.code_no}}</td>
                                     <td class="">{{item.item_name}}</td>
-                                    <td class=" text-center">{{item.qty}}</td>
-                                    <td class="text-center">
-                                        {{Math.floor(item.qty / item.item_per_package)}} x   {{Math.floor(item.qty % item.item_per_package)}}
+                                    <td class="col-1 text-center">{{item.qty}} {{item.child_unit}}</td>
+                                    <td class="col-1 text-center">
+                                       <span v-if="calQtyL(item.qty, item.item_per_package) > 0">{{calQtyL(item.qty, item.item_per_package)}} {{item.parent_unit}} </span>
+                                        <span v-if="calQtyL(item.qty, item.item_per_package) >0 && calQtyS(item.qty, item.item_per_package) > 0"> * </span>
+                                        <span v-if="calQtyS(item.qty, item.item_per_package)> 0">{{calQtyS(item.qty, item.item_per_package)}} {{item.child_unit}}  </span>
                                     </td>
                                     <td class="text-end">{{item.retail_price}}</td>
                                     <td class="text-end">{{item.whole_sale_price}}</td>
@@ -116,6 +118,12 @@ export default {
         },      
     },
     methods:{
+        calQtyL(qty, ipp){
+            return hp.calQtyL(qty, ipp);
+        },
+        calQtyS(qty, ipp){
+            return hp.calQtyS(qty, ipp)
+        },
         goBack(){
             this.$router.go(-1)
         },
@@ -127,10 +135,10 @@ export default {
                         stocks.push(data)
                     })
             })          
-            const res1=Object.entries(lib.gb_item_name_retail_price(stocks))   
+            const res1=Object.entries(hp.gb_item_name_retail_price(stocks))   
             console.log(res1)
             const res2=res1.map((ren)=>{
-                let item={item_name:ren[0], code_no:0, item_per_package:0, qty:0, pur_price:0, pur_amount:0, retail_price:0, retail_amount:0, whole_sale_price:0, whole_sale_amount:0}
+                let item={parent_unit:"",child_unit:"",item_name:ren[0], code_no:0, item_per_package:0, qty:0, pur_price:0, pur_amount:0, retail_price:0, retail_amount:0, whole_sale_price:0, whole_sale_amount:0}
                 ren[1].map((rep)=>{
                     item.code_no=rep.code_no;
                     item.item_per_package=rep.item_per_package;
@@ -141,6 +149,8 @@ export default {
                     item.retail_amount +=rep.retail_amount;
                     item.whole_sale_price =rep.whole_sale_price;
                     item.whole_sale_amount += rep.whole_sale_amount;
+                    item.parent_unit=rep.parent_unit;
+                    item.child_unit=rep.child_unit;
                 })
                 return item;
             }).sort((a,b)=>a.code_no - b.code_no)
@@ -157,7 +167,7 @@ export default {
             const to_date=Timestamp.fromDate(new Date(this.toDate))
             const query_url = query(collection(db, "openingStocks"),
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
-            const shapShot=await getDocs(query_url)
+            const snapShot=await getDocs(query_url)
             const stockItems=ss.stocks(snapShot)    
             this.stocksData=stockItems;
             this.displayReports();

@@ -52,13 +52,11 @@
                         <tbody>
                             <tr class="text-center fw-bold table-secondary">
                                 <td class="col-1">Code</td>
-                                <td class="col-2">Desc</td>
+                                <td class="col-">Description</td>
                                 <td class="col-1">Exp. date</td>
                                 <td class="col-1">Qty</td>
                                 <td class="col-1">Item price</td>
-                                <td class="col-1">D(Qty)</td>
-                                <td class="col-1">D(%)</td>
-                                <td class="col-1">D($)</td>
+                                <td class="col-1" colspan="3">Discount</td>                                
                                 <td class="col-1">Amount</td>
                                 <td class="col-1">Discount</td>
                                 <td class="col-1">Price</td>

@@ -31,10 +31,10 @@
         </div>     
         <div class="container-fluid my-2">
             <div class="row g-1">
-                <div class="col-lg-6">
+                <div class="col-lg-5">
                         <Products @setCode="setCode" :saleItems="saleItems" />
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-7">
                     <div class="card shadow">
                         <div class="card-body p-2">
                             <div class="row justify-content-end mb-2">
@@ -85,48 +85,72 @@
                             </div>
                               <table class="table table-bordered table-hover mb-0">
                                     <tbody class="small">
-                                        <tr class="text-center table-secondary">
-                                            <td class="col-2">Code</td>
-                                            <td class="col-3">Description</td>
-                                            <td class="col-2">Qty</td>
-                                            <td class="col-2">Price</td>
-                                            <td class="col-2">Amount</td>
+                                        <tr class="table-secondary">
+                                            <td class="col-1 text-center">No.</td>
+                                            <td class="col-2">Description</td>                                            
+                                            <td class="col-1 text-center"> L Unit</td>
+                                            <td class="col-1 text-center"> S Unit</td>
+                                            <td class="col-1 text-center">Qty</td>
+                                            <td class="col-1 text-center">Unit price</td>
+                                            <td class="col-2 text-center" colspan="2">Discount</td>
+                                            <td class="col-1 text-center">Amount</td>
                                         </tr>
-                                        <tr class="" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(i)" @mouseleave="saveEdit" >
+                                        <tr class="" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(i)"  >
                                             <td class="position-relative pt-2 text-center">
                                                 <span v-if="isNewSale">
                                                     <a  class="text-danger position-absolute top-50 start-0 translate-middle p-2" href="#!" @click="removeSaleItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                                 </span>
-                                                {{s.code_no}}</td>
-                                            <td class="pt-2">{{s.item_name}}</td>
+                                                {{i+1}}</td>
+                                            <td class="pt-2">{{s.item_name}}</td>                                           
                                             <td class="p-0">
-                                                <input :disabled="!isNewSale" :max="s.qty"min="1" @keypress.enter="saveEdit" @change="saveEdit" @keyup="saveEdit"   type="number" class="form-control-plaintext  text-center" v-model="s.sale_qty">
+                                                <input :disabled="!isNewSale" :max="Math.floor((s.qty -s.sale_qty_s)/s.item_per_package)" min="0" @change="saveEdit"  @keyup="saveEdit"   type="number" class="form-control-plaintext  text-center" v-model="s.sale_qty_l">
                                             </td>
+                                            <td class="p-0">
+                                                <input :disabled="!isNewSale" :max="s.qty" min="0" @keyup="saveEdit" @change="saveEdit"  type="number" class="form-control-plaintext  text-center" v-model="s.sale_qty_s">
+                                            </td>
+                                            <td class="pt-2 text-center">{{s.sale_qty}}</td>
                                             <td class="pt-2 text-end">{{s.sale_price}}</td>
+                                            <td class="p-0">
+                                                <div class="row g-0">
+                                                    <div class="col-6">
+                                                        <input :disabled="!isNewSale" min="0" @change="saveEdit"  @keyup="saveEdit"   type="number" class="form-control-plaintext  text-center" v-model="s.unit_discount">
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <select class="form-select form-select-sm" v-model="s.unit_discount_type" @change="saveEdit" >
+                                                            <option value="dis_qty">Qty</option>
+                                                            <option value="dis_percent">%</option>
+                                                            <option value="dis_amount">$</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="pt-2">
+                                                {{s.discount}}
+                                            </td>
                                             <td class="pt-2 text-end">{{s.sale_amount}}</td>
                                         </tr>  
                                         <tr>
-                                            <td colspan="4" class="text-end">Total amount</td>
+                                            <td colspan="8" class="text-end">Total amount</td>
                                             <td class="text-end">{{total_amount}}</td>
                                         </tr>                     
                                         <tr>
-                                            <td colspan="4" class="text-end pt-2" >Discount</td>
+                                            <td colspan="8" class="text-end pt-2" >Discount</td>
                                             <td class="text-end p-0">
                                                 <input @click="setInput" @mouseleave="setInput" :disabled="!isNewSale"  type="number" @keypress.enter="calDiscount"  @change="calDiscount" @keyup="calDiscount" v-model="discount" class="form-control-plaintext text-end m-0">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="4" class="text-end">Charges</td>
+                                            <td colspan="8" class="text-end">Charges</td>
                                             <td class="text-end">{{charges}}</td>
                                         </tr>
                                         <tr>
-                                            <td colspan="4" class="text-end pt-2">Pay</td>
+                                            <td colspan="8" class="text-end pt-2">Pay</td>
                                             <td class="text-end p-0">
                                                 <input @click="setInput" @mouseleave="setInput" :disabled="!isNewSale" @keypress.enter="calPay" @change="calPay" @keyup="calPay" type="number" v-model="pay" class="form-control-plaintext text-end m-0">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="4" class="text-end">Refunds</td>
+                                            <td colspan="8" class="text-end">Refunds</td>
                                             <td class="text-end">
                                                 {{refunds}}
                                             </td>
@@ -363,11 +387,14 @@ export default {
             let isSufficient=true;
             this.saleItems.filter((f, i)=>{
                 if(p.id===f.id){
-                    if(p.qty <= f.sale_qty-1){                       
+                    if(p.qty <= f.sale_qty_s-1 || p.qty < (f.sale_qty_l * f.item_per_package) + f.sale_qty_s){                       
                         isSufficient=false                        
                          this.msg.type="error";
                         this.msg.info="It is the maximum amount of stock"         
-                        return this.saleItems[i].sale_qty=p.qty;           
+                        this.saleItems[i].sale_qty=p.qty                                                                  
+                        this.saleItems[i].sale_qty_l=Math.floor(p.qty /  p.item_per_package);   
+                        this.saleItems[i].sale_qty_s=Math.floor(p.qty % p.item_per_package)    
+                        isSufficient=true;                                          
                     }
                 }
             });
@@ -379,10 +406,22 @@ export default {
             if(!checkQty) return false;
             this.saleItems= this.saleItems.map((f)=>{
                 if(f.id ===this.editItem.id){
+                    let discount=0;
+                    if(f.unit_discount && f.unit_discount_type){
+                        if(f.unit_discount_type ==="dis_qty"){
+                            discount=f.sale_price * f.unit_discount;
+                        }else if(f.unit_discount_type==="dis_percent"){
+                            discount=(f.sale_price * f.sale_qty) * f.unit_discount /100
+                        }else if(f.unit_discount_type==="dis_amount"){
+                            discount=f.unit_discount;
+                        }
+                    }
                     return {
                         ...f,  
-                        sale_amount : f.sale_price * f.sale_qty,
-                        pur_amount : f.pur_price * f.sale_qty
+                        pur_amount : f.pur_price *  f.sale_qty,
+                        sale_qty : f.sale_qty_s + (f.sale_qty_l * f.item_per_package),
+                        sale_amount : discount >0 ?  (f.sale_price *  (f.sale_qty_s + (f.sale_qty_l * f.item_per_package))) - discount : f.sale_price * (f.sale_qty_s + (f.sale_qty_l * f.item_per_package)),
+                        discount: discount
                     }
                 }else{
                     return {...f}
@@ -396,7 +435,9 @@ export default {
             if(!checkQty) return false;
            this.store_item ={
                 ...p,
-                sale_qty : 1,
+                sale_qty_s : 1,
+                sale_qty_l :0,
+                sale_qty:1,
                 sale_type: this.sale_type,
                 sale_price: this.sale_type==='retail' ? p.retail_price : p.whole_sale_price,
                 sale_amount : this.sale_type==='retail' ? p.retail_price : p.whole_sale_price,
@@ -421,7 +462,7 @@ export default {
         updateStoringItem(){
           this.saleItems= this.saleItems.map((f)=>{
                 if(f.id ===this.store_item.id){
-                    return {...f, sale_qty : f.sale_qty + 1,
+                    return {...f, sale_qty : f.sale_qty + 1,sale_qty_s : f.sale_qty_s + 1,
                          sale_amount : f.sale_price * (f.sale_qty + 1),
                          pur_amount : f.pur_price * (f.sale_qty + 1),
                         }

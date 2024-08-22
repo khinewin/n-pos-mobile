@@ -47,17 +47,17 @@
                         <table class="table table-bordered mb-0  table-hover">
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary">
-                                    <td class="" colspan="2">No.</td>
-                                    <td class="">Desc</td>
-                                    <td class="">Exp. date</td>
-                                    <td class="">Qty</td>
-                                    <td class="">Item price</td>
-                                    <td class="" colspan="3">
+                                    <td class="col-1" colspan="2">No.</td>
+                                    <td class="col-2">Description</td>
+                                    <td class="col-1">Exp. date</td>
+                                    <td class="col-1">Qty</td>
+                                    <td class="col-1">Item price</td>
+                                    <td class="col-2" colspan="3">
                                         Discount
                                     </td>                                   
-                                    <td class="">Amount</td>
-                                    <td class="">Discount</td>
-                                    <td class="">Price</td>
+                                    <td class="col-1">Amount</td>
+                                    <td class="col-1">Discount</td>
+                                    <td class="col-1">Price</td>
                                 </tr>
                                 <tr class="small"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase" :key="st.id" @mouseenter="setEdit(i)"  @keypress.enter="calEdit(i)" @mouseleave="calEdit(i)">
                                     <td class="pt-2">

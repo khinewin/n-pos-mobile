@@ -26,27 +26,27 @@ const router = createRouter({
       path: '/',
       name: 'Welcome',
       component: Login,
-      meta : {title: "N-POS | Welcome"}
+      meta : {title: "E-POS | Welcome"}
 
     },
     {
       path: '/auth/login',
       name: 'Login',     
       component: Login,
-      meta : {title: "N-POS | User signin"}
+      meta : {title: "E-POS | User signin"}
 
     },
     {
       path: '/admin/dashboard',
       name: 'Dashboard',     
       component: Dashboard,
-      meta : {title: "N-POS | Admin dashboard"}
+      meta : {title: "E-POS | Admin dashboard"}
     },
     {
       path: '/sale',
       name: 'Sale',     
       component: Sale,
-      meta : {title: "N-POS | Sale"}
+      meta : {title: "E-POS | Sale"}
 
     },
     {
@@ -59,93 +59,93 @@ const router = createRouter({
       path: '/products',
       name: 'Products',     
       component: Products,
-      meta : {title: "N-POS | Products code"}
+      meta : {title: "E-POS | Products code"}
 
     },
     {
       path: '/products/opening-stocks',
       name: 'OpeningStocks',     
       component: OpeningStocks,
-      meta : {title: "N-POS | Opening stocks"}
+      meta : {title: "E-POS | Opening stocks"}
 
     },
     {
       path: '/products/opening-stocks/new',
       name: 'NewOpeningStocks',     
       component: NewOpeningStocks,
-      meta : {title: "N-POS | New opening stock"}
+      meta : {title: "E-POS | New opening stock"}
     },
     {
       path: '/products/opening-stocks/:id/edit',
       name: 'EditOpeningStocks',     
       component: EditOpeningStocks,
-      meta : {title: "N-POS | Edit opening stock"}
+      meta : {title: "E-POS | Edit opening stock"}
     },
     {
       path: '/purchase',
       name: 'Purchase',     
       component: Purchase,
-      meta : {title: "N-POS | Purchase"}
+      meta : {title: "E-POS | Purchase"}
     },
     {
       path: '/purchase/:id/edit',
       name: 'EditPurchase',     
       component: EditPurchase,
-      meta : {title: "N-POS | Edit purchase"}
+      meta : {title: "E-POS | Edit purchase"}
     },
     {
       path: '/purchase/add',
       name: 'AddPurchase',     
       component: AddPurchase,
-      meta : {title: "N-POS | Add purchase"}    },
+      meta : {title: "E-POS | Add purchase"}    },
    
     {
       path: '/suppliers',
       name: 'Suppliers',     
       component: Suppliers,
-      meta : {title: "N-POS | Suppliers"}
+      meta : {title: "E-POS | Suppliers"}
     },
     {
       path: '/customers',
       name: 'Customers',     
       component: Customers,
-      meta : {title: "N-POS | Customers"}
+      meta : {title: "E-POS | Customers"}
     },
     {
       path: "/reports",
       name: "Reports",
       component: Reports,
-      meta : {title: "N-POS | Reports"}
+      meta : {title: "E-POS | Reports"}
     },
     {
       path: "/reports/products/:reportType",
       name: "ReportsProduct",
       component: ReportProduct,
-      meta : {title: "N-POS | Report product code"}
+      meta : {title: "E-POS | Report product code"}
     },
     {
       path: "/reports/stocks/:reportType/:fromDate/:toDate",
       name: "ReportsStocks",
       component: ReportStocks,
-      meta : {title: "N-POS | Report opening stock"}
+      meta : {title: "E-POS | Report opening stock"}
     },
     {
       path: "/reports/sales/:reportType/:fromDate/:toDate",
       name: "ReportsSales",
       component: ReportSales,
-      meta : {title: "N-POS | Report sales"}
+      meta : {title: "E-POS | Report sales"}
     },
     {
       path: "/reports/purchase/:reportType/:fromDate/:toDate",
       name: "ReportsPurchase",
       component: ReportPurchase,
-      meta : {title: "N-POS | Report purchase"}
+      meta : {title: "E-POS | Report purchase"}
     },
     {
       path: '/user/profile',
       name: 'Profile',     
       component: Profile,    
-      meta: { title: 'N-POS | User profile' },
+      meta: { title: 'E-POS | User profile' },
     }
   ], 
 })

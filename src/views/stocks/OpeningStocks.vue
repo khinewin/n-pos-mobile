@@ -45,22 +45,22 @@
                         </div>
                         <table class="table table-bordered mb-0  table-hover">
                             <tbody>
-                                <tr class="text-center fw-bold table-secondary">
-                                    <td class="col-1">Code</td>
+                                <tr class=" fw-bold table-secondary">
+                                    <td class="col-1 text-center">Code</td>
                                     <td class="col-2">Desc</td>
-                                    <td class="col-1" colspan="2">Qty</td>                                   
-                                    <td class="col-1">Retail price</td>
-                                    <td class="col-1">Retail amount</td>
-                                    <td class="col-1">Wholesale price</td>
-                                    <td class="col-1">Wholesale amount</td>
-                                    <td class="col-1">Pur price</td>
-                                    <td class="col-1">Pur amount</td>
+                                    <td class="col-1 text-center" colspan="2">Qty</td>                                   
+                                    <td class="col-1 text-end">Retail price</td>
+                                    <td class="col-1 text-end">Wholesale price</td>
+                                    <td class="col-1 text-end">Pur price</td>
+                                    <td class="col-1 text-end">Retail Amt</td>
+                                    <td class="col-1 text-end">Wholesale Amt</td>                                    
+                                    <td class="col-1 text-end">Pur Amt</td>
                                 </tr>
                                 <tr class=""v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id">
                                     <td class="text-center">
                                             {{st.code_no}}                                           
                                     </td>
-                                    <td class="text-center">{{st.item_name}}</td>
+                                    <td class="text-start">{{st.item_name}}</td>
                                     <td class="text-center">                                      
                                          <span>{{st.qty}}</span>
                                     </td>
@@ -71,28 +71,26 @@
                                          <span>{{st.retail_price}}</span>
                                     </td>
                                     <td class="text-end">                                      
-                                        <span>{{st.retail_amount}}</span>
-                                   </td>
-                                    <td class="text-end">                                      
-                                         <span>{{st.whole_sale_price}}</span>
-                                    </td>
-                                    <td class="text-end">                                      
-                                        <span>{{st.whole_sale_amount}}</span>
+                                        <span>{{st.whole_sale_price}}</span>
                                    </td>
                                    <td class="text-end">                                      
-                                    <span>{{st.pur_price}}</span>
-                               </td>
+                                        <span>{{st.pur_price}}</span>
+                                    </td>
+                                    <td class="text-end">                                      
+                                        <span>{{st.retail_amount}}</span>
+                                   </td>                                  
+                                    <td class="text-end">                                      
+                                        <span>{{st.whole_sale_amount}}</span>
+                                   </td>                                  
                                <td class="text-end">                                      
                                    <span>{{st.pur_amount}}</span>
                               </td>
                                  
                                 </tr>
                                 <tr class="small">
-                                    <td colspan="5" class="text-end fw-bold">Total</td>
+                                    <td colspan="7" class="text-end fw-bold">Total</td>
                                     <td class="text-end">{{total_retail_amount}}</td>
-                                    <td class="text-end fw-bold">Total</td>
                                     <td class="text-end">{{total_whole_sale_amount}}</td>
-                                    <td class="text-end fw-bold">Total</td>
                                     <td class="text-end">{{total_pur_amount}}</td>
                                 </tr>                                                                                         
                             </tbody>
