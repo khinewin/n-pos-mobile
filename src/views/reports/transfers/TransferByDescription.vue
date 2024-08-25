@@ -1,0 +1,215 @@
+<template lang="">
+    <div class="container-fluid">            
+        <div class="row">                 
+            <div class="col-12">
+                    <table class="table table-bordered border-dark table-hover">
+                        <tbody class="" v-if="reports.length > 0">    
+                            <tr class="fw-bold text-center">
+                                <td class="col-1">Code</td>
+                                <td class="col-2">Description</td>
+                                <td class="col-1">Packing size</td>
+                                <td class="col-1">From Loc Bal</td> 
+                                <td class="col-1">To Loc Bal</td> 
+                                <td class="col-1">Transfer Bal</td>
+                                <td class="col-1">After From Loc Bal</td> 
+                                <td class="col-1">After To Loc Bal</td>                                         
+                            </tr>                        
+                                <tr v-for="item in reports" :key="item.code_no">
+                                    <td class="text-center">{{item.code_no}}</td>
+                                    <td class="">{{item.item_name}}</td>
+                                    <td class="">                 
+                                        1{{item.parent_unit}} * {{item.item_per_package}}{{item.child_unit}}
+                                    </td>
+                                    <td class="text-end">
+                                        <span  v-if="from_location=='Main'">
+                                         <span v-if="calQtyL(item.main_qty, item.item_per_package) > 0">{{calQtyL(item.main_qty, item.item_per_package)}}{{item.parent_unit}} </span>
+                                         <span v-if="calQtyL(item.main_qty, item.item_per_package) >0 && calQtyS(item.main_qty, item.item_per_package) > 0">, </span>
+                                         <span v-if="calQtyS(item.main_qty, item.item_per_package)> 0">{{calQtyS(item.main_qty, item.item_per_package)}}{{item.child_unit}}  </span>
+                                        </span>
+                                        <span v-if="from_location=='Shop'">
+                                         <span v-if="calQtyL(item.qty, item.item_per_package) > 0">{{calQtyL(item.qty, item.item_per_package)}}{{item.parent_unit}} </span>
+                                         <span v-if="calQtyL(item.qty, item.item_per_package) >0 && calQtyS(item.qty, item.item_per_package) > 0">, </span>
+                                         <span v-if="calQtyS(item.qty, item.item_per_package)> 0">{{calQtyS(item.qty, item.item_per_package)}}{{item.child_unit}}  </span>
+                                        </span>
+                                      </td>
+                                      <td class="text-end">
+                                         <span  v-if="to_location=='Main'">
+                                          <span v-if="calQtyL(item.main_qty, item.item_per_package) > 0">{{calQtyL(item.main_qty, item.item_per_package)}}{{item.parent_unit}} </span>
+                                          <span v-if="calQtyL(item.main_qty, item.item_per_package) >0 && calQtyS(item.main_qty, item.item_per_package) > 0">, </span>
+                                          <span v-if="calQtyS(item.main_qty, item.item_per_package)> 0">{{calQtyS(item.main_qty, item.item_per_package)}}{{item.child_unit}}  </span>
+                                         </span>
+                                         <span v-if="to_location=='Shop'">
+                                          <span v-if="calQtyL(item.qty, item.item_per_package) > 0">{{calQtyL(item.qty, item.item_per_package)}}{{item.parent_unit}} </span>
+                                          <span v-if="calQtyL(item.qty, item.item_per_package) >0 && calQtyS(item.qty, item.item_per_package) > 0">, </span>
+                                          <span v-if="calQtyS(item.qty, item.item_per_package)> 0">{{calQtyS(item.qty, item.item_per_package)}}{{item.child_unit}}  </span>
+                                         </span>
+                                       </td>
+                                       <td class="text-end">
+                                         <span v-if="calQtyL(item.transfer_qty, item.item_per_package) > 0">{{calQtyL(item.transfer_qty, item.item_per_package)}}{{item.parent_unit}} </span>
+                                         <span v-if="calQtyL(item.transfer_qty, item.item_per_package) >0 && calQtyS(item.transfer_qty, item.item_per_package) > 0">, </span>
+                                         <span v-if="calQtyS(item.transfer_qty, item.item_per_package)> 0">{{calQtyS(item.transfer_qty, item.item_per_package)}}{{item.child_unit}}  </span>
+                                       </td>
+                                       <td class="text-end">
+                                         <span  v-if="from_location=='Main'">
+                                          <span v-if="calQtyL(item.main_qty -item.transfer_qty, item.item_per_package) > 0">{{calQtyL(item.main_qty-item.transfer_qty, item.item_per_package)}}{{item.parent_unit}} </span>
+                                          <span v-if="calQtyL(item.main_qty -item.transfer_qty, item.item_per_package) >0 && calQtyS(item.main_qty-item.transfer_qty, item.item_per_package) > 0">, </span>
+                                          <span v-if="calQtyS(item.main_qty-item.transfer_qty, item.item_per_package)> 0">{{calQtyS(item.main_qty-item.transfer_qty, item.item_per_package)}}{{item.child_unit}}  </span>
+                                         </span>
+                                         <span v-if="from_location=='Shop'">
+                                          <span v-if="calQtyL(item.qty-item.transfer_qty, item.item_per_package) > 0">{{calQtyL(item.qty-item.transfer_qty, item.item_per_package)}}{{item.parent_unit}} </span>
+                                          <span v-if="calQtyL(item.qty-item.transfer_qty, item.item_per_package) >0 && calQtyS(item.qty-item.transfer_qty, item.item_per_package) > 0">, </span>
+                                          <span v-if="calQtyS(item.qty-item.transfer_qty, item.item_per_package)> 0">{{calQtyS(item.qty-item.transfer_qty, item.item_per_package)}}{{item.child_unit}}  </span>
+                                         </span>
+                                       </td>
+                                       <td class="text-end">
+                                         <span  v-if="to_location=='Main'">
+                                          <span v-if="calQtyL(item.main_qty +item.transfer_qty, item.item_per_package) > 0">{{calQtyL(item.main_qty+item.transfer_qty, item.item_per_package)}}{{item.parent_unit}} </span>
+                                          <span v-if="calQtyL(item.main_qty +item.transfer_qty, item.item_per_package) >0 && calQtyS(item.main_qty+item.transfer_qty, item.item_per_package) > 0">, </span>
+                                          <span v-if="calQtyS(item.main_qty+item.transfer_qty, item.item_per_package)> 0">{{calQtyS(item.main_qty+item.transfer_qty, item.item_per_package)}}{{item.child_unit}}  </span>
+                                         </span>
+                                         <span v-if="to_location=='Shop'">
+                                          <span v-if="calQtyL(item.qty+item.transfer_qty, item.item_per_package) > 0">{{calQtyL(item.qty+item.transfer_qty, item.item_per_package)}}{{item.parent_unit}} </span>
+                                          <span v-if="calQtyL(item.qty+item.transfer_qty, item.item_per_package) >0 && calQtyS(item.qty+item.transfer_qty, item.item_per_package) > 0">, </span>
+                                          <span v-if="calQtyS(item.qty+item.transfer_qty, item.item_per_package)> 0">{{calQtyS(item.qty+item.transfer_qty, item.item_per_package)}}{{item.child_unit}}  </span>
+                                         </span>
+                                       </td>
+                                </tr>
+                           
+                        </tbody>
+                    </table>
+                    <div v-if="isLoading">
+                        <div colspan="5">
+                            <div class="d-flex justify-content-center my-5">
+                                <div class="spinner-border text-primary"  role="status">
+                                  <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>   
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import db from '@/firebase/firestore'
+import * as hp from "@/lib/helper"
+import * as ss from "@/lib/snapshot/transfers"
+
+export default {
+    props:['fromDate', 'toDate', 'from_location', 'to_location'],
+    components: {
+    },
+  
+    data(){
+        return{                
+            reports:[],
+            transfersData:[],
+            total_pur_amount:0,
+            total_retail_amount:0,
+            total_whole_sale_amount:0,
+            total_main_retail_amount:0,
+            total_main_whole_sale_amount:0,
+            isLoading:false,
+            msg : {
+                type :"",
+                info :"",
+            },       
+        }
+    },
+   
+    mounted() {    
+            if(this.user !==null){
+                this.isLoading=true;
+                this.fetchStocks();  
+            }
+            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
+            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
+            if(this.reportType="by_date"){
+                this.displayReportType="by Date"
+            }
+    },
+   watch:{
+   
+    msg:{
+            handler(val){
+                if(val.type){
+                    setTimeout(()=>{
+                        this.msg.type="";
+                        this.msg.info="";
+                    }, 5000)
+                }
+            },deep:true
+        },
+        user(data){
+            if(data){
+                this.isLoading=true;
+                this.fetchStocks();  
+            }
+        }   
+   },
+    computed:{
+        user(){
+            return this.$store.getters.user;
+        },
+        report_type(){
+            return this.$store.getters.reportType;
+        },      
+    },
+    methods:{
+        calQtyL(qty, ipp){
+            return hp.calQtyL(qty, ipp);
+        },
+        calQtyS(qty, ipp){
+            return hp.calQtyS(qty, ipp)
+        },
+        goBack(){
+            this.$router.go(-1)
+        },
+       
+        displayReports(){       
+            let stocks=[]
+            this.transfersData.map((res)=>{
+                    res.products.map((data)=>{
+                        stocks.push(data)
+                    })
+            })          
+            const res1=Object.entries(hp.gb_item_name_retail_price(stocks))   
+            const res2=res1.map((ren)=>{
+                let item={main_qty:0, parent_unit:"",child_unit:"",item_name:ren[0], code_no:0, item_per_package:0, qty:0, 
+                    transfer_qty:0,
+                }
+                ren[1].map((rep)=>{
+                    item.code_no=rep.code_no;
+                    item.item_per_package=rep.item_per_package;
+                    item.qty += rep.qty;                 
+                    item.parent_unit=rep.parent_unit;
+                    item.child_unit=rep.child_unit;
+                    item.main_qty += rep.main_qty;
+                    item.transfer_qty += rep.transfer_qty;
+                
+                })
+                return item;
+            }).sort((a,b)=>a.code_no - b.code_no)                     
+           
+              this.reports=[...res2];        
+        },      
+        async fetchStocks(){
+            const from_date=Timestamp.fromDate(new Date(this.fromDate))
+            const to_date=Timestamp.fromDate(new Date(this.toDate))
+            const query_url = query(collection(db, "transfers"),
+            where("created_at", ">=", from_date), where("created_at", "<=", to_date),
+            where("from_location", "==", this.from_location), where("to_location", "==", this.to_location), 
+            orderBy("created_at", "desc"));
+            const snapShot=await getDocs(query_url)
+            const items=ss.transfers(snapShot)    
+            this.transfersData=items;
+            this.displayReports();
+            this.isLoading=false;
+        }
+    }
+}
+</script>
+<style lang="">
+    
+</style>

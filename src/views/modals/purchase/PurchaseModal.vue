@@ -64,12 +64,14 @@
                                                 <td>Pur date</td>                                    
                                                 <td>Supplier</td>
                                                 <td>User</td>
+                                                <td>Location</td>
                                             </tr>                                
                                             <tr v-if="purchases.length > 0" v-for="p in purchases" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal" aria-label="Close" style="cursor: context-menu;">
                                                 <td class="text-center">{{p.voucher_no}}</td>
                                                 <td class="text-center">{{showTime(p.pur_date)}}</td>
                                                 <td>{{p.supplier.name}} ({{p.supplier.company}})</td>
                                                 <td>{{removeAfterAt(p.user.email)}}</td>
+                                                <td>{{p.location}}</td>
                                             </tr>
                                         </tbody>
                                     </table>   

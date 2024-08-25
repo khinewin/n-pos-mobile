@@ -18,7 +18,8 @@
                                                         <tr class="fw-bold text-center">
                                                             <td >Code</td>
                                                             <td >Description</td>
-                                                            <td  colspan="2">Qty</td>
+                                                            <td>Packing size</td>
+                                                            <td >Qty</td>
                                                             <td >Price</td>
                                                             <td>Discount</td>
                                                             <td >Amount</td>
@@ -28,14 +29,13 @@
                                                         <tr v-for="s in res[1]" :key="s.code_no">
                                                             <td class="col-1 text-center">{{s.code_no}}</td>
                                                             <td class="col-4">{{s.item_name}}</td>
-                                                            <td class="text-center col-1">
-                                                                {{s.sale_qty}} {{s.child_unit}}
+                                                            <td class="col-1">
+                                                                1{{s.parent_unit}} * {{s.item_per_package}}{{s.child_unit}}
                                                             </td>
-                                                            <td class="text-center col-1">
-                                                                <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}} {{s.parent_unit}}</span>
-                                                                <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0"> * </span>
-                                                                <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}} {{s.child_unit}}</span>
-                
+                                                            <td class="text-end col-1">
+                                                                <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}}{{s.parent_unit}}</span>
+                                                                <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0">, </span>
+                                                                <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}} {{s.child_unit}}</span>                
                                                             </td>
                                                             <td class="col-1 text-end">{{s.sale_price}}</td>
                                                             <td class="col-1 text-end">{{s.discount}}</td>
@@ -54,16 +54,16 @@
                                 </td>
                             </tr>                                                     
                             <tr>
-                                <td class="text-end fw-bold">Amount</td>
-                                <td class="text-start">{{total_amount}}</td>
+                                <td class="text-end fw-bold">Total sale amount</td>
+                                <td class="text-start">{{total_sale_amount}}</td>
                             </tr>
                             <tr>
-                                <td class="text-end fw-bold">Discount</td>
-                                <td class="text-start">{{total_discount}}</td>
+                                <td class="text-end fw-bold">Total pur amount</td>
+                                <td class="text-start">{{total_pur_amount}}</td>
                             </tr>
                             <tr>
-                                <td class="text-end fw-bold">Total amount</td>
-                                <td class="text-start">{{total_charges}}</td>
+                                <td class="text-end fw-bold">Profit</td>
+                                <td class="text-start">{{total_profit}}</td>
                             </tr>
                           
                         </tbody>
@@ -87,7 +87,7 @@ import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper.js"
 import * as ss from "@/lib/snapshot/sales"
 export default {
-    props:['fromDate', 'toDate', 'customer_code'],
+    props:['fromDate', 'toDate', 'customer_code', 'code_no'],
     components: {
     },
   
@@ -97,10 +97,9 @@ export default {
             reports:[],
           //  current_month:[],
             salesData:[],
-            total_amount:0,       
-            total_discount:0,
-            total_charges:0,   
-            total_profit:0,
+            total_sale_amount:0,       
+            total_pur_amount:0,
+            total_profit:0,   
             isLoading:false,
             msg : {
                 type :"",
@@ -164,21 +163,30 @@ export default {
         },     
         displayReports(){       
             let sales=[]
-            this.salesData.map((res)=>{
-                    this.total_amount += res.total_amount
-                    this.total_discount +=res.discount
-                    this.total_charges += res.total_amount - res.discount                               
+            this.salesData.map((res)=>{                                         
                     res.products.map((data)=>{
+                        if(this.code_no){
+                            if(this.code_no==data.code_no)  sales.push({
+                            ...data,
+                            group_customer:  `${res.customer.name}(${res.customer.phone})`,
+                            customer_code: res.customer.code,
+                            group_date : hp.showTime(res.sale_date)
+                        })
+                       }else{
                         sales.push({
                             ...data,
-                            group_customer: `${res.customer.name}(${res.customer.phone})`,
+                            group_customer:  `${res.customer.name}(${res.customer.phone})`,
                             customer_code: res.customer.code,
-                            group_date :  this.showTime(res.sale_date)
+                            group_date: hp.showTime(res.sale_date)
                         })
+                       }
                     })
             })
             sales.sort((a,b)=>Number(a.customer_code) - Number(b.customer_code))
-            const gbc=Object.entries(hp.gb_customer(sales))         
+            const gbc=Object.entries(hp.gb_customer(sales))       
+            let total_sale_amount=0;
+            let total_pur_amount=0;
+            let total_profit=0;  
             const data=gbc.map((res)=>{
                 const name=res[0];
                 const gbd=Object.entries(hp.gb_date(res[1]))
@@ -223,11 +231,17 @@ export default {
                             pur_amount += res.pur_amount;
                             profit_amount += res.sale_amount - res.pur_amount;
                         })
+                        total_pur_amount +=pur_amount;
+                        total_sale_amount += sale_amount;
+                        total_profit+=profit_amount;
                         const res4={sale_amount, pur_amount, profit_amount}
 
                     const updateData=[date, res2,res4]
                     return updateData;
                 })
+                this.total_profit=total_profit;
+                this.total_sale_amount=total_sale_amount;
+                this.total_pur_amount=total_pur_amount;
                 return [name, gbc];
             })  
            this.reports=data;

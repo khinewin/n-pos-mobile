@@ -165,7 +165,7 @@
         <SalesModal @setCode="setOldCode" />
         <CustomerModal @setCustomer="setCustomer" />
         <!--Pritn item start-->
-        <div class="d-none" id="printMe" v-if="saleItems.length > 0" >
+        <div class="" id="printMe" v-if="saleItems.length > 0" >
                 <Print :data="printData" />
         </div>
         <!-- print item end-->
@@ -442,6 +442,7 @@ export default {
                 sale_price: this.sale_type==='retail' ? p.retail_price : p.whole_sale_price,
                 sale_amount : this.sale_type==='retail' ? p.retail_price : p.whole_sale_price,
                 pur_amount : p.pur_price,
+                discount: 0,
            }
            const s=this.saleItems;
             let temStore=[]

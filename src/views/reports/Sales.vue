@@ -13,27 +13,27 @@
                 <h3>N-POS</h3>
                 <h5>Reports sales {{displayReportType}}</h5>
                 <h6 v-if="displayFromDate || displayToDate">From {{showTime(displayFromDate)}} To {{showTime(displayToDate)}}</h6>
-                <h5 v-if="customer_code">{{customer_name}}</h5>
+                <h6 ><span v-if="code_no">Code : {{item_name}} , </span> <span v-if="customer_code">Customer : {{customer_name}}</span></h6>
 
             </div>            
             <div class="col-12">                   
                     <div v-if="reportType==='by_date'">
-                        <SalesByDate  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" />
+                        <SalesByDate  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no" />
                     </div>
                     <div v-if="reportType==='by_voucher'">
                         <SalesByVoucher  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :voucher_no="voucher_no" />
                     </div>
                     <div v-if="reportType==='by_description'">
-                        <SalesByDescription  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate"/>
+                        <SalesByDescription  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no"/>
                     </div>
                     <div v-if="reportType==='by_customer_date'">
-                        <SalesByCustomerDate :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate"/>
+                        <SalesByCustomerDate :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no"/>
                     </div>
                     <div v-if="reportType==='by_customer'">
-                        <SalesByCustomer  :fromDate="fromDate"  :toDate="toDate" :customer_code="customer_code"/>
+                        <SalesByCustomer  :fromDate="fromDate"  :toDate="toDate" :customer_code="customer_code" :code_no="code_no"/>
                     </div>
                     <div v-if="reportType==='by_chart'">
-                        <SalesByChart  :fromDate="fromDate"  :toDate="toDate" :customer_code="customer_code"/>
+                        <SalesByChart  :fromDate="fromDate"  :toDate="toDate" :customer_code="customer_code" :code_no="code_no"/>
                     </div>
             </div>
         </div>
@@ -63,6 +63,8 @@ export default {
             voucher_no: this.$route.query.voucher_no,
             customer_name: this.$route.query.customer_name,
             customer_code: this.$route.query.customer_code,
+            code_no: this.$route.query.code_no,
+            item_name: this.$route.query.item_name,
             displayFromDate:"",
             displayToDate:"",
             displayReportType:"",

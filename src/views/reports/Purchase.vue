@@ -13,26 +13,33 @@
                 <h3>N-POS</h3>
                 <h5>Reports purchase {{displayReportType}}</h5>
                 <h6 v-if="displayFromDate || displayToDate">From {{showTime(displayFromDate)}} To {{showTime(displayToDate)}}</h6>
-                <h5 v-if="supplier">{{supplier_name}} ({{supplier_company}})</h5>
+                <div class="row js">
+                    <div class="col-6">                    
+                        <span v-if="supplier">Supplier : {{supplier_name}} ({{supplier_company}})</span>
+                    </div>
+                    <div class="col-6">
+                        Location : {{location}}
+                    </div>
+                </div>
             </div>            
             <div class="col-12">                   
                     <div v-if="reportType==='by_date'">
-                        <PurchaseByDate :fromDate="fromDate" :supplier="supplier" :toDate="toDate" />
+                        <PurchaseByDate :fromDate="fromDate" :supplier="supplier" :toDate="toDate" :location="location" />
                     </div>
                     <div v-if="reportType==='by_voucher'">
-                        <PurchaseByVoucher :supplier="supplier"  :fromDate="fromDate"  :toDate="toDate" :voucher_no="voucher_no" />
+                        <PurchaseByVoucher :supplier="supplier"  :fromDate="fromDate"  :toDate="toDate" :voucher_no="voucher_no"  :location="location" />
                     </div>
                     <div v-if="reportType==='by_description'">
-                        <PurchaseByDescription :supplier="supplier" :fromDate="fromDate"  :toDate="toDate"/>
+                        <PurchaseByDescription :supplier="supplier" :fromDate="fromDate"  :toDate="toDate"  :location="location"/>
                     </div>
                     <div v-if="reportType==='by_supplier'">
-                        <PurchaseBySupplier :supplier="supplier" :fromDate="fromDate"  :toDate="toDate"/>
+                        <PurchaseBySupplier :supplier="supplier" :fromDate="fromDate"  :toDate="toDate"  :location="location"/>
                     </div>
                     <div v-if="reportType==='by_supplier_date'">
-                        <PurchaseBySupplierDate :supplier="supplier" :fromDate="fromDate"  :toDate="toDate"/>
+                        <PurchaseBySupplierDate :supplier="supplier" :fromDate="fromDate"  :toDate="toDate"  :location="location"/>
                     </div>
                     <div v-if="reportType==='by_exp_date'">
-                        <PurchaseByExpDate  :fromDate="fromDate"  :toDate="toDate" :supplier="supplier"/>
+                        <PurchaseByExpDate  :fromDate="fromDate"  :toDate="toDate" :supplier="supplier"  :location="location"/>
                     </div>
             </div>
         </div>
@@ -58,6 +65,7 @@ export default {
         return{         
             reportType:this.$route.params['reportType'],
             fromDate:this.$route.params['fromDate'],
+            location: this.$route.params['location'],
             toDate:this.$route.params['toDate'],
             voucher_no: this.$route.query.voucher_no,
             supplier:this.$route.query.supplier,

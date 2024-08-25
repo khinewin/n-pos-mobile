@@ -19,27 +19,33 @@
             </div>
            <SalesSession />
            <PurchaseSession />
-           <div class="row g-1 mt-2">           
-            <div class="col-sm-2 col-lg-2 d-grid">
-                <router-link class="btn" :to="{name : 'Sale'}" ><i class="fa-solid fa-cash-register"></i> Sale</router-link>
+           <div class="row g-0 mt-2">           
+            <div class="col-sm-2 col-lg-3 d-grid">
+                <router-link class="btn btn-sm" :to="{name : 'Sale'}" ><i class="fa-solid fa-cash-register"></i> Sale</router-link>
             </div>
-            <div class="col-sm-2 col-lg-2 d-grid">
-                <router-link class="btn" :to="{name : 'Purchase'}"><i class="fa-solid fa-cart-shopping"></i> Purchase</router-link>
+            <div class="col-sm-2 col-lg-3 d-grid">
+                <router-link class="btn btn-sm" :to="{name : 'Purchase'}"><i class="fa-solid fa-cart-shopping"></i> Purchase</router-link>
             </div>
-            <div class="col-sm-2 col-lg-2 d-grid">
-                <router-link class="btn" :to="{name : 'OpeningStocks'}"><i class="fa-solid fa-money-bill-trend-up"></i> Stocks</router-link>
+            <div class="col-sm-2 col-lg-3 d-grid">
+                <router-link class="btn btn-sm" :to="{name : 'OpeningStocks'}"><i class="fa-solid fa-money-bill-trend-up"></i> Stocks</router-link>
             </div>
-            <div class="col-sm-2 col-lg-2 d-grid">
-                <router-link class="btn" :to="{name : 'Suppliers'}"><i class="fa-solid fa-person-walking-luggage"></i> Suppliers</router-link>
+            <div class="col-sm-2 col-lg-3 d-grid">
+                <router-link class="btn btn-sm" :to="{name : 'Products'}"><i class="fa-solid fa-list-check"></i> Products code</router-link>
             </div>
-            <div class="col-sm-2 col-lg-2 d-grid">
-                <router-link class="btn" :to="{name : 'Customers'}"><i class="fa-solid fa-users"></i> Customers</router-link>
+            <div class="col-sm-2 col-lg-3 d-grid">
+                <router-link class="btn btn-sm" :to="{name : 'Suppliers'}"><i class="fa-solid fa-person-walking-luggage"></i> Suppliers</router-link>
             </div>
-            <div class="col-sm-2 col-lg-2  d-grid">
-                <router-link :to="{name: 'Reports'}" class="btn"><i class="fa-solid fa-chart-pie"></i> Reports</router-link>
+            <div class="col-sm-2 col-lg-3 d-grid">
+                <router-link class="btn btn-sm" :to="{name : 'Customers'}"><i class="fa-solid fa-users"></i> Customers</router-link>
+            </div>
+            <div class="col-sm-2 col-lg-3 d-grid">
+                <router-link class="btn btn-sm" :to="{name : 'Transfers'}"><i class="fa-solid fa-right-left"></i> Transfers</router-link>
+            </div>
+            <div class="col-sm-2 col-lg-3  d-grid">
+                <router-link :to="{name: 'Reports'}" class="btn btn-sm"><i class="fa-solid fa-chart-pie"></i> Reports</router-link>
             </div>
            </div>
-           <div class="row mt-2 g-2">
+           <div class="row mt-1 g-2">
             <div class="col-lg-6">
                 <SalesChart />
             </div>

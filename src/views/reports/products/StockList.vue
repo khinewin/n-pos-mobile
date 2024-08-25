@@ -7,22 +7,28 @@
                                 <tr class="text-center fw-bold">
                                     <td class="col-1"> Code</td>
                                     <td class="col-2"> Description</td>
-                                    <td class="col-1" colspan="2" @click="sortQty"><i class="fa-solid fa-sort"></i> Qty</td>
-                                    <td class="col-1" v-if="sale_price"> Retail price</td>
+                                    <td class="col-1">Packing size</td>
+                                    <td class="col-1" @click="sortMainQty" v-if="location =='All' || location=='Main'"><i class="fa-solid fa-sort"></i> Main Qty</td>
+                                    <td class="col-1" @click="sortQty" v-if="location =='All' || location=='Shop'"><i class="fa-solid fa-sort"></i> Shop Qty</td>
+                                    <td class="col-1" v-if="sale_price" > Retail price</td>
                                     <td class="col-1" v-if="sale_price"> Wholesale price</td>
                                     <td class="col-1"  v-if="pur_price"> Pur price</td>
                                 </tr>                                                       
                                 <tr class="" v-if="reports.length > 0"  v-for="(p, i) in reports" :key="p.id" >                                    
                                     <td class="text-center">{{p.code_no}}</td>
                                     <td >{{p.item_name}}</td>
-                                    <td class="text-center col-1">
-                                        {{p.qty}} {{p.child_unit}}
+                                    <td>
+                                        1{{p.parent_unit}} * {{p.item_per_package}}{{p.child_unit}}
                                     </td>
-                                    <td class="text-center col-1">
-                                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0">{{calQtyL(p.qty, p.item_per_package)}} {{p.parent_unit}}</span>
-                                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0 && calQtyS(p.qty, p.item_per_package) > 0"> * </span>
-                                        <span v-if="calQtyS(p.qty, p.item_per_package) > 0">{{calQtyS(p.qty, p.item_per_package)}} {{p.child_unit}}</span>
-
+                                    <td class="text-end" v-if="location =='All' || location=='Main'">
+                                        <span v-if="calQtyL(p.main_qty, p.item_per_package) > 0">{{calQtyL(p.main_qty, p.item_per_package)}}{{p.parent_unit}}</span>
+                                        <span v-if="calQtyL(p.main_qty, p.item_per_package) > 0 && calQtyS(p.main_qty, p.item_per_package) > 0">, </span>
+                                        <span v-if="calQtyS(p.main_qty, p.item_per_package) > 0">{{calQtyS(p.main_qty, p.item_per_package)}}{{p.child_unit}}</span>
+                                    </td>
+                                    <td class="text-end" v-if="location =='All' || location=='Shop'">
+                                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0">{{calQtyL(p.qty, p.item_per_package)}}{{p.parent_unit}}</span>
+                                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0 && calQtyS(p.qty, p.item_per_package) > 0">, </span>
+                                        <span v-if="calQtyS(p.qty, p.item_per_package) > 0">{{calQtyS(p.qty, p.item_per_package)}}{{p.child_unit}}</span>
                                     </td>                                            
                                     <td v-if="sale_price" class="text-end">{{p.retail_price}}</td>
                                     <td v-if="sale_price" class="text-end">{{p.whole_sale_price}}</td>
@@ -49,7 +55,7 @@
     import * as lib from "@/lib/snapshot/products"
     import * as hp from '@/lib/helper'
     export default {
-    props: ['sale_price','pur_price',],
+    props: ['sale_price','pur_price', 'location', 'code_no'],
     data(){
         return {
             isLoading:false,
@@ -91,14 +97,33 @@
             }
            
         },
+        sortMainQty(){
+            if(this.sort==="asc"){
+                this.reports=this.reports.sort((a,b)=>{
+                        return a.main_qty - b.main_qty;
+                })
+                this.sort="desc"
+            }else{
+                this.reports=this.reports.sort((a,b)=>{
+                        return a.main_qty + b.main_qty;
+                })
+                this.sort="asc"
+            }
+           
+        },
         calQtyL(qty,ipp){
             return hp.calQtyL(qty,ipp)
         },
         calQtyS(qty, ipp){
             return hp.calQtyS(qty,ipp)
         },
-        async fetchProducts(){                    
-            const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
+        async fetchProducts(){   
+            let query_url="";             
+            if(this.code_no){
+                 query_url = query(collection(db, "products"), where("code_no", "==", Number(this.code_no)), orderBy("created_at", "desc"));
+            }else{
+                 query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
+            } 
             const snapShot=await getDocs(query_url)           
             if(snapShot._snapshot.docChanges.length <=0){
                 this.msg.type='error' 

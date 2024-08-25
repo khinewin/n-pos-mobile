@@ -27,6 +27,21 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                            <td class="text-end col-4 p-2">Location :</td>
+                                            <td class="col-8">
+                                                <select class="form-control-plaintext" v-model="location">
+                                                    <option value="Main">Main</option>
+                                                    <option value="Shop">Shop</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-sm-6 col-lg-4">
+                                <table class="table mb-0 table-borderless">
+                                    <tbody>                                       
+                                        <tr>
                                             <td class="text-end pt-2">Pur date :</td>
                                             <td class="py-0">
                                                 <input type="date" :class="{'border-0 border-bottom border-danger' : v$.pur_date.$errors.length > 0}"  v-model="pur_date" class="form-control-plaintext border-bottom" id="pur_date" placeholder="Date">                                                
@@ -157,6 +172,7 @@ export default {
             total_amount:0,
             total_discount:0,
             total_price:0,
+            location: "Main",
 
         
             isLoading:false,
@@ -181,7 +197,7 @@ export default {
                     setTimeout(()=>{
                         this.msg.type="";
                         this.msg.info="";
-                    }, 5000)
+                    }, 3000)
                 }
             },deep:true
         }
@@ -272,6 +288,7 @@ export default {
                 voucher_no: this.voucher_no,
                 pur_date: Timestamp.fromDate(new Date(this.pur_date)),
                 supplier: this.supplier,
+                location: this.location,
                 products : this.storePurchase,
                 user : {uid: this.user.uid, email: this.user.email},
                 total_amount:this.total_amount,
@@ -286,9 +303,16 @@ export default {
                 const id=p.id;
                 const pur_qty=p.pur_qty;               
                 const updateDocument=doc(db, "products", id)
-                await updateDoc(updateDocument, {
-                qty : increment(pur_qty)
-                 })    
+                if(this.location==="Main"){
+                    await updateDoc(updateDocument, {
+                     main_qty : increment(pur_qty)
+                 })
+                }
+                 if(this.location==="Shop"){
+                    await updateDoc(updateDocument, {
+                     qty : increment(pur_qty)
+                 })
+                }    
             })
             this.msg.type="success";
             this.msg.info="Purchase save successful."          

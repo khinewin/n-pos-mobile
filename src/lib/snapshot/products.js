@@ -13,7 +13,8 @@ const products=(snapShot)=>{
             item_per_package: doc.data().item_per_package,
             parent_unit: doc.data().parent_unit,
             child_unit: doc.data().child_unit,
-            pur_price:doc.data().pur_price,       
+            pur_price:doc.data().pur_price,      
+            main_qty: doc.data().main_qty, 
         };                                
         products.push(product);                           
     });

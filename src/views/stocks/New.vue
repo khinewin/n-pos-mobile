@@ -53,15 +53,20 @@
                                 <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
                                     <td class="col-2">Desc</td>
-                                    <td class="col-1">Qty</td>                                   
-                                    <td class="col-1">Retail price</td>
-                                    <td class="col-1">Wholesale price</td>
+                                    <td class="col-1">Packing size</td>
+                                    <td class="col-1">Main S Qty</td>     
+                                    <td class="col-1">Shop S Qty</td>   
+                                    <td class="col-1">RT S price</td>
+                                    <td class="col-1">WS S price</td>
+                                    <!--<td class="col-1">Wholesale price</td>-->
                                     <td class="col-1">Pur price</td>
-                                    <td class="col-1">Retail amount</td>                                    
-                                    <td class="col-1">Wholesale amount</td>                                    
-                                    <td class="col-1">Pur amount</td>
+                                    <td class="col-1">Main RT Amt</td>                                    
+                                    <td class="col-1">Main WS Am</td>                                    
+                                    <td class="col-1">Shop RT Amt</td>                                    
+                                    <td class="col-1">Shop WS Am</td>
+                                    <!--<td class="col-1">Pur Amt</td>-->
                                 </tr>
-                                <tr class="" v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id" @mouseenter="setEdit(i)"  @keypress.enter="calEdit(i)" @mouseleave="calEdit(i)">
+                                <tr class="" v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id" @mouseenter="setEdit(i)" >
                                     <td class="text-center pt-2">
                                         <div class="position-relative">
                                             {{st.code_no}}                                           
@@ -69,33 +74,45 @@
                                         </div>                                    
                                     </td>
                                     <td class="pt-2">{{st.item_name}}</td>
+                                    <td class="pt-2">1{{st.parent_unit}} * {{st.item_per_package}}{{st.child_unit}}</td>
                                     <td class="text-center p-0">
-                                            <input   type="number"  v-model="st.qty" class="form-control-plaintext  text-center"  placeholder="Qty">
+                                            <input   type="number"  v-model="st.main_qty" class="form-control-plaintext  text-center"  placeholder="Qty">
+                                    </td>
+                                    <td class="text-center p-0">
+                                        <input  @keyup="calEdit(i)" @change="calEdit(i)"  type="number"  v-model="st.qty" class="form-control-plaintext  text-center"  placeholder="Qty">
                                     </td>                                  
                                     <td class="p-0">
-                                            <input  type="number"  v-model="st.retail_price" class="form-control-plaintext  text-center" placeholder="0">                                    
+                                            <input @keyup="calEdit(i)" @change="calEdit(i)"  type="number"  v-model="st.retail_price" class="form-control-plaintext  text-center" placeholder="0">                                    
                                     </td>                                    
                                     <td class="p-0">
-                                            <input  type="number"  v-model="st.whole_sale_price" class="form-control-plaintext  text-center" placeholder="0">                                        
+                                            <input @keyup="calEdit(i)" @change="calEdit(i)"  type="number"  v-model="st.whole_sale_price" class="form-control-plaintext  text-center" placeholder="0">                                        
                                     </td>
                                     <td class="p-0">
                                         <input  type="number"  v-model="st.pur_price" class="form-control-plaintext  text-center" placeholder="0">                                       
                                     </td>
                                     <td class="text-end pt-2">                                       
+                                        <span>{{st.main_retail_amount}}</span>
+                                   </td>
+                                    <td class="text-end pt-2">                                    
+                                         <span>{{st.main_whole_sale_amount}}</span>
+                                    </td> 
+                                    <td class="text-end pt-2">                                       
                                         <span>{{st.retail_amount}}</span>
                                    </td>
                                     <td class="text-end pt-2">                                    
                                          <span>{{st.whole_sale_amount}}</span>
-                                    </td>                                   
-                                    <td class="text-end pt-2">                                    
+                                    </td>  
+                                                                     
+                                    <!--<td class="text-end pt-2">                                    
                                          <span>{{st.pur_amount}}</span>
-                                    </td>                                 
+                                    </td>-->                                 
                                 </tr>
                                 <tr class="small">
-                                    <td colspan="6" class="text-end fw-bold">Total</td>
+                                    <td colspan="8" class="text-end fw-bold">Total</td>
+                                    <td class="text-end">{{total_main_retail_amount}}</td>
+                                    <td class="text-end">{{total_main_whole_sale_amount}}</td>
                                     <td class="text-end">{{total_retail_amount}}</td>
-                                    <td class="text-end">{{total_whole_sale_amount}}</td>
-                                    <td class="text-end">{{total_pur_amount}}</td>
+                                    <td class="text-end">{{total_whole_sale_amount}}</td>                                   
                                 </tr>                                                                                         
                             </tbody>
                         </table>                                                                                                                    
@@ -139,6 +156,8 @@ export default {
             editItem: {},        
             total_retail_amount:0,
             total_whole_sale_amount:0, 
+            total_main_retail_amount:0,
+            total_main_whole_sale_amount:0,
             total_pur_amount:0,    
             pur_amount:0, 
             isLoading:false,
@@ -184,21 +203,27 @@ export default {
                 if(f.id===oei.id){
                     f.retail_amount=f.qty * f.retail_price;                  
                     f.whole_sale_amount=f.qty * f.whole_sale_price;
-                    f.pur_amount=f.qty * f.pur_price;
+                    f.main_retail_amount=f.main_qty * f.retail_price;
+                    f.main_whole_sale_amount=f.main_qty * f.whole_sale_price
+                    //f.pur_amount=f.qty * f.pur_price;
                 }
             }) && this.calTotal();
                  
         },
         calTotal(){
             this.total_whole_sale_amount=this.storeItems.reduce((accu, cur)=>accu + cur.whole_sale_amount,0)
-            this.total_retail_amount=this.storeItems.reduce((accu, cur)=>accu + cur.retail_amount,0)   
-            this.total_pur_amount=this.storeItems.reduce((accu, cur)=>accu + cur.pur_amount,0) 
+            this.total_retail_amount=this.storeItems.reduce((accu, cur)=>accu + cur.retail_amount,0)  
+            this.total_main_whole_sale_amount=this.storeItems.reduce((accu, cur)=>accu + cur.main_whole_sale_amount,0)
+            this.total_main_retail_amount=this.storeItems.reduce((accu, cur)=>accu + cur.main_retail_amount,0)   
+            //this.total_pur_amount=this.storeItems.reduce((accu, cur)=>accu + cur.pur_amount,0) 
         },
         removeStoreItem(i){
             this.storeItems.splice(i, 1)
         },
         storingItem(){           
             this.storeItems.push(this.purchase_item)   
+            this.editItem=this.purchase_item;
+            this.calEdit();
          },
         setCode(p){           
             this.purchase_item=p;
@@ -228,7 +253,9 @@ export default {
                 user : {uid: this.user.uid, email: this.user.email},
                 total_retail_amount:this.total_retail_amount,
                 total_whole_sale_amount:this.total_whole_sale_amount,   
-                total_pur_amount:this.total_pur_amount,         
+                total_main_retail_amount: this.total_main_retail_amount,
+                total_main_whole_sale_amount: this.total_main_whole_sale_amount,
+                //total_pur_amount:this.total_pur_amount,         
             }      
             const saveDocument=collection(db, "openingStocks")
             await addDoc(saveDocument, voucher)
@@ -237,6 +264,7 @@ export default {
                 const updateDocument=doc(db, "products", id)
                 await updateDoc(updateDocument, {
                         qty : p.qty,
+                        main_qty: p.main_qty,
                         retail_price: p.retail_price,
                         whole_sale_price: p.whole_sale_price,
                         pur_price: p.pur_price,
@@ -267,6 +295,7 @@ export default {
                 this.msg.info='Oops..., something went wrong!'
                 this.isLoading=false;
                 this.isUpdating=false;
+                this.isAddAllLoading=false;
                 return false;
             }
             snapShot && snapShot.forEach((doc) => {         
@@ -280,6 +309,7 @@ export default {
                     child_unit: doc.data().child_unit,
                     pur_price:doc.data().pur_price,
                     qty : doc.data().qty,
+                    main_qty: doc.data().main_qty,
                     created_at : doc.data().created_at,
                     code_no : doc.data().code_no,           
                     item_per_package: doc.data().item_per_package, 

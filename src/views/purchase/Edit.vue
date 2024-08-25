@@ -21,11 +21,26 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4 pt-2">Voucher no. :</td>
+                                            <td class="text-end col-4 p-2">Voucher no. :</td>
                                             <td class="col-8 py-0">
                                                 <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td class="text-end col-4 p-2">Location :</td>
+                                            <td class="col-8">
+                                                <select class="form-control-plaintext" v-model="location" disabled>
+                                                    <option value="Main">Main</option>
+                                                    <option value="Shop">Shop</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-sm-6 col-lg-4">
+                                <table class="table mb-0 table-borderless">
+                                    <tbody>                                      
                                         <tr>
                                             <td class="text-end pt-2">Pur date :</td>
                                             <td class="py-0">
@@ -59,7 +74,7 @@
                                     <td class="col-1">Discount</td>
                                     <td class="col-1">Price</td>
                                 </tr>
-                                <tr class="small"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase" :key="st.id" @mouseenter="setEdit(i)"  @keypress.enter="calEdit(i)" @mouseleave="calEdit(i)">
+                                <tr class="small"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase" :key="st.id" @mouseenter="setEdit(i)"  >
                                     <td class="pt-2">
                                         <a class="text-danger" href="#!" @click="removeStoreItem(i, st)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                     </td>
@@ -70,19 +85,19 @@
                                             <input @change="setExpDate(st.id)"  type="date"  v-model="st.tmp_exp_date" class="form-control-plaintext  text-center"  placeholder="Exp. date">
                                     </td>
                                     <td class="">
-                                            <input   type="number"  v-model="st.pur_qty" class="form-control-plaintext  text-center"  placeholder="Qty">
+                                            <input @keyup="calEdit(i)" @change="calEdit(i)"  type="number"  v-model="st.pur_qty" class="form-control-plaintext  text-center"  placeholder="Qty">
                                     </td>
                                     <td class="">
-                                            <input  type="number"  v-model="st.pur_price" class="form-control-plaintext text-center" placeholder="Price">
+                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.pur_price" class="form-control-plaintext text-center" placeholder="Price">
                                     </td>
                                     <td class="">
-                                            <input  type="number"  v-model="st.dis_qty" class="form-control-plaintext text-center" placeholder="0">
+                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.dis_qty" class="form-control-plaintext text-center" placeholder="0">
                                     </td>
                                     <td class="">
-                                            <input  type="number"  v-model="st.dis_percent" class="form-control-plaintext  text-center" placeholder="0">
+                                            <input @keyup="calEdit(i)" @change="calEdit(i)"  type="number"  v-model="st.dis_percent" class="form-control-plaintext  text-center" placeholder="0">
                                     </td>
                                     <td class="">
-                                            <input  type="number"  v-model="st.dis_amount" class="form-control-plaintext text-center" placeholder="0">
+                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.dis_amount" class="form-control-plaintext text-center" placeholder="0">
                                     </td>
                                     <td class="text-end pt-2">{{st.amount}}</td>
                                     <td class="text-end pt-2">{{st.discount}}</td>
@@ -99,7 +114,7 @@
                                 <tr class="small">
                                     <td colspan="11" class="text-end pt-2">Extra discount</td>
                                     <td class="text-end">
-                                        <input  type="number" @keyup="calTotal"   v-model="extra_discount" class="form-control-plaintext  text-end" placeholder="0">
+                                        <input   type="number" @keyup="calTotal"  @change="calTotal"  v-model="extra_discount" class="form-control-plaintext  text-end" placeholder="0">
                                     </td>
                                 </tr>
                                 <tr class="small">
@@ -152,6 +167,8 @@ export default {
     data(){
         return{    
             id:"",
+            location:"",
+            old_location:"",
             tmp_exp_date:"",
             voucher_no:"", 
             pur_date:"",
@@ -234,6 +251,8 @@ export default {
                 this.tmpStorePurchase=p.products;// store for original item;
                 this.supplier=p.supplier;
                 this.id=p.id;
+                this.location=p.location;
+                this.old_location=p.location;
                 this.storePurchase.map((s)=>{
                     return s.old_pur_qty=s.pur_qty;
                 })
@@ -335,9 +354,16 @@ export default {
                     const pur_qty=p.pur_qty;     
                     const old_pur_qty=p.old_pur_qty;          
                     const updateDocument=doc(db, "products", id)
-                    await updateDoc(updateDocument, {                      
+                    if(this.location==="Shop"){
+                        await updateDoc(updateDocument, {                      
                         qty : pur_qty > old_pur_qty ? increment(pur_qty-old_pur_qty) : increment(- (old_pur_qty - pur_qty))
-                    })    
+                    })   
+                    } 
+                    if(this.location==="Main"){
+                        await updateDoc(updateDocument, {                      
+                        main_qty : pur_qty > old_pur_qty ? increment(pur_qty-old_pur_qty) : increment(- (old_pur_qty - pur_qty))
+                    })   
+                    } 
                 })
                 this.storePurchase.map((s)=>{
                     return s.old_pur_qty=s.pur_qty;

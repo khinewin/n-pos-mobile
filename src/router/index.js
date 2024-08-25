@@ -19,6 +19,10 @@ import ReportPurchase from '@/views/reports/Purchase.vue'
 import ReportProduct from '@/views/reports/Products.vue'
 import Customers from '@/views/customer/Customers.vue'
 import store from "@/store"
+import NewTransfer from '@/views/transfers/New.vue'
+import Transfers from '@/views/transfers/Transfers.vue'
+import EditTransfer from '@/views/transfers/Edit.vue'
+import ReportsTransfers from '@/views/reports/Transfers.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),  
   routes: [
@@ -26,27 +30,28 @@ const router = createRouter({
       path: '/',
       name: 'Welcome',
       component: Login,
-      meta : {title: "E-POS | Welcome"}
+      meta : {title: "N-PRO-POS | Welcome"}
 
     },
     {
       path: '/auth/login',
       name: 'Login',     
       component: Login,
-      meta : {title: "E-POS | User signin"}
+      meta : {title: "N-PRO-POS | User signin"}
 
     },
     {
       path: '/admin/dashboard',
       name: 'Dashboard',     
       component: Dashboard,
-      meta : {title: "E-POS | Admin dashboard"}
+      meta : {title: "N-PRO-POS | Admin dashboard"}
     },
+    
     {
       path: '/sale',
       name: 'Sale',     
       component: Sale,
-      meta : {title: "E-POS | Sale"}
+      meta : {title: "N-PRO-POS | Sale"}
 
     },
     {
@@ -59,93 +64,117 @@ const router = createRouter({
       path: '/products',
       name: 'Products',     
       component: Products,
-      meta : {title: "E-POS | Products code"}
+      meta : {title: "N-PRO-POS | Products code"}
 
     },
     {
       path: '/products/opening-stocks',
       name: 'OpeningStocks',     
       component: OpeningStocks,
-      meta : {title: "E-POS | Opening stocks"}
+      meta : {title: "N-PRO-POS | Opening stocks"}
 
     },
     {
       path: '/products/opening-stocks/new',
       name: 'NewOpeningStocks',     
       component: NewOpeningStocks,
-      meta : {title: "E-POS | New opening stock"}
+      meta : {title: "N-PRO-POS | New opening stock"}
     },
     {
       path: '/products/opening-stocks/:id/edit',
       name: 'EditOpeningStocks',     
       component: EditOpeningStocks,
-      meta : {title: "E-POS | Edit opening stock"}
+      meta : {title: "N-PRO-POS | Edit opening stock"}
     },
     {
       path: '/purchase',
       name: 'Purchase',     
       component: Purchase,
-      meta : {title: "E-POS | Purchase"}
+      meta : {title: "N-PRO-POS | Purchase"}
     },
     {
       path: '/purchase/:id/edit',
       name: 'EditPurchase',     
       component: EditPurchase,
-      meta : {title: "E-POS | Edit purchase"}
+      meta : {title: "N-PRO-POS | Edit purchase"}
     },
     {
       path: '/purchase/add',
       name: 'AddPurchase',     
       component: AddPurchase,
-      meta : {title: "E-POS | Add purchase"}    },
+      meta : {title: "N-PRO-POS | Add purchase"}    },
    
     {
       path: '/suppliers',
       name: 'Suppliers',     
       component: Suppliers,
-      meta : {title: "E-POS | Suppliers"}
+      meta : {title: "N-PRO-POS | Suppliers"}
     },
     {
       path: '/customers',
       name: 'Customers',     
       component: Customers,
-      meta : {title: "E-POS | Customers"}
+      meta : {title: "N-PRO-POS | Customers"}
     },
     {
       path: "/reports",
       name: "Reports",
       component: Reports,
-      meta : {title: "E-POS | Reports"}
+      meta : {title: "N-PRO-POS | Reports"}
     },
     {
-      path: "/reports/products/:reportType",
+      path: "/reports/products/:reportType/:location",
       name: "ReportsProduct",
       component: ReportProduct,
-      meta : {title: "E-POS | Report product code"}
+      meta : {title: "N-PRO-POS | Report product code"}
     },
     {
-      path: "/reports/stocks/:reportType/:fromDate/:toDate",
+      path: "/reports/transfers/:reportType/:fromDate/:toDate/:from_location/:to_location",
+      name: "ReportsTransfer",
+      component: ReportsTransfers,
+      meta : {title: "N-PRO-POS | Report transfer location"}
+    },
+    {
+      path: "/reports/stocks/:reportType/:fromDate/:toDate/:location",
       name: "ReportsStocks",
       component: ReportStocks,
-      meta : {title: "E-POS | Report opening stock"}
+      meta : {title: "N-PRO-POS | Report opening stock"}
     },
     {
       path: "/reports/sales/:reportType/:fromDate/:toDate",
       name: "ReportsSales",
       component: ReportSales,
-      meta : {title: "E-POS | Report sales"}
+      meta : {title: "N-PRO-POS | Report sales"}
     },
     {
-      path: "/reports/purchase/:reportType/:fromDate/:toDate",
+      path: "/reports/purchase/:reportType/:fromDate/:toDate/:location",
       name: "ReportsPurchase",
       component: ReportPurchase,
-      meta : {title: "E-POS | Report purchase"}
+      meta : {title: "N-PRO-POS | Report purchase"}
+    },
+    {
+      path: '/transfers/:id/edit',
+      name: 'EditTransfer',     
+      component: EditTransfer,    
+      meta: { title: 'N-PRO-POS | Edit transfer' },
+    },
+    {
+      path: '/transfers/new',
+      name: 'AddTransfer',     
+      component: NewTransfer,    
+      meta: { title: 'N-PRO-POS | New transfer' },
+    },
+    {
+      path: '/transfers',
+      name: 'Transfers',     
+      component: Transfers,    
+      meta: { title: 'N-PRO-POS | Transfers' },
     },
     {
       path: '/user/profile',
       name: 'Profile',     
       component: Profile,    
-      meta: { title: 'E-POS | User profile' },
+      meta: { title: 'N-PRO-POS | User profile' },
     }
   ], 
 })

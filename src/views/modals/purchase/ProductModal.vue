@@ -7,7 +7,7 @@
                 <div class="card min-vh-100">
                     <div class="card-body p-2">                                             
                         <div class="row g-1">
-                            <div class="col-lg-4">
+                            <div class="col-lg-3">
                                 <div class="card  shadow">
                                     <div class="card-body p-2 small">
                                         <div class="row g-1">
@@ -41,23 +41,36 @@
                                     </div>
                                 </div>                                
                             </div>
-                            <div class="col-lg-8 table-responsive">
+                            <div class="col-lg-9 table-responsive">
                                 <div class="card shadow">
                                     <div class="card-body p-2">
                                         <table class="table table-bordered mb-0 table-hover">
                                             <tbody class="small">
                                                 <tr class="table-secondary text-center">
-                                                    <td>Code</td>
-                                                    <td>Description</td>
-                                                    <td colspan="2">Qty</td>
-                                                    <td>Created date</td>
+                                                    <td class="col-1">Code</td>
+                                                    <td class="col-2">Description</td>
+                                                    <td class="col-2" colspan="2">Shop qty</td>
+                                                    <td class="col-2" colspan="2">Main qty</td>
                                                 </tr>                                      
                                                 <tr class="" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"   style="cursor:context-menu">
                                                     <td class="text-center">{{p.code_no}}</td>
                                                     <td>{{p.item_name}}</td>
-                                                    <td class="text-center">{{p.qty}}</td>
-                                                    <td class="text-center">{{Math.floor(p.qty % p.item_per_package)}} x {{Math.floor(p.qty / p.item_per_package)}}</td>
-                                                    <td class="text-center">{{showTime(p.created_at)}}</td>
+                                                    <td class="text-center col-1">
+                                                        <span v-if="p.qty >0">{{p.qty}} {{p.child_unit}}</span>
+                                                    </td>
+                                                    <td class="text-center col-1">
+                                                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0">{{calQtyL(p.qty, p.item_per_package)}} {{p.parent_unit}}</span>
+                                                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0 && calQtyS(p.qty, p.item_per_package) > 0"> * </span>
+                                                        <span v-if="calQtyS(p.qty, p.item_per_package) > 0">{{calQtyS(p.qty, p.item_per_package)}} {{p.child_unit}}</span>                
+                                                    </td>
+                                                    <td class="text-center col-1">
+                                                       <span v-if="p.main_qty > 0">{{p.main_qty}} {{p.child_unit}}</span>
+                                                    </td>
+                                                    <td class="text-center col-1">
+                                                        <span v-if="calQtyL(p.main_qty, p.item_per_package) > 0">{{calQtyL(p.main_qty, p.item_per_package)}} {{p.parent_unit}}</span>
+                                                        <span v-if="calQtyL(p.main_qty, p.item_per_package) > 0 && calQtyS(p.main_qty, p.item_per_package) > 0"> * </span>
+                                                        <span v-if="calQtyS(p.main_qty, p.item_per_package) > 0">{{calQtyS(p.main_qty, p.item_per_package)}} {{p.child_unit}}</span>                
+                                                    </td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -143,6 +156,12 @@ export default {
       
     },
     methods:{
+        calQtyL(qty,ipp){
+            return hp.calQtyL(qty,ipp)
+        },
+        calQtyS(qty, ipp){
+            return hp.calQtyS(qty,ipp)
+        },
         updateProducts(){
                 this.isUpdating=true;
                 this.fetchProducts();

@@ -13,16 +13,17 @@
                 <h3>N-POS</h3>
                 <h5>Reports stocks {{displayReportType}}</h5>
                 <h6 v-if="displayFromDate || displayToDate">From {{showTime(displayFromDate)}} To {{showTime(displayToDate)}}</h6>
+                <h6>Location : {{location}}</h6>
             </div>            
             <div class="col-12">                   
                     <div v-if="reportType==='by_date'">
-                        <StocksByDate :fromDate="fromDate"  :toDate="toDate" />
+                        <StocksByDate :fromDate="fromDate"  :toDate="toDate" :location="location" />
                     </div>
                     <div v-if="reportType==='by_voucher'">
-                        <StocksByVoucher :fromDate="fromDate"  :toDate="toDate" :voucher_no="voucher_no" />
+                        <StocksByVoucher :fromDate="fromDate"  :toDate="toDate" :voucher_no="voucher_no" :location="location" />
                     </div>
                     <div v-if="reportType==='by_description'">
-                        <StocksByDescription :fromDate="fromDate"  :toDate="toDate"/>
+                        <StocksByDescription :fromDate="fromDate"  :toDate="toDate" :location="location"/>
                     </div>
             </div>
         </div>
@@ -42,6 +43,7 @@ export default {
     data(){
         return{         
             reportType:this.$route.params['reportType'],
+            location: this.$route.params['location'],
             fromDate:this.$route.params['fromDate'],
             toDate:this.$route.params['toDate'],
             voucher_no: this.$route.query.voucher_no,

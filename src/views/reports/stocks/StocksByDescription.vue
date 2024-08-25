@@ -5,37 +5,47 @@
                     <table class="table table-bordered border-dark table-hover">
                         <tbody class="" v-if="reports.length > 0">    
                             <tr class="fw-bold text-center">
-                                <td >Code</td>
-                                <td >Description</td>
-                                <td  colspan="2">Qty</td>
-                                <td >Retail price</td>
-                                <td >Wholesale price</td>
-                                <td >Pur price</td>
-                                <td >Retail amount</td>
-                                <td >Wholesale amount</td>
-                                <td >Pur amount</td>
+                                <td class="col-1">Code</td>
+                                <td  class="col-2">Description</td>
+                                <td class="col-1">Packing size</td>
+                                <td class="col-1 " v-if="location=='Main' || location=='All'">Main Qty</td>         
+                                <td class="col-1" v-if="location=='Shop' || location=='All'">Shop Qty</td>                          
+                                <td class="col-1 ">RT price</td>
+                                <td class="col-1 ">WS price</td>
+                                <td class="col-1" v-if="location=='Main' || location=='All'">Main RT Amt</td>                                    
+                                <td class="col-1" v-if="location=='Main' || location=='All'">Main WS Am</td>                                    
+                                <td class="col-1" v-if="location=='Shop' || location=='All'">Shop RT Amt</td>                                    
+                                <td class="col-1" v-if="location=='Shop' || location=='All'">Shop WS Am</td>                                                
                             </tr>                        
                                 <tr v-for="item in reports" :key="item.code_no">
                                     <td class="text-center">{{item.code_no}}</td>
                                     <td class="">{{item.item_name}}</td>
-                                    <td class="col-1 text-center">{{item.qty}} {{item.child_unit}}</td>
-                                    <td class="col-1 text-center">
-                                       <span v-if="calQtyL(item.qty, item.item_per_package) > 0">{{calQtyL(item.qty, item.item_per_package)}} {{item.parent_unit}} </span>
-                                        <span v-if="calQtyL(item.qty, item.item_per_package) >0 && calQtyS(item.qty, item.item_per_package) > 0"> * </span>
-                                        <span v-if="calQtyS(item.qty, item.item_per_package)> 0">{{calQtyS(item.qty, item.item_per_package)}} {{item.child_unit}}  </span>
+                                    <td class="">                 
+                                        1{{item.parent_unit}} * {{item.item_per_package}}{{item.child_unit}}
+                                    </td>
+                                    <td class="text-end" v-if="location=='Main' || location=='All'">
+                                        <span v-if="calQtyL(item.main_qty, item.item_per_package) > 0">{{calQtyL(item.main_qty, item.item_per_package)}}{{item.parent_unit}} </span>
+                                         <span v-if="calQtyL(item.main_qty, item.item_per_package) >0 && calQtyS(item.main_qty, item.item_per_package) > 0">, </span>
+                                         <span v-if="calQtyS(item.main_qty, item.item_per_package)> 0">{{calQtyS(item.main_qty, item.item_per_package)}}{{item.child_unit}}  </span>
+                                     </td>
+                                    <td class="text-end" v-if="location=='Shop' || location=='All'">
+                                       <span v-if="calQtyL(item.qty, item.item_per_package) > 0">{{calQtyL(item.qty, item.item_per_package)}}{{item.parent_unit}}</span>
+                                        <span v-if="calQtyL(item.qty, item.item_per_package) >0 && calQtyS(item.qty, item.item_per_package) > 0">, </span>
+                                        <span v-if="calQtyS(item.qty, item.item_per_package)> 0">{{calQtyS(item.qty, item.item_per_package)}}{{item.child_unit}}  </span>
                                     </td>
                                     <td class="text-end">{{item.retail_price}}</td>
                                     <td class="text-end">{{item.whole_sale_price}}</td>
-                                    <td class="text-end">{{item.pur_price}}</td>
-                                    <td class="text-end">{{item.retail_amount}}</td>
-                                    <td class="text-end">{{item.whole_sale_amount}}</td>
-                                    <td class="text-end">{{item.pur_amount}}</td>
+                                    <td class="text-end" v-if="location=='Main' || location=='All'">{{item.main_retail_amount}}</td>
+                                    <td class="text-end" v-if="location=='Main' || location=='All'">{{item.main_whole_sale_amount}}</td>
+                                    <td class="text-end" v-if="location=='Shop' || location=='All'">{{item.retail_amount}}</td>
+                                    <td class="text-end" v-if="location=='Shop' || location=='All'">{{item.whole_sale_amount}}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="7" class="text-end fw-bold">Total</td>
+                                    <td :colspan="[location=='All' ? 7 : 4]" class="text-end fw-bold">Total</td>
+                                    <td class="text-end">{{total_main_retail_amount}}</td>
+                                    <td class="text-end">{{total_main_whole_sale_amount}}</td>
                                     <td class="text-end">{{total_retail_amount}}</td>
                                     <td class="text-end">{{total_whole_sale_amount}}</td>
-                                    <td class="text-end">{{total_pur_amount}}</td>
                                 </tr>
                            
                         </tbody>
@@ -60,7 +70,7 @@ import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/stocks"
 
 export default {
-    props:['fromDate', 'toDate'],
+    props:['fromDate', 'toDate', 'location'],
     components: {
     },
   
@@ -71,6 +81,8 @@ export default {
             total_pur_amount:0,
             total_retail_amount:0,
             total_whole_sale_amount:0,
+            total_main_retail_amount:0,
+            total_main_whole_sale_amount:0,
             isLoading:false,
             msg : {
                 type :"",
@@ -138,7 +150,7 @@ export default {
             const res1=Object.entries(hp.gb_item_name_retail_price(stocks))   
             console.log(res1)
             const res2=res1.map((ren)=>{
-                let item={parent_unit:"",child_unit:"",item_name:ren[0], code_no:0, item_per_package:0, qty:0, pur_price:0, pur_amount:0, retail_price:0, retail_amount:0, whole_sale_price:0, whole_sale_amount:0}
+                let item={main_qty:0, main_whole_sale_amount:0, main_retail_amount:0,parent_unit:"",child_unit:"",item_name:ren[0], code_no:0, item_per_package:0, qty:0, pur_price:0, pur_amount:0, retail_price:0, retail_amount:0, whole_sale_price:0, whole_sale_amount:0}
                 ren[1].map((rep)=>{
                     item.code_no=rep.code_no;
                     item.item_per_package=rep.item_per_package;
@@ -151,6 +163,9 @@ export default {
                     item.whole_sale_amount += rep.whole_sale_amount;
                     item.parent_unit=rep.parent_unit;
                     item.child_unit=rep.child_unit;
+                    item.main_qty += rep.main_qty;
+                    item.main_retail_amount += rep.main_retail_amount;
+                    item.main_whole_sale_amount += rep.main_whole_sale_amount;
                 })
                 return item;
             }).sort((a,b)=>a.code_no - b.code_no)
@@ -158,7 +173,8 @@ export default {
                res2.map((ren)=>{
                     this.total_retail_amount += ren.retail_amount;
                      this.total_whole_sale_amount+= ren.whole_sale_amount;
-                    this.total_pur_amount += ren.pur_amount;
+                     this.total_main_retail_amount +=ren.main_retail_amount;
+                     this.total_main_whole_sale_amount += ren.main_whole_sale_amount;
                })
               this.reports=[...res2];        
         },      

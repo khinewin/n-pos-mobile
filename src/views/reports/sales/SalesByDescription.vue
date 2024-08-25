@@ -7,7 +7,8 @@
                             <tr class="fw-bold text-center">
                                 <td class="col-1">Code</td>
                                 <td class="col-3">Description</td>
-                                <td class="col-1" colspan="2">Qty</td>
+                                <td class="col-1">Packing size</td>
+                                <td class="col-1">Qty</td>
                                 <td class="col-1">Sale price</td>
                                 <td class="col-1">Pur price</td>
                                 <td class="col-1">Discount</td>
@@ -18,13 +19,13 @@
                                 <tr v-for="s in reports" :key="s.code_no">
                                     <td class="text-center">{{s.code_no}}</td>
                                     <td>{{s.item_name}}</td>
-                                    <td class="text-center col-1">
-                                        {{s.sale_qty}} {{s.child_unit}}
+                                    <td class="col-1">
+                                        1{{s.parent_unit}} * {{s.item_per_package}}{{s.child_unit}}
                                     </td>
-                                    <td class="text-center col-1">
-                                        <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}} {{s.parent_unit}}</span>
-                                        <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0"> * </span>
-                                        <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}} {{s.child_unit}}</span>
+                                    <td class="text-end col-1">
+                                        <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}}{{s.parent_unit}}</span>
+                                        <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0">, </span>
+                                        <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}}{{s.child_unit}}</span>
 
                                     </td>                                    
                                     <td class="text-end">{{s.sale_price}}</td>
@@ -40,14 +41,7 @@
                                     <td class="text-end">{{pur_amount}}</td>
                                     <td class="text-end">{{profit_amount}}</td>
                                 </tr>
-                                <tr>
-                                    <td colspan="9" class="text-end fw-bold">Discount</td>
-                                    <td class="text-end">{{discount}}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="9" class="text-end fw-bold">Gross profit</td>
-                                    <td class="text-end">{{profit_amount-discount}}</td>
-                                </tr>
+                            
                         </tbody>
                     </table>
                     <div v-if="isLoading">
@@ -69,23 +63,18 @@ import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper.js"
 
 export default {
-    props:['fromDate', 'toDate', 'customer_code'],
+    props:['fromDate', 'toDate', 'customer_code','code_no'],
     components: {
     },
   
     data(){
-        return{       
-           
+        return{                 
             reports:[],
-          //  current_month:[],
-            salesData:[],
-            grand_total:"",
-            total_sale_amount:0,
-            total_pur_amount:0,
-            total_profit:0,
-            net_profit:"",
-            discount:"",
+            salesData:[],           
             isLoading:false,
+            sale_amount :0, 
+            pur_amount:0,
+            profit_amount:0,
             msg : {
                 type :"",
                 info :"",
@@ -148,7 +137,11 @@ export default {
             let sales=[]
             this.salesData.map((res)=>{
                     res.products.map((data)=>{
-                        sales.push(data)
+                        if(this.code_no){
+                            if(this.code_no == data.code_no)  sales.push({...data, group_date : hp.showTime(res.sale_date)});
+                       }else{
+                            sales.push({...data, group_date : hp.showTime(res.sale_date)})
+                       }
                     })
             })          
             const res1=Object.entries(hp.gb_item_name_sale_price(sales))   

@@ -33,6 +33,19 @@
                                     </td>
                                 </tr>
                                 <tr>
+                                    <td class="text-end col-4">Location :</td>
+                                    <td class="col-8">
+                                        {{location}}
+                                    </td>
+                                </tr>
+                              
+                            </tbody>
+                      </table>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <table class="table mb-0 table-borderless">
+                            <tbody>                              
+                                <tr>
                                     <td class="text-end">Pur date :</td>
                                     <td class="" v-if="pur_date">
                                         {{showTime(pur_date)}}
@@ -52,7 +65,7 @@
                         <tbody>
                             <tr class="text-center fw-bold table-secondary">
                                 <td class="col-1">Code</td>
-                                <td class="col-">Description</td>
+                                <td class="col-2">Description</td>
                                 <td class="col-1">Exp. date</td>
                                 <td class="col-1">Qty</td>
                                 <td class="col-1">Item price</td>
@@ -67,7 +80,11 @@
                                 <td class="text-center">                                   
                                      <span v-if="st.exp_date">{{showTime(st.exp_date)}}</span>
                                 </td>
-                                <td class="text-center">{{st.pur_qty}}</td>
+                                <td class="col-1 text-center">
+                                    <span v-if="calQtyL(st.pur_qty, st.item_per_package) > 0">{{calQtyL(st.pur_qty, st.item_per_package)}} {{st.parent_unit}} </span>
+                                     <span v-if="calQtyL(st.pur_qty, st.item_per_package) >0 && calQtyS(st.pur_qty, st.item_per_package) > 0"> * </span>
+                                     <span v-if="calQtyS(st.pur_qty, st.item_per_package)> 0">{{calQtyS(st.pur_qty, st.item_per_package)}} {{st.child_unit}}  </span>
+                                 </td>
                                 <td class="text-end">{{st.pur_price}}</td>
                                 <td class="text-center">{{st.dis_qty}}</td>
                                 <td class="text-center">{{st.dis_percent}}</td>
@@ -147,6 +164,12 @@ export default {
     },
  
     methods:{     
+        calQtyL(qty, ipp){
+            return hp.calQtyL(qty, ipp);
+        },
+        calQtyS(qty, ipp){
+            return hp.calQtyS(qty, ipp)
+        },
         async print () {
         // Pass the element id here
         await this.$htmlToPaper('printMe');
@@ -173,6 +196,7 @@ export default {
             this.supplier_name=`${p.supplier.name} (${p.supplier.company})`;
             this.supplier=p.supplier;
             this.pur_user=p.user;
+            this.location=p.location;
            // this.products=p.products;
            this.products=p.products.map((p)=>{
                return {

@@ -45,28 +45,36 @@
                         </div>
                         <table class="table table-bordered mb-0  table-hover">
                             <tbody>
-                                <tr class=" fw-bold table-secondary">
-                                    <td class="col-1 text-center">Code</td>
+                                <tr class=" fw-bold table-secondary text-center">
+                                    <td class="col-1 ">Code</td>
                                     <td class="col-2">Desc</td>
-                                    <td class="col-1 text-center" colspan="2">Qty</td>                                   
-                                    <td class="col-1 text-end">Retail price</td>
-                                    <td class="col-1 text-end">Wholesale price</td>
-                                    <td class="col-1 text-end">Pur price</td>
-                                    <td class="col-1 text-end">Retail Amt</td>
-                                    <td class="col-1 text-end">Wholesale Amt</td>                                    
-                                    <td class="col-1 text-end">Pur Amt</td>
+                                    <td class="col-1">Packing size</td>
+                                    <td class="col-1 ">Main Qty</td>         
+                                    <td class="col-1">Shop Qty</td>                          
+                                    <td class="col-1 ">RT price</td>
+                                    <td class="col-1 ">WS price</td>
+                                    <td class="col-1">Pur price</td>
+                                    <td class="col-1">Main RT Amt</td>                                    
+                                    <td class="col-1">Main WS Am</td>                                    
+                                    <td class="col-1">Shop RT Amt</td>                                    
+                                    <td class="col-1">Shop WS Am</td>
                                 </tr>
                                 <tr class=""v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id">
                                     <td class="text-center">
                                             {{st.code_no}}                                           
                                     </td>
                                     <td class="text-start">{{st.item_name}}</td>
-                                    <td class="text-center">                                      
-                                         <span>{{st.qty}}</span>
-                                    </td>
-                                    <td class="text-center">
-                                        {{Math.floor(st.qty / st.item_per_package)}} x {{Math.floor(st.qty % st.item_per_package)}}
-                                    </td>
+                                    <td class="">1{{st.parent_unit}} * {{st.item_per_package}}{{st.child_unit}}</td>
+                                    <td class="col-1 text-end">
+                                        <span v-if="calQtyL(st.main_qty, st.item_per_package) > 0">{{calQtyL(st.main_qty, st.item_per_package)}}{{st.parent_unit}} </span>
+                                         <span v-if="calQtyL(st.main_qty, st.item_per_package) >0 && calQtyS(st.main_qty, st.item_per_package) > 0">, </span>
+                                         <span v-if="calQtyS(st.main_qty, st.item_per_package)> 0">{{calQtyS(st.main_qty, st.item_per_package)}}{{st.child_unit}}  </span>
+                                     </td>
+                                    <td class="col-1 text-end">
+                                        <span v-if="calQtyL(st.qty, st.item_per_package) > 0">{{calQtyL(st.qty, st.item_per_package)}}{{st.parent_unit}} </span>
+                                         <span v-if="calQtyL(st.qty, st.item_per_package) >0 && calQtyS(st.qty, st.item_per_package) > 0">, </span>
+                                         <span v-if="calQtyS(st.qty, st.item_per_package)> 0">{{calQtyS(st.qty, st.item_per_package)}}{{st.child_unit}}  </span>
+                                     </td>
                                     <td class="text-end">                                      
                                          <span>{{st.retail_price}}</span>
                                     </td>
@@ -74,24 +82,28 @@
                                         <span>{{st.whole_sale_price}}</span>
                                    </td>
                                    <td class="text-end">                                      
-                                        <span>{{st.pur_price}}</span>
+                                     <span>{{st.pur_price}}</span>
                                     </td>
+                                   <td class="text-end">                                      
+                                        <span>{{st.main_retail_amount}}</span>
+                                    </td>
+                                    <td class="text-end">                                      
+                                        <span>{{st.main_whole_sale_amount}}</span>
+                                   </td>                                  
                                     <td class="text-end">                                      
                                         <span>{{st.retail_amount}}</span>
                                    </td>                                  
-                                    <td class="text-end">                                      
-                                        <span>{{st.whole_sale_amount}}</span>
-                                   </td>                                  
                                <td class="text-end">                                      
-                                   <span>{{st.pur_amount}}</span>
+                                   <span>{{st.whole_sale_amount}}</span>
                               </td>
                                  
                                 </tr>
                                 <tr class="small">
-                                    <td colspan="7" class="text-end fw-bold">Total</td>
+                                    <td colspan="8" class="text-end fw-bold">Total</td>
+                                    <td class="text-end">{{total_main_retail_amount}}</td>
+                                    <td class="text-end">{{total_main_whole_sale_amount}}</td>
                                     <td class="text-end">{{total_retail_amount}}</td>
                                     <td class="text-end">{{total_whole_sale_amount}}</td>
-                                    <td class="text-end">{{total_pur_amount}}</td>
                                 </tr>                                                                                         
                             </tbody>
                         </table>                                                                                                                    
@@ -137,6 +149,8 @@ export default {
             storeItems: [],
             total_retail_amount:0,
             total_whole_sale_amount:0,    
+            total_main_retail_amount:0,
+            total_main_whole_sale_amount:0,
             total_pur_amount:0,  
             isLoading:false,
             msg : {
@@ -163,6 +177,12 @@ export default {
     },
     
     methods:{    
+        calQtyL(qty, ipp){
+            return hp.calQtyL(qty, ipp);
+        },
+        calQtyS(qty, ipp){
+            return hp.calQtyS(qty, ipp)
+        },
         async print () {
         // Pass the element id here
          await this.$htmlToPaper('printMe');
@@ -191,6 +211,8 @@ export default {
             this.total_retail_amount=p.total_retail_amount;
             this.total_whole_sale_amount=p.total_whole_sale_amount
             this.total_pur_amount=p.total_pur_amount
+            this.total_main_retail_amount=p.total_main_retail_amount
+            this.total_main_whole_sale_amount=p.total_main_whole_sale_amount;
         },    
         
        showTime(t){

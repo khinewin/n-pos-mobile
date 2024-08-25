@@ -11,24 +11,27 @@
                                     <table class="table table-bordered mb-0 border-dark table-hover" style="border-style: hidden;">
                                         <thead>
                                             <tr class="fw-bold text-center">
-                                                <td class="col-2">Code</td>
+                                                <td class="col-1">Code</td>
                                                 <td class="col-3">Description</td>
-                                                <td class="col-2" colspan="2">Qty</td>
+                                                <td class="col-1">Packing size</td>
+                                                <td class="col-1">Qty</td>
                                                 <td class="col-1">Item price</td>
                                                 <td class="col-1">Amount</td>
-                                                <td class="col-2" colspan="3">Discount</td>                                              
-                                                <td class="col-2">Price</td>
+                                                <td class="col-1" colspan="3">Discount</td>                                              
+                                                <td class="col-1">Price</td>
                                             </tr>
                                         </thead>
                                         <tbody>                                            
                                             <tr v-for="item in r[1]" :key="item.code_no">
                                                 <td class="text-center">{{item.code_no}}</td>
                                                 <td >{{item.item_name}}</td>
-                                                <td class="col-1 text-center">{{item.pur_qty}} {{item.child_unit}}</td>
-                                                <td class="col-1 text-center">
-                                                    <span v-if="calQtyL(item.pur_qty, item.item_per_package) > 0">{{calQtyL(item.pur_qty, item.item_per_package)}} {{item.parent_unit}} </span>
-                                                    <span v-if="calQtyL(item.pur_qty, item.item_per_package) >0 && calQtyS(item.pur_qty, item.item_per_package) > 0"> * </span>
-                                                    <span v-if="calQtyS(item.pur_qty, item.item_per_package)> 0">{{calQtyS(item.pur_qty, item.item_per_package)}} {{item.child_unit}}  </span>
+                                                <td class="">
+                                                    1{{item.parent_unit}} * {{item.item_per_package}}{{item.child_unit}}
+                                                </td>
+                                                <td class=" text-end">
+                                                    <span v-if="calQtyL(item.pur_qty, item.item_per_package) > 0">{{calQtyL(item.pur_qty, item.item_per_package)}}{{item.parent_unit}}</span>
+                                                    <span v-if="calQtyL(item.pur_qty, item.item_per_package) >0 && calQtyS(item.pur_qty, item.item_per_package) > 0">, </span>
+                                                    <span v-if="calQtyS(item.pur_qty, item.item_per_package)> 0">{{calQtyS(item.pur_qty, item.item_per_package)}}{{item.child_unit}} </span>
                                                 </td>
                                                 <td  class="text-end">{{item.pur_price}}</td>
                                                 <td class="text-end">{{item.amount}}</td>
@@ -68,7 +71,7 @@ import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper.js"
 import * as ss from "@/lib/snapshot/purchases"
 export default {
-    props:['fromDate', 'toDate', 'supplier'],
+    props:['fromDate', 'toDate', 'supplier','location'],
     components: {
     },  
     data(){
@@ -199,12 +202,24 @@ export default {
 
             const prevDate=Timestamp.fromDate(last_6_month)
             const nowDate=Timestamp.fromDate(today)
-
            let query_url="";
+           const loc=this.location=="All" ? null : this.location;
+           if(this.supplier && loc !==null){
+            query_url = query(collection(db, "purchases"),
+            where("pur_date", ">=", prevDate), where("pur_date", "<=", nowDate),
+            where('supplier.code',"==", Number(this.supplier)), where("location","==", loc),
+             orderBy("pur_date", "desc"));                                         
+            }else
            if(this.supplier){
             query_url = query(collection(db, "purchases"),            
             where('supplier.code',"==", Number(this.supplier)),
+            where("pur_date", ">=", prevDate), where("pur_date", "<=", nowDate),
              orderBy("pur_date", "desc"));                                         
+            }else if(loc !==null){
+                query_url = query(collection(db, "purchases"),
+                where("pur_date", ">=", prevDate), where("pur_date", "<=", nowDate),
+                where("location","==", loc),
+                orderBy("pur_date", "desc"));        
             }else{
                 query_url = query(collection(db, "purchases"), 
                 where("pur_date", ">=", prevDate), where("pur_date", "<=", nowDate),

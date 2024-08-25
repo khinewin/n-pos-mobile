@@ -12,7 +12,8 @@ const purchases=(arr)=>{
             total_discount: doc.data().total_discount,
             extra_discount: doc.data().extra_discount,
             total_price:doc.data().total_price,     
-            exp_date: doc.data().exp_date,                                       
+            exp_date: doc.data().exp_date,         
+            location:doc.data().location,                              
         };                                       
         purchaseItems.push(purchase);                          
     });

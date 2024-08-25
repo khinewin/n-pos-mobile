@@ -103,39 +103,74 @@
                                         <td>Packing size <span class="float-end"><i class="fa-solid fa-caret-right"></i></span></td>
                                         <td colspan="2" class="text-center">
                                             <div class="" v-if="Object.keys(editItem).length >0" data-bs-toggle="modal" data-bs-target="#selectPackingSizeModal">
-                                                    1 {{editItem.parent_unit}} * {{editItem.item_per_package}} {{editItem.child_unit}}
+                                                    1{{editItem.parent_unit}} * {{editItem.item_per_package}}{{editItem.child_unit}}
                                             </div>
                                         </td>
                                     </tr>
                                     <tr class="table-secondary">
-                                        <td>Qty</td>
+                                        <td>Shop Qty</td>
                                         <td class="text-center">
                                             <div  v-if="Object.keys(editItem).length >0">
-                                               {{editItem.qty}} {{editItem.child_unit}}
+                                               {{editItem.qty}}{{editItem.child_unit}}
                                             </div>
                                         </td>
                                         <td class="text-center">
                                             <div  v-if="Object.keys(editItem).length >0">
-                                                {{Math.floor(editItem.qty / editItem.item_per_package)}} {{editItem.parent_unit}} * {{Math.floor(editItem.qty % editItem.item_per_package)}}  {{editItem.child_unit}}
+                                                {{Math.floor(editItem.qty / editItem.item_per_package)}}{{editItem.parent_unit}} * {{Math.floor(editItem.qty % editItem.item_per_package)}}{{editItem.child_unit}}
+                                            </div>
+                                        </td>
+                                    </tr>    
+                                    <tr class="table-secondary">
+                                        <td>Main Qty</td>
+                                        <td class="text-center">
+                                            <div  v-if="Object.keys(editItem).length >0">
+                                               {{editItem.main_qty}}{{editItem.child_unit}}
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <div  v-if="Object.keys(editItem).length >0">
+                                                {{Math.floor(editItem.main_qty / editItem.item_per_package)}}{{editItem.parent_unit}} * {{Math.floor(editItem.main_qty % editItem.item_per_package)}}{{editItem.child_unit}}
                                             </div>
                                         </td>
                                     </tr>                                    
                                     <tr class="table-primary">
                                         <td>Retail price</td>
                                         <td class="text-center">
-                                           1 {{editItem.child_unit}} {{editItem.retail_price}}
+                                            <div  v-if="Object.keys(editItem).length >0">
+                                                1 {{editItem.child_unit}} {{editItem.retail_price}}
+                                                </div>
                                         </td>
-                                        <td class="text-center">1 {{editItem.parent_unit}} {{editItem.retail_price * editItem.item_per_package}}</td>
+                                        <td class="text-center">
+                                            <div  v-if="Object.keys(editItem).length >0">
+                                                1 {{editItem.parent_unit}} {{editItem.retail_price * editItem.item_per_package}}
+                                            </div>
+                                            </td>
                                     </tr>
                                     <tr class="table-success">
                                         <td>Wholesale price</td>
-                                        <td colspan="" class="text-center">1 {{editItem.child_unit}} {{editItem.whole_sale_price}}</td>
-                                        <td class="text-center">1 {{editItem.parent_unit}} {{editItem.whole_sale_price * editItem.item_per_package}}</td>
+                                        <td colspan="" class="text-center">
+                                            <div  v-if="Object.keys(editItem).length >0">
+                                                1 {{editItem.child_unit}} {{editItem.whole_sale_price}}
+                                            </div>
+                                        </td>
+                                        <td class="text-center">            
+                                            <div  v-if="Object.keys(editItem).length >0">
+                                                1 {{editItem.parent_unit}} {{editItem.whole_sale_price * editItem.item_per_package}}
+                                            </div>
+                                        </td>
                                     </tr>      
                                     <tr class="table-warning">
                                         <td>Purchase price</td>
-                                        <td colspan="" class="text-center">1 {{editItem.child_unit}} {{editItem.pur_price}}</td>
-                                        <td class="text-center">1 {{editItem.parent_unit}} {{editItem.pur_price * editItem.item_per_package}}</td>
+                                        <td colspan="" class="text-center">
+                                            <div  v-if="Object.keys(editItem).length >0">
+                                                1 {{editItem.child_unit}} {{editItem.pur_price}}
+                                            </div>
+                                        </td>
+                                        <td class="text-center">                                  
+                                            <div  v-if="Object.keys(editItem).length >0">
+                                                1 {{editItem.parent_unit}} {{editItem.pur_price * editItem.item_per_package}}
+                                            </div>
+                                        </td>
                                     </tr>                             
                                 </tbody>
                             </table>
@@ -264,6 +299,7 @@ export default {
                 whole_sale_price: 0,
                 created_at : save_time,          
                 pur_price: 0,
+                main_qty:0,
 
             }
             const result=await addDoc(dataCollection, data);
@@ -399,7 +435,7 @@ export default {
             this.products=products;
             this.isLoading=false;
             this.isUpdating=false;
-            this.$store.dispatch("setProducts", this.products)
+            this.editItem=products[0]
        } ,
     }
 }

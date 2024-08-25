@@ -13,7 +13,8 @@
                                             <tr class="fw-bold text-center">
                                                 <td>Code</td>
                                                 <td>Description</td>
-                                                <td colspan="2">Qty</td>
+                                                <td>Packing size</td>
+                                                <td>Qty</td>
                                                 <td>Sale price</td>
                                                 <td>Pur price</td>
                                                 <td>Discount</td>
@@ -26,14 +27,13 @@
                                             <tr v-for="s in r[1]" :key="s.code_no">
                                                 <td class="col-1 text-center">{{s.code_no}}</td>
                                                 <td class="col-2">{{s.item_name}}</td>
-                                                <td class="text-center col-1">
-                                                    {{s.sale_qty}} {{s.child_unit}}
+                                                <td class=" col-1">
+                                                    1{{s.parent_unit}} * {{s.item_per_package}}{{s.child_unit}}
                                                 </td>
-                                                <td class="text-center col-1">
-                                                    <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}} {{s.parent_unit}}</span>
-                                                    <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0"> * </span>
-                                                    <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}} {{s.child_unit}}</span>
-    
+                                                <td class="text-end col-1">
+                                                    <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}}{{s.parent_unit}}</span>
+                                                    <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0">, </span>
+                                                    <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}}{{s.child_unit}}</span>    
                                                 </td>
                                                 <td class="col-1 text-end">{{s.sale_price}}</td>
                                                 <td class="col-1 text-end">{{s.pur_price}}</td>
@@ -53,20 +53,24 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="text-end fw-bold">Amount</td>
-                                <td class="text-start">{{total_amount}}</td>
+                                <td class="text-end fw-bold">Total sale amount</td>
+                                <td class="text-start">{{total_sale_amount}}</td>
+                            </tr>                                                     
+                            <tr>
+                                <td class="text-end fw-bold">Total pur amount</td>
+                                <td class="text-start">{{total_pur_amount}}</td>
                             </tr>
                             <tr>
+                                <td class="text-end fw-bold">Profit</td>
+                                <td class="text-start">{{total_profit}}</td>
+                            </tr>
+                            <!--<tr>
                                 <td class="text-end fw-bold">Discount</td>
                                 <td class="text-start">{{total_discount}}</td>
                             </tr>
-                            <tr>
+                             <tr>
                                 <td class="text-end fw-bold">Total amount</td>
                                 <td class="text-start">{{total_charges}}</td>
-                            </tr>
-                            <tr>
-                                <td class="text-end fw-bold">Gross profit</td>
-                                <td class="text-start">{{total_profit}}</td>
                             </tr>
                             <tr>
                                 <td class="text-end fw-bold">Total pay</td>
@@ -75,7 +79,7 @@
                             <tr>
                                 <td class="text-end fw-bold">Total refunds</td>
                                 <td class="text-start">{{total_refunds}}</td>
-                            </tr>
+                            </tr>-->
                         </tbody>
                     </table>
                     <div v-if="isLoading">
@@ -97,7 +101,7 @@ import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper.js"
 import * as ss from "@/lib/snapshot/sales"
 export default {
-    props:['fromDate', 'toDate', 'customer_code'],
+    props:['fromDate', 'toDate', 'customer_code', 'code_no'],
     components: {
     },
   
@@ -107,13 +111,13 @@ export default {
             reports:[],
           //  current_month:[],
             salesData:[],
-            total_amount:0,
-            total_discount:0,
-            total_charges:0,
+            total_sale_amount:0,
             total_pur_amount:0,
+          //  total_charges:0,
+          //  total_pur_amount:0,
             total_profit:0,
-            total_pay:0,
-            total_refunds:0,
+          //  total_pay:0,
+          //  total_refunds:0,
             isLoading:false,
             msg : {
                 type :"",
@@ -176,23 +180,32 @@ export default {
         displayReports(){       
             let sales=[]
             this.salesData.map((res)=>{
-                    this.total_amount += res.total_amount
-                    this.total_discount +=res.discount
-                    this.total_charges += res.total_amount - res.discount
-                    this.total_pay += res.pay;
-                    this.total_refunds += res.refunds
+                  //  this.total_amount += res.total_amount
+                   // this.total_discount +=res.discount
+                   // this.total_charges += res.total_amount - res.discount
+                   // this.total_pay += res.pay;
+                   // this.total_refunds += res.refunds
                     res.products.map((data)=>{
+                       if(this.code_no){
+                            if(this.code_no==data.code_no)  sales.push({
+                            ...data,
+                            group_customer:  `${res.customer.name}(${res.customer.phone})`,
+                            customer_code: res.customer.code,
+                        })
+                       }else{
                         sales.push({
                             ...data,
                             group_customer:  `${res.customer.name}(${res.customer.phone})`,
                             customer_code: res.customer.code,
                         })
+                       }
                     })
             })
             sales.sort((a,b)=>Number(a.customer_code) - Number(b.customer_code))
             const gbd=Object.entries(hp.gb_customer(sales))
             let total_profit=0;
             let total_pur_amount=0;
+            let total_sale_amount=0;
            const gbc=gbd.map((res)=>{
             const res1=Object.entries(hp.gb_item_name_sale_price(res[1]))
                 const res2=res1.map((res)=>{
@@ -235,6 +248,7 @@ export default {
                 })
                 total_profit += profit_amount;
                 total_pur_amount += pur_amount;
+                total_sale_amount += sale_amount;
                 const res4={sale_amount, pur_amount, profit_amount}
 
                 const newData=[res[0],  [...res2],res4]               
@@ -242,6 +256,7 @@ export default {
            })           
            this.total_pur_amount=total_pur_amount;
            this.total_profit=total_profit;
+           this.total_sale_amount=total_sale_amount;
            this.reports=gbc;
         
         },   

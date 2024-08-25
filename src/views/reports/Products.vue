@@ -14,19 +14,20 @@
                 <h3>N-POS</h3>
                 <h5>Reports products code {{displayReportType}}</h5>
                 <h6 v-if="displayDate">{{showTime(displayDate)}}</h6>
+                <h6><span v-if="code_no">Code : {{item_name}},</span> Location : {{location}}</h6>
             </div>            
             <div class="col-12">                   
                     <div v-if="reportType==='stock_list'">
-                        <StockList  />
+                        <StockList :location="location" :code_no="code_no" />
                     </div>        
                     <div v-if="reportType==='stock_list_sale_price'">
-                        <StockList :sale_price="true" />
+                        <StockList :sale_price="true" :location="location" :code_no="code_no" />
                     </div>
                     <div v-if="reportType==='stock_list_pur_price'">
-                        <StockList :pur_price="true" />
+                        <StockList :pur_price="true" :location="location" :code_no="code_no" />
                     </div>   
                     <div v-if="reportType==='stock_list_pur_sale_price'">
-                        <StockList :pur_price="true" :sale_price="true" />
+                        <StockList :pur_price="true" :sale_price="true" :location="location"  :code_no="code_no"/>
                     </div>        
             </div>
         </div>
@@ -46,6 +47,9 @@ export default {
     data(){
         return{         
             reportType:this.$route.params['reportType'],         
+            location: this.$route.params['location'],
+            code_no: this.$route.query['code_no'],
+            item_name: this.$route.query["item_name"],
             displayDate:"",
             displayReportType:"",
             reports:[],

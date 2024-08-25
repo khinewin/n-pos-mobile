@@ -56,7 +56,8 @@
                                         <tr class="text-center fw-bold">
                                             <td class="col-1">No.</td>
                                             <td class="col-6">Description</td>
-                                            <td class="col-2" colspan="2">Qty</td>
+                                            <td class="col-1">Packing size</td>
+                                            <td class="col-1">Qty</td>
                                             <td class="col-1 ">Unit price</td>
                                             <td class="col-1">Discount</td>
                                             <td class="col-1 ">Amount</td>
@@ -64,13 +65,13 @@
                                         <tr class="" v-if="sale.products.length > 0" v-for="(s, i) in sale.products" :key="s.id" >     
                                             <td class="text-center">{{i+1}}</td>                   
                                             <td class="">{{s.item_name}}</td>
-                                            <td class="text-center">
-                                                {{s.sale_qty}} {{s.child_unit}}
+                                            <td class="">
+                                                1{{s.parent_unit}} * {{s.item_per_package}}{{s.child_unit}}
                                             </td>
-                                            <td class="text-center">
-                                                <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}} {{s.parent_unit}}</span>
-                                                <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0"> * </span>
-                                                <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}} {{s.child_unit}}</span>
+                                            <td class="text-end">
+                                                <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}}{{s.parent_unit}}</span>
+                                                <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0">, </span>
+                                                <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}}{{s.child_unit}}</span>
 
                                             </td>
                                             <td class="text-end">{{s.sale_price}}</td>
@@ -124,8 +125,7 @@ export default {
     data(){
         return{                  
             reports:[],
-            salesData:[],
-            grand_total:"",
+            salesData:[],          
             isLoading:false,
             msg : {
                 type :"",

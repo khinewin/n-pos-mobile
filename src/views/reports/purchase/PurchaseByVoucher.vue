@@ -15,7 +15,7 @@
                     <div class="card-body">
                 <div class="table-responsive">
                     <div class="row  mb-2">
-                    <div class="col-lg-12">
+                    <div class="col-lg-6">
                         <table class="table mb-0 table-borderless">
                             <tbody>
                                 <tr class="">
@@ -23,6 +23,20 @@
                                     <td class="pb-0" style="border-bottom: 1px dotted;">
                                         {{p.voucher_no}}
                                     </td>                              
+                                    <td class="text-end pb-0">Location :</td>
+                                    <td class="pb-0"  style="border-bottom: 1px dotted;">
+                                        {{p.location}}
+                                    </td>                            
+                                   
+                                </tr>
+                            </tbody>
+                      </table>
+                    </div>
+                    <div class="col-lg-6">
+                        <table class="table mb-0 table-borderless">
+                            <tbody>
+                                <tr class="">
+                                                                
                                     <td class="text-end pb-0">Pur date :</td>
                                     <td class="pb-0" v-if="p.pur_date" style="border-bottom: 1px dotted;">
                                         {{showTime(p.pur_date)}}
@@ -39,15 +53,16 @@
                    <table class="table table-bordered  table-hover">
                         <tbody>
                             <tr class="small text-center fw-bold table-secondary">
-                                <td class="">Code</td>
-                                <td class="">Desc</td>
-                                <td class="">Exp. date</td>
-                                <td class="" colspan="2">Qty</td>
-                                <td class="">Item price</td>
+                                <td class="col-1">Code</td>
+                                <td class="col-2">Desc</td>
+                                <td class="col-1">Exp. date</td>
+                                <td class="col-1">Packing size</td>
+                                <td class="col1">Qty</td>
+                                <td class="col-1">Item price</td>
                                 <td colspan="3" class="col-2">Discount</td>
-                                <td class="">Amount</td>
-                                <td class="">Discount</td>
-                                <td class="">Price</td>
+                                <td class="col-1">Amount</td>
+                                <td class="col-1">Discount</td>
+                                <td class="col-1">Price</td>
                             </tr>
                             <tr class="small text-center" v-if="p.products.length > 0" v-for="st in p.products" :key="st.id">
                                 <td class="">{{st.code_no}}</td>
@@ -55,35 +70,37 @@
                                 <td class="">                                   
                                      <span v-if="st.exp_date">{{showTime(st.exp_date)}}</span>
                                 </td>
-                                <td class="col-1 text-center">{{st.pur_qty}} {{st.child_unit}}</td>
-                                    <td class="col-1 text-center">
-                                       <span v-if="calQtyL(st.pur_qty, st.item_per_package) > 0">{{calQtyL(st.pur_qty, st.item_per_package)}} {{st.parent_unit}} </span>
-                                        <span v-if="calQtyL(st.pur_qty, st.item_per_package) >0 && calQtyS(st.pur_qty, st.item_per_package) > 0"> * </span>
-                                        <span v-if="calQtyS(st.pur_qty, st.item_per_package)> 0">{{calQtyS(st.pur_qty, st.item_per_package)}} {{st.child_unit}}  </span>
+                                <td class=" text-start">
+                                    1{{st.parent_unit}} * {{st.item_per_package}}{{st.child_unit}}
+                                </td>
+                                    <td class="text-end">
+                                       <span v-if="calQtyL(st.pur_qty, st.item_per_package) > 0">{{calQtyL(st.pur_qty, st.item_per_package)}}{{st.parent_unit}} </span>
+                                        <span v-if="calQtyL(st.pur_qty, st.item_per_package) >0 && calQtyS(st.pur_qty, st.item_per_package) > 0">, </span>
+                                        <span v-if="calQtyS(st.pur_qty, st.item_per_package)> 0">{{calQtyS(st.pur_qty, st.item_per_package)}}{{st.child_unit}}  </span>
                                     </td>
-                                <td class="">{{st.pur_price}}</td>
+                                <td class="text-end">{{st.pur_price}}</td>
                                 <td>{{st.dis_qty}}</td>
-                                <td class="">{{st.dis_percent}}</td>
-                                <td class="">{{st.dis_amount}}</td>
-                                <td class="">{{st.amount}}</td>
-                                <td class="">{{st.discount}}</td>
-                                <td class="">{{st.price}}</td>
+                                <td class="text-end">{{st.dis_percent}}</td>
+                                <td class="text-end">{{st.dis_amount}}</td>
+                                <td class="text-end">{{st.amount}}</td>
+                                <td class="text-end">{{st.discount}}</td>
+                                <td class="text-end">{{st.price}}</td>
                             </tr>
                             <tr class="small">
                                 <td colspan="9" class="text-end">Amount</td>
-                                <td class="text-center">{{p.total_amount}}</td>
+                                <td class="text-end">{{p.total_amount}}</td>
                             </tr>
                             <tr class="small">
                                 <td colspan="9" class="text-end">Discount</td>
-                                <td class="text-center ">{{p.total_discount}}</td>
+                                <td class="text-end ">{{p.total_discount}}</td>
                             </tr>
                             <tr class="small">
                                 <td colspan="9" class="text-end">Extra discount</td>
-                                <td class="text-center">{{p.extra_discount}}</td>
+                                <td class="text-end">{{p.extra_discount}}</td>
                             </tr>
                             <tr class="small">
                                 <td colspan="9" class="text-end">Total price</td>
-                                <td class="text-center">{{p.total_price}}</td>
+                                <td class="text-end">{{p.total_price}}</td>
                             </tr>                           
                         </tbody>
                    </table>                          
@@ -101,7 +118,7 @@ import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper.js"
 import * as ss from "@/lib/snapshot/purchases"
 export default {
-    props:['fromDate', 'toDate', 'voucher_no', 'supplier'],
+    props:['fromDate', 'toDate', 'voucher_no', 'supplier', 'location'],
     components: {
     },
   
@@ -174,13 +191,27 @@ export default {
             const from_date=Timestamp.fromDate(new Date(this.fromDate))
             const to_date=Timestamp.fromDate(new Date(this.toDate))
            let query_url="";
+           const loc=this.location=="All" ? null : this.location;
+
            if(this.voucher_no){
              query_url = query(collection(db, "purchases"), 
             where("voucher_no", "==", Number(this.voucher_no)));
-           }else if(this.supplier){
-            query_url = query(collection(db, "purchases"), 
-            where("supplier.code", "==", Number(this.supplier)));
-           }else{
+           } if(this.supplier && loc !==null){
+            query_url = query(collection(db, "purchases"),
+            where("pur_date", ">=", from_date), where("pur_date", "<=", to_date),
+            where('supplier.code',"==", Number(this.supplier)), where("location","==", loc),
+             orderBy("pur_date", "desc"));                                         
+            }else if(this.supplier){
+                query_url = query(collection(db, "purchases"),
+                where("pur_date", ">=", from_date), where("pur_date", "<=", to_date),
+                where('supplier.code',"==", Number(this.supplier)),
+                orderBy("pur_date", "desc"));             
+            }else if(loc !==null){
+                query_url = query(collection(db, "purchases"),
+                where("pur_date", ">=", from_date), where("pur_date", "<=", to_date),
+                where("location","==", loc),
+                orderBy("pur_date", "desc"));        
+            }else{
              query_url = query(collection(db, "purchases"), 
             where("pur_date", ">=", from_date), where("pur_date", "<=", to_date), orderBy("pur_date", "desc"));
            }           

@@ -6,36 +6,88 @@
                 <div class="col-sm-6">
                     <div class="card  shadow">
                         <div class="card-body p-2 rounded small">
-                            <div class="form-floating mb-2">
-                                <input type="date" class="form-control form-control-sm" id="from_date" v-model="from_date" placeholder="From date">
-                                <label for="from_date">From date</label>
-                            </div>  
-                            <div class="form-floating mb-2">
-                                <input type="date" class="form-control form-control-sm" id="to_date" v-model="to_date" placeholder="To date">
-                                <label for="to_date">To date</label>
-                            </div>    
-                            <div class="mb-2 input-group">
-                                <div class="form-floating ">
-                                    <input  type="text" class="form-control form-control-sm" id="voucher_no" v-model="voucher_no" placeholder="Voucher no.">
-                                    <label for="voucher_no">Voucher no.</label>
-                                </div> 
-                                <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
-                            </div>
-                            <div class="input-group mb-2">
-                                <div class="form-floating">
-                                    <input data-bs-toggle="modal" data-bs-target="#customerModal" type="text" class="form-control form-control-sm" id="customer" v-model="customer.name" placeholder="Supplier">
-                                    <label for="supplier">Customer</label>
-                                </div> 
-                                <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>  
-                            </div>   
-                            <div class="input-group">
-                                <div class="form-floating">
-                                    <input data-bs-toggle="modal" data-bs-target="#searchSupplier" type="text" class="form-control form-control-sm" id="supplier" v-model="supplier.name" placeholder="Supplier">
-                                    <label for="supplier">Supplier</label>
-                                </div> 
-                                <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>  
+                            <div class="row g-2">                              
+                                <div class="col-6">
+                                    <div class="form-floating mb-2">
+                                        <input type="date" class="form-control form-control-sm" id="from_date" v-model="from_date" placeholder="From date">
+                                        <label for="from_date">From date</label>
+                                    </div>  
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-floating mb-2">
+                                        <input type="date" class="form-control form-control-sm" id="to_date" v-model="to_date" placeholder="To date">
+                                        <label for="to_date">To date</label>
+                                    </div>
+                                </div>
+                            </div>                                                    
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="form-floating mb-2">
+                                        <select v-model="from_location" class="form-select form-select-sm" id="from_location">
+                                            <option>Main</option>
+                                            <option>Shop</option>
+                                        </select>
+                                        <label for="from_location">From location</label>
+                                    </div>  
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-floating mb-2">
+                                        <select v-model="to_location" class="form-select form-select-sm" id="to_location">
+                                            <option>Main</option>
+                                            <option>Shop</option>
+                                        </select>
+                                        <label for="to_location">To location</label>
+                                    </div>    
+                                </div>
                             </div> 
-                                             
+                            <div class="form-floating mb-2">
+                                <select v-model="location" class="form-select form-select-sm">
+                                    <option>All</option>
+                                    <option>Main</option>
+                                    <option>Shop</option>
+                                </select>
+                                <label for="location">Location</label>
+                            </div>    
+                           <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="mb-2 input-group">
+                                        <div class="form-floating ">
+                                            <input data-bs-toggle="modal" data-bs-target="#searchCode"  type="text" class="form-control form-control-sm" id="item_name" v-model="item_name" placeholder="Code">
+                                            <label for="item_name">Code</label>
+                                        </div> 
+                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-2 input-group">
+                                        <div class="form-floating ">
+                                            <input  type="text" class="form-control form-control-sm" id="voucher_no" v-model="voucher_no" placeholder="Voucher no.">
+                                            <label for="voucher_no">Voucher no.</label>
+                                        </div> 
+                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
+                                    </div>
+                                </div>
+                           </div>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <div class="form-floating">
+                                            <input data-bs-toggle="modal" data-bs-target="#searchSupplier" type="text" class="form-control form-control-sm" id="supplier" v-model="supplier.name" placeholder="Supplier">
+                                            <label for="supplier">Supplier</label>
+                                        </div> 
+                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>  
+                                    </div> 
+                                </div>
+                                <div class="col-6">
+                                    <div class="input-group mb-2">
+                                        <div class="form-floating">
+                                            <input data-bs-toggle="modal" data-bs-target="#customerModal" type="text" class="form-control form-control-sm" id="customer" v-model="customer.name" placeholder="Supplier">
+                                            <label for="supplier">Customer</label>
+                                        </div> 
+                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>  
+                                    </div>  
+                                </div>                             
+                            </div>                                                                                                 
                         </div>
                     </div>
                 </div>
@@ -99,6 +151,20 @@
                                   </div>
                                   <!--Sales dropen button-->
                               </li>
+                              <li class="list-group-item">
+                                <!-- Sales dropend button -->
+                              <div class="btn-group dropend">
+                                  <button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                      Transfers
+                                  </button>                               
+                                  <ul class="dropdown-menu py-0">                                  
+                                      <li class="list-group-item" v-for="tf in transfers" :key="tf.code">                                     
+                                          <button :class="{'disabled' : !tf.active}" class="dropdown-item small" @click="reportTransfers(tf.code)">{{tf.name}}</button>
+                                      </li>                                          
+                                  </ul>
+                              </div>
+                              <!--Sales dropen button-->
+                          </li>
                             </ul>
                         </div>                                          
                     </div>
@@ -107,6 +173,7 @@
         </div>
         <SupplierModal @setCode="setSupplier" />
         <CustomerModal @setCustomer="setCustomer" />
+        <ProductModal @setCode="setCode" />
     </div>
 </template>
 <script>
@@ -117,17 +184,24 @@ import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, o
 import db from '@/firebase/firestore'
 import SupplierModal from '@/views/modals/purchase/SupplierModal.vue'
 import CustomerModal from '@/views/modals/sales/CustomerModal.vue'
+import ProductModal from "@/views/modals/reports/ProductModal.vue"
 
 export default {
     components: {
-        PageHeader, SupplierModal, CustomerModal
+        PageHeader, SupplierModal, CustomerModal, ProductModal
     },
     setup () {
         return { v$: useVuelidate() }
     },
     data(){
         return{         
+            from_location:"Main",
+            to_location:"Shop",
             from_date:"",
+            item_name:"",
+            location: "All",
+            code_no:"",
+            item_name:"",
             to_date:"",
             voucher_no:"",
             supplier: {
@@ -149,6 +223,11 @@ export default {
                 {code: "stock_list_pur_sale_price", name: "stock list pur & sale price", active: true},             
              ],
              stocks:[
+                {code : "by_date", name: "by date", active: true},
+                {code: "by_description", name:"by description", active: true},
+                {code: "by_voucher", name: "by voucher", active: true},               
+             ],
+             transfers:[
                 {code : "by_date", name: "by date", active: true},
                 {code: "by_description", name:"by description", active: true},
                 {code: "by_voucher", name: "by voucher", active: true},               
@@ -203,6 +282,10 @@ export default {
         }
     },
     methods:{
+        setCode(p){
+            this.code_no=p.code_no;
+            this.item_name=p.item_name;
+        },
         clearInput(){
             this.voucher_no="";
             this.supplier={},
@@ -215,21 +298,28 @@ export default {
             this.supplier=s;
         },
         reportProducts(r_type){
-            this.$router.push({name: "ReportsProduct", params :{"reportType": r_type}
+            this.$router.push({name: "ReportsProduct", params :{"reportType": r_type, "location": this.location},
+            query : { "code_no": this.code_no ? this.code_no : null, "item_name": this.item_name ? this.item_name : null}
            })
         },
         reportStocks(r_type){                     
-            this.$router.push({name: "ReportsStocks", params :{"reportType": r_type, "fromDate": this.from_date, "toDate": this.to_date},
+            this.$router.push({name: "ReportsStocks", params :{"reportType": r_type, "fromDate": this.from_date, "toDate": this.to_date, "location": this.location},
+            query : {voucher_no: this.voucher_no
+            }})
+        },
+        reportTransfers(r_type){                     
+            this.$router.push({name: "ReportsTransfer", params :{"reportType": r_type, "fromDate": this.from_date, "toDate": this.to_date, "from_location": this.from_location, "to_location": this.to_location},
             query : {voucher_no: this.voucher_no
             }})
         },
         reportSales(r_type){                     
             this.$router.push({name: "ReportsSales", params :{"reportType": r_type, "fromDate": this.from_date, "toDate": this.to_date},
             query : {voucher_no: this.voucher_no,  customer_code: this.customer.code ? this.customer.code : null,
-                customer_name: this.customer.name ? this.customer.name : null,}})
+                customer_name: this.customer.name ? this.customer.name : null, code_no: this.code_no ? this.code_no : null, item_name: this.item_name ? this.item_name : null}
+            })
         },
         reportPurchase(r_type){                     
-            this.$router.push({name: "ReportsPurchase", params :{"reportType": r_type, "fromDate": this.from_date, "toDate": this.to_date},
+            this.$router.push({name: "ReportsPurchase", params :{"reportType": r_type, "fromDate": this.from_date, "toDate": this.to_date, "location": this.location},
             query : {voucher_no: this.voucher_no ? this.voucher_no : null,
             supplier: this.supplier.code ? this.supplier.code : null,
             supplier_name: this.supplier.code ? this.supplier.name : null,
