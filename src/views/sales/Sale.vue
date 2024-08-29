@@ -1,7 +1,7 @@
 <template lang="">
     <div>           
         <PageHeader page-title="Sale" page-code="sale" :msg-type="msg.type" :msg-info="msg.info" />
-        <div class="container-fluid my-2">
+        <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                            
                 <div class="col-sm-4 lg-md-2 pt-1 ps-4 small">
                     <div class="form-check form-check-inline" >
@@ -31,13 +31,13 @@
         </div>     
         <div class="container-fluid my-2">
             <div class="row g-1">
-                <div class="col-lg-5">
+                <div class="col-lg-4">
                         <Products @setCode="setCode" :saleItems="saleItems" />
                 </div>
-                <div class="col-lg-7">
+                <div class="col-lg-8">
                     <div class="card shadow">
                         <div class="card-body p-2">
-                            <div class="row justify-content-end mb-2">
+                            <div class="row justify-content-end mb-3">
                                 <div class="col-sm-6">
                                     <table class="table mb-0 table-borderless small">
                                         <thead class="small">
@@ -83,7 +83,8 @@
                                   </table>
                                 </div>
                             </div>
-                              <table class="table table-bordered table-hover mb-0">
+                              <div class="vh-60 overflow-y-auto">
+                                <table class="table table-bordered table-hover mb-0">
                                     <tbody class="small">
                                         <tr class="table-secondary">
                                             <td class="col-1 text-center">No.</td>
@@ -98,7 +99,7 @@
                                         <tr class="" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(i)"  >
                                             <td class="position-relative pt-2 text-center">
                                                 <span v-if="isNewSale">
-                                                    <a  class="text-danger position-absolute top-50 start-0 translate-middle p-2" href="#!" @click="removeSaleItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
+                                                    <a  class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeSaleItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                                 </span>
                                                 {{i+1}}</td>
                                             <td class="pt-2">{{s.item_name}}</td>                                           
@@ -112,11 +113,11 @@
                                             <td class="pt-2 text-end">{{s.sale_price}}</td>
                                             <td class="p-0">
                                                 <div class="row g-0">
-                                                    <div class="col-6">
+                                                    <div class="col-7">
                                                         <input :disabled="!isNewSale" min="0" @change="saveEdit"  @keyup="saveEdit"   type="number" class="form-control-plaintext  text-center" v-model="s.unit_discount">
                                                     </div>
-                                                    <div class="col-6">
-                                                        <select class="form-select form-select-sm" v-model="s.unit_discount_type" @change="saveEdit" >
+                                                    <div class="col-5">
+                                                        <select class="form-control-plaintext text-center" v-model="s.unit_discount_type" @change="saveEdit" >
                                                             <option value="dis_qty">Qty</option>
                                                             <option value="dis_percent">%</option>
                                                             <option value="dis_amount">$</option>
@@ -124,7 +125,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="pt-2">
+                                            <td class="pt-2 ">
                                                 {{s.discount}}
                                             </td>
                                             <td class="pt-2 text-end">{{s.sale_amount}}</td>
@@ -157,6 +158,7 @@
                                         </tr>
                                     </tbody>
                               </table>
+                              </div>
                         </div>
                     </div>
                 </div>
@@ -165,7 +167,7 @@
         <SalesModal @setCode="setOldCode" />
         <CustomerModal @setCustomer="setCustomer" />
         <!--Pritn item start-->
-        <div class="" id="printMe" v-if="saleItems.length > 0" >
+        <div class="d-none" id="printMe" v-if="saleItems.length > 0" >
                 <Print :data="printData" />
         </div>
         <!-- print item end-->
@@ -442,7 +444,7 @@ export default {
                 sale_price: this.sale_type==='retail' ? p.retail_price : p.whole_sale_price,
                 sale_amount : this.sale_type==='retail' ? p.retail_price : p.whole_sale_price,
                 pur_amount : p.pur_price,
-                discount: 0,
+                discount : 0,
            }
            const s=this.saleItems;
             let temStore=[]

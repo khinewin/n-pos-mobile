@@ -24,7 +24,7 @@
                                                 </div> 
                                             </div>
                                         </div>
-                                        <div class="row">
+                                        <div class="row mt-2">
                                             <div class="col-4 d-grid">
                                                 <button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
                                             </div>
@@ -49,27 +49,25 @@
                                                 <tr class="table-secondary text-center">
                                                     <td class="col-1">Code</td>
                                                     <td class="col-2">Description</td>
-                                                    <td class="col-2" colspan="2">Shop qty</td>
-                                                    <td class="col-2" colspan="2">Main qty</td>
+                                                    <td class="col-1">Packing size</td>
+                                                    <td class="col-1">Shop qty</td>
+                                                    <td class="col-1">Main qty</td>
                                                 </tr>                                      
                                                 <tr class="" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"   style="cursor:context-menu">
                                                     <td class="text-center">{{p.code_no}}</td>
                                                     <td>{{p.item_name}}</td>
-                                                    <td class="text-center col-1">
-                                                        <span v-if="p.qty >0">{{p.qty}} {{p.child_unit}}</span>
+                                                    <td class="col-1">
+                                                        <span v-if="p.parent_unit && p.child_unit">1{{p.parent_unit}} * {{p.item_per_package}}{{p.child_unit}}</span>
                                                     </td>
-                                                    <td class="text-center col-1">
-                                                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0">{{calQtyL(p.qty, p.item_per_package)}} {{p.parent_unit}}</span>
-                                                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0 && calQtyS(p.qty, p.item_per_package) > 0"> * </span>
-                                                        <span v-if="calQtyS(p.qty, p.item_per_package) > 0">{{calQtyS(p.qty, p.item_per_package)}} {{p.child_unit}}</span>                
-                                                    </td>
-                                                    <td class="text-center col-1">
-                                                       <span v-if="p.main_qty > 0">{{p.main_qty}} {{p.child_unit}}</span>
-                                                    </td>
-                                                    <td class="text-center col-1">
-                                                        <span v-if="calQtyL(p.main_qty, p.item_per_package) > 0">{{calQtyL(p.main_qty, p.item_per_package)}} {{p.parent_unit}}</span>
-                                                        <span v-if="calQtyL(p.main_qty, p.item_per_package) > 0 && calQtyS(p.main_qty, p.item_per_package) > 0"> * </span>
-                                                        <span v-if="calQtyS(p.main_qty, p.item_per_package) > 0">{{calQtyS(p.main_qty, p.item_per_package)}} {{p.child_unit}}</span>                
+                                                    <td class="text-end col-1">
+                                                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0">{{calQtyL(p.qty, p.item_per_package)}}{{p.parent_unit}}</span>
+                                                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0 && calQtyS(p.qty, p.item_per_package) > 0">, </span>
+                                                        <span v-if="calQtyS(p.qty, p.item_per_package) > 0">{{calQtyS(p.qty, p.item_per_package)}}{{p.child_unit}}</span>                
+                                                    </td>                                                  
+                                                    <td class="text-end col-1">
+                                                        <span v-if="calQtyL(p.main_qty, p.item_per_package) > 0">{{calQtyL(p.main_qty, p.item_per_package)}}{{p.parent_unit}}</span>
+                                                        <span v-if="calQtyL(p.main_qty, p.item_per_package) > 0 && calQtyS(p.main_qty, p.item_per_package) > 0">, </span>
+                                                        <span v-if="calQtyS(p.main_qty, p.item_per_package) > 0">{{calQtyS(p.main_qty, p.item_per_package)}}{{p.child_unit}}</span>                
                                                     </td>
                                                 </tr>
                                             </tbody>

@@ -27,7 +27,7 @@
                                 </div> 
                             </div>
                         </div>
-                          <div class="row">
+                          <div class="row mt-2">
                             <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
                             <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
@@ -54,7 +54,7 @@
                                     </tr>
                                    
                                     <tr style="cursor: context-menu;" class="" v-if="suppliers.length > 0"  v-for="(p, i) in suppliers" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal">                                         
-                                        <td :class="{'table-secondary': sort_item ==='code'}" >
+                                        <td :class="{'table-secondary': sort_item ==='code'}" class="text-center">
                                              {{p.code}}
                                          </td>
                                         <td :class="{'table-secondary': sort_item ==='name'}">
@@ -66,7 +66,7 @@
                                         <td :class="{'table-secondary': sort_item ==='company'}">
                                             {{p.company}}
                                         </td>
-                                        <td :class="{'table-secondary': sort_item ==='created_at'}">{{showTime(p.created_at)}}</td>
+                                        <td :class="{'table-secondary': sort_item ==='created_at'}" class="text-center">{{showTime(p.created_at)}}</td>
                                     </tr>
                                 </tbody>
                             </table>

@@ -1,73 +1,69 @@
 <template lang="">
-    <div class="container-fluid">            
-        <div class="row">                 
-            <div class="col-12">
-                    <table class="table table-bordered border-dark table-hover">
-                        <tbody class="" v-if="reports.length > 0">    
-                            <tr class="fw-bold text-center">
-                                <td class="col-1">Code</td>
-                                <td class="col-2">Description</td>
-                                <td class="col-1">Packing size</td>
-                                <td class="col-1">Qty</td>
-                                <td class="col-1">Item price</td>
-                                <td class="col-1">Amount</td>         
-                                <td class="col-1" colspan="4">Discount</td>                       
-                                <td class="col-1">Price</td>
-                            </tr>                        
-                                <tr v-for="s in reports[0]" :key="s.code_no">
-                                    <td class="text-center">{{s.code_no}}</td>
-                                    <td>{{s.item_name}}</td>
-                                    <td class="col-1">
-                                        1{{s.parent_unit}} * {{s.item_per_package}}{{s.child_unit}}
-                                    </td>
-                                    <td class="col-1 text-end">
-                                       <span v-if="calQtyL(s.pur_qty, s.item_per_package) > 0">{{calQtyL(s.pur_qty, s.item_per_package)}}{{s.parent_unit}} </span>
-                                        <span v-if="calQtyL(s.pur_qty, s.item_per_package) >0 && calQtyS(s.pur_qty, s.item_per_package) > 0">, </span>
-                                        <span v-if="calQtyS(s.pur_qty, s.item_per_package)> 0">{{calQtyS(s.pur_qty, s.item_per_package)}}{{s.child_unit}}  </span>
-                                    </td>
-                                    <td class="text-end">{{s.pur_price}}</td>
-                                    <td class="text-end">{{s.amount}}</td>                                   
-                                    <td class="text-center">{{s.dis_qty}}</td>
-                                    <td class="text-center">{{s.dis_percent}}</td>
-                                    <td class="text-end">{{s.dis_amount}}</td>
-                                    <td class="text-end">{{s.discount}}</td>
-                                    <td class="text-end">{{s.price}}</td>
-                                </tr>
-                                <tr class="text-end">                              
-                                    <td class="fw-bold" colspan="5" >Total</td>
-                                    <td class="">{{reports[1].amount}}</td>                                                                                      
-                                    <td class="" colspan="4">{{total_discount}}</td>
-                                    <td class="">{{reports[1].price}}</td>                                  
-                                </tr>
-                                <tr>                              
-                                    <td class="fw-bold text-end" >Total amount</td>
-                                    <td class="">{{total_amount}}</td>                                  
-                                </tr>
-                                <tr>
-                                    <td  class="text-end fw-bold">Total discount</td>
-                                    <td>{{total_discount}}</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-end fw-bold">Extra discount</td>
-                                    <td>{{extra_discount}}</td>
-                                </tr>
-                                <tr>
-                                    <td  class="text-end fw-bold">Total price</td>
-                                    <td>{{total_price}}</td>
-                                </tr>
-                        </tbody>
-                    </table>
-                    <div v-if="isLoading">
-                        <div colspan="5">
-                            <div class="d-flex justify-content-center my-5">
-                                <div class="spinner-border text-primary"  role="status">
-                                  <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>   
-            </div>
-        </div>
+    <div class="">
+        <table class="table table-bordered border-dark table-hover">
+            <tbody class="" >    
+                <tr class="fw-bold text-center">
+                    <td class="col-1">Code</td>
+                    <td class="col-2">Description</td>
+                    <td class="col-1">Packing size</td>
+                    <td class="col-1">Qty</td>
+                    <td class="col-1">Item price</td>
+                    <td class="col-1">Amount</td>         
+                    <td class="col-1" colspan="4">Discount</td>                       
+                    <td class="col-1">Price</td>
+                </tr> 
+                </tbody>
+                <tbody v-if="reports.length > 0">                       
+                    <tr v-for="s in reports[0]" :key="s.code_no">
+                        <td class="text-center">{{s.code_no}}</td>
+                        <td>{{s.item_name}}</td>
+                        <td class="col-1">
+                            1{{s.parent_unit}} * {{s.item_per_package}}{{s.child_unit}}
+                        </td>
+                        <td class="col-1 text-end">
+                           <span v-if="calQtyL(s.pur_qty, s.item_per_package) > 0">{{calQtyL(s.pur_qty, s.item_per_package)}}{{s.parent_unit}} </span>
+                            <span v-if="calQtyL(s.pur_qty, s.item_per_package) >0 && calQtyS(s.pur_qty, s.item_per_package) > 0">, </span>
+                            <span v-if="calQtyS(s.pur_qty, s.item_per_package)> 0">{{calQtyS(s.pur_qty, s.item_per_package)}}{{s.child_unit}}  </span>
+                        </td>
+                        <td class="text-end">{{s.pur_price}}</td>
+                        <td class="text-end">{{s.amount}}</td>                                   
+                        <td class="text-center">{{s.dis_qty}}</td>
+                        <td class="text-center">{{s.dis_percent}}</td>
+                        <td class="text-end">{{s.dis_amount}}</td>
+                        <td class="text-end">{{s.discount}}</td>
+                        <td class="text-end">{{s.price}}</td>
+                    </tr>
+                    <tr class="text-end">                              
+                        <td class="fw-bold" colspan="5" >Total</td>
+                        <td class="">{{reports[1].amount}}</td>                                                                                      
+                        <td class="" colspan="4">{{total_discount}}</td>
+                        <td class="">{{reports[1].price}}</td>                                  
+                    </tr>
+                    <tr>                              
+                        <td class="fw-bold text-end" >Total amount</td>
+                        <td class="">{{total_amount}}</td>                                  
+                    </tr>
+                    <tr>
+                        <td  class="text-end fw-bold">Total discount</td>
+                        <td>{{total_discount}}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-end fw-bold">Extra discount</td>
+                        <td>{{extra_discount}}</td>
+                    </tr>
+                    <tr>
+                        <td  class="text-end fw-bold">Total price</td>
+                        <td>{{total_price - extra_discount}}</td>
+                    </tr>
+            </tbody>
+        </table>
+        <div v-if="isLoading">
+                <div class="d-flex justify-content-center my-5">
+                    <div class="spinner-border text-primary"  role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+        </div>                                                  
     </div>
 </template>
 <script>
@@ -75,7 +71,7 @@ import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, o
 import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper"
 export default {
-    props:['fromDate', 'toDate','supplier', 'location'],
+    props:['fromDate', 'toDate','supplier', 'location', 'code_no'],
     components: {
     },
   
@@ -151,12 +147,15 @@ export default {
             if (this.purchaseData.length <=0) return false;
             let purchase=[]
             this.purchaseData.map((res)=>{
-                    this.total_amount += res.total_amount;
-                    this.total_discount += res.total_discount;
+                if(!this.code_no){
                     this.extra_discount += res.extra_discount;
-                    this.total_price +=res.total_price;
+                }
                     res.products.map((data)=>{
+                       if(this.code_no){
+                            if(this.code_no == data.code_no)  purchase.push(data)
+                       }else{
                         purchase.push(data)
+                       }
                     })
             })          
             const res1=Object.entries(hp.gb_item_name_pur_price(purchase));           
@@ -179,14 +178,26 @@ export default {
                     return item;
                 }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)
 
+                let amount=0;
+                let price=0;
+                let discount=0;
+
                 const res3={amount: 0, price:0, discount:0}
                 res2.map((ren)=>{
                     res3.amount += ren.amount;
                     res3.discount += ren.discount;
                     res3.price += ren.price;
+
+                    amount += ren.amount;
+                    price += ren.price;
+                    discount += ren.discount;
                 })
                 const newData=[[...res2], res3]
-              
+
+                this.total_amount +=amount;
+                this.total_discount += discount;
+                this.total_price += price;    
+                              
               this.reports=newData;
         
         },

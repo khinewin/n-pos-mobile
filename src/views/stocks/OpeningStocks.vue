@@ -1,7 +1,7 @@
 <template lang="">
     <div>           
         <PageHeader page-title="Stocks" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
-        <div class="container-fluid my-2">
+        <div class="container-fluid">
             <div class="row mb-2 justify-content-end">
                 <div class="col-sm-2 d-grid">
                     <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print</button>
@@ -19,7 +19,7 @@
                         <button @click="closeOpeningStock" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                 </div>
             </div>
-            <div class="card shadow" id="printMe">
+            <div class="card shadow min-vh-75" id="printMe">
                 <div class="card-body p-2">
                     <form @submit.prevent="saveStocks">
                         <div class="row justify-content-end mb-2">
@@ -47,7 +47,7 @@
                             <tbody>
                                 <tr class=" fw-bold table-secondary text-center">
                                     <td class="col-1 ">Code</td>
-                                    <td class="col-2">Desc</td>
+                                    <td class="col-1">Desc</td>
                                     <td class="col-1">Packing size</td>
                                     <td class="col-1 ">Main Qty</td>         
                                     <td class="col-1">Shop Qty</td>                          
@@ -57,7 +57,7 @@
                                     <td class="col-1">Main RT Amt</td>                                    
                                     <td class="col-1">Main WS Am</td>                                    
                                     <td class="col-1">Shop RT Amt</td>                                    
-                                    <td class="col-1">Shop WS Am</td>
+                                    <td class="col-1">Shop WS Amt</td>
                                 </tr>
                                 <tr class=""v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id">
                                     <td class="text-center">

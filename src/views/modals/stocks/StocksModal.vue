@@ -19,7 +19,7 @@
                                             <input type="date" v-model="search_by_to_date" @change="searchStocks" placeholder="To pur date" class="form-control form-control-sm">
                                             <label for="search_by_to_pur_date" class="small ">To pur date</label>
                                         </div>                             
-                                        <div class="row">
+                                        <div class="row mt-2">
                                             <div class="col-4 d-grid">
                                                 <button class="btn btn-sm text-dark" @click="clearSearch"> <i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
                                                 </div>

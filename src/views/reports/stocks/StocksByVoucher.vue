@@ -1,20 +1,18 @@
 <template lang="">
     <div class="container-fluid">  
         <div v-if="isLoading">
-            <div colspan="5">
                 <div class="d-flex justify-content-center my-5">
                     <div class="spinner-border text-primary"  role="status">
                       <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
-            </div>
         </div>  
-         <div class="row mb-2" v-if="reports" v-for="stock in reports">
+         <div class="row" v-if="reports" v-for="stock in reports">
             <div class="col-12 mb-2">
-                <div class="card shadow">
-                    <div class="card-body">
+                <div class="card">
+                    <div class="card-body p-2">
                         <div class="mb-2">
-                            <table class="table mb-2 table-borderless">
+                            <table class="table mb-2  table-borderless">
                                 <tbody class="small">
                                     <tr>
                                         <td class="text-end col-2 p-0 fw-bold">Voucher no. :</td>
@@ -30,7 +28,7 @@
                                 </tbody>
                           </table>
                         </div>         
-                        <table class="table table-bordered  table-hover">
+                        <table class="table table-bordered mb-0  table-hover">
                             <tbody>
                                 <tr class="small text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>

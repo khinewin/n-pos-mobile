@@ -1,11 +1,16 @@
 <template lang="">
-    <div>       
+    <div class="">    
+        <span v-if="msgType" class="position-fixed end-0 top-0  z-3 alert alert-secondary" role="alert" :class="[msgType=='success' ? 'text-success' : 'text-danger']">
+            <span v-if="msgType=='error'"><i class="fa-solid fa-triangle-exclamation"></i> </span>
+            <span v-if="msgType=='success'"><i class="fa-solid fa-check"></i> </span>
+           <span class="ms-2"> {{msgInfo}}</span>
+        </span>
+   
     <LeftSidebar />
     <Navbar />  
     <div class="container-fluid">
-        <span v-if="msgType" class="fixed-top alert" role="alert" :class="[msgType=='success' ? 'alert-success' : 'alert-danger']">{{msgInfo}}</span>
-        <div class="row bg-secondary-subtle pt-3 pb-1">           
-            <div class="col-12  pt-1 bg-secondary-subtle">
+        <div class="row">           
+            <div class="col-12 py-2">
                    <LeftMenuBtn />
                   <span class="h5 ms-3"> 
                     {{pageTitle}} 
@@ -22,13 +27,20 @@
     import LeftSidebar from "@/views/partials/LeftSidebar.vue"
     import Navbar from "@/views/partials/Navbar.vue"
     import LeftMenuBtn from '@/views/partials/LeftMenuBtn.vue'
+    import db from '@/firebase/firestore'
+    import { enableNetwork, disableNetwork } from "firebase/firestore"; 
+
 export default {
     props: ['pageTitle', 'pageCode', 'msgType', 'msgInfo'],
     components : {
         LeftMenuBtn, RightSidebar, LeftSidebar, Navbar
     },
+    mounted() {
+        this.checkConnection();
+    },
     methods:{
-     
+       async checkConnection(){
+        }
     },
     watch:{
         

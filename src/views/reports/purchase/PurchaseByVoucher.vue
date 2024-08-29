@@ -9,11 +9,10 @@
                 </div>
             </div>
         </div>  
-         <div class="row mb-2" v-if="reports" v-for="p in reports">
+         <div class="row" v-if="reports" v-for="p in reports">
             <div class="mb-2 col-12">
-                <div class="card shadow">
-                    <div class="card-body">
-                <div class="table-responsive">
+                <div class="card">
+                    <div class="card-body p-2">
                     <div class="row  mb-2">
                     <div class="col-lg-6">
                         <table class="table mb-0 table-borderless">
@@ -50,7 +49,7 @@
                       </table>
                     </div>
                 </div>                 
-                   <table class="table table-bordered  table-hover">
+                   <table class="table table-bordered mb-0 table-hover">
                         <tbody>
                             <tr class="small text-center fw-bold table-secondary">
                                 <td class="col-1">Code</td>
@@ -64,6 +63,8 @@
                                 <td class="col-1">Discount</td>
                                 <td class="col-1">Price</td>
                             </tr>
+                        </tbody>
+                        <tbody>
                             <tr class="small text-center" v-if="p.products.length > 0" v-for="st in p.products" :key="st.id">
                                 <td class="">{{st.code_no}}</td>
                                 <td class="">{{st.item_name}}</td>
@@ -104,7 +105,6 @@
                             </tr>                           
                         </tbody>
                    </table>                          
-                </div>
                 </div>
             </div>
             </div>

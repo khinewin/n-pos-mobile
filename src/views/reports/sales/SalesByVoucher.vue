@@ -1,18 +1,16 @@
 <template lang="">
     <div class="container-fluid">  
         <div v-if="isLoading">
-            <div colspan="5">
                 <div class="d-flex justify-content-center my-5">
                     <div class="spinner-border text-primary"  role="status">
                       <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
-            </div>
         </div>  
-         <div class="row mb-2" v-if="reports" v-for="sale in reports">
+         <div class="row" v-if="reports" v-for="sale in reports">
             <div class="col-12 mb-2">
-                <div class="card shadow">
-                    <div class="card-body">
+                <div class="card">
+                    <div class="card-body p-2">
                         <div class="row justify-content-end" >   
                             <div class="col-6">
                                 <table class="table mb-0 table-borderless">
@@ -55,12 +53,12 @@
                                     <tbody class="">
                                         <tr class="text-center fw-bold">
                                             <td class="col-1">No.</td>
-                                            <td class="col-6">Description</td>
-                                            <td class="col-1">Packing size</td>
+                                            <td class="col-5">Description</td>
+                                            <td class="col-2">Packing size</td>
                                             <td class="col-1">Qty</td>
                                             <td class="col-1 ">Unit price</td>
                                             <td class="col-1">Discount</td>
-                                            <td class="col-1 ">Amount</td>
+                                            <td class="col-1">Amount</td>
                                         </tr>
                                         <tr class="" v-if="sale.products.length > 0" v-for="(s, i) in sale.products" :key="s.id" >     
                                             <td class="text-center">{{i+1}}</td>                   
@@ -78,7 +76,8 @@
                                             <td class="text-end">{{s.discount}}</td>
                                             <td class="text-end">{{s.sale_amount}}</td>
                                         </tr>                        
-                                  
+                                    </tbody>
+                                    <tbody>
                                         <tr>
                                             <td colspan="6" class="text-end col-6 pe-2 " style="border-bottom-style: hidden;">Total amount</td>
                                             <td class="text-end col-6 ">{{sale.total_amount}}</td>

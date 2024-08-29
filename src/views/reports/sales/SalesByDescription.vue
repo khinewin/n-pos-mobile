@@ -1,60 +1,56 @@
 <template lang="">
-    <div class="container-fluid">            
-        <div class="row">                 
-            <div class="col-12">
-                    <table class="table table-bordered border-dark table-hover">
-                        <tbody class="" v-if="reports.length > 0">    
-                            <tr class="fw-bold text-center">
-                                <td class="col-1">Code</td>
-                                <td class="col-3">Description</td>
-                                <td class="col-1">Packing size</td>
-                                <td class="col-1">Qty</td>
-                                <td class="col-1">Sale price</td>
-                                <td class="col-1">Pur price</td>
-                                <td class="col-1">Discount</td>
-                                <td class="col-1">Sale amount</td>                                
-                                <td class="col-1">Pur amount</td>
-                                <td class="col-1">Profit</td>
-                            </tr>                        
-                                <tr v-for="s in reports" :key="s.code_no">
-                                    <td class="text-center">{{s.code_no}}</td>
-                                    <td>{{s.item_name}}</td>
-                                    <td class="col-1">
-                                        1{{s.parent_unit}} * {{s.item_per_package}}{{s.child_unit}}
-                                    </td>
-                                    <td class="text-end col-1">
-                                        <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}}{{s.parent_unit}}</span>
-                                        <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0">, </span>
-                                        <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}}{{s.child_unit}}</span>
+    <div class="">
+        <table class="table table-bordered border-dark table-hover">
+            <tbody class="" >    
+                <tr class="fw-bold text-center">
+                    <td class="col-1">Code</td>
+                    <td class="col-3">Description</td>
+                    <td class="col-1">Packing size</td>
+                    <td class="col-1">Qty</td>
+                    <td class="col-1">Sale price</td>
+                    <td class="col-1">Pur price</td>
+                    <td class="col-1">Discount</td>
+                    <td class="col-1">Sale amount</td>                                
+                    <td class="col-1">Pur amount</td>
+                    <td class="col-1">Profit</td>
+                </tr> 
+                </tbody>
+                <tbody v-if="reports.length > 0">                       
+                    <tr v-for="s in reports" :key="s.code_no">
+                        <td class="text-center">{{s.code_no}}</td>
+                        <td>{{s.item_name}}</td>
+                        <td class="col-1">
+                            1{{s.parent_unit}} * {{s.item_per_package}}{{s.child_unit}}
+                        </td>
+                        <td class="text-end col-1">
+                            <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}}{{s.parent_unit}}</span>
+                            <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0">, </span>
+                            <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}}{{s.child_unit}}</span>
 
-                                    </td>                                    
-                                    <td class="text-end">{{s.sale_price}}</td>
-                                    <td  class="text-end">{{s.pur_price}}</td>
-                                    <td class="text-end">{{s.discount}}</td>
-                                    <td  class="text-end">{{s.sale_amount}}</td>                                   
-                                    <td  class="text-end">{{s.pur_amount}}</td>
-                                    <td  class="text-end">{{s.profit}}</td>
-                                </tr>
-                                <tr>                              
-                                    <td class="fw-bold text-end" colspan="7">Total</td>
-                                    <td class="text-end">{{sale_amount}}</td>
-                                    <td class="text-end">{{pur_amount}}</td>
-                                    <td class="text-end">{{profit_amount}}</td>
-                                </tr>
-                            
-                        </tbody>
-                    </table>
-                    <div v-if="isLoading">
-                        <div colspan="5">
-                            <div class="d-flex justify-content-center my-5">
-                                <div class="spinner-border text-primary"  role="status">
-                                  <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>   
-            </div>
-        </div>
+                        </td>                                    
+                        <td class="text-end">{{s.sale_price}}</td>
+                        <td  class="text-end">{{s.pur_price}}</td>
+                        <td class="text-end">{{s.discount}}</td>
+                        <td  class="text-end">{{s.sale_amount}}</td>                                   
+                        <td  class="text-end">{{s.pur_amount}}</td>
+                        <td  class="text-end">{{s.profit}}</td>
+                    </tr>
+                    <tr>                              
+                        <td class="fw-bold text-end" colspan="7">Total</td>
+                        <td class="text-end">{{sale_amount}}</td>
+                        <td class="text-end">{{pur_amount}}</td>
+                        <td class="text-end">{{profit_amount}}</td>
+                    </tr>
+                
+            </tbody>
+        </table>
+        <div v-if="isLoading">
+                <div class="d-flex justify-content-center my-5">
+                    <div class="spinner-border text-primary"  role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+        </div>                                                 
     </div>
 </template>
 <script>

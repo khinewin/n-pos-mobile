@@ -1,12 +1,12 @@
 <template lang="">
     <!-- packingSizes Modal -->
-    <div class="modal fade" id="packingSizeModal"  tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal fade" id="packingSizeModal" data-bs-backdrop="false"  tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
        <div class="modal-dialog">
          <div class="modal-content">               
            <div>
                <div class="card">
                    <div class="card-body p-2"> 
-                    <div class="row justify-content-end">
+                    <div class="row justify-content-end mb-2">
                         <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateData"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                         </button></div>

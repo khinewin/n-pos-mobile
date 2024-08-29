@@ -1,7 +1,7 @@
 <template lang="">     
     <div>           
         <PageHeader page-title="User profile" page-code="profile"  :msg-type="msg.type" :msg-info="msg.info" />
-        <div class="container my-2">
+        <div class="container">
             <div class="row justify-content-center g-2" v-if="user !==null">
                 <div class="col-sm-10 col-md-8 col-lg-6">
                         <div class="card shadow mb-2"  >

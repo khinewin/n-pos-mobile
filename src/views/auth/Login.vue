@@ -95,9 +95,7 @@ export default {
     },
     mounted() {    
         this.isCheckAuth=true;
-        setTimeout(()=>{
-            this.checkLogin();
-        }, 2000)
+         this.checkLogin();
     },
     computed:{
         user(){
@@ -116,17 +114,18 @@ export default {
                     if(this.$route.redirectedFrom===undefined){
                         this.$router.push({name: "Dashboard"})
                     }else{
-                       // console.log(this.$route.redirectedFrom)
                         const redirectPage=this.$route.redirectedFrom.name
                         const redirectParams=this.$route.redirectedFrom.params
-                        if(redirectPage !== "Welcome" || redirectPage !== "Login"){
+                        if(redirectPage !== "Welcome"){
                             this.$router.push({name: redirectPage, params : redirectParams})
                         }else{
                             this.$router.push({name: "Dashboard"})
                         }
                     }                                   
                 }
+               setTimeout(()=>{
                 this.isCheckAuth=false;
+               }, 3000)
             });
         },
         async doSignin(){

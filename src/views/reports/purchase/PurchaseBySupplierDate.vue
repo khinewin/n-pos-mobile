@@ -1,94 +1,95 @@
 <template lang="">
-    <div class="container-fluid">  
-             
-        <div class="row">                 
-            <div class="col-12">
-                    <table class="table table-bordered border-dark table-hover">
-                        <tbody class="" v-if="reports.length > 0">                            
-                            <tr v-for="r in reports" :key="r[0]">
-                                <td class="col-1 text-center">{{r[0]}}</td>
-                                <td class="p-0 col-11">
-                                    <table class="table table-bordered border-dark table-hover mb-0" style="border-style: hidden;">
-                                        <tbody>
-                                            <tr v-for="res in r[1]">
-                                                    <td class="col-1 text-center">{{res[0]}}</td>
-                                                    <td class="p-0 col-11">
-                                                        <table class="table table-bordered mb-0 border-dark table-hover mb-0" style="border-style: hidden;">
-                                                            <thead>
-                                                                <tr class="fw-bold text-center">
-                                                                    <td class="col-1">Code</td>
-                                                                    <td class="col-2">Description</td>
-                                                                    <td class="col-1">Packing size</td>
-                                                                    <td class="col-1">Qty</td>
-                                                                    <td class="col-1">Item price</td>
-                                                                    <td class="col-1">Amount</td>
-                                                                    <td class="col-2" colspan="4">Discount</td>                                              
-                                                                    <td class="col-1">Price</td>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>                                            
-                                                                <tr v-for="item in res[1]" :key="item.code_no">
-                                                                    <td class="text-center">{{item.code_no}}</td>
-                                                                    <td >{{item.item_name}}</td>
-                                                                    <td class="col-1">
-                                                                        1{{item.parent_unit}} * {{item.item_per_package}}{{item.child_unit}}
-                                                                    </td>
-                                                                    <td class="col-1 text-end">
-                                                                    <span v-if="calQtyL(item.pur_qty, item.item_per_package) > 0">{{calQtyL(item.pur_qty, item.item_per_package)}} {{item.parent_unit}} </span>
-                                                                        <span v-if="calQtyL(item.pur_qty, item.item_per_package) >0 && calQtyS(item.pur_qty, item.item_per_package) > 0"> * </span>
-                                                                        <span v-if="calQtyS(item.pur_qty, item.item_per_package)> 0">{{calQtyS(item.pur_qty, item.item_per_package)}} {{item.child_unit}}  </span>
-                                                                    </td>
-                                                                    <td class="text-end">{{item.pur_price}}</td>
-                                                                    <td class="text-end">{{item.amount}}</td>
-                                                                    <td class="text-center">{{item.dis_qty}}</td>
-                                                                    <td class="text-center">{{item.dis_percent}}</td>
-                                                                    <td class="text-end">{{item.dis_amount}}</td>
-                                                                    <td class="text-end">{{item.discount}}</td>
-                                                                    <td class="text-end">{{item.price}}</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td colspan="5" class="text-end fw-bold">Total</td>
-                                                                    <td class="text-end">{{res[2].amount}}</td>
-                                                                    <td colspan="4" class="text-end">{{res[2].discount}}</td>                                                
-                                                                    <td class="text-end">{{res[2].price}}</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </td>
-                                            </tr>                                           
-                                        </tbody>
-                                    </table>
-                                
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-end fw-bold">Total amount</td>
-                                <td class="text-start">{{total_amount}}</td>                                
-                            </tr>                         
-                            <tr>
-                                <td class="text-end fw-bold">Total discount</td>
-                                <td class="text-start">{{total_discount}}</td>
-                            </tr>
-                            <tr>
-                                <td class="text-end fw-bold">Extra discount</td>
-                                <td class="text-start">{{extra_discount}}</td>
-                            </tr>
-                            <tr>
-                                <td class="text-end fw-bold">Total price</td>
-                                <td class="text-start">{{total_price}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div v-if="isLoading">
-                        <div colspan="5">
-                            <div class="d-flex justify-content-center my-5">
-                                <div class="spinner-border text-primary"  role="status">
-                                  <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>   
-            </div>
+    <div class="">  
+        <table class="table table-bordered border-dark table-hover">
+            <tbody class="" v-if="reports.length > 0">                            
+                <tr v-for="r in reports" :key="r[0]">
+                    <td class="col-1 text-center">{{r[0]}}</td>
+                    <td class="p-0 col-11">
+                        <table class="table table-bordered border-dark table-hover mb-0" style="border-style: hidden;">
+                            <tbody>
+                                <tr v-for="res in r[1]">
+                                        <td class="col-1 text-center">{{res[0]}}</td>
+                                        <td class="p-0 col-11">
+                                            <table class="table table-bordered mb-0 border-dark table-hover mb-0" style="border-style: hidden;">
+                                                <tbody>
+                                                    <tr class="fw-bold text-center">
+                                                        <td class="col-1">Code</td>
+                                                        <td class="col-2">Description</td>
+                                                        <td class="col-1">Packing size</td>
+                                                        <td class="col-1">Qty</td>
+                                                        <td class="col-1">Item price</td>
+                                                        <td class="col-1">Amount</td>
+                                                        <td class="col-2" colspan="4">Discount</td>                                              
+                                                        <td class="col-1">Price</td>
+                                                    </tr>
+                                                </tbody>
+                                                <tbody>                                            
+                                                    <tr v-for="item in res[1]" :key="item.code_no">
+                                                        <td class="text-center">{{item.code_no}}</td>
+                                                        <td >{{item.item_name}}</td>
+                                                        <td class="col-1">
+                                                            1{{item.parent_unit}} * {{item.item_per_package}}{{item.child_unit}}
+                                                        </td>
+                                                        <td class="col-1 text-end">
+                                                        <span v-if="calQtyL(item.pur_qty, item.item_per_package) > 0">{{calQtyL(item.pur_qty, item.item_per_package)}} {{item.parent_unit}} </span>
+                                                            <span v-if="calQtyL(item.pur_qty, item.item_per_package) >0 && calQtyS(item.pur_qty, item.item_per_package) > 0"> * </span>
+                                                            <span v-if="calQtyS(item.pur_qty, item.item_per_package)> 0">{{calQtyS(item.pur_qty, item.item_per_package)}} {{item.child_unit}}  </span>
+                                                        </td>
+                                                        <td class="text-end">{{item.pur_price}}</td>
+                                                        <td class="text-end">{{item.amount}}</td>
+                                                        <td class="text-center">{{item.dis_qty}}</td>
+                                                        <td class="text-center">{{item.dis_percent}}</td>
+                                                        <td class="text-end">{{item.dis_amount}}</td>
+                                                        <td class="text-end">{{item.discount}}</td>
+                                                        <td class="text-end">{{item.price}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="5" class="text-end fw-bold">Total</td>
+                                                        <td class="text-end">{{res[2].amount}}</td>
+                                                        <td colspan="4" class="text-end">{{res[2].discount}}</td>                                                
+                                                        <td class="text-end">{{res[2].price}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="10" class="text-end fw-bold">Extra discount</td>
+                                                        <td class="text-end">{{res[2].extra_discount}}</td>                                                        
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="10" class="text-end fw-bold">Total price</td>
+                                                        <td class="text-end">{{res[2].price - res[2].extra_discount}}</td>                                                        
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                </tr>                                           
+                            </tbody>
+                        </table>
+                    
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-end fw-bold">Total amount</td>
+                    <td class="text-start">{{total_amount}}</td>                                
+                </tr>                         
+                <tr>
+                    <td class="text-end fw-bold">Total discount</td>
+                    <td class="text-start">{{total_discount}}</td>
+                </tr>
+                <tr>
+                    <td class="text-end fw-bold">Extra discount</td>
+                    <td class="text-start">{{extra_discount}}</td>
+                </tr>
+                <tr>
+                    <td class="text-end fw-bold">Total price</td>
+                    <td class="text-start">{{total_price - extra_discount}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div v-if="isLoading">
+                <div class="d-flex justify-content-center my-5">
+                    <div class="spinner-border text-primary"  role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
         </div>
     </div>
 </template>
@@ -98,7 +99,7 @@ import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper.js"
 import * as ss from "@/lib/snapshot/purchases"
 export default {
-    props:['fromDate', 'toDate', 'supplier', 'location'],
+    props:['fromDate', 'toDate', 'supplier', 'location', 'code_no'],
     components: {
     },
   
@@ -170,10 +171,9 @@ export default {
             if (this.purchaseData.length <=0) return false;   
             let purchase=[]             
             this.purchaseData.map((res)=>{
-                    this.total_amount += res.total_amount;
-                    this.total_price += res.total_price;
+                if(!this.code_no){
                     this.extra_discount += Number(res.extra_discount);
-                    this.total_discount += res.total_discount;
+                 }  
                     res.products.map((data)=>{
                         purchase.push({...data,
                             supplier_code: res.supplier.code,
@@ -182,10 +182,18 @@ export default {
                              supplier_company :res.supplier.company,
                              supplier_phone: res.supplier.phone,
                              supplier_id: res.supplier.id, 
-                             group_date :  this.showTime(res.pur_date)
+                             group_date :  this.showTime(res.pur_date),
+                             extra_discount : res.extra_discount,
                             })
                        })
             })
+            if(this.code_no){
+                purchase=purchase.filter((f)=>f.code_no === Number(this.code_no))
+            }
+
+            let total_amount=0;
+            let total_price=0;
+            let total_discount=0;
            
             const gbs=Object.entries(hp.gb_supplier(purchase))       
             const data=gbs.map((res)=>{
@@ -195,7 +203,7 @@ export default {
                     const date=ren[0];
                     const res1=Object.entries(hp.gb_item_name_pur_price(ren[1]))
                     const res2=res1.map((rep)=>{
-                        let item={parent_unit:"", child_unit:"",item_name: rep[0], code_no:"", discount:0, pur_qty:0, pur_price:0, amount:0, item_per_package:0, price:0, dis_qty:0, dis_amount:0, dis_percent:0}
+                        let item={extra_discount:0, parent_unit:"", child_unit:"",item_name: rep[0], code_no:"", discount:0, pur_qty:0, pur_price:0, amount:0, item_per_package:0, price:0, dis_qty:0, dis_amount:0, dis_percent:0}
                         rep[1].map((r)=>{
                             item.code_no=r.code_no;
                             item.pur_qty += r.pur_qty;
@@ -209,18 +217,35 @@ export default {
                             item.discount += r.discount;
                             item.parent_unit=r.parent_unit;
                             item.child_unit=r.child_unit;
+                            item.extra_discount += r.extra_discount;
                         })
                         return item;                    
 
                     }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)
-                    const res3={amount: 0, price:0, discount:0}
+
+                    let amount=0;
+                    let price=0;
+                    let discount=0;
+
+                    const res3={amount: 0, price:0, discount:0, extra_discount: 0}
                     res2.map((ren)=>{
                         res3.amount += ren.amount;
                         res3.discount += ren.discount;
                         res3.price += ren.price;
+                        res3.extra_discount += ren.extra_discount;
+
+                        amount += ren.amount;
+                        price += ren.price;
+                        discount += ren.discount;
                     })    
+                    total_amount += amount;
+                    total_price += price;
+                    total_discount += discount;
                     return [date, res2, res3];
                 })
+                this.total_amount = total_amount;
+                this.total_price =total_price;
+                this.total_discount =total_discount;
                 return [supplier_name, gbc];                     
             })
            // console.log(data)

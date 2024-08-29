@@ -1,7 +1,7 @@
 <template lang="">
     <div>           
         <PageHeader page-title="Edit purchase" page-code="editPurchase" :msg-type="msg.type" :msg-info="msg.info" />
-        <div class="container-fluid my-2">
+        <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                
                 <div class="col-sm-2 d-grid">
                         <button type="button" @click="savePurchase" class="btn btn-sm" :disabled="isLoading || !voucher_no">
@@ -13,7 +13,7 @@
                         <router-link :to="{name : 'Purchase'}" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> Close</router-link>
                 </div>
             </div>
-            <div class="card shadow">
+            <div class="card shadow min-vh-75">
                 <div class="card-body p-2">
                     <form @submit.prevent="savePurchase">
                         <div class="row justify-content-end">
@@ -132,7 +132,6 @@
         </div>
         </div>
         </div>
-        <Footer />
     </div>
 </template>
 <script>

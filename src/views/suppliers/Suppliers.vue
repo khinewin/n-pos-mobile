@@ -1,7 +1,7 @@
 <template lang="">       
     <div>           
            <PageHeader page-title="Suppliers" page-code="suppliers" :msg-type="msg.type" :msg-info="msg.info"/>
-           <div class="container-fluid my-2">
+           <div class="container-fluid">
                <div class="row mb-2 justify-content-end">                            
                 <div class="col-sm-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveSupplier">
@@ -30,7 +30,7 @@
                                     <label for="search_by_company" class="small">Company</label>
                                  </div> 
                             </div>
-                             <div class="row">
+                             <div class="row mt-2">
                                     <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="searchSuppliers"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
                                     <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
@@ -41,50 +41,48 @@
                       </div>                                                                                                          
                    </div>                        
                    <div class="col-lg-9">
-                       <div class="card shadow">
+                       <div class="card shadow vh-75">
                            <div class="card-body p-2 table-responsive">
                                <table class="table table-bordered table-hover mb-0">
                                    <tbody class="">
                                        <tr class="text-center table-secondary" style="cursor: context-menu;">
-                                           <td colspan="2" @click="sortSuppliers('code')"><i class="fa-solid fa-sort"></i> Code</td>
+                                           <td  @click="sortSuppliers('code')"><i class="fa-solid fa-sort"></i> Code</td>
                                            <td @click="sortSuppliers('name')"><i class="fa-solid fa-sort"></i> Name</td>
                                            <td @click="sortSuppliers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
                                            <td @click="sortSuppliers('company')"><i class="fa-solid fa-sort"></i> Company</td>
                                            <td @click="sortSuppliers('created_at')"><i class="fa-solid fa-sort"></i> Date</td>
                                        </tr>
                                        <tr>
-                                            <td class="" colspan="2">
-                                                <input type="text" v-model="code" class="form-control-plaintext text-center" id="code" placeholder="Code">                                                                                       
+                                            <td class="">
+                                                <input @keypress.enter="saveSupplier" type="text" v-model="code" class="form-control-plaintext text-center" id="code" placeholder="Code">                                                                                       
                                             </td>
                                             <td class="">
-                                                <input type="text" v-model="name" :class="{'border-danger' : v$.name.$errors.length}" class="form-control-plaintext text-center" id="name" placeholder="Name">                                               
+                                                <input @keypress.enter="saveSupplier" type="text" v-model="name" :class="{'border-danger' : v$.name.$errors.length}" class="form-control-plaintext text-center" id="name" placeholder="Name">                                               
                                             </td>
                                             <td class="">
-                                                <input type="tel" v-model="phone"  :class="{'border-danger' : v$.phone.$errors.length}"  class="form-control-plaintext text-center" id="phone" placeholder="Phone">                                            
+                                                <input @keypress.enter="saveSupplier" type="tel" v-model="phone"  :class="{'border-danger' : v$.phone.$errors.length}"  class="form-control-plaintext text-center" id="phone" placeholder="Phone">                                            
                                             </td>
                                             <td class="">
-                                                <input type="text" v-model="company"  :class="{'border-danger' : v$.company.$errors.length}"  class="form-control-plaintext text-center" id="company" placeholder="Company">                                              
+                                                <input @keypress.enter="saveSupplier" type="text" v-model="company"  :class="{'border-danger' : v$.company.$errors.length}"  class="form-control-plaintext text-center" id="company" placeholder="Company">                                              
                                             </td>
                                             <td class="">
-                                                <input type="date" v-model="created_at"    class="form-control-plaintext text-center" id="company" placeholder="Date">                                              
+                                                <input @change="saveSupplier" type="date" v-model="created_at"    class="form-control-plaintext text-center" id="company" placeholder="Date">                                              
                                             </td>
                                         </tr>
                                        
-                                       <tr class="text-center" v-if="suppliers.length > 0"  v-for="(p, i) in suppliers" :key="p.id" @mouseenter="setEdit(i)" @mouseleave="saveEdit" @keypress.enter="saveEdit">
-                                            <td>
-                                                <a class="text-danger" href="#!" @click="removeSupplier(i, p)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
-                                            </td>
-                                           <td :class="{'table-secondary': sort_item ==='code'}" class="pt-2">
+                                       <tr class="text-center" v-if="suppliers.length > 0"  v-for="(p, i) in suppliers" :key="p.id" @mouseenter="setEdit(p)" >                                           
+                                           <td :class="{'table-secondary': sort_item ==='code'}" class="pt-2 position-relative">
+                                                <a class="text-danger position-absolute start-0 top-50 translate-middle ps-2" href="#!" @click="removeSupplier(i, p)"><i class="fa-solid fa-square-minus"></i></a>                                                                                        
                                                 {{p.code}}
                                             </td>
                                            <td :class="{'table-secondary': sort_item ==='name'}" class="p-0">
-                                                <input type="text" class="form-control-plaintext text-center m-0" v-model="p.name">
+                                                <input @keyup="saveEdit" type="text" class="form-control-plaintext text-center m-0" v-model="p.name">
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='phone'}" class="p-0">
-                                            <input type="text" class="form-control-plaintext text-center  m-0" v-model="p.phone">
+                                            <input @keyup="saveEdit" type="text" class="form-control-plaintext text-center  m-0" v-model="p.phone">
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='company'}" class="p-0">
-                                            <input type="text" class="form-control-plaintext text-center m-0" v-model="p.company">
+                                            <input @keyup="saveEdit" type="text" class="form-control-plaintext text-center m-0" v-model="p.company">
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='created_at'}" class="pt-2">{{showTime(p.created_at)}}</td>
                                        </tr>
@@ -182,7 +180,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                        setTimeout(()=>{
                            this.msg.type="";
                            this.msg.info="";
-                       }, 5000)
+                       }, 3000)
                    }
                },deep:true
            }
@@ -241,8 +239,8 @@ import { required, email ,helpers} from '@vuelidate/validators'
                        company: this.editItem.company
                     })  
            },
-           setEdit(i){
-               this.editItem=this.suppliers[i];
+           setEdit(p){
+               this.editItem=p;
            },
            clearSearch(){
                this.search_by_code="";

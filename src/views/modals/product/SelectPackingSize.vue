@@ -1,17 +1,17 @@
 <template lang="">
     <!-- packingSizes Modal -->
-    <div class="modal fade" id="selectPackingSizeModal"  tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal fade" id="selectPackingSizeModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
        <div class="modal-dialog">
          <div class="modal-content">               
            <div>
                <div class="card">
                    <div class="card-body p-2"> 
-                    <div class="row justify-content-end">
+                    <div class="row justify-content-end mb-2">
                         <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateData"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                         </button></div>
                         <div class="col-4 d-grid"><button class="btn btn-sm text-dark" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button></div>
-                 </div> 
+                    </div> 
                    <div class="row g-2">
                     <div class="col-12">
                         <table class="table table-bordered mb-0">
@@ -24,7 +24,7 @@
                                                        
                                 <tr class="" style="cursor:context-menu">
                                     <td class="text-center p-0">
-                                        <select @change="setCode" class="form-control-plaintext form-select-sm text-center" v-model="parent_unit">
+                                        <select @change="setCode" class="form-control-plaintext  text-center" v-model="parent_unit">
                                             <option  v-if="parentPackingSizes.length > 0"  v-for="p in parentPackingSizes" :key="p.id" >{{p.parent_unit}}</option>
                                         </select>
                                     </td>
@@ -32,7 +32,7 @@
                                         <input @keypress.enter="setCode" type="number" class="form-control-plaintext text-center" v-model="packing">
                                     </td>
                                     <td class="text-center p-0">
-                                        <select @change="setCode" class="form-control-plaintext form-select-sm text-center" v-model="child_unit">
+                                        <select @change="setCode" class="form-control-plaintext  text-center" v-model="child_unit">
                                             <option  v-if="childPackingSizes.length > 0"  v-for="p in childPackingSizes" :key="p.id" >{{p.child_unit}}</option>
                                         </select>
                                     </td>
@@ -79,6 +79,12 @@ export default {
        }
    },   
    mounted() {
+    const myModalEl = document.getElementById('selectPackingSizeModal')
+       myModalEl.addEventListener('hidden.bs.modal', event => {     
+           this.parent_unit="";
+           this.packing="";
+           this.child_unit="";          
+       })   
    },
    created(){
        if(this.user !==null){         

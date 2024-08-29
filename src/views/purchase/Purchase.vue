@@ -2,7 +2,7 @@
     <div>
         <PageHeader page-title="Purchases" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
         <PurchaseModal @setCode="setCode"/>           
-        <div class="container-fluid my-2 ">
+        <div class="container-fluid">
             <div class="row mb-2 justify-content-end">
                 <div class="col-sm-2 d-grid">
                     <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print</button>
@@ -20,7 +20,7 @@
                         <button class="btn btn-sm" :disabled="!voucher_no" @click="closeVoucher"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                 </div>
             </div>
-            <div class="card shadow" id="printMe">
+            <div class="card shadow min-vh-75" id="printMe">
                 <div class=" card-body p-2 table-responsive">
                     <div class="row justify-content-end mb-2">
                     <div class="col-sm-6 col-lg-4">
@@ -116,7 +116,6 @@
                 </div>
             </div>
         </div>
-        <Footer />
     </div>
 </template>
 <script>

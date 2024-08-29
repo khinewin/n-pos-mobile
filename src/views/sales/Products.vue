@@ -21,24 +21,25 @@
                             <div class="mb-2 col-sm-6">
                                     <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Description" class="form-control form-control-sm">
                             </div>                                                                                                                                           
-                        </div>
-                          <div class="row" v-if="isLoading">
-                            <div class="col-lg-12">
-                                    <div class="d-flex justify-content-center ">
-                                        <div class="spinner-border text-primary"  role="status">
-                                          <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                    </div>                               
-                            </div>
-                          </div>
-                            <div class="row g-1" v-if="products.length > 0" >                                
-                                <div class="col-6 col-sm-4 "  v-for="(p,i) in products" :key="p.id" @click="setCode(p)"  style="cursor:context-menu">
+                        </div>                          
+                           <div class="vh-60 overflow-y-auto">
+                            <div class="row my-5" v-if="isLoading">
+                                <div class="col-12">
+                                        <div class="d-flex justify-content-center ">
+                                            <div class="spinner-border text-primary"  role="status">
+                                              <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>                               
+                                </div>
+                              </div>
+                            <div class="row g-1" v-if="products.length > 0"  >                                
+                                <div class="col-6"  v-for="(p,i) in products" :key="p.id" @click="setCode(p)"  style="cursor:context-menu">
                                         <div class="card" >
-                                            <div class="card-body  small  text-center" :class="[i%2===0 ? 'bg-info' : 'bg-secondary-subtle']">
+                                            <div class="card-body  small  text-center" :class="[i%3===1 ? 'bg-secondary-subtle' : 'bg-info']">
                                                     <div class="position-relative pt-2 mt-1">
                                                         <span>{{p.code_no}}</span>
                                                         <span class="position-absolute top-0 start-50 translate-middle badge bg-success p-1" :class="{'bg-danger' : p.qty <= 5, 'bg-warning': p.qty >=6 && p.qty <=10}" style="font-size: 12px;">
-                                                            {{Math.floor(p.qty / p.item_per_package)}}*{{Math.floor(p.qty % p.item_per_package)}}
+                                                            {{p.qty ? Math.floor(p.qty / p.item_per_package) : 0}}*{{p.qty ? Math.floor(p.qty % p.item_per_package) : 0}}
                                                         </span>
                                                     </div>
                                                     <div>{{p.item_name}}</div>
@@ -46,13 +47,14 @@
                                             </div>
                                         </div>
                                 </div>
-                            </div>                                                                                   
+                            </div>  
+                           </div>                                                                                 
                    </div>
                </div>                       
      <!--end -->
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query} from 'firebase/firestore'
+import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query, onSnapshot } from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as ss from "@/lib/snapshot/products"
 export default {  
@@ -65,6 +67,7 @@ export default {
            search_by_item_name:"",
            isLoading:false,
            isBtnLoading:false,
+           message :"",
        }
    },  
    mounted() {
@@ -138,21 +141,22 @@ export default {
                })
            }else{
                    this.products= this.productsData.filter((p, i)=>{
-                           if(i < 20){
+                           if(i < 15){
                                return p;
                            }
                     })                                     
            }
        },     
        async fetchProducts(){
-       const query_url = query(collection(db, "products"))
-       const snapShot=await getDocs(query_url)
-       const products=ss.products(snapShot);     
-       this.products=[];
-       this.productsData=products;
-       this.products=products;
-       this.isLoading=false;
-       this.isBtnLoading=false;
+            const query_url = query(collection(db, "products"))
+            const snapShot=await getDocs(query_url)
+            const products=ss.products(snapShot);     
+            this.products=[];
+            this.productsData=products;
+            this.isLoading=false;
+            this.isBtnLoading=false;    
+            this.searchProducts();     
+      
       } ,    
    }   
 }

@@ -1,98 +1,76 @@
 <template lang="">
-    <div class="container-fluid">  
-             
-        <div class="row">                 
-            <div class="col-12">
-                    <table class="table table-bordered border-dark table-hover">
-                        <tbody class="" v-if="reports.length > 0">                            
-                            <tr v-for="r in reports" :key="r[0]">
-                                <td class="col-1 text-center">{{r[0]}}</td>
-                                <td colspan="5" class="p-0 col-11">
-                                    <table class="table table-bordered mb-0 border-dark table-hover " style="border-style: hidden;">
-                                        <thead>
-                                            <tr class="fw-bold text-center">
-                                                <td>Code</td>
-                                                <td>Description</td>
-                                                <td>Packing size</td>
-                                                <td>Qty</td>
-                                                <td>Sale price</td>
-                                                <td>Pur price</td>
-                                                <td>Discount</td>
-                                                <td>Sale amount</td>
-                                                <td>Pur amount</td>
-                                                <td>Profit</td>
-                                            </tr>
-                                        </thead>
-                                        <tbody>                                            
-                                            <tr v-for="s in r[1]" :key="s.code_no">
-                                                <td class="col-1 text-center">{{s.code_no}}</td>
-                                                <td class="col-2">{{s.item_name}}</td>
-                                                <td class=" col-1">
-                                                    1{{s.parent_unit}} * {{s.item_per_package}}{{s.child_unit}}
-                                                </td>
-                                                <td class="text-end col-1">
-                                                    <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}}{{s.parent_unit}}</span>
-                                                    <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0">, </span>
-                                                    <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}}{{s.child_unit}}</span>    
-                                                </td>
-                                                <td class="col-1 text-end">{{s.sale_price}}</td>
-                                                <td class="col-1 text-end">{{s.pur_price}}</td>
-                                                <td class="col-1 text-end">{{s.discount}}</td>
-                                                <td class="col-1 text-end">{{s.sale_amount}}</td>
-                                                <td class="col-1 text-end">{{s.pur_amount}}</td>
-                                                <td class="col-1 text-end">{{s.profit}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="7" class="text-end fw-bold">Total</td>
-                                                <td class="text-end">{{r[2].sale_amount}}</td>
-                                                <td class="text-end">{{r[2].pur_amount}}</td>
-                                                <td class="text-end">{{r[2].profit_amount}}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-end fw-bold">Total sale amount</td>
-                                <td class="text-start">{{total_sale_amount}}</td>
-                            </tr>                                                     
-                            <tr>
-                                <td class="text-end fw-bold">Total pur amount</td>
-                                <td class="text-start">{{total_pur_amount}}</td>
-                            </tr>
-                            <tr>
-                                <td class="text-end fw-bold">Profit</td>
-                                <td class="text-start">{{total_profit}}</td>
-                            </tr>
-                            <!--<tr>
-                                <td class="text-end fw-bold">Discount</td>
-                                <td class="text-start">{{total_discount}}</td>
-                            </tr>
-                             <tr>
-                                <td class="text-end fw-bold">Total amount</td>
-                                <td class="text-start">{{total_charges}}</td>
-                            </tr>
-                            <tr>
-                                <td class="text-end fw-bold">Total pay</td>
-                                <td class="text-start">{{total_pay}}</td>
-                            </tr>
-                            <tr>
-                                <td class="text-end fw-bold">Total refunds</td>
-                                <td class="text-start">{{total_refunds}}</td>
-                            </tr>-->
-                        </tbody>
-                    </table>
-                    <div v-if="isLoading">
-                        <div colspan="5">
-                            <div class="d-flex justify-content-center my-5">
-                                <div class="spinner-border text-primary"  role="status">
-                                  <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>   
+    <div class="">
+        <table class="table table-bordered mb-0 border-dark table-hover ">
+            <tbody class="fw-bold text-center">
+                <tr><td rowspan="2">Customer</td></tr>
+                <tr >
+                    <td>Code</td>
+                    <td>Description</td>
+                    <td>Packing size</td>
+                    <td>Qty</td>
+                    <td>Sale price</td>
+                    <td>Pur price</td>
+                    <td>Discount</td>
+                    <td>Sale amount</td>
+                    <td>Pur amount</td>
+                    <td>Profit</td>
+                </tr>
+            </tbody>
+            <tbody v-if="reports.length > 0" v-for="r in reports" :key="r[0]">      
+                <tr>
+                    <td :rowspan="r[1].length + 2" class="text-center col-1">{{r[0]}}</td>
+                </tr>                                      
+                <tr v-for="s in r[1]" :key="s.code_no">
+                    <td class="col-1 text-center">{{s.code_no}}</td>
+                    <td class="col-2">{{s.item_name}}</td>
+                    <td class=" col-1">
+                        1{{s.parent_unit}} * {{s.item_per_package}}{{s.child_unit}}
+                    </td>
+                    <td class="text-end col-1">
+                        <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}}{{s.parent_unit}}</span>
+                        <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0">, </span>
+                        <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}}{{s.child_unit}}</span>    
+                    </td>
+                    <td class="col-1 text-end">{{s.sale_price}}</td>
+                    <td class="col-1 text-end">{{s.pur_price}}</td>
+                    <td class="col-1 text-end">{{s.discount}}</td>
+                    <td class="col-1 text-end">{{s.sale_amount}}</td>
+                    <td class="col-1 text-end">{{s.pur_amount}}</td>
+                    <td class="col-1 text-end">{{s.profit}}</td>
+                </tr>
+                <tr>
+                    <td colspan="7" class="text-end fw-bold">Total</td>
+                    <td class="text-end">{{r[2].sale_amount}}</td>
+                    <td class="text-end">{{r[2].pur_amount}}</td>
+                    <td class="text-end">{{r[2].profit_amount}}</td>
+                </tr>
+            </tbody>
+            <tbody v-if="reports.length">
+                <tr>
+                    <td class="text-end fw-bold" colspan="2">Total sale amount</td>
+                    <td class="text-end">{{total_sale_amount}}</td>
+                </tr>
+                <tr>
+                    <td class="text-end fw-bold" colspan="2">Total pur amount</td>
+                    <td class="text-end">{{total_pur_amount}}</td>
+                </tr>
+                <tr>
+                    <td class="text-end fw-bold" colspan="2">Discount</td>
+                    <td class="text-end">{{total_discount}}</td>
+                </tr>
+                <tr>
+                    <td class="text-end fw-bold" colspan="2">Total profit</td>
+                    <td class="text-end">{{total_profit - total_discount}}</td>
+                </tr>   
+            </tbody>
+        </table>
+        <div v-if="isLoading">
+            <div class="d-flex justify-content-center my-5">
+                <div class="spinner-border text-primary"  role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
             </div>
-        </div>
+    </div>                                                                                                                 
     </div>
 </template>
 <script>
@@ -113,11 +91,8 @@ export default {
             salesData:[],
             total_sale_amount:0,
             total_pur_amount:0,
-          //  total_charges:0,
-          //  total_pur_amount:0,
             total_profit:0,
-          //  total_pay:0,
-          //  total_refunds:0,
+            total_discount:0,
             isLoading:false,
             msg : {
                 type :"",
@@ -179,23 +154,21 @@ export default {
        
         displayReports(){       
             let sales=[]
-            this.salesData.map((res)=>{
-                  //  this.total_amount += res.total_amount
-                   // this.total_discount +=res.discount
-                   // this.total_charges += res.total_amount - res.discount
-                   // this.total_pay += res.pay;
-                   // this.total_refunds += res.refunds
+            this.salesData.map((res)=>{         
+                if(!this.code_no){
+                        this.total_discount += res.discount;
+                    }          
                     res.products.map((data)=>{
                        if(this.code_no){
                             if(this.code_no==data.code_no)  sales.push({
                             ...data,
-                            group_customer:  `${res.customer.name}(${res.customer.phone})`,
+                            group_customer:  `${res.customer.name}`,
                             customer_code: res.customer.code,
                         })
                        }else{
                         sales.push({
                             ...data,
-                            group_customer:  `${res.customer.name}(${res.customer.phone})`,
+                            group_customer:  `${res.customer.name}`,
                             customer_code: res.customer.code,
                         })
                        }

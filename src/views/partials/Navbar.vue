@@ -1,7 +1,7 @@
 <template lang="">             
-  <nav class="navbar bg-secondary fixed-top">
+  <nav class="navbar bg-secondary">
     <div class="container">
-      <a class="navbar-brand text-warning" href="#!">E-POS</a>
+      <a class="navbar-brand text-warning" href="#!">N-PRO-POS</a>
       <button class="btn btn-outline-light btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#rightSide" aria-controls="rightSide">
         <i class="fa-solid fa-bars"></i>
       </button>          

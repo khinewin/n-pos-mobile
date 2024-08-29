@@ -37,7 +37,7 @@
                                         </div>
                                        </div>
                                 
-                                <div class="row">
+                                <div class="row mt-2">
                                         <div class="col-4 d-grid">
                                             <button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
                                         </div>

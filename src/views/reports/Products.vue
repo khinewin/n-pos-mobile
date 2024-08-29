@@ -1,6 +1,6 @@
 <template lang="">
-    <div class="container-fluid">   
-        <div class="row">
+    <div class="container-fluid my-4">   
+        <div class="row fixed-top ps-2 pt-2">
             <div class="col-2">
                 <button class="btn" @click="goBack"><i class="fa-solid fa-circle-chevron-left"></i></button>
             </div>
@@ -11,23 +11,39 @@
         </div>        
         <div class="row"  id="printMe" >
             <div class="col-12 text-center">
-                <h3>N-POS</h3>
+                <h3>N-PRO-POS</h3>
                 <h5>Reports products code {{displayReportType}}</h5>
-                <h6 v-if="displayDate">{{showTime(displayDate)}}</h6>
-                <h6><span v-if="code_no">Code : {{item_name}},</span> Location : {{location}}</h6>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="h6">Code : {{item_name}}</div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="h6">Balance : 
+                            <span v-if="gt_equal">>= {{gt_equal}}</span> 
+                            <span v-if="gt_equal && lt_equal"> and </span>
+                            <span v-if="lt_equal"><= {{lt_equal}}</span>
+                        </div>
+                    </div> 
+                    <div class="col-sm-2">
+                        <div class="h6">Location : {{this.location}} </div>
+                    </div>                                       
+                    <div class="col-sm-4">
+                        <h6  class="" v-if="displayDate">Date : {{showTime(displayDate)}}</h6>
+                    </div>
+                </div>  
             </div>            
             <div class="col-12">                   
                     <div v-if="reportType==='stock_list'">
-                        <StockList :location="location" :code_no="code_no" />
+                        <StockList :location="location" :code_no="code_no" :lt_equal="lt_equal" :gt_equal="gt_equal"  />
                     </div>        
                     <div v-if="reportType==='stock_list_sale_price'">
-                        <StockList :sale_price="true" :location="location" :code_no="code_no" />
+                        <StockList :sale_price="true" :location="location" :code_no="code_no"  :lt_equal="lt_equal" :gt_equal="gt_equal" />
                     </div>
                     <div v-if="reportType==='stock_list_pur_price'">
-                        <StockList :pur_price="true" :location="location" :code_no="code_no" />
+                        <StockList :pur_price="true" :location="location" :code_no="code_no"  :lt_equal="lt_equal" :gt_equal="gt_equal" />
                     </div>   
                     <div v-if="reportType==='stock_list_pur_sale_price'">
-                        <StockList :pur_price="true" :sale_price="true" :location="location"  :code_no="code_no"/>
+                        <StockList :pur_price="true" :sale_price="true" :location="location"  :code_no="code_no"  :lt_equal="lt_equal" :gt_equal="gt_equal"/>
                     </div>        
             </div>
         </div>
@@ -50,6 +66,8 @@ export default {
             location: this.$route.params['location'],
             code_no: this.$route.query['code_no'],
             item_name: this.$route.query["item_name"],
+            gt_equal: this.$route.query.gt_equal,    
+            lt_equal: this.$route.query.lt_equal,    
             displayDate:"",
             displayReportType:"",
             reports:[],
@@ -115,7 +133,7 @@ export default {
          await this.$htmlToPaper('printMe');
         },
         goBack(){
-            this.$router.go(-1)
+            this.$router.push({name: "Reports"})
         },
       
         showTime(t){

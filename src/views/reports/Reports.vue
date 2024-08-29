@@ -1,10 +1,10 @@
 <template lang="">
     <div>           
         <PageHeader page-title="Reports" page-code="reports" :msg-type="msg.type" :msg-info="msg.info" />        
-            <div class="container-fluid my-2">
+            <div class="container-fluid">
             <div class="row g-2">
                 <div class="col-sm-6">
-                    <div class="card  shadow">
+                    <div class="card  shadow min-vh-80">
                         <div class="card-body p-2 rounded small">
                             <div class="row g-2">                              
                                 <div class="col-6">
@@ -40,6 +40,26 @@
                                     </div>    
                                 </div>
                             </div> 
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="mb-2 input-group">
+                                        <div class="form-floating ">
+                                            <input  type="number" class="form-control form-control-sm" id="gt_equal" v-model="gt_equal" placeholder=">=">
+                                            <label for="gt_equal">>=</label>
+                                        </div> 
+                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-2 input-group">
+                                        <div class="form-floating ">
+                                            <input  type="number" class="form-control form-control-sm" id="lt_equal" v-model="lt_equal" placeholder="<=">
+                                            <label for="lt_equal"><=</label>
+                                        </div> 
+                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
+                                    </div>
+                                </div>
+                               </div>
                             <div class="form-floating mb-2">
                                 <select v-model="location" class="form-select form-select-sm">
                                     <option>All</option>
@@ -92,7 +112,7 @@
                     </div>
                 </div>
                 <div class="col-sm-6">
-                    <div class="card shadow">
+                    <div class="card shadow min-vh-80">
                         <div class="card-body p-2 small report">                                                                                      
                             <ul class="list-group">
                                 <li class="list-group-item">
@@ -195,6 +215,8 @@ export default {
     },
     data(){
         return{         
+            gt_equal:null,
+            lt_equal:null,
             from_location:"Main",
             to_location:"Shop",
             from_date:"",
@@ -288,8 +310,13 @@ export default {
         },
         clearInput(){
             this.voucher_no="";
-            this.supplier={},
+            this.supplier={}
             this.customer={}
+            this.lt_equal=null;
+            this.gt_equal=null;
+            this.from_location="Main";
+            this.to_location="Shop";
+            this.location="All";
         },
         setCustomer(c){
             this.customer=c;
@@ -299,7 +326,9 @@ export default {
         },
         reportProducts(r_type){
             this.$router.push({name: "ReportsProduct", params :{"reportType": r_type, "location": this.location},
-            query : { "code_no": this.code_no ? this.code_no : null, "item_name": this.item_name ? this.item_name : null}
+            query : { "code_no": this.code_no ? this.code_no : null, "item_name": this.item_name ? this.item_name : null,
+            gt_equal : this.gt_equal , lt_equal : this.lt_equal
+            }
            })
         },
         reportStocks(r_type){                     
@@ -324,6 +353,7 @@ export default {
             supplier: this.supplier.code ? this.supplier.code : null,
             supplier_name: this.supplier.code ? this.supplier.name : null,
             supplier_company: this.supplier.code ? this.supplier.company : null,
+            "code_no": this.code_no ? this.code_no : null, "item_name" : this.item_name ? this.item_name : null
             }})
         },     
      

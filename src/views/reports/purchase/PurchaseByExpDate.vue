@@ -1,68 +1,54 @@
 <template lang="">
-    <div class="container-fluid">  
-             
-        <div class="row">                 
-            <div class="col-12">
-                    <table class="table table-bordered border-dark table-hover">
-                        <tbody class="" v-if="reports.length > 0">                            
-                            <tr v-for="r in reports" :key="r[0]">
-                                <td class="col-1 text-center">{{r[0]}}</td>
-                                <td class="p-0 col-11">
-                                    <table class="table table-bordered mb-0 border-dark table-hover" style="border-style: hidden;">
-                                        <thead>
-                                            <tr class="fw-bold text-center">
-                                                <td class="col-1">Code</td>
-                                                <td class="col-3">Description</td>
-                                                <td class="col-1">Packing size</td>
-                                                <td class="col-1">Qty</td>
-                                                <td class="col-1">Item price</td>
-                                                <td class="col-1">Amount</td>
-                                                <td class="col-1" colspan="3">Discount</td>                                              
-                                                <td class="col-1">Price</td>
-                                            </tr>
-                                        </thead>
-                                        <tbody>                                            
-                                            <tr v-for="item in r[1]" :key="item.code_no">
-                                                <td class="text-center">{{item.code_no}}</td>
-                                                <td >{{item.item_name}}</td>
-                                                <td class="">
-                                                    1{{item.parent_unit}} * {{item.item_per_package}}{{item.child_unit}}
-                                                </td>
-                                                <td class=" text-end">
-                                                    <span v-if="calQtyL(item.pur_qty, item.item_per_package) > 0">{{calQtyL(item.pur_qty, item.item_per_package)}}{{item.parent_unit}}</span>
-                                                    <span v-if="calQtyL(item.pur_qty, item.item_per_package) >0 && calQtyS(item.pur_qty, item.item_per_package) > 0">, </span>
-                                                    <span v-if="calQtyS(item.pur_qty, item.item_per_package)> 0">{{calQtyS(item.pur_qty, item.item_per_package)}}{{item.child_unit}} </span>
-                                                </td>
-                                                <td  class="text-end">{{item.pur_price}}</td>
-                                                <td class="text-end">{{item.amount}}</td>
-                                                <td  class="text-center">{{item.dis_qty}}</td>
-                                                <td class="text-center">{{item.dis_percent}}</td>
-                                                <td class="text-end">{{item.dis_amount}}</td>
-                                                <td class="text-end">{{item.price}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="5" class="text-end fw-bold">Total</td>
-                                                <td class="text-end">{{r[2].amount}}</td>
-                                                <td colspan="3" class="text-end">{{r[2].discount}}</td>                                                
-                                                <td class="text-end">{{r[2].price}}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>                          
-                        </tbody>
-                    </table>
-                    <div v-if="isLoading">
-                        <div colspan="5">
-                            <div class="d-flex justify-content-center my-5">
-                                <div class="spinner-border text-primary"  role="status">
-                                  <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>   
+    <div class="">
+        <table class="table table-bordered mb-0 border-dark table-hover">
+            <tbody class="fw-bold text-center">
+                <tr><td class="col-1" rowspan="2">Exp. date</td></tr>
+                <tr>
+                    <td class="col-1">Code</td>
+                    <td class="col-3">Description</td>
+                    <td class="col-1">Packing size</td>
+                    <td class="col-1">Qty</td>
+                    <td class="col-1">Item price</td>
+                    <td class="col-1">Amount</td>
+                    <td class="col-1" colspan="3">Discount</td>                                              
+                    <td class="col-1">Price</td>
+                </tr>
+            </tbody>
+            <tbody v-if="reports.length >0" v-for="r in reports" :key="r[0]">   
+                <tr><td :rowspan="r[1].length + 2" class="text-center">{{r[0]}}</td></tr>                                         
+                <tr v-for="item in r[1]" :key="item.code_no">
+                    <td class="text-center">{{item.code_no}}</td>
+                    <td >{{item.item_name}}</td>
+                    <td class="">
+                        1{{item.parent_unit}} * {{item.item_per_package}}{{item.child_unit}}
+                    </td>
+                    <td class=" text-end">
+                        <span v-if="calQtyL(item.pur_qty, item.item_per_package) > 0">{{calQtyL(item.pur_qty, item.item_per_package)}}{{item.parent_unit}}</span>
+                        <span v-if="calQtyL(item.pur_qty, item.item_per_package) >0 && calQtyS(item.pur_qty, item.item_per_package) > 0">, </span>
+                        <span v-if="calQtyS(item.pur_qty, item.item_per_package)> 0">{{calQtyS(item.pur_qty, item.item_per_package)}}{{item.child_unit}} </span>
+                    </td>
+                    <td  class="text-end">{{item.pur_price}}</td>
+                    <td class="text-end">{{item.amount}}</td>
+                    <td  class="text-center">{{item.dis_qty}}</td>
+                    <td class="text-center">{{item.dis_percent}}</td>
+                    <td class="text-end">{{item.dis_amount}}</td>
+                    <td class="text-end">{{item.price}}</td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="text-end fw-bold">Total</td>
+                    <td class="text-end">{{r[2].amount}}</td>
+                    <td colspan="3" class="text-end">{{r[2].discount}}</td>                                                
+                    <td class="text-end">{{r[2].price}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div v-if="isLoading">
+            <div class="d-flex justify-content-center my-5">
+                <div class="spinner-border text-primary"  role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
             </div>
-        </div>
+    </div>                                                                                    
     </div>
 </template>
 <script>

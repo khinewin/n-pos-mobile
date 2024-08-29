@@ -1,66 +1,62 @@
 <template lang="">
-    <div class="container-fluid">            
-        <div class="row">                 
-            <div class="col-12">
-                    <table class="table table-bordered border-dark table-hover">
-                        <tbody class="" v-if="reports.length > 0">    
-                            <tr class="fw-bold text-center">
-                                <td class="col-1">Code</td>
-                                <td  class="col-2">Description</td>
-                                <td class="col-1">Packing size</td>
-                                <td class="col-1 " v-if="location=='Main' || location=='All'">Main Qty</td>         
-                                <td class="col-1" v-if="location=='Shop' || location=='All'">Shop Qty</td>                          
-                                <td class="col-1 ">RT price</td>
-                                <td class="col-1 ">WS price</td>
-                                <td class="col-1" v-if="location=='Main' || location=='All'">Main RT Amt</td>                                    
-                                <td class="col-1" v-if="location=='Main' || location=='All'">Main WS Am</td>                                    
-                                <td class="col-1" v-if="location=='Shop' || location=='All'">Shop RT Amt</td>                                    
-                                <td class="col-1" v-if="location=='Shop' || location=='All'">Shop WS Am</td>                                                
-                            </tr>                        
-                                <tr v-for="item in reports" :key="item.code_no">
-                                    <td class="text-center">{{item.code_no}}</td>
-                                    <td class="">{{item.item_name}}</td>
-                                    <td class="">                 
-                                        1{{item.parent_unit}} * {{item.item_per_package}}{{item.child_unit}}
-                                    </td>
-                                    <td class="text-end" v-if="location=='Main' || location=='All'">
-                                        <span v-if="calQtyL(item.main_qty, item.item_per_package) > 0">{{calQtyL(item.main_qty, item.item_per_package)}}{{item.parent_unit}} </span>
-                                         <span v-if="calQtyL(item.main_qty, item.item_per_package) >0 && calQtyS(item.main_qty, item.item_per_package) > 0">, </span>
-                                         <span v-if="calQtyS(item.main_qty, item.item_per_package)> 0">{{calQtyS(item.main_qty, item.item_per_package)}}{{item.child_unit}}  </span>
-                                     </td>
-                                    <td class="text-end" v-if="location=='Shop' || location=='All'">
-                                       <span v-if="calQtyL(item.qty, item.item_per_package) > 0">{{calQtyL(item.qty, item.item_per_package)}}{{item.parent_unit}}</span>
-                                        <span v-if="calQtyL(item.qty, item.item_per_package) >0 && calQtyS(item.qty, item.item_per_package) > 0">, </span>
-                                        <span v-if="calQtyS(item.qty, item.item_per_package)> 0">{{calQtyS(item.qty, item.item_per_package)}}{{item.child_unit}}  </span>
-                                    </td>
-                                    <td class="text-end">{{item.retail_price}}</td>
-                                    <td class="text-end">{{item.whole_sale_price}}</td>
-                                    <td class="text-end" v-if="location=='Main' || location=='All'">{{item.main_retail_amount}}</td>
-                                    <td class="text-end" v-if="location=='Main' || location=='All'">{{item.main_whole_sale_amount}}</td>
-                                    <td class="text-end" v-if="location=='Shop' || location=='All'">{{item.retail_amount}}</td>
-                                    <td class="text-end" v-if="location=='Shop' || location=='All'">{{item.whole_sale_amount}}</td>
-                                </tr>
-                                <tr>
-                                    <td :colspan="[location=='All' ? 7 : 4]" class="text-end fw-bold">Total</td>
-                                    <td class="text-end">{{total_main_retail_amount}}</td>
-                                    <td class="text-end">{{total_main_whole_sale_amount}}</td>
-                                    <td class="text-end">{{total_retail_amount}}</td>
-                                    <td class="text-end">{{total_whole_sale_amount}}</td>
-                                </tr>
-                           
-                        </tbody>
-                    </table>
-                    <div v-if="isLoading">
-                        <div colspan="5">
-                            <div class="d-flex justify-content-center my-5">
-                                <div class="spinner-border text-primary"  role="status">
-                                  <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>   
-            </div>
-        </div>
+    <div class="">
+        <table class="table table-bordered border-dark table-hover">
+            <tbody class="">    
+                <tr class="fw-bold text-center">
+                    <td class="col-1">Code</td>
+                    <td  class="col-2">Description</td>
+                    <td class="col-1">Packing size</td>
+                    <td class="col-1 " v-if="location=='Main' || location=='All'">Main Qty</td>         
+                    <td class="col-1" v-if="location=='Shop' || location=='All'">Shop Qty</td>                          
+                    <td class="col-1 ">RT price</td>
+                    <td class="col-1 ">WS price</td>
+                    <td class="col-1" v-if="location=='Main' || location=='All'">Main RT Amt</td>                                    
+                    <td class="col-1" v-if="location=='Main' || location=='All'">Main WS Am</td>                                    
+                    <td class="col-1" v-if="location=='Shop' || location=='All'">Shop RT Amt</td>                                    
+                    <td class="col-1" v-if="location=='Shop' || location=='All'">Shop WS Am</td>                                                
+                </tr>   
+                </tbody>
+                <tbody  v-if="reports.length > 0">                     
+                    <tr v-for="item in reports" :key="item.code_no">
+                        <td class="text-center">{{item.code_no}}</td>
+                        <td class="">{{item.item_name}}</td>
+                        <td class="">                 
+                            1{{item.parent_unit}} * {{item.item_per_package}}{{item.child_unit}}
+                        </td>
+                        <td class="text-end" v-if="location=='Main' || location=='All'">
+                            <span v-if="calQtyL(item.main_qty, item.item_per_package) > 0">{{calQtyL(item.main_qty, item.item_per_package)}}{{item.parent_unit}} </span>
+                             <span v-if="calQtyL(item.main_qty, item.item_per_package) >0 && calQtyS(item.main_qty, item.item_per_package) > 0">, </span>
+                             <span v-if="calQtyS(item.main_qty, item.item_per_package)> 0">{{calQtyS(item.main_qty, item.item_per_package)}}{{item.child_unit}}  </span>
+                         </td>
+                        <td class="text-end" v-if="location=='Shop' || location=='All'">
+                           <span v-if="calQtyL(item.qty, item.item_per_package) > 0">{{calQtyL(item.qty, item.item_per_package)}}{{item.parent_unit}}</span>
+                            <span v-if="calQtyL(item.qty, item.item_per_package) >0 && calQtyS(item.qty, item.item_per_package) > 0">, </span>
+                            <span v-if="calQtyS(item.qty, item.item_per_package)> 0">{{calQtyS(item.qty, item.item_per_package)}}{{item.child_unit}}  </span>
+                        </td>
+                        <td class="text-end">{{item.retail_price}}</td>
+                        <td class="text-end">{{item.whole_sale_price}}</td>
+                        <td class="text-end" v-if="location=='Main' || location=='All'">{{item.main_retail_amount}}</td>
+                        <td class="text-end" v-if="location=='Main' || location=='All'">{{item.main_whole_sale_amount}}</td>
+                        <td class="text-end" v-if="location=='Shop' || location=='All'">{{item.retail_amount}}</td>
+                        <td class="text-end" v-if="location=='Shop' || location=='All'">{{item.whole_sale_amount}}</td>
+                    </tr>
+                    <tr>
+                        <td :colspan="[location=='All' ? 7 : 4]" class="text-end fw-bold">Total</td>
+                        <td class="text-end">{{total_main_retail_amount}}</td>
+                        <td class="text-end">{{total_main_whole_sale_amount}}</td>
+                        <td class="text-end">{{total_retail_amount}}</td>
+                        <td class="text-end">{{total_whole_sale_amount}}</td>
+                    </tr>
+               
+            </tbody>
+        </table>
+        <div v-if="isLoading">
+                <div class="d-flex justify-content-center my-5">
+                    <div class="spinner-border text-primary"  role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+        </div>                                              
     </div>
 </template>
 <script>
@@ -147,6 +143,12 @@ export default {
                         stocks.push(data)
                     })
             })          
+            if(this.location=="Main"){
+                stocks=stocks.filter((f)=>f.main_qty > 0)
+            }
+            if(this.location=="Shop"){
+                stocks=stocks.filter((f)=>f.qty > 0)
+            }  
             const res1=Object.entries(hp.gb_item_name_retail_price(stocks))   
             console.log(res1)
             const res2=res1.map((ren)=>{

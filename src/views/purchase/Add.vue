@@ -1,7 +1,7 @@
 <template lang="">
     <div>           
         <PageHeader page-title="New purchase" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
-        <div class="container-fluid my-2">
+        <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                
                 <div class="col-sm-2 d-grid">
                         <button type="button" @click="savePurchase" class="btn btn-sm" :disabled="isLoading">
@@ -13,7 +13,7 @@
                         <router-link :to="{name : 'Purchase'}" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> Close</router-link>
                 </div>
             </div>
-            <div class="card shadow">
+            <div class="card shadow min-vh-75">
                 <div  class="card-body p-2">
                     <form @submit.prevent="savePurchase">
                         <div class="row justify-content-end">
@@ -305,12 +305,14 @@ export default {
                 const updateDocument=doc(db, "products", id)
                 if(this.location==="Main"){
                     await updateDoc(updateDocument, {
-                     main_qty : increment(pur_qty)
+                     main_qty : increment(pur_qty),
+                     pur_price: p.pur_price
                  })
                 }
                  if(this.location==="Shop"){
                     await updateDoc(updateDocument, {
-                     qty : increment(pur_qty)
+                     qty : increment(pur_qty),
+                     pur_price: p.pur_price,
                  })
                 }    
             })

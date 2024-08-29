@@ -1,19 +1,28 @@
 <template lang="">
-    <div class="container-fluid">   
-        <div class="row">
+    <div class="container-fluid my-4">   
+        <div class="row fixed-top ps-2 pt-2">
             <div class="col-2">
-                <button class="btn" @click="goBack">Back</button>
+                <button class="btn" @click="goBack"><i class="fa-solid fa-circle-chevron-left"></i></button>
             </div>
             <div class="col-2">
-                <button class="btn" @click="print">Print</button>
-            </div>
-        </div>        
+                <button class="btn" @click="print"><i class="fa-solid fa-print"></i></button>
+            </div>    
+        </div>  
         <div class="row"  id="printMe" >
             <div class="col-12 text-center">
-                <h3>N-POS</h3>
+                <h3>N-PRO-POS</h3>
                 <h5>Reports stocks {{displayReportType}}</h5>
-                <h6 v-if="displayFromDate || displayToDate">From {{showTime(displayFromDate)}} To {{showTime(displayToDate)}}</h6>
-                <h6>Location : {{location}}</h6>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="h6" >Code : {{item_name}}</div>
+                    </div>
+                    <div class="col-sm-4">
+                        <h6>Location : {{location}}</h6>
+                    </div>
+                    <div class="col-sm-4">
+                         <h6 v-if="displayFromDate || displayToDate">Date : From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</h6>
+                    </div>
+                </div>
             </div>            
             <div class="col-12">                   
                     <div v-if="reportType==='by_date'">
@@ -105,7 +114,7 @@ export default {
          await this.$htmlToPaper('printMe');
         },
         goBack(){
-            this.$router.go(-1)
+            this.$router.push({name: "Reports"})
         },
       
         showTime(t){
