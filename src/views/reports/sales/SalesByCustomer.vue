@@ -18,7 +18,7 @@
             </tbody>
             <tbody v-if="reports.length > 0" v-for="r in reports" :key="r[0]">      
                 <tr>
-                    <td :rowspan="r[1].length + 2" class="text-center col-1">{{r[0]}}</td>
+                    <td :rowspan="r[1].length + 4" class="text-center col-1">{{r[0]}}</td>
                 </tr>                                      
                 <tr v-for="s in r[1]" :key="s.code_no">
                     <td class="col-1 text-center">{{s.code_no}}</td>
@@ -44,6 +44,14 @@
                     <td class="text-end">{{r[2].pur_amount}}</td>
                     <td class="text-end">{{r[2].profit_amount}}</td>
                 </tr>
+                <tr>
+                    <td colspan="9" class="text-end fw-bold">Extra discount</td>
+                    <td class="text-end">{{r[2].extra_discount}}</td>                  
+                </tr>
+                <tr>
+                    <td colspan="9" class="text-end fw-bold">Total profit</td>
+                    <td class="text-end">{{r[2].profit_amount - r[2].extra_discount}}</td>                  
+                </tr>
             </tbody>
             <tbody v-if="reports.length">
                 <tr>
@@ -55,7 +63,7 @@
                     <td class="text-end">{{total_pur_amount}}</td>
                 </tr>
                 <tr>
-                    <td class="text-end fw-bold" colspan="2">Discount</td>
+                    <td class="text-end fw-bold" colspan="2">Total discount</td>
                     <td class="text-end">{{total_discount}}</td>
                 </tr>
                 <tr>
@@ -159,21 +167,17 @@ export default {
                         this.total_discount += res.discount;
                     }          
                     res.products.map((data)=>{
-                       if(this.code_no){
-                            if(this.code_no==data.code_no)  sales.push({
+                            sales.push({
                             ...data,
                             group_customer:  `${res.customer.name}`,
                             customer_code: res.customer.code,
-                        })
-                       }else{
-                        sales.push({
-                            ...data,
-                            group_customer:  `${res.customer.name}`,
-                            customer_code: res.customer.code,
-                        })
-                       }
+                            extra_discount: res.discount,
+                        })                     
                     })
             })
+            if(this.code_no){
+                sales=sales.filter((f)=>f.code_no === Number(this.code_no))
+            }
             sales.sort((a,b)=>Number(a.customer_code) - Number(b.customer_code))
             const gbd=Object.entries(hp.gb_customer(sales))
             let total_profit=0;
@@ -195,6 +199,7 @@ export default {
                     parent_unit:"",
                     child_unit:"",
                     discount:0,
+                    extra_discount:0,
                 }                
                 res[1].map((ren)=>{
                     item.item_per_package=ren.item_per_package;
@@ -208,21 +213,24 @@ export default {
                     item.discount += ren.discount;
                     item.parent_unit=ren.parent_unit;
                     item.child_unit=ren.child_unit;
+                    item.extra_discount += ren.extra_discount;
                 })
                 return item;
            }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)
-           let sale_amount=0;
+                let sale_amount=0;
                 let pur_amount=0;
                 let profit_amount=0;
+                let extra_discount=0;
                 res2.map((res)=>{
                     sale_amount += res.sale_amount;
                     pur_amount += res.pur_amount;
                     profit_amount += res.sale_amount - res.pur_amount;
+                    extra_discount += res.extra_discount;
                 })
                 total_profit += profit_amount;
                 total_pur_amount += pur_amount;
                 total_sale_amount += sale_amount;
-                const res4={sale_amount, pur_amount, profit_amount}
+                const res4={sale_amount, pur_amount, profit_amount, extra_discount}
 
                 const newData=[res[0],  [...res2],res4]               
                 return newData;                             

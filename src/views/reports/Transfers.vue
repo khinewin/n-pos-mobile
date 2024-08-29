@@ -12,18 +12,27 @@
             <div class="col-12 text-center">
                 <h3>N-POS</h3>
                 <h5>Reports transfers {{displayReportType}}</h5>
-                <h6 v-if="displayFromDate || displayToDate">From {{showTime(displayFromDate)}} To {{showTime(displayToDate)}}</h6>
-                <h6>From  : {{from_location}} - To  : {{to_location}}</h6>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <h6>Code : {{item_name}}</h6>
+                    </div>
+                    <div class="col-sm-4">
+                        <h6>From  : {{from_location}} - To  : {{to_location}}</h6>
+                    </div>
+                    <div class="col-sm-4">
+                        <h6 v-if="displayFromDate || displayToDate">From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</h6>
+                    </div>
+                </div>
             </div>            
             <div class="col-12">                   
                     <div v-if="reportType==='by_date'">
-                        <TransferByDate :fromDate="fromDate"  :toDate="toDate" :from_location="from_location" :to_location="to_location" />
+                        <TransferByDate :fromDate="fromDate"  :toDate="toDate" :from_location="from_location" :to_location="to_location" :code_no="code_no" />
                     </div>
                     <div v-if="reportType==='by_voucher'">
-                        <TransferByVoucher :fromDate="fromDate"  :toDate="toDate" :voucher_no="voucher_no" :from_location="from_location" :to_location="to_location" />
+                        <TransferByVoucher :fromDate="fromDate"  :toDate="toDate" :voucher_no="voucher_no" :from_location="from_location" :to_location="to_location" :code_no="code_no" />
                     </div>
                     <div v-if="reportType==='by_description'">
-                        <TransferByDescription :fromDate="fromDate"  :toDate="toDate" :from_location="from_location" :to_location="to_location"/>
+                        <TransferByDescription :fromDate="fromDate"  :toDate="toDate" :from_location="from_location" :to_location="to_location" :code_no="code_no"/>
                     </div>
             </div>
         </div>
@@ -48,6 +57,8 @@ export default {
             fromDate:this.$route.params['fromDate'],
             toDate:this.$route.params['toDate'],
             voucher_no: this.$route.query.voucher_no,
+            code_no: this.$route.query.code_no,
+            item_name: this.$route.query.item_name,
             displayFromDate:"",
             displayToDate:"",
             displayReportType:"",

@@ -338,7 +338,8 @@ export default {
         },
         reportTransfers(r_type){                     
             this.$router.push({name: "ReportsTransfer", params :{"reportType": r_type, "fromDate": this.from_date, "toDate": this.to_date, "from_location": this.from_location, "to_location": this.to_location},
-            query : {voucher_no: this.voucher_no
+            query : {voucher_no: this.voucher_no,  "code_no": this.code_no ? this.code_no : null, "item_name" : this.item_name ? this.item_name : null
+
             }})
         },
         reportSales(r_type){                     

@@ -17,15 +17,17 @@
                                                 <td >Description</td>
                                                 <td>Packing size</td>
                                                 <td >Qty</td>
-                                                <td >Price</td>
+                                                <td >Sale price</td>
                                                 <td>Discount</td>
-                                                <td >Amount</td>
+                                                <td >Sale amount</td>
+                                                <td>Pur Amount</td>
+                                                <td>Profit</td>
                                             </tr>
                                         </thead>
                                         <tbody>                                            
                                             <tr v-for="s in res[1]" :key="s.code_no">
                                                 <td class="col-1 text-center">{{s.code_no}}</td>
-                                                <td class="col-4">{{s.item_name}}</td>
+                                                <td class="col-2">{{s.item_name}}</td>
                                                 <td class="col-1">
                                                     1{{s.parent_unit}} * {{s.item_per_package}}{{s.child_unit}}
                                                 </td>
@@ -37,10 +39,22 @@
                                                 <td class="col-1 text-end">{{s.sale_price}}</td>
                                                 <td class="col-1 text-end">{{s.discount}}</td>
                                                 <td class="col-1 text-end">{{s.sale_amount}}</td>
+                                                <td class="col-1 text-end">{{s.pur_amount}}</td>
+                                                <td class="col-1 text-end">{{s.profit}}</td>
                                             </tr>
                                             <tr>
                                                 <td colspan="6" class="text-end fw-bold">Total</td>
                                                 <td class="text-end">{{res[2].sale_amount}}</td>
+                                                <td class="text-end">{{res[2].pur_amount}}</td>
+                                                <td class="text-end">{{res[2].profit_amount}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="8" class="text-end fw-bold">Extra discount</td>
+                                                <td class="text-end">{{res[2].extra_discount}}</td>                  
+                                            </tr>
+                                            <tr>
+                                                <td colspan="8" class="text-end fw-bold">Total profit</td>
+                                                <td class="text-end">{{res[2].profit_amount - res[2].extra_discount}}</td>                  
                                             </tr>
                                         </tbody>
                                     </table>
@@ -166,23 +180,18 @@ export default {
                         this.total_discount += res.discount
                     }                                       
                     res.products.map((data)=>{
-                        if(this.code_no){
-                            if(this.code_no==data.code_no)  sales.push({
-                            ...data,
-                            group_customer:  `${res.customer.name}(${res.customer.phone})`,
-                            customer_code: res.customer.code,
-                            group_date : hp.showTime(res.sale_date)
-                        })
-                       }else{
                         sales.push({
                             ...data,
                             group_customer:  `${res.customer.name}(${res.customer.phone})`,
                             customer_code: res.customer.code,
-                            group_date: hp.showTime(res.sale_date)
+                            group_date: hp.showTime(res.sale_date),
+                            extra_discount: res.discount,
                         })
-                       }
                     })
             })
+            if(this.code_no){
+                sales=sales.filter((f)=>f.code_no === Number(this.code_no))
+            }
             sales.sort((a,b)=>Number(a.customer_code) - Number(b.customer_code))
             const gbc=Object.entries(hp.gb_customer(sales))       
             let total_sale_amount=0;
@@ -208,6 +217,7 @@ export default {
                                 child_unit:"",
                                 parent_unit:"",
                                 discount:0,
+                                extra_discount : 0,
                             }                
                             res[1].map((ren)=>{
                                 item.item_per_package=ren.item_per_package;
@@ -221,21 +231,24 @@ export default {
                                 item.discount += ren.discount;
                                 item.child_unit=ren.child_unit;
                                 item.parent_unit=ren.parent_unit;
+                                item.extra_discount += ren.extra_discount;
                             })
                         return item;
                     }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)
                         let sale_amount=0;
                         let pur_amount=0;
                         let profit_amount=0;
+                        let extra_discount=0;
                         res2.map((res)=>{
                             sale_amount += res.sale_amount;
                             pur_amount += res.pur_amount;
                             profit_amount += res.sale_amount - res.pur_amount;
+                            extra_discount += res.extra_discount;
                         })
                         total_pur_amount +=pur_amount;
                         total_sale_amount += sale_amount;
                         total_profit+=profit_amount;
-                        const res4={sale_amount, pur_amount, profit_amount}
+                        const res4={sale_amount, pur_amount, profit_amount, extra_discount}
 
                     const updateData=[date, res2,res4]
                     return updateData;

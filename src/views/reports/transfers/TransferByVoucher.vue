@@ -1,5 +1,5 @@
 <template lang="">
-    <div class="container-fluid">  
+    <div class="">  
         <div v-if="isLoading">
             <div colspan="5">
                 <div class="d-flex justify-content-center my-5">
@@ -9,10 +9,10 @@
                 </div>
             </div>
         </div>  
-         <div class="row mb-2" v-if="reports" v-for="stock in reports">
-            <div class="col-12">
-                <div class="card shadow">
-                    <div class="card-body">
+         <div class="row" v-if="reports" v-for="stock in reports">
+            <div class="col-12 mb-2">
+                <div class="card">
+                    <div class="card-body p-2">
                         <div class="mb-2">
                             <table class="table mb-0 table-borderless ">
                                 <tbody class="small">
