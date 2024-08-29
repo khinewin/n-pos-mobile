@@ -159,7 +159,12 @@ export default {
                             this.total_discount += res.discount;
                         }              
                     res.products.map((data)=>{
-                            sales.push({...data, group_date : hp.showTime(res.sale_date), extra_discount: res.discount})
+                        let index = sales.findIndex((item) => item.voucher_no == res.voucher_no);
+                        if(index === -1){
+                             sales.push({...data, group_date : hp.showTime(res.sale_date), voucher_no: res.voucher_no, extra_discount: res.discount})
+                        }else{
+                            sales.push({...data, group_date : hp.showTime(res.sale_date), voucher_no: res.voucher_no, extra_discount: 0})
+                        }
                     })
             })
 

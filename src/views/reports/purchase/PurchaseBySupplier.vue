@@ -161,16 +161,13 @@ export default {
                     this.extra_discount += res.extra_discount;
                 }  
                     res.products.map((data)=>{
-                        purchase.push({...data,
-                            supplier_code: res.supplier.code,
-                             group_supplier : `${res.supplier.name} (${res.supplier.company})`, 
-                             supplier_name: res.supplier.name,
-                             supplier_company :res.supplier.company,
-                             supplier_phone: res.supplier.phone,
-                             supplier_id: res.supplier.id, 
-                             extra_discount: res.extra_discount
-                            })
-                       })
+                        let index = purchase.findIndex((item) => item.voucher_no == res.voucher_no);
+                        if(index === -1){
+                            purchase.push({...data, group_supplier : `${res.supplier.name} (${res.supplier.company})`,  voucher_no: res.voucher_no, extra_discount: res.extra_discount})
+                        }else{
+                            purchase.push({...data, group_supplier : `${res.supplier.name} (${res.supplier.company})`,  voucher_no: res.voucher_no, extra_discount: 0})
+                        }   
+                 })
             })
 
             if(this.code_no){

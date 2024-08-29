@@ -166,15 +166,18 @@ export default {
                     this.extra_discount += res.extra_discount;
                 }        
                     res.products.map((data)=>{
-                        if(this.code_no){
-                            if(this.code_no==data.code_no) purchase.push({...data, group_date : this.showTime(res.pur_date), extra_discount: res.extra_discount})
+                        let index = purchase.findIndex((item) => item.voucher_no == res.voucher_no);
+                        if(index === -1){
+                            purchase.push({...data, group_date : this.showTime(res.pur_date), voucher_no: res.voucher_no, extra_discount: res.extra_discount})
                         }else{
-                            purchase.push({...data, group_date : this.showTime(res.pur_date), extra_discount: res.extra_discount})
+                            purchase.push({...data, group_date : this.showTime(res.pur_date), voucher_no: res.voucher_no, extra_discount: 0})
                         }
                     })
             })
 
-            console.log(purchase)
+            if(this.code_no){
+                purchase =purchase.filter((f)=>f.code_no === Number(this.code_no))
+            }  
 
             let total_amount=0;
             let total_discount=0;

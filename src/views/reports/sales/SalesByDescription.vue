@@ -41,6 +41,14 @@
                         <td class="text-end">{{pur_amount}}</td>
                         <td class="text-end">{{profit_amount}}</td>
                     </tr>
+                    <tr>                              
+                        <td class="fw-bold text-end" colspan="9">Extra discount</td>
+                        <td class="text-end">{{extra_discount}}</td>                                   
+                    </tr>
+                    <tr>                              
+                        <td class="fw-bold text-end" colspan="9">Total Profit</td>
+                        <td class="text-end">{{profit_amount - extra_discount}}</td>                                   
+                    </tr>  
                 
             </tbody>
         </table>
@@ -71,6 +79,7 @@ export default {
             sale_amount :0, 
             pur_amount:0,
             profit_amount:0,
+            extra_discount:0,
             msg : {
                 type :"",
                 info :"",
@@ -132,14 +141,16 @@ export default {
         displayReports(){       
             let sales=[]
             this.salesData.map((res)=>{
+                if(!this.code_no){
+                    this.extra_discount += res.discount;
+                }
                     res.products.map((data)=>{
-                        if(this.code_no){
-                            if(this.code_no == data.code_no)  sales.push({...data, group_date : hp.showTime(res.sale_date)});
-                       }else{
-                            sales.push({...data, group_date : hp.showTime(res.sale_date)})
-                       }
+                        sales.push({...data, group_date : hp.showTime(res.sale_date)})
                     })
             })          
+            if(this.code_no){
+                sales=sales.filter((f)=>f.code_no === Number(this.code_no))
+            }
             const res1=Object.entries(hp.gb_item_name_sale_price(sales))   
           // const res1=Object.entries(Object.groupBy(sales, s=>s.item_name))
            const res2=res1.map((res)=>{
