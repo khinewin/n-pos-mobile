@@ -23,6 +23,11 @@ import NewTransfer from '@/views/transfers/New.vue'
 import Transfers from '@/views/transfers/Transfers.vue'
 import EditTransfer from '@/views/transfers/Edit.vue'
 import ReportsTransfers from '@/views/reports/Transfers.vue'
+import Adjustments from '@/views/adjustments/Adjustments.vue'
+import NewAdjustment from '@/views/adjustments/New.vue'
+import EditAdjustment from '@/views/adjustments/Edit.vue'
+import ReportAdjustments from '@/views/reports/Adjustments.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),  
   routes: [
@@ -153,6 +158,12 @@ const router = createRouter({
       meta : {title: "N-PRO-POS | Report purchase"}
     },
     {
+      path: "/reports/adjustments/:reportType/:fromDate/:toDate",
+      name: "ReportsAdjustments",
+      component: ReportAdjustments,
+      meta : {title: "N-PRO-POS | Report adjustments"}
+    },
+    {
       path: '/transfers/:id/edit',
       name: 'EditTransfer',     
       component: EditTransfer,    
@@ -169,6 +180,24 @@ const router = createRouter({
       name: 'Transfers',     
       component: Transfers,    
       meta: { title: 'N-PRO-POS | Transfers' },
+    },
+    {
+      path: '/adjustments',
+      name: 'Adjustments',     
+      component: Adjustments,
+      meta : {title: "N-PRO-POS | Adjustments"}
+    },
+    {
+      path: '/adjustments/add',
+      name: 'NewAdjustment',     
+      component: NewAdjustment,
+      meta : {title: "N-PRO-POS | New adjustment"}
+    },
+    {
+      path: '/adjustments/:id/edit',
+      name: 'EditAdjustment',     
+      component: EditAdjustment,
+      meta : {title: "N-PRO-POS | Edit adjustments"}
     },
     {
       path: '/user/profile',

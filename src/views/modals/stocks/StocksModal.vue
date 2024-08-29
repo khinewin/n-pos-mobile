@@ -2,7 +2,7 @@
     <!-- Products Modal -->
     <div class="modal fade" id="stocksModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
        <div class="modal-dialog modal-xl">
-         <div class="modal-content p-2 min-vh-100">                         
+         <div class="modal-content p-2">                         
                     <div class="row g-2">
                         <div class="col-4">                                                         
                               <div class="card shadow">
@@ -37,7 +37,7 @@
                               </div>                                                                            
                         </div>
                         <div class="col-8 table-responsive">
-                            <div class="card shadow">
+                            <div class="card shadow vh-80 overflow-y-auto">
                                 <div class="card-body p-2">
                                     <table class="table table-bordered table-hover m-0">
                                         <tbody class="small text-center">

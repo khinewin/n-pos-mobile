@@ -37,6 +37,9 @@
                             <router-link class="nav-link" :to="{name : 'Transfers'}"><i class="fa-solid fa-right-left"></i> Transfers</router-link>
                           </li>
                           <li class="list-group-item bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
+                            <router-link class="nav-link" :to="{name : 'Adjustments'}"><i class="fa-solid fa-sliders"></i> Adjustment</router-link>
+                          </li>
+                          <li class="list-group-item bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
                             <router-link class="nav-link" :to="{name : 'Reports'}"><i class="fa-solid fa-chart-pie"></i> Reports</router-link>
                           </li>
                       </ul>

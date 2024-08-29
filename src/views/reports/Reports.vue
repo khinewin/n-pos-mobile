@@ -107,7 +107,33 @@
                                         <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>  
                                     </div>  
                                 </div>                             
-                            </div>                                                                                                 
+                            </div>         
+                            <div class="row g-2 ">
+                                <div class="col-6">
+                                    <div class="mb-2 input-group">
+                                        <div class="form-floating ">
+                                            <select v-model="adj_type" class="text-center form-select form-select-sm" id="adj_type">
+                                                <option>Increment</option>
+                                                <option>Decrement</option>
+                                            </select>
+                                            <label for="adj_type">Adj type</label>
+                                        </div> 
+                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-2 input-group">
+                                        <div class="form-floating ">
+                                            <select v-model="rts_rfs" class="text-center form-select form-select-sm" id="rts_rfs">
+                                                <option>Yes</option>
+                                                <option>No</option>
+                                            </select>
+                                            <label for="item_name">RTS/RFS</label>
+                                        </div> 
+                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
+                                    </div>
+                                </div>
+                               </div>                                                                                           
                         </div>
                     </div>
                 </div>
@@ -185,6 +211,20 @@
                               </div>
                               <!--Sales dropen button-->
                           </li>
+                          <li class="list-group-item">
+                            <!-- Sales dropend button -->
+                          <div class="btn-group dropend">
+                              <button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                  Adjustments
+                              </button>                               
+                              <ul class="dropdown-menu py-0">                                  
+                                  <li class="list-group-item" v-for="a in adjustments" :key="a.code">                                     
+                                      <button :class="{'disabled' : !a.active}" class="dropdown-item small" @click="reportAdjustments(a.code)">{{a.name}}</button>
+                                  </li>                                          
+                              </ul>
+                          </div>
+                          <!--Sales dropen button-->
+                      </li>
                             </ul>
                         </div>                                          
                     </div>
@@ -215,6 +255,8 @@ export default {
     },
     data(){
         return{         
+            adj_type:"",   
+            rts_rfs: "",
             gt_equal:null,
             lt_equal:null,
             from_location:"Main",
@@ -248,6 +290,13 @@ export default {
                 {code : "by_date", name: "by date", active: true},
                 {code: "by_description", name:"by description", active: true},
                 {code: "by_voucher", name: "by voucher", active: true},               
+             ],
+             adjustments:[
+                {code : "by_date", name: "by date", active: true},
+                {code: "by_description", name:"by description", active: true},
+                {code: "by_voucher", name: "by voucher", active: true},    
+                {code: "by_location", name: "by location", active: true},  
+                {code: "by_adj_type", name: "by type", active: true},               
              ],
              transfers:[
                 {code : "by_date", name: "by date", active: true},
@@ -324,6 +373,12 @@ export default {
         setSupplier(s){
             this.supplier=s;
         },
+        reportAdjustments(r_type){                     
+            this.$router.push({name: "ReportsAdjustments", params :{"reportType": r_type, "fromDate": this.from_date, "toDate": this.to_date},
+            query : {voucher_no: this.voucher_no, "code_no": this.code_no ? this.code_no : null, "item_name" : this.item_name ? this.item_name : null,
+            adj_type: this.adj_type ? this.adj_type : null, rts_rfs : this.rts_rfs ? this.rts_rfs :null, location: this.location
+            }})
+        },
         reportProducts(r_type){
             this.$router.push({name: "ReportsProduct", params :{"reportType": r_type, "location": this.location},
             query : { "code_no": this.code_no ? this.code_no : null, "item_name": this.item_name ? this.item_name : null,
@@ -336,6 +391,7 @@ export default {
             query : {voucher_no: this.voucher_no
             }})
         },
+        
         reportTransfers(r_type){                     
             this.$router.push({name: "ReportsTransfer", params :{"reportType": r_type, "fromDate": this.from_date, "toDate": this.to_date, "from_location": this.from_location, "to_location": this.to_location},
             query : {voucher_no: this.voucher_no,  "code_no": this.code_no ? this.code_no : null, "item_name" : this.item_name ? this.item_name : null

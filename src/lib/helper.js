@@ -29,6 +29,9 @@ const gb_supplier=groupBy(['group_supplier'])
 const gb_code=groupBy(['code_no'])
 const gb_item_name_pur_price=groupBy(['item_name', 'pur_price'])
 const gb_exp_date=groupBy(['group_exp_date'])
+const gb_item_name_adj_type=groupBy(['item_name', 'adj_type'])
+const gb_location=groupBy(['location'])
+const gb_adj_type=groupBy(['adj_type'])
 
 export   {
     showTime,
@@ -43,4 +46,7 @@ export   {
     gb_exp_date,
     calQtyL,
     calQtyS,
+    gb_item_name_adj_type,
+    gb_location,
+    gb_adj_type
     };

@@ -1,0 +1,186 @@
+<template lang="">
+    <div class="">
+        <table class="table table-bordered mb-0 border-dark table-hover">
+            <tbody class="" >    
+                    <tr class="fw-bold text-center">
+                        <td class="col-1">Code</td>
+                        <td class="col-2">Description</td>
+                        <td class="col-1">Before Adj</td>
+                        <td class="col-1">Adj type</td>
+                        <td class="col-1">Qty</td>      
+                        <td class="col-1">After Adj</td>   
+                        <td class="col-1">RTS/RFS</td>                          
+                        <td class="col-1">Remark</td>   
+                        <td class="col-1">Retail Amt</td>
+                        <td class="col-1">WS Amt</td>         
+                        <td class="col-1">Pur Amt</td>     
+                    </tr>  
+                </tbody>  
+                <tbody  v-if="reports.length > 0">                    
+                    <tr v-for="st in reports" :key="st.code_no">
+                        <td class="text-center">
+                            {{st.code_no}}                                           
+                        </td>
+                        <td class="">{{st.item_name}}</td>
+                        <td class="text-center">                                      
+                            <span>{{st.before_adj_qty}}</span>
+                        </td>
+                        <td class="">
+                            {{st.adj_type}}
+                        </td>
+                        <td class="text-center">                                      
+                            <span>{{st.adj_qty}}</span>
+                        </td>
+                        <td class="text-center">                                      
+                            <span>{{st.after_adj_qty}}</span>
+                        </td>
+                            <td class="text-center">                                      
+                                <span>{{st.rts_rfs}}</span>
+                        </td>
+                        <td class="">                                      
+                            <span>{{st.remark}}</span>
+                        </td>
+                        <td class="text-end">                                      
+                            <span>{{st.retail_amount}}</span>
+                        </td>  
+                        <td class="text-end">                                      
+                            <span>{{st.whole_sale_amount}}</span>
+                        </td>                                   
+                        <td class="text-end">                                      
+                            <span>{{st.pur_amount}}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="8" class="text-end fw-bold">Total</td>
+                        <td class="text-end">{{total_retail_amount}}</td>
+                        <td class="text-end">{{total_whole_sale_amount}}</td>
+                        <td class="text-end">{{total_pur_amount}}</td>
+                    </tr>
+               
+            </tbody>
+        </table>
+        <div v-if="isLoading">
+                <div class="d-flex justify-content-center my-5">
+                    <div class="spinner-border text-primary"  role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+        </div>                                                
+    </div>
+</template>
+<script>
+import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import db from '@/firebase/firestore'
+import * as hp from "@/lib/helper"
+import * as ss from "@/lib/snapshot/adjustments"
+
+export default {
+    props:['fromDate', 'toDate', 'code_no',  'adj_type', 'rts_rfs'],
+    components: {
+    },
+  
+    data(){
+        return{                
+            reports:[],
+            adjustmentsData:[],
+            total_pur_amount:0,
+            total_retail_amount:0,
+            total_whole_sale_amount:0,
+            isLoading:false,
+            msg : {
+                type :"",
+                info :"",
+            },       
+        }
+    },
+   
+    mounted() {    
+            if(this.user !==null){
+                this.isLoading=true;
+                this.fetchAdjustments();  
+            }
+            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
+            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
+            if(this.reportType="by_date"){
+                this.displayReportType="by Date"
+            }
+    },
+   watch:{
+   
+    msg:{
+            handler(val){
+                if(val.type){
+                    setTimeout(()=>{
+                        this.msg.type="";
+                        this.msg.info="";
+                    }, 5000)
+                }
+            },deep:true
+        },
+        user(data){
+            if(data){
+                this.isLoading=true;
+                this.fetchAdjustments();  
+            }
+        }   
+   },
+    computed:{
+        user(){
+            return this.$store.getters.user;
+        },
+        report_type(){
+            return this.$store.getters.reportType;
+        },      
+    },
+    methods:{
+        goBack(){
+            this.$router.go(-1)
+        },
+       
+        displayReports(){       
+            let stocks=[]
+            this.adjustmentsData.map((res)=>{
+                    res.products.map((data)=>{
+                        stocks.push(data)
+                    })
+            })          
+            if(this.code_no){
+                stocks=stocks.filter((f)=>f.code_no === Number(this.code_no))
+            }
+            stocks=stocks.filter((f)=>{
+                 if(this.adj_type) {
+                  return  f.adj_type== this.adj_type
+                }
+                return f;
+            })
+            stocks=stocks.filter((f)=>{
+                 if(this.rts_rfs) {
+                  return  f.rts_rfs== this.rts_rfs
+                }
+                return f;
+            }).sort((a,b)=>a.code_no - b.code_no)                    
+                     
+               stocks.map((ren)=>{
+                    this.total_retail_amount += ren.retail_amount;
+                     this.total_whole_sale_amount+= ren.whole_sale_amount;
+                    this.total_pur_amount += ren.pur_amount;
+               })
+              this.reports=[...stocks];        
+        },      
+        async fetchAdjustments(){
+            const from_date=Timestamp.fromDate(new Date(this.fromDate))
+            const to_date=Timestamp.fromDate(new Date(this.toDate))
+            const query_url = query(collection(db, "adjustments"),
+            where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
+            const snapShot=await getDocs(query_url)
+            const items=ss.adjustments(snapShot)    
+            this.adjustmentsData=items;
+            this.displayReports();
+            this.isLoading=false;
+        }
+    }
+}
+</script>
+<style lang="">
+    
+</style>

@@ -5,7 +5,7 @@
         <div class="modal-dialog modal-xl">
           <div class="modal-content"> 
            <div class="card">
-            <div class="card-body p-2 min-vh-100">
+            <div class="card-body p-2">
                <div class="row g-1">
                    <div class="col-lg-3">
                        <div class="card shadow">
@@ -46,7 +46,7 @@
                        </div>                                                                                                          
                    </div>                        
                    <div class="col-lg-9">
-                       <div class="card shadow">
+                       <div class="card shadow vh-80 overflow-y-auto">
                            <div class="card-body p-2 table-responsive">
                                <table class="table table-bordered table-hover mb-0">
                                    <tbody class="small">
