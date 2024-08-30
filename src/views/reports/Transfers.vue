@@ -9,18 +9,20 @@
             </div>
         </div>        
         <div class="row"  id="printMe" >
+            <div class="d-none d-print-block">
+                <LargePrintHeader />
+            </div>
             <div class="col-12 text-center">
-                <h3>N-POS</h3>
-                <h5>Reports transfers {{displayReportType}}</h5>
+                <h6>Reports transfers {{displayReportType}}</h6>
                 <div class="row">
                     <div class="col-sm-4">
-                        <h6>Code : {{item_name}}</h6>
+                        <div v-if="code_no">Code : {{item_name}}</div>
                     </div>
                     <div class="col-sm-4">
-                        <h6>From  : {{from_location}} - To  : {{to_location}}</h6>
+                        <div>From  : {{from_location}} - To  : {{to_location}}</div>
                     </div>
                     <div class="col-sm-4">
-                        <h6 v-if="displayFromDate || displayToDate">From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</h6>
+                        <div v-if="displayFromDate || displayToDate">From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</div>
                     </div>
                 </div>
             </div>            
@@ -44,9 +46,11 @@ import db from '@/firebase/firestore'
 import TransferByDate from "@/views/reports/transfers/TransferByDate.vue"
 import TransferByDescription from "@/views/reports/transfers/TransferByDescription.vue"
 import TransferByVoucher from "@/views/reports/transfers/TransferByVoucher.vue"
+import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
+
 export default {
     components: {
-        TransferByDate, TransferByDescription, TransferByVoucher
+        TransferByDate, TransferByDescription, TransferByVoucher,LargePrintHeader
     },
   
     data(){

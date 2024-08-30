@@ -9,18 +9,20 @@
             </div>
         </div>        
         <div class="row"  id="printMe" >
+            <div class="d-none d-print-block">
+                <LargePrintHeader />
+            </div>
             <div class="col-12 text-center">
-                <h3>N-PRO-POS</h3>
-                <h5>Reports adjustments {{displayReportType}}</h5>
+                <h6>Reports adjustments {{displayReportType}}</h6>
                 <div class="row">
                     <div class="col-sm-4">
-                        <div class="h6">Code : {{item_name}}</div>
+                        <div class="" v-if="code_no">Code : {{item_name}}</div>
                     </div>
                     <div class="col-sm-4">
                         <div class="">Location : {{location}}</div>
                     </div>
                     <div class="col-sm-4">
-                        <h6 v-if="displayFromDate || displayToDate">Date : From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</h6>
+                        <div v-if="displayFromDate || displayToDate">Date : From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</div>
                     </div>
                 </div>
             </div>            
@@ -52,11 +54,11 @@ import AdjustmentsByDescription from "@/views/reports/adjustments/AdjustmentsByD
 import AdjustmentsByVoucher from "@/views/reports/adjustments/AdjustmentsByVoucher.vue"
 import AdjustmentsByLocation from "@/views/reports/adjustments/AdjustmentsByLocation.vue"
 import AdjustmentsByAdjType from "@/views/reports/adjustments/AdjustmentsByAdjType.vue"
-
+import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
 
 export default {
     components: {
-        AdjustmentsByDate, AdjustmentsByDescription, AdjustmentsByVoucher, AdjustmentsByLocation, AdjustmentsByAdjType
+        AdjustmentsByDate, AdjustmentsByDescription, AdjustmentsByVoucher, AdjustmentsByLocation, AdjustmentsByAdjType,LargePrintHeader
     },
   
     data(){

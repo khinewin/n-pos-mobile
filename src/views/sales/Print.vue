@@ -1,10 +1,6 @@
 <template lang="">
-    <div class="container-fluid py-2">
-        <div class="row">
-            <div class="col-12">
-                   <h4 class="text-center"> Printing with N-POS</h4>
-            </div>
-        </div>
+    <div class="container-fluid py-2" v-if="largePrinter">
+    <LargePrintHeader />
     <div class="row justify-content-end small" >   
         <div class="col-6">
             <table class="table mb-0 table-borderless">
@@ -101,19 +97,112 @@
                     </tr>
                 </tbody>
           </table>
+        </div>      
+    </div>
+</div>
+<div class="container-fluid py-2" v-else>
+    <SmallPrintHeader />
+    <div class="" >   
+        <div class="">
+            <table class="small-print-header">
+                <tbody class="">  
+                    <tr>
+                        <td class="">Voucher no. <span class="">:</span></td>
+                        <td class="" style="border-bottom: 1px dotted;">
+                            {{data.voucher_no}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="">Date <span class="">:</span></td>
+                        <td class="" style="border-bottom: 1px dotted;">
+                           <span>{{showPrintTime(data.sale_date)}}</span>
+                        </td>
+                    </tr>       
+                                                   
+                    <tr>
+                        <td class="">Name <span class="">:</span></td>
+                        <td class="" style="border-bottom: 1px dotted;">
+                            {{data.customer.name}}
+                        </td>
+                    </tr>      
+                    <tr>
+                        <td class="">Phone <span class="">:</span></td>
+                        <td class="" style="border-bottom: 1px dotted;">
+                            {{data.customer.phone}}
+                        </td>
+                    </tr>                                               
+                </tbody>
+          </table>
         </div>
-      
+        <div class="">
+            <table class="small-print-table">
+                <tbody class="fw-bold text-center">
+                    <tr class="">
+                        <td class="">No.</td>
+                        <td class="">Description</td>
+                        <td class="" v-if="isQtyL">Qty L</td>
+                        <td class="" v-if="isQtyS">Qty S</td>
+                        <td class="">Discount</td>
+                        <td class="">Amount</td>
+                    </tr>
+                </tbody>
+                <tbody>
+                    <tr class="" v-if="data.saleItems.length > 0" v-for="(s, i) in data.saleItems" :key="s.id" >   
+                        <td class="text-center">{{i+1}}</td>                     
+                        <td class="">{{s.item_name}}</td>
+                        <td class="" v-if="isQtyL"><span v-if="s.sale_qty_l">{{s.sale_qty_l}} {{s.parent_unit}}</span></td>
+                        <td class="" v-if="isQtyS"><span v-if="s.sale_qty_s">{{s.sale_qty_s}} {{s.child_unit}}</span></td>
+                        <td class="text-end">{{s.discount}}</td>
+                        <td class="text-end">{{s.sale_amount}}</td>
+                    </tr>                        
+                    </tbody>
+                    <tbody class="text-end">
+                    <tr>
+                        <td :colspan="[isQtyL >0 && isQtyS > 0 ? 5 : 4]" class=" " style="border-bottom-style: hidden;">Total amount</td>
+                        <td class="">{{data.total_amount}}</td>
+                    </tr>                     
+                    <tr>
+                        <td :colspan="[isQtyL >0 && isQtyS > 0 ? 5 : 4]" class="" style="border-bottom-style: hidden;">Discount</td>
+                        <td class="">
+                            {{data.discount}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td :colspan="[isQtyL >0 && isQtyS > 0 ? 5: 4]" class="" style="border-bottom-style: hidden;">Charges</td>
+                        <td class="">{{data.charges}}</td>
+                    </tr>
+                    <tr >
+                        <td :colspan="[isQtyL >0 && isQtyS > 0 ? 5 : 4]" class="" style="border-bottom-style: hidden;">Pay</td>
+                        <td class="">
+                            {{data.pay}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td :colspan="[isQtyL >0 && isQtyS > 0 ? 5 : 4]" class="" >Refunds</td>
+                        <td class="">
+                            {{data.refunds}}
+                        </td>
+                    </tr>                           
+                </tbody>
+          </table>
+        
+        </div>      
     </div>
 </div>
 </template>
 <script>
 import {Timestamp, collection, addDoc, doc, increment,  updateDoc} from 'firebase/firestore'
+import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
+import SmallPrintHeader from "@/views/partials/SmallPrintHeader.vue"
 
 export default {
     props: ['data'],
+    components:{
+        LargePrintHeader, SmallPrintHeader
+    },
     data(){
         return{
-           
+            largePrinter:true,
         }
     },
     mounted() {
@@ -148,6 +237,19 @@ export default {
 
 }
 </script>
-<style lang="">
-    
+<style>
+      .small-print-header td{
+        padding: 2px;
+        font-size: 12px;
+    }
+    .small-print-table{
+        border: 1px solid;
+    }
+    .small-print-table td {
+        padding: 2px;
+        font-size: 12px;
+    }
+    .small-print-table tbody{
+        border-bottom: 1px solid;
+    }
 </style>

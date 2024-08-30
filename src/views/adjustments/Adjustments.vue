@@ -20,6 +20,10 @@
                 </div>
             </div>
             <div class="card shadow" id="printMe">
+                <div class="d-none d-print-block">
+                    <LargePrintHeader />
+                    <div>Adjustments</div>
+                </div>
                 <div class="card-body p-2">
                         <div class="row justify-content-end mb-2">
                             <div class="col-sm-10 col-lg-8">
@@ -125,9 +129,11 @@ import db from '@/firebase/firestore'
 import AdjustmentModal from '@/views/modals/adjustments/AdjustmentModal.vue'
 import * as hp from "@/lib/helper.js"
 import * as ss from "@/lib/snapshot/adjustments"
+import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
+
 export default {
     components: {
-        PageHeader, AdjustmentModal
+        PageHeader, AdjustmentModal, LargePrintHeader
     },
     setup () {
         return { v$: useVuelidate() }

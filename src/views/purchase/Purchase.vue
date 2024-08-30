@@ -21,6 +21,10 @@
                 </div>
             </div>
             <div class="card shadow min-vh-75" id="printMe">
+                <div class="d-none d-print-block">
+                    <LargePrintHeader />
+                    <div>Purchase</div>
+                </div>
                 <div class=" card-body p-2 table-responsive">
                     <div class="row justify-content-end mb-2">
                     <div class="col-sm-6 col-lg-4">
@@ -127,10 +131,11 @@ import db from '@/firebase/firestore'
 import PurchaseModal from '@/views/modals/purchase/PurchaseModal.vue'
 import Footer from '@/views/partials/Footer.vue'
 import * as hp from "@/lib/helper.js"
+import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
 
 export default {
     components: {
-        PageHeader, PurchaseModal, Footer
+        PageHeader, PurchaseModal, Footer, LargePrintHeader
     },
    
     data(){

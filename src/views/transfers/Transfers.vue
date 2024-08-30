@@ -20,6 +20,10 @@
                 </div>
             </div>
             <div class="card shadow min-vh-75" id="printMe">
+                <div class="d-none d-print-block">
+                    <LargePrintHeader />
+                    <div>Transfers</div>
+                </div>
                 <div class="card-body p-2">
                     <form @submit.prevent="saveTransfers">
                         <div class="row justify-content-end">
@@ -28,20 +32,14 @@
                                     <tbody>
                                         <tr>
                                             <td class="text-end col-4 pt-2 fw-bold">From location :</td>
-                                            <td class="col-8 py-0">
-                                                <select class="form-control-plaintext" v-model="from_location" disabled>
-                                                    <option value="Main">Main</option>
-                                                    <option value="Shop">Shop</option>
-                                                </select>
+                                            <td class="col-8 pt-2">
+                                                {{from_location}}
                                             </td>
                                         </tr>
                                         <tr>
                                             <td class="text-end pt-2 fw-bold">To location :</td>
-                                            <td class="py-0">
-                                                <select class="form-control-plaintext" v-model="to_location" disabled>
-                                                    <option value="Main">Main</option>
-                                                    <option value="Shop">Shop</option>
-                                                </select>
+                                            <td class="pt-2">
+                                                {{to_location}}
                                             </td>
                                         </tr>                                       
                                     </tbody>
@@ -52,8 +50,8 @@
                                     <tbody>
                                         <tr>
                                             <td class="text-end col-4 pt-2 fw-bold">Voucher no. :</td>
-                                            <td class="col-8 py-0">
-                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
+                                            <td class="col-8 pt-2">
+                                                {{voucher_no}}
                                             </td>
                                         </tr>
                                         <tr>
@@ -114,9 +112,11 @@ import db from '@/firebase/firestore'
 import TransfersModal from '@/views/modals/transfers/TransfersModal.vue'
 import * as ss from "@/lib/snapshot/products"
 import * as hp from "@/lib/helper"
+import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
+
 export default {
     components: {
-        PageHeader, TransfersModal
+        PageHeader, TransfersModal,LargePrintHeader
     },
     setup () {
         return { v$: useVuelidate() }

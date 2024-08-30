@@ -20,6 +20,10 @@
                 </div>
             </div>
             <div class="card shadow min-vh-75" id="printMe">
+                <div class="d-none d-print-block">
+                    <LargePrintHeader />
+                    <div>Opening stocks</div>
+                </div>
                 <div class="card-body p-2">
                     <form @submit.prevent="saveStocks">
                         <div class="row justify-content-end mb-2">
@@ -125,9 +129,11 @@ import db from '@/firebase/firestore'
 import StocksModal from '@/views/modals/stocks/StocksModal.vue'
 import * as hp from "@/lib/helper.js"
 import * as ss from "@/lib/snapshot/stocks"
+import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
+
 export default {
     components: {
-        PageHeader, StocksModal
+        PageHeader, StocksModal, LargePrintHeader
     },
     setup () {
         return { v$: useVuelidate() }

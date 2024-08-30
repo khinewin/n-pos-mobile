@@ -11,24 +11,26 @@
         </div>        
         <div class="row"  id="printMe" >
             <div class="col-12 text-center">
-                <h3>N-PRO-POS</h3>
-                <h5>Reports products code {{displayReportType}}</h5>
+                <div class="d-none d-print-block">
+                    <LargePrintHeader />
+                </div>
+                <h6>Reports products code {{displayReportType}}</h6>
                 <div class="row">
                     <div class="col-sm-4">
-                        <div class="h6">Code : {{item_name}}</div>
+                        <div class="" v-if="code_no">Code : {{item_name}}</div>
                     </div>
                     <div class="col-sm-2">
-                        <div class="h6">Balance : 
+                        <div class="" v-if="gt_equal || lt_equal">Balance : 
                             <span v-if="gt_equal">>= {{gt_equal}}</span> 
                             <span v-if="gt_equal && lt_equal"> and </span>
                             <span v-if="lt_equal"><= {{lt_equal}}</span>
                         </div>
                     </div> 
                     <div class="col-sm-2">
-                        <div class="h6">Location : {{this.location}} </div>
+                        <div class="">Location : {{this.location}} </div>
                     </div>                                       
                     <div class="col-sm-4">
-                        <h6  class="" v-if="displayDate">Date : {{showTime(displayDate)}}</h6>
+                        <div  class="" v-if="displayDate">Date : {{showTime(displayDate)}}</div>
                     </div>
                 </div>  
             </div>            
@@ -53,11 +55,11 @@
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import StockList from "@/views/reports/products/StockList.vue"
-
+import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
 
 export default {
     components: {
-       StockList
+       StockList, LargePrintHeader
     },
   
     data(){

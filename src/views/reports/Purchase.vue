@@ -9,21 +9,23 @@
             </div>    
         </div>      
         <div class="row"  id="printMe" >
+            <div class="d-none d-print-block">
+                <LargePrintHeader />
+            </div>
             <div class="col-12 text-center">
-                <h3>N-POS</h3>
-                <h5>Reports purchase {{displayReportType}}</h5>
+                <h6>Reports purchase {{displayReportType}}</h6>
                 <div class="row">
                     <div class="col-sm-4">
-                        <span class="h6">Code : {{item_name}}</span>
+                        <div class="" v-if="code_no">Code : {{item_name}}</div>
                     </div>
                     <div class="col-sm-2">
-                        <span v-if="supplier" class="h6">Supplier : {{supplier_name}} ({{supplier_company}}), </span>
+                        <div v-if="supplier" class="" v-is="supplier_name">Supplier : {{supplier_name}} ({{supplier_company}}), </div>
                     </div>
                     <div class="col-sm-2">
-                        <span>Location : {{this.location}}</span>
+                        <div>Location : {{this.location}}</div>
                     </div>
                     <div class="col-sm-4">
-                        <h6 v-if="displayFromDate || displayToDate">Date : From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</h6>
+                        <div v-if="displayFromDate || displayToDate">Date : From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</div>
                     </div>
                 </div>    
             </div>            
@@ -59,11 +61,12 @@ import PurchaseByDescription from "@/views/reports/purchase/PurchaseByDescriptio
 import PurchaseBySupplier from "@/views/reports/purchase/PurchaseBySupplier.vue"
 import PurchaseBySupplierDate from "@/views/reports/purchase/PurchaseBySupplierDate.vue"
 import PurchaseByExpDate from "@/views/reports/purchase/PurchaseByExpDate.vue"
+import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
 
 export default {
     components: {
        PurchaseByDate, PurchaseByDescription, PurchaseByVoucher, PurchaseBySupplier,
-       PurchaseBySupplierDate, PurchaseByExpDate
+       PurchaseBySupplierDate, PurchaseByExpDate, LargePrintHeader
     },
   
     data(){

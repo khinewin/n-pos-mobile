@@ -9,18 +9,20 @@
             </div>    
         </div>
         <div class="row"  id="printMe" >
+            <div class="d-none d-print-block">
+                <LargePrintHeader />
+            </div>
             <div class="col-12 text-center">
-                <h3>N-PRO-POS</h3>
-                <h5>Reports sales {{displayReportType}}</h5>
+                <h6>Reports sales {{displayReportType}}</h6>
                 <div class="row">
                     <div class="col-sm-4">
-                        <div class="h6">Code : {{item_name}}</div>
+                        <div class="" v-if="code_no">Code : {{item_name}}</div>
                     </div>
                     <div class="col-sm-4">
-                        <div class="h6">Customer : {{customer_name}}</div>
+                        <div class="" v-if="customer_name">Customer : {{customer_name}}</div>
                     </div>
                     <div class="col-sm-4">
-                        <h6 v-if="displayFromDate || displayToDate">Date : From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</h6>
+                        <div v-if="displayFromDate || displayToDate">Date : From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</div>
                     </div>
                 </div>
             </div>            
@@ -56,11 +58,12 @@ import SalesByDescription from "@/views/reports/sales/SalesByDescription.vue"
 import SalesByCustomer from "@/views/reports/sales/SalesByCustomer.vue"
 import SalesByCustomerDate from "@/views/reports/sales/SalesByCustomerDate.vue"
 import SalesByChart from "@/views/reports/sales/SalesByChart.vue"
+import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
 
 
 export default {
     components: {
-        SalesByDate,SalesByVoucher,SalesByDescription, SalesByCustomer, SalesByCustomerDate,SalesByChart
+        SalesByDate,SalesByVoucher,SalesByDescription, SalesByCustomer, SalesByCustomerDate,SalesByChart, LargePrintHeader
     },
   
     data(){
