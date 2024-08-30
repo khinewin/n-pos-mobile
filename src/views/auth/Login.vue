@@ -1,58 +1,74 @@
 <template>
-    <div class="container-fluid">           
-            <div class="row justify-content-center" style="min-height: 70vh;">                   
-                <div class="col-sm-6 align-self-center" v-if="isCheckAuth"> 
-                    <Welcome />           
+    <div class="">           
+            <div class="row g-1 vh-100">                   
+                <div class="col-sm-6 bg-primary bg-gradient d-none d-sm-block"> 
+                    <div class="row g-0 vh-100 justify-content-center">
+                            <div class="col-sm-10 col-lg-8 align-self-center">
+                                <Welcome :isCheckAuth="isCheckAuth" />
+                            </div>
+                    </div>           
                 </div>                
-                <div class="col-sm-6 align-self-center" v-else>
+                <div class="col-sm-6  align-self-center container-fluid">
                         <div class="row justify-content-center">
-                            <div class="col-sm-10 col-md-8">      
-                                <div class="text-center fw-light mb-2">Login to continued your session</div>                            
+                            <div class="col-sm-10 col-md-8">     
+                                <div class="text-center">
+                                    <img src="/img/logo.png" alt="" class="img-fluid" style="width: 100px">
+                                    <div class="text-primary logo h2">POS</div>
+                                </div>
+                                <div class="d-flex justify-content-center my-5 " v-if="isCheckAuth">
+                                    <div class="spinner-border text-primary"  role="status">
+                                      <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div> 
+                                <div v-else> 
+                                <div class="mb-1">
+                                    <span class="text-danger" v-if="message.error">{{message.error}}</span>
+                                    <span v-else class="fw-light">Login to continued your session</span>
+                                </div>                            
                                     <div class="card shadow border-0">
-                                        <div class="card-body">                                            
-                                                <form  @submit.prevent="doSignin">                                        
-                                                    <div class="mb-3">
-                                                        <label for="email" class="form-label">
-                                                            <span>E-mail</span>
-                                                            <span  class="text-danger small ms-3" v-for="error in v$.email.$errors" :key="error.$uid">
-                                                                {{error.$message}}
-                                                            </span>
-                                                        </label>
-                                                        <input type="email" class="form-control" id="email" v-model="email"  :class="{ 'is-invalid': v$.email.$errors.length}">
-                                                      
+                                        <div class="card-body">
+                                            <form @submit.prevent="doSignin">
+                                            <div class="mb-3">        
+                                                <label for="email" class="form-label small">
+                                                    <span>E-mail</span>
+                                                    <span  class="text-danger small ms-3" v-for="error in v$.email.$errors" :key="error.$uid">
+                                                        {{error.$message}}
+                                                    </span>
+                                                </label>                                                
+                                                <input @keypress="clearError" type="email" class="form-control"  id="email" v-model="email" >                                                                                                      
+                                            </div>                                                                                                  
+                                            <div class="mb-3 ">  
+                                                <label for="password" class="form-label small">
+                                                    <span>Password</span>
+                                                    <span  class="text-danger small ms-3" v-for="error in v$.password.$errors" :key="error.$uid">
+                                                        {{error.$message}}
+                                                    </span>
+                                                </label>                                                       
+                                                <div class="input-group">
+                                                    <input @keypress="clearError" :type="isShowPassword ? 'text' : 'password' " class="form-control" id="password" v-model="password">
+                                                            <span class="input-group-text" @click="handleShowPassword">
+                                                                <span   v-show="!isShowPassword">
+                                                                    <i class="fa-solid fa-eye-slash"></i>
+                                                                </span>
+                                                                <span  v-show="isShowPassword">
+                                                                    <i class="fa-solid fa-eye"></i>                                                        
+                                                                </span>
+                                                            </span>                                                        
+                                                    </div>                                                                                                           
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary" :class="{disabled: isLoading}">
+                                                    <div class="spinner-border text-light spinner-border-sm" role="status" v-if="isLoading">
+                                                        <span class="visually-hidden">Loading...</span>
                                                     </div>
-                                                    <div class="mb-3">
-                                                        <label for="password" class="form-label">
-                                                            <span>Password</span>
-                                                            <span  class="text-danger small ms-3" v-for="error in v$.password.$errors" :key="error.$uid">
-                                                                {{error.$message}}
-                                                            </span>
-                                                        </label>
-                                                        <div class="input-group">
-                                                            <input :type="isShowPassword ? 'text' : 'password' " class="form-control" id="password" v-model="password" :class="{ 'is-invalid': v$.password.$errors.length }">
-                                                                    <span class="input-group-text" @click="handleShowPassword">
-                                                                        <span   v-show="isShowPassword">
-                                                                            <i class="fa-solid fa-eye-slash"></i>
-                                                                        </span>
-                                                                        <span  v-show="!isShowPassword">
-                                                                            <i class="fa-solid fa-eye"></i>                                                        
-                                                                        </span>
-                                                                    </span>                                                        
-                                                            </div>                                                        
-                                                    </div>
-                                                    <div class="mb-3 d-grid">
-                                                        <button type="submit" class="btn btn-primary" :class="{disabled: isLoading}">
-                                                            <div class="spinner-border text-light spinner-border-sm" role="status" v-if="isLoading">
-                                                                <span class="visually-hidden">Loading...</span>
-                                                            </div>
-                                                            Signin
-                                                        </button>
-                                                    </div>
-                                            </form>             
+                                                    Signin
+                                                </button>
+                                            </div>                                                                                           
+                                        </form>
+                                        </div>
                                         </div>
                                     </div>
-                                    <div class="text-danger text-center mt-2" v-if="message.error">{{message.error}}</div>
-                            </div>
+                            </div>                            
                         </div>
                 </div>
             </div>
@@ -103,6 +119,9 @@ export default {
         }
     },
     methods:{
+        clearError(){
+            this.message.error=null;
+        },
         handleShowPassword(){
             this.isShowPassword = !this.isShowPassword;
         },
@@ -123,9 +142,9 @@ export default {
                         }
                     }                                   
                 }
-               setTimeout(()=>{
-                this.isCheckAuth=false;
-               }, 3000)
+                setTimeout(()=>{
+                    this.isCheckAuth=false;
+                }, 2000)
             });
         },
         async doSignin(){

@@ -10,10 +10,50 @@
     text-align: center;
 }
 */
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap');
+
+.logo {
+    font-family: "Exo 2", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+  }
+
 .table tbody td {
     font-size: 13px;
     padding-top: 1px;
     padding-bottom: 1px;
     padding-left: 2px;
     padding-right: 2px;;
+}
+
+.min-vh-80{
+    min-height: 80vh !important;
+}
+.vh-80{
+    height: 80vh !important;
+}
+.min-vh-75{
+    min-height: 75vh !important;
+}
+.vh-75{
+    height: 75vh !important;
+}
+.min-vh-70{
+    min-height: 70vh !important;
+}
+.vh-70{
+    height: 70vh !important;
+}
+.min-vh-65{
+min-height: 65vh !important;
+}
+.vh-65{
+    height: 65vh !important;
+}
+.min-vh-60{
+min-height: 60vh !important;
+}
+.vh-60{
+    height: 60vh !important;
 }

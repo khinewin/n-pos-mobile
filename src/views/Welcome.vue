@@ -1,20 +1,18 @@
 <template lang="">
     <div>
-            <div class="card border-0">
-                <div class="card-body bg-secondary-subtle">
-                        <h1 class="text-center text-primary logo">N-PRO-POS</h1>
-                        <p class="text-center">Manage your store and sell products with enterprise function pos.</p>
-                        <div class="d-flex justify-content-center ">
-                            <div class="spinner-border text-primary"  role="status">
-                              <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </div>   
+            <div class="justify-content-center">
+                <div class="text-white">     
+                        <div class="h5 mb-3">We will give it to you with</div>     
+                        <div class="h4 mb-3">N-PRO-POS</div>                                                                 
+                        <div class="mb-2"><i class="fa-solid fa-circle-check"></i> Manage your store easily</div>
+                        <div class="mb-2"><i class="fa-solid fa-circle-check"></i> Sell ​​your products smartly</div>                          
                 </div>
             </div>
     </div>
 </template>
 <script>
 export default {
+    props: ['isCheckAuth']
     
 }
 </script>
