@@ -1,13 +1,13 @@
 <template lang="">
-    <div class="container-fluid">   
-        <div class="row">
+    <div class="container-fluid my-4">   
+        <div class="row fixed-top ps-2 pt-2">
             <div class="col-2">
-                <button class="btn" @click="goBack">Back</button>
+                <button class="btn" @click="goBack"><i class="fa-solid fa-circle-chevron-left"></i></button>
             </div>
             <div class="col-2">
-                <button class="btn" @click="print">Print</button>
-            </div>
-        </div>        
+                <button class="btn" @click="print"><i class="fa-solid fa-print"></i></button>
+            </div>    
+        </div>         
         <div class="row"  id="printMe" >
             <div class="d-none d-print-block">
                 <LargePrintHeader />
