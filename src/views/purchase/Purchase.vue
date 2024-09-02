@@ -31,14 +31,14 @@
                         <table class="table mb-0 table-borderless">
                             <tbody>
                                 <tr>
-                                    <td class="text-end col-4">Voucher no. :</td>
-                                    <td class="col-8">
+                                    <td class=" col-2">Voucher no. <span class="float-end">:</span></td>
+                                    <td class="col-4" style="border-bottom: 1px dotted;">
                                         {{voucher_no}}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="text-end col-4">Location :</td>
-                                    <td class="col-8">
+                                    <td class=" col-2">Location <span class="float-end">:</span></td>
+                                    <td class="col-4"  style="border-bottom: 1px dotted;">
                                         {{location}}
                                     </td>
                                 </tr>
@@ -50,14 +50,14 @@
                         <table class="table mb-0 table-borderless">
                             <tbody>                              
                                 <tr>
-                                    <td class="text-end">Pur date :</td>
-                                    <td class="" v-if="pur_date">
+                                    <td class="col-2">Pur date <span class="float-end">:</span></td>
+                                    <td class="col-4" v-if="pur_date"  style="border-bottom: 1px dotted;">
                                         {{showTime(pur_date)}}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="text-end">Supplier :</td>
-                                    <td class="">
+                                    <td class="">Supplier <span class="float-end">:</span></td>
+                                    <td class=""  style="border-bottom: 1px dotted;">
                                         {{supplier_name}}
                                     </td>
                                 </tr>
@@ -69,11 +69,12 @@
                         <tbody>
                             <tr class="text-center fw-bold table-secondary">
                                 <td class="col-1">Code</td>
-                                <td class="col-2">Description</td>
-                                <td class="col-1">Exp. date</td>
-                                <td class="col-1">Qty</td>
-                                <td class="col-1">Item price</td>
-                                <td class="col-1" colspan="3">Discount</td>                                
+                                <td class="col-2">Descrption</td>
+                                <td class="col-1">Exp. date</td>     
+                                <td class="col-1">Packing size</td>                              
+                                <td class="col-1" colspan="1">Qty</td>
+                                <td class="col-2">Unit price</td>                                    
+                                <td class="col-1">Discount</td>                                    
                                 <td class="col-1">Amount</td>
                                 <td class="col-1">Discount</td>
                                 <td class="col-1">Price</td>
@@ -84,34 +85,43 @@
                                 <td class="text-center">                                   
                                      <span v-if="st.exp_date">{{showTime(st.exp_date)}}</span>
                                 </td>
-                                <td class="col-1 text-center">
-                                    <span v-if="calQtyL(st.pur_qty, st.item_per_package) > 0">{{calQtyL(st.pur_qty, st.item_per_package)}} {{st.parent_unit}} </span>
-                                     <span v-if="calQtyL(st.pur_qty, st.item_per_package) >0 && calQtyS(st.pur_qty, st.item_per_package) > 0"> * </span>
-                                     <span v-if="calQtyS(st.pur_qty, st.item_per_package)> 0">{{calQtyS(st.pur_qty, st.item_per_package)}} {{st.child_unit}}  </span>
+                                <td class="col-1">
+                                    {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                  </td>
-                                <td class="text-end">{{st.pur_price}}</td>
-                                <td class="text-center">{{st.dis_qty}}</td>
-                                <td class="text-center">{{st.dis_percent}}</td>
-                                <td class="text-end">{{st.dis_amount}}</td>
+                                <td class="text-end">
+                                    {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.pur_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                                </td>
+                                <td class="text-center">
+                                    {{st.qty_pur_price}} * {{st.qty_pur_price_unit}}
+                                </td>
+                                <td class="text-center">
+                                    <span v-if="st.dis_qty">{{st.dis_qty}}{{st.dis_qty_unit}}</span>
+                                    <span v-if="st.dis_amount">{{st.dis_amount}}$</span>
+                                    <span v-if="st.dis_percent">{{st.dis_percent}}%</span> 
+                                </td>
                                 <td class="text-end">{{st.amount}}</td>
                                 <td class="text-end">{{st.discount}}</td>
                                 <td class="text-end">{{st.price}}</td>
                             </tr>
                             <tr class="small">
-                                <td colspan="10" class="text-end">Amount</td>
-                                <td class="text-end">{{this.total_amount}}</td>
+                                <td colspan="9" class="text-end">Total amount</td>
+                                <td class="text-end">{{total_amount}}</td>
                             </tr>
                             <tr class="small">
-                                <td colspan="10" class="text-end">Discount</td>
-                                <td class="text-end ">{{this.total_discount}}</td>
+                                <td colspan="9" class="text-end">Total discount</td>
+                                <td class="text-end ">{{total_discount}}</td>
                             </tr>
                             <tr class="small">
-                                <td colspan="10" class="text-end">Extra discount</td>
-                                <td class="text-end">{{this.extra_discount}}</td>
+                                <td colspan="9" class="text-end">Total price</td>
+                                <td class="text-end">{{total_price}}</td>
+                            </tr>  
+                            <tr class="small">
+                                <td colspan="9" class="text-end">Extra discount</td>
+                                <td class="text-end">{{extra_discount}}</td>
                             </tr>
                             <tr class="small">
-                                <td colspan="10" class="text-end">Total price</td>
-                                <td class="text-end">{{this.total_price}}</td>
+                                <td colspan="9" class="text-end">Grand total price</td>
+                                <td class="text-end">{{grand_total_price}}</td>
                             </tr>                           
                         </tbody>
                    </table>     
@@ -142,6 +152,7 @@ export default {
         return{ 
             id:"",      
             voucher_no:"", 
+            location:"",
             pur_date:"",
             supplier : "",
             supplier_name:"",
@@ -150,6 +161,7 @@ export default {
             total_amount:0,
             total_discount:0,
             extra_discount:0,
+            grand_total_price:0,
             total_price:0,
             isLoading:false,
             msg : {
@@ -168,11 +180,11 @@ export default {
     },
  
     methods:{     
-        calQtyL(qty, ipp){
-            return hp.calQtyL(qty, ipp);
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
-        calQtyS(qty, ipp){
-            return hp.calQtyS(qty, ipp)
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
         async print () {
         // Pass the element id here
@@ -188,7 +200,8 @@ export default {
             this.total_amount=0
             this.total_discount=0
             this.extra_discount=0
-            this.total_price=0
+            this.total_price=0,
+            this.location="";
         },
         goEdit(){           
             this.$router.push({name: "EditPurchase", params: {id:this.voucher_no}})
@@ -202,11 +215,7 @@ export default {
             this.pur_user=p.user;
             this.location=p.location;
            // this.products=p.products;
-           this.products=p.products.map((p)=>{
-               return {
-                    ...p, amount : p.pur_qty * p.pur_price
-               }                
-           })
+           this.products=p.products;
             this.calAmount(p);
         },
         calAmount(p){
@@ -214,6 +223,7 @@ export default {
             this.total_discount=p.total_discount;
             this.extra_discount=p.extra_discount;
             this.total_price=p.total_price;
+            this.grand_total_price=p.grand_total_price;
         },
         
        showTime(t){

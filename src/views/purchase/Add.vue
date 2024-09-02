@@ -362,7 +362,10 @@ export default {
            }
         },
         setExpDate(id){
-            this.editItem.exp_date=Timestamp.fromDate(new Date(this.editItem.tmp_exp_date))
+           const arr=this.storePurchase.filter((f)=>f.id==id)
+           const p=arr[0]
+           this.editItem.exp_date=p.tmp_exp_date ? Timestamp.fromDate(new Date(p.tmp_exp_date))  : null;
+           p.exp_date=p.tmp_exp_date ? Timestamp.fromDate(new Date(p.tmp_exp_date))  : null;
         },
         setSupplier(s){
             this.supplier_name=s.name;
@@ -518,10 +521,8 @@ export default {
             this.total_amount=total_amount;
             this.total_discount=total_discount;
             this.total_price=total_price;
-
-            if(this.extra_discount){
-                this.grand_total_price=total_price - this.extra_discount
-            }
+            this.grand_total_price=this.extra_discount ? this.total_price - this.extra_discount : this.total_price;
+           
         },
         removeStoreItem(i){
             this.storePurchase.splice(i, 1)
@@ -560,6 +561,7 @@ export default {
                 total_discount:this.total_discount,
                 total_price:this.total_price,
                 extra_discount: this.extra_discount,
+                grand_total_price: this.grand_total_price,
             }      
             
             const saveDocument=collection(db, "purchases")

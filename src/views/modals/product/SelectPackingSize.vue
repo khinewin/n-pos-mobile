@@ -28,6 +28,7 @@
                                     
                                     <td class="col-1 p-0" colspan="2">
                                         <select class="form-control-plaintext text-center" v-model="largest_unit">
+                                            <option value=""></option>
                                             <option v-for="s in packingSizes" :key="s.id">{{s.packing_unit}}</option>
                                         </select>
                                     </td>
