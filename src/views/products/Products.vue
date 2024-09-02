@@ -21,7 +21,7 @@
                         <div class="card-body p-2">
                             <div class="row g-2">
                                 <div class="form-floating col-sm-6 col-lg-12">
-                                    <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchProducts" placeholder="Code" class="form-control form-control-sm">
+                                    <input type="search" id="search_by_code" v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control form-control-sm">
                                     <label for="search_by_code" class="small">Code</label>
                                 </div>
                                 <div class="form-floating col-sm-6 col-lg-12">
@@ -89,89 +89,121 @@
                 <div class="col-lg-4">
                     <div class="card shadow">
                         <div class="card-body p-2">
-                            <table class="table table-bordered mb-0">
+                            <table class="table table-bordered mb-0" v-if="Object.keys(editItem).length >0" >
                                 <tbody>
                                     <tr class="table-white">
-                                        <td colspan="3">
-                                            <div class="text-center text-primary h6 pt-2" v-if="Object.keys(editItem).length >0" >
+                                        <td colspan="4">
+                                            <div class="text-center text-primary h6 pt-2">
                                                     {{editItem.item_name}}
                                             </div>
                                         </td>
                                     </tr>
                                     <tr class="table-info">
-                                        <td>Packing size <span class="float-end"><i class="fa-solid fa-caret-right"></i></span></td>
-                                        <td colspan="2" class="text-center">
-                                            <div class="" v-if="Object.keys(editItem).length >0" data-bs-toggle="modal" data-bs-target="#selectPackingSizeModal">
-                                                    1{{editItem.parent_unit}} * {{editItem.item_per_package}}{{editItem.child_unit}}
+                                        <td class="col-1">Packing size <span class="float-end"><i class="fa-solid fa-caret-right"></i></span></td>
+                                        <td colspan="3" class="text-center col-2" data-bs-toggle="modal" data-bs-target="#selectPackingSizeModal">
+                                            <div class="" v-if="Object.keys(editItem.packing_size).length" >
+                                                    <span v-if="editItem.packing_size.largest_unit">1{{editItem.packing_size.largest_unit}} * </span>
+                                                    <span v-if="editItem.packing_size.medium_qty">{{editItem.packing_size.medium_qty}}</span><span v-else>1</span>{{editItem.packing_size.medium_unit}}
+                                                    * {{editItem.packing_size.smallest_qty}}{{editItem.packing_size.smallest_unit}}
                                             </div>
                                         </td>
                                     </tr>
                                     <tr class="table-secondary">
-                                        <td>Shop Qty</td>
-                                        <td class="text-center">
-                                            <div  v-if="Object.keys(editItem).length >0">
-                                               {{editItem.qty}}{{editItem.child_unit}}
-                                            </div>
-                                        </td>
-                                        <td class="text-center">
-                                            <div  v-if="Object.keys(editItem).length >0">
-                                                {{editItem.qty ? Math.floor(editItem.qty / editItem.item_per_package) : 0}}{{editItem.parent_unit}} * {{editItem.qty ? Math.floor(editItem.qty % editItem.item_per_package) : 0}}{{editItem.child_unit}}
+                                        <td>Shop Qty</td>                                       
+                                        <td class="text-center" colspan="3">
+                                            <div  v-if="editItem.packing_size">
+                                                {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            
                                             </div>
                                         </td>
                                     </tr>    
-                                    <tr class="table-secondary">
-                                        <td>Main Qty</td>
-                                        <td class="text-center">
-                                            <div  v-if="Object.keys(editItem).length >0">
-                                               {{editItem.main_qty}}{{editItem.child_unit}}
-                                            </div>
-                                        </td>
-                                        <td class="text-center">
-                                            <div  v-if="Object.keys(editItem).length >0">
-                                                {{editItem.main_qty ? Math.floor(editItem.main_qty / editItem.item_per_package) : 0}}{{editItem.parent_unit}} * {{editItem.main_qty ? Math.floor(editItem.main_qty % editItem.item_per_package) : 0}}{{editItem.child_unit}}
-                                            </div>
-                                        </td>
-                                    </tr>                                    
                                     <tr class="table-primary">
-                                        <td>Retail price</td>
+                                        <td class="">Main Qty</td>                                      
+                                        <td class="text-center" colspan="3">
+                                            <div  v-if="editItem.packing_size">
+                                                {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.main_qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            
+                                            </div>
+                                        </td>
+                                    </tr>            
+                                    <tr class="fw-bold">
+                                        <td></td>
                                         <td class="text-center">
-                                            <div  v-if="Object.keys(editItem).length >0">
-                                                1 {{editItem.child_unit}} {{editItem.retail_price}}
-                                                </div>
+                                            <span v-if="Object.keys(editItem.packing_size).length">{{editItem.packing_size.largest_unit}}</span>
+                                            <span v-else>L unit</span>
                                         </td>
                                         <td class="text-center">
-                                            <div  v-if="Object.keys(editItem).length >0">
-                                                1 {{editItem.parent_unit}} {{editItem.retail_price * editItem.item_per_package}}
-                                            </div>
-                                            </td>
+                                            <span v-if="Object.keys(editItem.packing_size).length">{{editItem.packing_size.medium_unit}}</span>
+                                            <span v-else>M unit</span>
+                                        </td>                                        
+                                        <td class="text-center" >
+                                            <span v-if="Object.keys(editItem.packing_size).length">{{editItem.packing_size.smallest_unit}}</span>
+                                            <span v-else>S unit</span>
+                                        </td>
+                                    </tr>                        
+                                    <tr class="">
+                                        <td class="pt-2">Pur price</td>
+                                        <td class="text-center p-0">
+                                            <span v-if="Object.keys(editItem.packing_size).length > 0">
+                                            <input :disabled="!editItem.packing_size.largest_unit" @keyup="calPurPrice('largest_unit')" type="number" v-model="editItem.pur_price.largest_unit" class="form-control-plaintext text-center">
+                                            </span>
+                                        </td>
+                                        <td class="text-center p-0">
+                                            <span v-if="Object.keys(editItem.packing_size).length > 0">
+                                            <input :disabled="!editItem.packing_size.medium_unit"  @keyup="calPurPrice('medium_unit')"  type="number" v-model="editItem.pur_price.medium_unit" class="form-control-plaintext text-center">
+                                            </span>
+                                        </td>
+                                        <td class="text-center p-0">
+                                            <span v-if="Object.keys(editItem.packing_size).length > 0">
+                                                <input :disabled="!editItem.packing_size.smallest_unit" @keyup="calPurPrice('smallest_unit')" type="number" v-model="editItem.pur_price.smallest_unit" class="form-control-plaintext text-center">
+                                            </span>
+                                        </td>                                        
                                     </tr>
-                                    <tr class="table-success">
-                                        <td>Wholesale price</td>
-                                        <td colspan="" class="text-center">
-                                            <div  v-if="Object.keys(editItem).length >0">
-                                                1 {{editItem.child_unit}} {{editItem.whole_sale_price}}
-                                            </div>
+                                    <tr class="">
+                                        <td class="pt-2">Retail price</td>
+                                        <td class="text-center p-0">
+                                            <span v-if="Object.keys(editItem.packing_size).length > 0">
+                                            <input :disabled="!editItem.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="editItem.retail_price.largest_unit" class="form-control-plaintext text-center">
+                                            </span>
                                         </td>
-                                        <td class="text-center">            
-                                            <div  v-if="Object.keys(editItem).length >0">
-                                                1 {{editItem.parent_unit}} {{editItem.whole_sale_price * editItem.item_per_package}}
-                                            </div>
+                                        <td class="text-center p-0">
+                                            <span v-if="Object.keys(editItem.packing_size).length > 0">
+                                            <input :disabled="!editItem.packing_size.medium_unit"  @keyup="calRetailPrice('medium_unit')"  type="number" v-model="editItem.retail_price.medium_unit" class="form-control-plaintext text-center">
+                                            </span>
                                         </td>
-                                    </tr>      
-                                    <tr class="table-warning">
-                                        <td>Purchase price</td>
-                                        <td colspan="" class="text-center">
-                                            <div  v-if="Object.keys(editItem).length >0">
-                                                1 {{editItem.child_unit}} {{editItem.pur_price}}
-                                            </div>
+                                        <td class="text-center p-0">
+                                            <span v-if="Object.keys(editItem.packing_size).length > 0">
+                                                <input :disabled="!editItem.packing_size.smallest_unit" @keyup="calRetailPrice('smallest_unit')" type="number" v-model="editItem.retail_price.smallest_unit" class="form-control-plaintext text-center">
+                                            </span>
+                                        </td>                                        
+                                    </tr>
+                                    <tr class="">
+                                        <td class="pt-2">Whole sale price</td>
+                                        <td class="text-center p-0">
+                                            <span v-if="Object.keys(editItem.packing_size).length > 0">
+                                            <input :disabled="!editItem.packing_size.largest_unit" @keyup="calWholesalePrice('largest_unit')" type="number" v-model="editItem.whole_sale_price.largest_unit" class="form-control-plaintext text-center">
+                                            </span>
                                         </td>
-                                        <td class="text-center">                                  
-                                            <div  v-if="Object.keys(editItem).length >0">
-                                                1 {{editItem.parent_unit}} {{editItem.pur_price * editItem.item_per_package}}
-                                            </div>
+                                        <td class="text-center p-0">
+                                            <span v-if="Object.keys(editItem.packing_size).length > 0">
+                                            <input :disabled="!editItem.packing_size.medium_unit"  @keyup="calWholesalePrice('medium_unit')"  type="number" v-model="editItem.whole_sale_price.medium_unit" class="form-control-plaintext text-center">
+                                            </span>
                                         </td>
-                                    </tr>                             
+                                        <td class="text-center p-0">
+                                            <span v-if="Object.keys(editItem.packing_size).length > 0">
+                                                <input :disabled="!editItem.packing_size.smallest_unit" @keyup="calWholesalePrice('smallest_unit')" type="number" v-model="editItem.whole_sale_price.smallest_unit" class="form-control-plaintext text-center">
+                                            </span>
+                                        </td>                                        
+                                    </tr>                                              
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="4">
+                                            <button class="btn btn-sm" @click="saveEdit">                     
+                                            <span v-if="!isSavingEdit"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSavingEdit"></span>
+                                             </button>
+                                        </td>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -193,6 +225,7 @@ import Footer from '@/views/partials/Footer.vue'
 import * as ss from "@/lib/snapshot/products"
 import PackingSizeModal from "@/views/modals/product/PackingSize.vue";
 import SelectPackingSizeModal from "@/views/modals/product/SelectPackingSize.vue";
+import * as hp from "@/lib/helper"
 
 export default {
     components: {
@@ -210,7 +243,6 @@ export default {
         return{
             code_no :"",
             item_name:"",
-            item_per_package: "",
             products : [],
             isLoading: false,
             sortBy:"asc",
@@ -221,6 +253,7 @@ export default {
             editItem:{},
             isUpdating:false,
             isSaving:false,
+            isSavingEdit:false,
             isDeleting:false,
             selected_items:[],
             msg : {
@@ -265,10 +298,12 @@ export default {
     },
 
     methods:{   
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
+        },
+        
         setPackingSize(p){
-            this.editItem.parent_unit=p.parent_unit;
-            this.editItem.child_unit=p.child_unit;
-            this.editItem.item_per_package=p.packing;
+            this.editItem.packing_size=p;
             this.saveEdit();
         } ,
         async removeProduct(i, p){
@@ -291,16 +326,12 @@ export default {
                 user: {uid:this.user.uid, email:this.user.email},
                 item_name: this.item_name, 
                 code_no : code_no,
-                item_per_package: Number(this.item_per_package),
                 qty : 0,
-                retail_price: 0,
-                whole_sale_price: 0,
+                retail_price: {},
+                whole_sale_price: {},
                 created_at : save_time,          
-                pur_price: 0,
+                pur_price: {},
                 main_qty:0,
-                child_uni:"",
-                parent_unit:"",
-
             }
             const result=await addDoc(dataCollection, data);
             if(result){
@@ -312,7 +343,6 @@ export default {
             }
             this.fetchProducts();
             this.item_name="";
-            this.item_per_package="";
             this.code_no="";
             this.v$.$reset()
             this.isSaving=false;
@@ -322,22 +352,83 @@ export default {
             this.fetchProducts();
         },
        async saveEdit(){
+        this.isSavingEdit=true;
             const updateDocument=doc(db, "products", this.editItem.id)
                 await updateDoc(updateDocument, {
-                    item_name : this.editItem.item_name,
-                    parent_unit: this.editItem.parent_unit,
-                    child_unit: this.editItem.child_unit,
-                    item_per_package: this.editItem.item_per_package,
-                    code_no: this.editItem.code_no,
+                    packing_size : this.editItem.packing_size,
+                    pur_price: this.editItem.pur_price,
+                    retail_price: this.editItem.retail_price,
+                    whole_sale_price: this.editItem.whole_sale_price,
                  })  
+            this.isSavingEdit=false;
+        },
+        calRetailPrice(unit){
+            const er=this.editItem.retail_price;
+            const ep=this.editItem.packing_size;
+            switch(unit){
+                case "largest_unit":
+                    this.editItem.retail_price.medium_unit = Math.floor(er.largest_unit / ep.medium_qty)
+                    this.editItem.retail_price.smallest_unit = Math.floor((er.largest_unit / ep.medium_qty) / ep.smallest_qty)
+                break;
+                case "medium_unit":
+                    this.editItem.retail_price.largest_unit = Math.floor(er.medium_unit * ep.medium_qty)
+                    this.editItem.retail_price.smallest_unit = Math.floor(er.medium_unit / ep.smallest_qty)
+                break;
+                case "smallest_unit":
+                    this.editItem.retail_price.largest_unit = Math.floor((er.smallest_unit * ep.smallest_qty) * ep.medium_qty)
+                    this.editItem.retail_price.medium_unit = Math.floor(er.smallest_unit * ep.smallest_qty)
+                break;
+            }
+        },
+        calPurPrice(unit){
+            const er=this.editItem.pur_price;
+            const ep=this.editItem.packing_size;
+            switch(unit){
+                case "largest_unit":
+                    this.editItem.pur_price.medium_unit = Math.floor(er.largest_unit / ep.medium_qty)
+                    this.editItem.pur_price.smallest_unit = Math.floor((er.largest_unit / ep.medium_qty) / ep.smallest_qty)
+                break;
+                case "medium_unit":
+                    this.editItem.pur_price.largest_unit = Math.floor(er.medium_unit * ep.medium_qty)
+                    this.editItem.pur_price.smallest_unit = Math.floor(er.medium_unit / ep.smallest_qty)
+                break;
+                case "smallest_unit":
+                    this.editItem.pur_price.largest_unit = Math.floor((er.smallest_unit * ep.smallest_qty) * ep.medium_qty)
+                    this.editItem.pur_price.medium_unit = Math.floor(er.smallest_unit * ep.smallest_qty)
+                break;
+            }
+        },
+        calWholesalePrice(unit){
+            const er=this.editItem.whole_sale_price;
+            const ep=this.editItem.packing_size;
+            switch(unit){
+                case "largest_unit":
+                    this.editItem.whole_sale_price.medium_unit = Math.floor(er.largest_unit / ep.medium_qty)
+                    this.editItem.whole_sale_price.smallest_unit = Math.floor((er.largest_unit / ep.medium_qty) / ep.smallest_qty)
+                break;
+                case "medium_unit":
+                    this.editItem.whole_sale_price.largest_unit = Math.floor(er.medium_unit * ep.medium_qty)
+                    this.editItem.whole_sale_price.smallest_unit = Math.floor(er.medium_unit / ep.smallest_qty)
+                break;
+                case "smallest_unit":
+                    this.editItem.whole_sale_price.largest_unit = Math.floor((er.smallest_unit * ep.smallest_qty) * ep.medium_qty)
+                    this.editItem.whole_sale_price.medium_unit = Math.floor(er.smallest_unit * ep.smallest_qty)
+                break;
+            }
         },
         setEdit(i){
             this.editItem=this.products[i];
+            this.$store.dispatch("setProduct", this.editItem)
         },
         clearSearch(){
             this.search_by_code="";
             this.search_by_description="";
             this.searchProducts();
+        },
+        onPaste(){
+            setTimeout(()=>{
+                this.searchProducts();
+            }, 200)
         },
         searchProducts(){
             this.products=[];
@@ -355,71 +446,11 @@ export default {
                            }
                        }) 
             }
+            if(this.products.length > 0){
+                this.setEdit(0)
+            }
         },
-        sortProducts(sort){   
-            this.products=[];
-            this.sort_item=sort;
-            if(this.sortBy=="asc"){
-                this.sortBy="desc"
-                this.products=this.productsData.sort((a,b)=>{
-                    const item_a=a.item_name.toUpperCase();
-                    const item_b=b.item_name.toUpperCase();
-                    switch(sort){
-                        case "qty":
-                            return a.qty - b.qty;
-                        break;
-                        case "item_per_package":
-                            return a.item_per_package - b.item_per_package;
-                        break;
-                        case "item_name":
-                          return item_a < item_b ? 1 : -1;
-                        break;
-                        case "code_no":
-                            return a.code_no - b.code_no;
-                        break;
-                        case "retail_price":
-                            return a.retail_price - b.retail_price;
-                        break;
-                        case "whole_sale_price":
-                           return  a.whole_sale_price - b.whole_sale_price;
-                        break;
-                        case "pur_price":
-                           return  a.pur_price - b.pur_price;
-                        break;
-                    }
-                })
-            }else{
-                this.sortBy="asc"
-                this.products=this.productsData.sort((a,b)=>{
-                    const item_a=a.item_name.toUpperCase();
-                    const item_b=b.item_name.toUpperCase();
-                    switch(sort){
-                        case "qty":
-                            return a.qty + b.qty;
-                        break;
-                        case "item_per_package":
-                            return a.item_per_package + b.item_per_package;
-                        break;
-                        case "item_name":
-                            return item_a < item_b ? -1 : 1;
-                        break;
-                        case "code_no":
-                            return a.code_no + b.code_no;
-                        break;
-                        case "retail_price":
-                            return a.retail_price + b.retail_price;
-                        break;
-                        case "whole_sale_price":
-                           return  a.whole_sale_price + b.whole_sale_price;
-                        break;
-                        case "pur_price":
-                           return  a.pur_price + b.pur_price;
-                        break;
-                    }
-                })
-            }            
-        },
-        
+      
         async fetchProducts(){                    
             const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
             const snapShot=await getDocs(query_url)        
@@ -432,10 +463,10 @@ export default {
             }
             const products=ss.products(snapShot);            
             this.productsData=products;
-            this.products=products;
+            this.searchProducts();
+            //this.products=products;
             this.isLoading=false;
             this.isUpdating=false;
-            this.editItem=products[0]
        } ,
     }
 }

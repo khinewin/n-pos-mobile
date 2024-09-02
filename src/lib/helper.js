@@ -12,13 +12,31 @@ const showTime=(t)=>{
     return formattedDate;
 };
 
-const calQtyL=(qty, ipp)=>{
-    return Math.floor(qty / ipp) 
-}
-const calQtyS=(qty, ipp)=>{
-    return Math.floor(qty % ipp) 
-}
 
+    const calPackingQty=(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit)=>{
+        if(l_unit){
+            const l=Math.floor(qty / (m_unit_qty * s_unit_qty))
+            const m=Math.floor((qty % (m_unit_qty * s_unit_qty)) / s_unit_qty)
+            const s=(qty % (m_unit_qty * s_unit_qty)) % s_unit_qty
+
+            const ll=`${l ? l : ''}${l ? l_unit : ''}`
+            const mm=`${m ? m : ''}${m ? m_unit : ''}`
+            const ss=`${s ? s : ''}${s ? s_unit : ''}`
+
+            return `${ll}${l && m ? ", ": ""}${mm}${m && s ? ", ":""}${ss}`
+        }
+        if(!l_unit){
+            const m=Math.floor((qty / s_unit_qty))
+            const s =Math.floor(qty % s_unit_qty)
+
+            const mm=`${m ? m : ''}${m ? m_unit : ''}`
+            const ss=`${s ? s : ''}${s ? s_unit : ''}`
+
+             return `${mm}${m && s ? ", ":""}${ss}`
+        }
+    }
+    
+   
 
 const gb_date=groupBy(['group_date'])
 const gb_item_name_sale_price=groupBy(['item_name', 'sale_price'])
@@ -44,9 +62,8 @@ export   {
     gb_item_name_retail_price,
     gb_item_name_pur_price,
     gb_exp_date,
-    calQtyL,
-    calQtyS,
     gb_item_name_adj_type,
     gb_location,
-    gb_adj_type
+    gb_adj_type,
+    calPackingQty
     };

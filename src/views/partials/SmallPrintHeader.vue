@@ -1,7 +1,7 @@
 <template lang="">
     <div class="">
         <div class="">
-               <h4 class=""> Printing with N-PRO-POS</h4>
+               <h4 class=""> Printing with N-PHARMACY</h4>
                <div class="small">ခြံအမှတ် (၅)၊ သဲပုံစေတီအရှေ့လမ်းကြား (Rocket သောက်ရေသန့်စက်ရုံလမ်း)၊ တက္ကသိုလ်ပတ်လမ်း၊ ရှိုးကန့်ရပ်ကွက်၊ စျေးကြို ၊ မော်လမြိုင်မြို့။ </div>
                <div class="small">09970488345</div>
         </div>

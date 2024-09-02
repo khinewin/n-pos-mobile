@@ -10,6 +10,7 @@ import { createStore } from 'vuex'
     printSale:{},
     reportsData:[],
     reportType:"",
+    product:{},
   },
 
   getters: {
@@ -21,6 +22,7 @@ import { createStore } from 'vuex'
     printSale:state=>state.printSale,
     reportsData:state=>state.reportsData,
     reportType:state=>state.reportType,
+    product:state=>state.product,
   },
 
   mutations: {
@@ -47,7 +49,10 @@ import { createStore } from 'vuex'
       },
       SET_REPORT_TYPE(state, payload){
           state.reportType=payload
-      } 
+      },
+      SET_PRODUCT(state, payload){
+          state.product=payload;
+      }
   },
 
   actions: {
@@ -74,6 +79,9 @@ import { createStore } from 'vuex'
       },
       setReportType(context, payload){
           context.commit("SET_REPORT_TYPE", payload)
+      },
+      setProduct(context, payload){
+          context.commit("SET_PRODUCT", payload)
       }
   },
   

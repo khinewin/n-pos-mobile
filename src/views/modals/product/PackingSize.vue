@@ -13,36 +13,30 @@
                         <div class="col-4 d-grid"><button class="btn btn-sm text-dark" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button></div>
                  </div>
                    <div class="row g-2">
-                    <div class="col-6">
+                    <div class="col-12">
                         <table class="table table-bordered mb-0 table-hover">
                             <tbody class="small">
                                 <tr class="table-secondary text-center">
-                                    <td>Parent unit</td>
+                                    <td>Packing name</td>
+                                    <td>Packing unit</td>
                                 </tr>      
                                 <tr class="">
-                                    <td class="p-0"><input type="text" @keypress.enter="saveParentUnit" v-model="parent_unit" class="form-control-plaintext text-center"></td>
-                                </tr>                                
-                                <tr class="" v-if="parentPackingSizes.length > 0"  v-for="p in parentPackingSizes" :key="p.id"  style="cursor:context-menu">
-                                    <td class="text-center"><a href="#!" class='text-danger float-start' @click="removePackingSize(p)"><i class="fa-solid fa-square-minus"></i></a> {{p.parent_unit}}</td>
+                                    <td class="p-0"><input type="text" @keypress.enter="savePackingSize" v-model="packing_name" class="form-control-plaintext text-center"></td>
+                                    <td class="p-0"><input type="text" @keypress.enter="savePackingSize" v-model="packing_unit" class="form-control-plaintext text-center"></td>
+                                </tr>                                                                                       
+                                <tr  class="" v-if="packingSizes.length > 0"  v-for="p in packingSizes" :key="p.id" @mouseenter="setEdit(p)"  style="cursor:context-menu">
+                                    <td class="p-0 position-relative">
+                                        <a href="#!" class='text-danger position-absolute start-0 top-50 translate-middle ps-2' @click="removePackingSize(p)"><i class="fa-solid fa-square-minus"></i></a>
+                                        <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center" v-model="p.packing_name">
+                                        </td>
+                                    <td class="text-center p-0">
+                                        <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center" v-model="p.packing_unit">
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="col-6">
-                        <table class="table table-bordered mb-0 table-hover">
-                            <tbody class="small">
-                                <tr class="table-secondary text-center">
-                                    <td>Child unit</td>
-                                </tr>      
-                                <tr class="">
-                                    <td class="p-0"><input type="text" @keypress.enter="saveChildUnit" v-model="child_unit" class="form-control-plaintext text-center"></td>
-                                </tr>                                
-                                <tr class="" v-if="childPackingSizes.length > 0"  v-for="p in childPackingSizes" :key="p.id"   style="cursor:context-menu">
-                                    <td class="text-center"><a href="#!" class='text-danger float-start' @click="removePackingSize(p)"><i class="fa-solid fa-square-minus"></i></a> {{p.child_unit}}</td>                                             
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    
                    </div>
                     <div v-if="isLoading">
                         <div colspan="5">
@@ -72,13 +66,12 @@ export default {
   
    data(){
        return{
-           parentPackingSizes:[],
-           childPackingSizes:[],
+            packingSizes:[],
+            packing_unit:"",
+            packing_name:"",
            isUpdating:false,
-           isLoading:false,
-           parent_unit:"",
-           packing:"",
-           child_unit:"",
+           isLoading:false,       
+           editItem:{}
        }
    },   
    mounted() {
@@ -109,33 +102,28 @@ export default {
             await deleteDoc(document) //if no items delete document;
             this.fetchpackingSizes();  
         },
-      async saveParentUnit(){          
-            if(!this.parent_unit) return false;
-            this.isSaving=true;
-            const created_at=Timestamp.fromDate(new Date());
-            const dataCollection=collection(db, "packingSizes", )
-            const data={
-                user: {uid:this.user.uid, email:this.user.email},
-                parent_unit: this.parent_unit,               
-                created_at: created_at
-            }
-            const result=await addDoc(dataCollection, data);
-            this.fetchpackingSizes();
-            this.parent_unit="";           
+        setEdit(p){
+            this.editItem=p;
         },
-        async saveChildUnit(){          
-            if(!this.child_unit) return false;
+        async saveEdit(){
+            const data=doc(db, "packingSizes", this.editItem.id)
+            await updateDoc(data, this.editItem)
+        },
+        async savePackingSize(){          
+            if(!this.packing_unit || !this.packing_name) return false;
             this.isSaving=true;
             const created_at=Timestamp.fromDate(new Date());
             const dataCollection=collection(db, "packingSizes", )
             const data={
                 user: {uid:this.user.uid, email:this.user.email},
-                child_unit: this.child_unit,               
+                packing_unit: this.packing_unit,         
+                packing_name: this.packing_name,      
                 created_at: created_at
             }
             const result=await addDoc(dataCollection, data);
             this.fetchpackingSizes();
-            this.child_unit="";           
+            this.packing_unit="";          
+            this.packing_name=""; 
         },
        updateData(){
                this.isUpdating=true;
@@ -145,10 +133,8 @@ export default {
        async fetchpackingSizes(){
        const query_url = query(collection(db, "packingSizes"), orderBy("created_at", "desc"));
        const snapShot=await getDocs(query_url)
-       const parentPackingSizes=ss.packingParentSizes(snapShot)     
-       const childPackingSizes=ss.packingChildSizes(snapShot)  
-       this.parentPackingSizes=parentPackingSizes;
-       this.childPackingSizes=childPackingSizes;
+       const pz=ss.packingSizes(snapShot)          
+       this.packingSizes=pz;
        this.isLoading=false;
        this.isUpdating=false;
       } ,

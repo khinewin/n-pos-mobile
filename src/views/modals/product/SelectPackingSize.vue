@@ -7,36 +7,53 @@
                <div class="card">
                    <div class="card-body p-2"> 
                     <div class="row justify-content-end mb-2">
-                        <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateData"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
-                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
-                        </button></div>
+                        <div class="col-4 d-grid">
+                            <button class="btn btn-sm text-dark" data-bs-dismiss="modal" @click="setCode"><span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
+                            </button>
+                        </div>
+                        <div class="col-4 d-grid">
+                            <button class="btn btn-sm text-dark" @click="updateData"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
+                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
+                            </button>
+                        </div>
                         <div class="col-4 d-grid"><button class="btn btn-sm text-dark" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button></div>
                     </div> 
                    <div class="row g-2">
                     <div class="col-12">
                         <table class="table table-bordered mb-0">
                             <tbody class="small">
-                                <tr class="table-secondary text-center">
-                                    <td>Parent unit</td>
-                                    <td>Packing</td>
-                                    <td>Child unit</td>
-                                </tr>     
-                                                       
-                                <tr class="" style="cursor:context-menu">
-                                    <td class="text-center p-0">
-                                        <select @change="setCode" class="form-control-plaintext  text-center" v-model="parent_unit">
-                                            <option  v-if="parentPackingSizes.length > 0"  v-for="p in parentPackingSizes" :key="p.id" >{{p.parent_unit}}</option>
+                                <tr class="text-center">
+                                    <td class="col-1">Largest unit</td>
+                                    
+                                    <td class="col-1 p-0" colspan="2">
+                                        <select class="form-control-plaintext text-center" v-model="largest_unit">
+                                            <option v-for="s in packingSizes" :key="s.id">{{s.packing_unit}}</option>
                                         </select>
                                     </td>
-                                    <td class="p-0">
-                                        <input @keypress.enter="setCode" type="number" class="form-control-plaintext text-center" v-model="packing">
+                                </tr> 
+                                <tr class=" text-center">
+                                    <td>Medium unit</td>
+                                    <td class="col-1 p-0">
+                                        <input type="number" class="form-control-plaintext text-center" v-model="medium_qty">
                                     </td>
-                                    <td class="text-center p-0">
-                                        <select @change="setCode" class="form-control-plaintext  text-center" v-model="child_unit">
-                                            <option  v-if="childPackingSizes.length > 0"  v-for="p in childPackingSizes" :key="p.id" >{{p.child_unit}}</option>
+                                    <td class="col-1 p-0">
+                                        <select class="form-control-plaintext text-center" v-model="medium_unit">
+                                            <option v-for="s in packingSizes" :key="s.id">{{s.packing_unit}}</option>
                                         </select>
                                     </td>
-                                </tr>
+                                </tr>      
+                                <tr class="text-center">
+                                    <td>Smallest unit</td>
+                                    <td class="col-1 p-0">
+                                        <input type="number" class="form-control-plaintext text-center" v-model="smallest_qty">
+                                    </td>
+                                    <td class="col-1 p-0">
+                                        <select class="form-control-plaintext text-center " v-model="smallest_unit">
+                                            <option v-for="s in packingSizes" :key="s.id">{{s.packing_unit}}</option>
+                                        </select>
+                                    </td>
+                                </tr>                                 
                             </tbody>
                         </table>
                     </div>
@@ -69,21 +86,27 @@ import { required, email ,helpers} from '@vuelidate/validators'
 export default {   
    data(){
        return{
-           parentPackingSizes:[],
-           childPackingSizes:[],
+           packingSizes:[],
            isUpdating:false,
            isLoading:false,
-           parent_unit:"",
-           packing:"",
-           child_unit:"",
+           isSaving:false,
+           smallest_unit:"",
+           smallest_qty:"",
+        
+           medium_unit:"",
+           medium_qty:"",
+
+           largest_unit:"",
        }
    },   
    mounted() {
     const myModalEl = document.getElementById('selectPackingSizeModal')
-       myModalEl.addEventListener('hidden.bs.modal', event => {     
-           this.parent_unit="";
-           this.packing="";
-           this.child_unit="";          
+       myModalEl.addEventListener('show.bs.modal', event => {     
+            this.smallest_unit=this.product.packing_size.smallest_unit
+            this.smallest_qty=this.product.packing_size.smallest_qty;
+            this.medium_qty=this.product.packing_size.medium_qty;
+            this.medium_unit=this.product.packing_size.medium_unit;
+            this.largest_unit=this.product.packing_size.largest_unit;
        })   
    },
    created(){
@@ -96,7 +119,9 @@ export default {
        user(){
            return this.$store.getters.user;
        },    
-      
+      product(){
+        return this.$store.getters.product;
+      }
    },
    watch:{       
        user(data){
@@ -109,9 +134,21 @@ export default {
    },
    methods:{
         setCode(){
-            if(this.parent_unit && this.packing && this.child_unit){
-                const packingSize={parent_unit : this.parent_unit, packing: this.packing, child_unit: this.child_unit}
+            if(this.medium_unit && this.smallest_qty && this.smallest_unit){
+                const packingSize={
+                    largest_unit: this.largest_unit,
+                    medium_qty: this.medium_qty,
+                    medium_unit: this.medium_unit,
+                    smallest_qty: this.smallest_qty,
+                    smallest_unit: this.smallest_unit,
+                }
                 this.$emit("setPackingSize", packingSize)
+
+                this.largest_unit="";
+                this.medium_qty="";
+                this.medium_unit="";
+                this.smallest_qty="";
+                this.smallest_unit="";
             }
         },
        updateData(){
@@ -121,11 +158,9 @@ export default {
       
        async fetchpackingSizes(){
        const query_url = query(collection(db, "packingSizes"), orderBy("created_at", "desc"));
-       const snapShot=await getDocs(query_url)
-       const parentPackingSizes=ss.packingParentSizes(snapShot)     
-       const childPackingSizes=ss.packingChildSizes(snapShot)  
-       this.parentPackingSizes=parentPackingSizes;
-       this.childPackingSizes=childPackingSizes;
+       const snapShot=await getDocs(query_url)      
+       const pz=ss.packingSizes(snapShot)  
+       this.packingSizes=pz;
        this.isLoading=false;
        this.isUpdating=false;
       } ,
