@@ -63,10 +63,11 @@
                                 <tr class="small text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
                                     <td class="col-2">Descrption</td>
-                                    <td class="col-1">Exp. date</td>                                   
-                                    <td class="col-1">Qty</td>
-                                    <td class="col-1">Item price</td>                                    
-                                    <td class="col-2" colspan="3">Discount</td>                                    
+                                    <td class="col-1">Exp. date</td>     
+                                    <td class="col-1">Packing size</td>                              
+                                    <td class="col-1" colspan="1">Qty</td>
+                                    <td class="col-2" colspan="2">Unit price</td>                                    
+                                    <td class="col-1">Discount</td>                                    
                                     <td class="col-1">Amount</td>
                                     <td class="col-1">Discount</td>
                                     <td class="col-1">Price</td>
@@ -82,32 +83,40 @@
                                     <td class="p-0">
                                         <input @change="setExpDate(st.id)"  type="date"  v-model="st.tmp_exp_date" class="form-control-plaintext text-center"  placeholder="Exp. date">                                   
                                     </td>
+                                    <td class="pt-2">
+                                        {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
+                                    </td>
+                                    <td class="pt-2 text-end" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.pur_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                                    </td>                                                                   
                                     <td class="p-0">
-                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.pur_qty" class="form-control-plaintext  text-center"  placeholder="Qty">                                      
-                                    </td>                                   
-                                    <td class="p-0">
-                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.pur_price" class="form-control-plaintext  text-center" placeholder="Price">                                        
+                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.qty_pur_price" class="form-control-plaintext  text-center" placeholder="Price">                                        
                                     </td>
                                     <td class="p-0">
-                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.dis_qty" class="form-control-plaintext  text-center" placeholder="0">                                       
+                                        <select @change="calEdit" class="form-control-plaintext text-center" v-model="st.qty_pur_price_unit">
+                                            <option  v-for="pu in onlyString(st.packing_size)">{{pu}}</option>
+                                        </select>
                                     </td>
-                                    <td class="p-0">
-                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.dis_percent" class="form-control-plaintext  text-center" placeholder="0">                                       
-                                    </td>
-                                    <td class="p-0">
-                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.dis_amount" class="form-control-plaintext text-center" placeholder="0">                                       
-                                    </td>
+                                    <td class="text-center pt-2" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
+                                        <span v-if="st.dis_qty">{{st.dis_qty}}{{st.dis_qty_unit}}</span>
+                                            <span v-if="st.dis_amount">{{st.dis_amount}}$</span>
+                                            <span v-if="st.dis_percent">{{st.dis_percent}}%</span>                                      
+                                    </td>                                                                   
                                     <td class="text-end pt-2">{{st.amount}}</td>
                                     <td class="text-end pt-2">{{st.discount}}</td>
                                     <td class="text-end pt-2">{{st.price}}</td>
                                 </tr>
                                 <tr class="small">
-                                    <td colspan="10" class="text-end">Amount</td>
+                                    <td colspan="10" class="text-end">Total amount</td>
                                     <td class="text-end">{{total_amount}}</td>
                                 </tr>
                                 <tr class="small">
-                                    <td colspan="10" class="text-end">Discount</td>
+                                    <td colspan="10" class="text-end">Total discount</td>
                                     <td class="text-end ">{{total_discount}}</td>
+                                </tr>
+                                <tr class="small">
+                                    <td colspan="10" class="text-end">Total price</td>
+                                    <td class="text-end">{{total_price}}</td>
                                 </tr>
                                 <tr class="small">
                                     <td colspan="10" class="text-end pt-2">Extra discount</td>
@@ -116,8 +125,8 @@
                                     </td>
                                 </tr>
                                 <tr class="small">
-                                    <td colspan="10" class="text-end">Total price</td>
-                                    <td class="text-end">{{total_price}}</td>
+                                    <td colspan="10" class="text-end">Grand total price</td>
+                                    <td class="text-end">{{grand_total_price}}</td>
                                 </tr>
                             </tbody>
                         </table>                                                                                                                    
@@ -128,7 +137,124 @@
         </div>
         </div>
         </div>
-        
+        <!-- pur price Modal -->
+        <div class="modal fade" id="setQtyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+            <div class="modal-content">               
+                <div class="modal-body p-2">
+                    <div class="row text-end mb-2">                       
+                        <div class="col-6">
+                            <button type="button" class="btn btn-sm" @click="setPurQty" data-bs-dismiss="modal">
+                                <span ><i class="fa-solid fa-hard-drive"></i> Save</span>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                        </div>
+                    </div>
+                    <div>
+                        <table class="table table-bordered" v-if="Object.keys(editItem).length">
+                            <tbody>
+                                <tr v-if="editItem.packing_size.largest_unit">
+                                    <td class="p-0">
+                                        <input type="number" v-model="editItem.pur_l_qty" class="form-control-plaintext text-center">
+                                    </td>
+                                    <td class="p-0">
+                                        <select class="form-control-plaintext text-center" v-model="editItem.pur_l_unit">
+                                                <option selected>{{editItem.packing_size.largest_unit}}</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0">
+                                        <input type="number" v-model="editItem.pur_m_qty" class="form-control-plaintext text-center">
+                                    </td>
+                                    <td class="p-0">
+                                        <select class="form-control-plaintext text-center" v-model="editItem.pur_m_unit">
+                                                <option selected>{{editItem.packing_size.medium_unit}}</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0">
+                                        <input type="number" v-model="editItem.pur_s_qty" class="form-control-plaintext text-center">
+                                    </td>
+                                    <td class="p-0">
+                                        <select class="form-control-plaintext text-center" v-model="editItem.pur_s_unit">
+                                                <option selected>{{editItem.packing_size.smallest_unit}}</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>                
+            </div>
+            </div>
+        </div>
+        <!--end pur price modal-->  
+        <!-- discount price Modal -->
+        <div class="modal fade" id="setDiscountModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+            <div class="modal-content">               
+                <div class="modal-body p-2">
+                    <div class="row text-end mb-2 justify-content-end">     
+                        <div class="col-4" v-if="Object.keys(editItem).length">
+                            <button v-if="editItem.amount" type="button" @click="saveDiscount" class="btn btn-sm" :disabled="isLoading" data-bs-dismiss="modal">
+                                <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
+                            </button>
+                        </div>                  
+                        <div class="col-4" v-if="Object.keys(editItem).length">
+                            <button type="button" class="btn btn-sm" @click="clearDiscount" v-if="editItem.amount">
+                                <span><i class="fa-solid fa-broom"></i>  Clear</span>
+                            </button>
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                        </div>
+                    </div>
+                    <div>
+                        <table class="table table-bordered" v-if="Object.keys(editItem).length">
+                            <tbody v-if="editItem.amount">
+                                <tr>
+                                    <td class="p-0">
+                                        <select @change="calDiscount" class="form-control-plaintext text-center" v-model="editItem.dis_qty_unit">
+                                                <option  v-for="pu in onlyString(editItem.packing_size)">{{pu}}</option>
+                                        </select>
+                                    </td>
+                                    <td class="p-0">
+                                        <input type="number" @change="calDiscount" @keyup="calDiscount" v-model="editItem.dis_qty" class="form-control-plaintext text-center">
+                                    </td>                                    
+                                </tr>
+                                <tr>
+                                    <td class="pt-2 text-center">
+                                        %
+                                    </td>
+                                    <td class="p-0">
+                                        <input @keyup="calDiscount" @change="calDiscount" type="number" v-model="editItem.dis_percent" class="form-control-plaintext text-center">
+                                    </td>                                    
+                                </tr>
+                                <tr>
+                                    <td class="pt-2 text-center">
+                                        $
+                                    </td>
+                                    <td class="p-0">
+                                        <input @keyup="calDiscount" @change="calDiscount" type="number" v-model="editItem.dis_amount" class="form-control-plaintext text-center">
+                                    </td>                                    
+                                </tr>
+                                <tr>
+                                    <td class="p-1 text-end">Discount</td>
+                                    <td  class="p-1 text-center">{{editItem.discount}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>                
+            </div>
+            </div>
+        </div>
+        <!--end discount modal-->  
     </div>
 </template>
 <script>
@@ -139,6 +265,8 @@ import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, q
 import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/purchase/ProductModal.vue'
 import SupplierModal from '@/views/modals/purchase/SupplierModal.vue'
+import * as hp from "@/lib/helper"
+
 export default {
     components: {
         PageHeader, ProductModal, SupplierModal
@@ -168,10 +296,13 @@ export default {
             purchase_item: {},
             storePurchase: [],
             editItem: {},
+
             extra_discount: 0,
             total_amount:0,
             total_discount:0,
             total_price:0,
+            grand_total_price:0,
+
             location: "Main",
 
         
@@ -209,6 +340,27 @@ export default {
     },
     
     methods:{
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
+        },
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
+        },
+        onlyString(p){
+           if(p.largest_unit){
+            return {
+                largest_unit : p.largest_unit,
+                 medium_unit: p.medium_unit, 
+                 smallest_unit:p.smallest_unit
+                }
+           }
+           if(!p.largest_unit){
+            return {
+                 medium_unit: p.medium_unit, 
+                 smallest_unit:p.smallest_unit
+                }
+           }
+        },
         setExpDate(id){
             this.editItem.exp_date=Timestamp.fromDate(new Date(this.editItem.tmp_exp_date))
         },
@@ -216,46 +368,159 @@ export default {
             this.supplier_name=s.name;
             this.supplier=s;
         },
+
+        clearDiscount(){
+            this.editItem.dis_amount=0;
+            this.editItem.dis_qty=0;
+            this.editItem.dis_percent=0;
+            this.editItem.dis_qty_unit="";
+            const e=this.editItem;
+            e.discount=0;           
+        },
+        
+        saveDiscount(){
+            const e=this.editItem;
+            return this.storePurchase.map((f)=>{  
+                if(f.id===e.id){
+                    f.dis_qty=e.dis_qty ? e.dis_qty : null;
+                    f.dis_qty_unit=e.dis_qty_unit ? e.dis_qty_unit : null;
+                    f.dis_amount=e.dis_amount ? e.dis_amount : null;
+                    f.dis_percent=e.dis_percent ? e.dis_percent :null;
+                    f.discount=e.discount;
+                    f.price =f.amount - e.discount;
+                }
+            }) && this.calTotal();
+        },
+        calDiscount(){
+            const e=this.editItem;
+            return this.storePurchase.map((f)=>{   
+                if(f.id===e.id){
+                    if(e.dis_amount){
+                        e.discount=e.dis_amount;
+                    }else if(e.dis_percent){
+                        e.discount=(f.amount * e.dis_percent) /100;
+                    }else if(e.dis_qty){      
+                        const arr=Object.entries(e.packing_size)               
+                        const d_units=arr.filter((ft)=>{
+                            return ft[1]==e.dis_qty_unit;
+                        })  
+                       const dis_unit=d_units[0][0]  
+                       console.log(dis_unit)
+                       let discount=0;
+                       if(dis_unit=="largest_unit"){
+                           discount=e.pur_price.largest_unit * e.dis_qty
+                       }else if(dis_unit=="medium_unit"){
+                            discount=e.pur_price.medium_unit * e.dis_qty;
+                       }else if(dis_unit=="smallest_unit"){
+                            discount=e.pur_price.smallest_unit * e.dis_qty;
+                       }    
+                       e.discount=discount;                        
+                    }
+                    else{
+                        e.discount=0;
+                    }
+                }
+            })
+        },      
+
+        setPurQty(){
+            const e=this.editItem;
+                let pur_qty=0;
+                pur_qty += e.pur_l_qty ? e.pur_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
+                pur_qty += e.pur_m_qty ? e.pur_m_qty * e.packing_size.smallest_qty: 0;
+                pur_qty += e.pur_s_qty ? e.pur_s_qty : 0;
+               return this.storePurchase.map((f)=>{   
+                    if(f.id===e.id){
+                        f.pur_qty=pur_qty,
+                        f.pur_l_qty =e.pur_l_qty ? e.pur_l_qty : 0,
+                        f.pur_m_qty= e.pur_m_qty ? e.pur_m_qty : 0,
+                        f.pur_s_qty= e.pur_s_qty  ? e.pur_s_qty  : 0
+                    }
+               }) &&
+               this.calEdit();
+        },
      
         setEdit(i){
             const item=this.storePurchase[i];
-            this.editItem=item;
+            this.editItem={...item, 
+                pur_l_unit: item.packing_size.largest_unit,
+                pur_m_unit: item.packing_size.medium_unit,
+                pur_s_unit: item.packing_size.smallest_unit,
+                pur_l_qty: item.pur_l_qty ? item.pur_l_qty : 0,
+                pur_m_qty: item.pur_m_qty ? item.pur_m_qty : 0,
+                pur_s_qty: item.pur_s_qty  ? item.pur_s_qty  : 0
+            };
         },
         calEdit(i){
             const oei=this.editItem;
-           return this.storePurchase.map((f)=>{
+            this.storePurchase.map((f)=>{
                 if(f.id===oei.id){
-                   f.amount=f.pur_qty * f.pur_price;
-                   if(f.dis_qty){                        
-                        f.discount=f.dis_qty * f.pur_price;
-                        f.price=f.amount - f.discount;
-                   }else 
-                   if(f.dis_percent){
-                        f.discount= f.amount * f.dis_percent / 100;
-                        f.price=f.amount - f.discount;
-                       
-                   }else if(f.dis_amount){
-                        f.price= f.amount - f.dis_amount;
-                        f.discount=f.dis_amount;
-                       
-                   }else{
-                        f.price=f.amount;
-                        f.discount=0;
-                        f.dis_qty=0;
-                        f.dis_amount=0;
-                        f.dis_percent=0;
-                   }
+                    if(f.qty_pur_price && f.qty_pur_price_unit){
+                       const arr=Object.entries(f.packing_size)
+                        const units=arr.filter((ft)=>{
+                            return ft[1]==f.qty_pur_price_unit;
+                        })  
+                       const pur_unit=units[0][0]     
+                       let amount=0;
+                       if(pur_unit=="largest_unit"){
+                           amount=Math.floor((f.qty_pur_price / (f.packing_size.medium_qty * f.packing_size.smallest_qty)) * f.pur_qty)
+                       }else if(pur_unit=="medium_unit"){
+                            amount=Math.floor((f.qty_pur_price / f.packing_size.smallest_qty) * f.pur_qty)
+                       }else if(pur_unit=="smallest_unit"){
+                            amount=Math.floor(f.qty_pur_price  * f.pur_qty)
+                       }    
+                        f.amount=amount;
+                        f.price=f.discount ? amount - f.discount : amount;
+
+                       let smallest_price=0;
+                       let medium_price=0;
+                       let largest_price=0; 
+                       if(pur_unit=="largest_unit"){
+                           smallest_price=Math.floor((f.qty_pur_price / (f.packing_size.medium_qty * f.packing_size.smallest_qty)))
+                           medium_price=smallest_price * f.packing_size.smallest_qty
+                           largest_price=medium_price * f.packing_size.medium_qty
+                       }else if(pur_unit=="medium_unit"){
+                            smallest_price=Math.floor((f.qty_pur_price / f.packing_size.smallest_qty))
+                            medium_price=smallest_price * f.packing_size.smallest_qty
+                            largest_price=medium_price * f.packing_size.medium_qty
+                       }else if(pur_unit=="smallest_unit"){
+                            smallest_price=Math.floor(f.qty_pur_price)
+                            medium_price=smallest_price * f.packing_size.smallest_qty
+                            largest_price=medium_price * f.packing_size.medium_qty
+                       }    
+
+                       const pur_price={
+                            largest_unit : largest_price,
+                            medium_unit: medium_price,
+                            smallest_unit: smallest_price
+                       }
+                       f.pur_price=pur_price;
+                      
+                    }else{
+                        f.amount=0
+                    }
                 }
             }) && this.calTotal();
            
         },
+        
         calTotal(){
+            let total_amount=0;
+            let total_price=0;
+            let total_discount=0;
+            
+            this.storePurchase.map((m)=>{
+                total_amount += m.amount ? m.amount : 0;
+                total_price += m.price ? m.price : 0;
+                total_discount += m.discount ? m.discount : 0;
+            })
 
-            this.total_amount=this.storePurchase.reduce((accu, cur)=>accu + cur.amount,0)
-            this.total_discount=this.storePurchase.reduce((accu, cur)=>accu + cur.discount,0)
-            this.total_price=this.storePurchase.reduce((accu, cur)=>accu + cur.price,0)
+            this.total_amount=total_amount;
+            this.total_discount=total_discount;
+            this.total_price=total_price;
+
             if(this.extra_discount){
-                this.total_price =this.total_price - this.extra_discount;
+                this.grand_total_price=total_price - this.extra_discount
             }
         },
         removeStoreItem(i){
@@ -265,7 +530,7 @@ export default {
             this.storePurchase.push(this.purchase_item)   
          },
         setCode(p){           
-            this.purchase_item={...p, pur_qty: "", pur_price: ""};
+            this.purchase_item={...p, pur_qty: "", qty_pur_price: ""};
             const s=this.storePurchase;
             let temStore=[]
             for(let i=0; i<s.length; i++){
@@ -325,11 +590,12 @@ export default {
             this.supplier={}
             this.storePurchase=[]
             this.purchase_item=null
-            this.editItem=null,
+            this.editItem={},
             this.total_amount=0,
             this.total_discount=0,
             this.total_price=0,
             this.extra_discount=0
+            this.grand_total_price=0;
             this.v$.$reset()
         },
            
@@ -340,142 +606,3 @@ export default {
     
 </style>
 
-
-  <!--
-                                           <ul class="list-gorup list-group-flush">
-                        <li class="list-group-item">
-                            <div class="row justify-content-end">
-                                <div class="col-lg-3">
-                                    <div class="text-end mt-2">Voucher no. :</div>
-                                </div>
-                                <div class="col-lg-3">                                 
-                                    <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext border-bottom" id="voucher_no" placeholder="Voucher no">                                        
-                                </div>
-                            </div>     
-                        </li>                       
-                        <li class="list-group-item">
-                            <div class="row justify-content-end">
-                                <div class="col-lg-3">
-                                    <div class="text-end mt-2">Date :</div>
-                                </div>
-                                <div class="col-lg-3">                                
-                                    <input type="date" :class="{'border-0 border-bottom border-danger' : v$.pur_date.$errors.length > 0}"  v-model="pur_date" class="form-control-plaintext border-bottom" id="pur_date" placeholder="Date">                                        
-                                </div>
-                            </div>     
-                        </li>
-                        <li class="list-group-item">
-                            <div class="row justify-content-end">
-                                <div class="col-lg-3">                                
-                                    <div class="text-end mt-2">Supplier :</div>
-                                </div>
-                                <div class="col-lg-3">                                
-                                    <input type="text" :class="{'border-0 border-bottom border-danger' : v$.supplier.name.$errors.length > 0}"  v-model="supplier.name" data-bs-toggle="modal" data-bs-target="#searchSupplier"  class="form-control-plaintext border-bottom">                                        
-                                    
-                                </div>
-                            </div>     
-                        </li>
-                   </ul>              
-                -->
-                   <!--
-                <ul class="list-group ">
-        
-                    <li class="list-group-item list-group-item-action">
-                        <div class="row g-0 small fw-bold">
-                            <div class="col-lg-1" >Code</div>
-                            <div class="col-lg-2">Desc</div>
-                            <div class="col-lg-1 text-center">Qty</div>
-                            <div class="col-lg-2 text-center">Item price</div>
-                            <div class="col-lg-2 text-center">
-                                <div class="row g-0">
-                                    <div class="col-4">Dis qty</div>
-                                    <div class="col-4">Dis %</div>
-                                    <div class="col-4">Dis $</div>
-                                </div>
-                            </div>                           
-                            <div class="col-lg-1 text-center">Amout</div>
-                            <div class="col-lg-1 text-center">Dis</div>
-                            <div class="col-lg-2 text-center">Price</div>
-                        </div> 
-                    </li>
-                    <li class="list-group-item list-group-item-action" v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase" :key="st.id">
-                        <div class="row g-0 small"  @mouseenter="setEdit(i)"  @keypress.enter="calEdit(i)" @mouseleave="calEdit(i)">
-                            <div class="col-lg-1" >
-                                <a class="text-danger" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>
-                                 {{st.code_no}}
-                                </div>
-                            <div class="col-lg-2">{{st.item_name}}</div>
-                            <div class="col-lg-1 text-center">                                
-                                <span  v-if="editItem && editItem.code_no ==st.code_no">
-                                    <input   type="number"  v-model="editItem.pur_qty" class="form-control-plaintext form-control-sm text-center"  placeholder="Qty">
-                                 </span>
-                                 <span v-else>{{st.pur_qty}}</span>
-                            </div>
-                            <div class="col-lg-2 text-center">
-                                <span  v-if="editItem && editItem.code_no ==st.code_no">
-                                    <input  type="number"  v-model="editItem.pur_price" class="form-control-plaintext form-control-sm text-center" placeholder="Price">
-                                 </span>
-                                 <span v-else>{{st.pur_price}}</span>
-                            </div>
-                            <div class="col-lg-2 text-center">
-                                <div class="row g-0">
-                                    <div class="col-4">
-                                        <span  v-if="editItem && editItem.code_no ==st.code_no">
-                                            <input  type="number"  v-model="editItem.dis_qty" class="form-control-plaintext form-control-sm text-center" placeholder="Dis qty">
-                                         </span>
-                                         <span v-else>{{st.dis_qty}}</span>
-                                    </div>
-                                    <div class="col-4">
-                                        <span  v-if="editItem && editItem.code_no ==st.code_no">
-                                            <input  type="number"  v-model="editItem.dis_percent" class="form-control-plaintext form-control-sm text-center" placeholder="Dis %">
-                                         </span>
-                                         <span v-else>{{st.dis_percent}}</span>
-                                    </div>
-                                    <div class="col-4">
-                                        <span  v-if="editItem && editItem.code_no ==st.code_no">
-                                            <input  type="number"  v-model="editItem.dis_amount" class="form-control-plaintext form-control-sm text-center" placeholder="Dis $">
-                                         </span>
-                                         <span v-else>{{st.dis_amount}}</span>
-                                    </div>
-                                </div>
-                            </div>    
-                            <div class="col-lg-1 text-center">                                
-                                 <span>{{st.amount}}</span>
-                            </div>
-                            <div class="col-lg-1 text-center">                                
-                                <span>{{st.discount}}</span>
-                           </div>
-                            <div class="col-lg-2 text-center">                                
-                                <span>{{st.price}}</span>
-                           </div>
-                        </div> 
-                    </li>
-                    
-                    <li class="list-group-item list-group-item-action">
-                        <div class="row g-0 small fw-bold justify-content-end">                            
-                            <div class="col-lg-1 text-end">Amount</div>
-                            <div class="col-lg-2 text-center">{{total_amount}}</div>
-                        </div> 
-                    </li>
-                    <li class="list-group-item list-group-item-action">
-                        <div class="row g-0 small fw-bold justify-content-end">                            
-                            <div class="col-lg-1 text-end">Discount</div>
-                            <div class="col-lg-2 text-center">{{total_discount}}</div>
-                        </div> 
-                    </li>
-                    <li class="list-group-item list-group-item-action">
-                        <div class="row g-0 small fw-bold justify-content-end">                            
-                            <div class="col-lg-1 text-end">Extra discount</div>
-                            <div class="col-lg-2 text-center">
-                                <input  type="number" @keyup="calTotal"  v-model="extra_discount" class="form-control-plaintext form-control-sm text-center" placeholder="0">
-                            </div>
-                        </div> 
-                    </li>
-                    
-                    <li class="list-group-item list-group-item-action">
-                        <div class="row g-0 small fw-bold justify-content-end">                            
-                            <div class="col-lg-1 text-end">Total price</div>
-                            <div class="col-lg-2 text-center">{{total_price}}</div>
-                        </div> 
-                    </li>
-                </ul> 
-            -->

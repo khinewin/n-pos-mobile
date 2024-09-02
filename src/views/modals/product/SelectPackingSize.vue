@@ -136,11 +136,11 @@ export default {
         setCode(){
             if(this.medium_unit && this.smallest_qty && this.smallest_unit){
                 const packingSize={
-                    largest_unit: this.largest_unit,
-                    medium_qty: this.medium_qty,
-                    medium_unit: this.medium_unit,
-                    smallest_qty: this.smallest_qty,
-                    smallest_unit: this.smallest_unit,
+                    largest_unit: this.largest_unit ? this.largest_unit : null,
+                    medium_qty: this.medium_qty ? this.medium_qty : null,
+                    medium_unit: this.medium_unit ? this.medium_unit : null,
+                    smallest_qty: this.smallest_qty ? this.smallest_qty : null,
+                    smallest_unit: this.smallest_unit ? this.smallest_unit : null,
                 }
                 this.$emit("setPackingSize", packingSize)
 

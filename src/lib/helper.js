@@ -35,6 +35,15 @@ const showTime=(t)=>{
              return `${mm}${m && s ? ", ":""}${ss}`
         }
     }
+
+  const  calPackingSize=(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty)=>{
+        if(l_unit){
+            return `1${l_unit} * ${m_unit_qty}${m_unit} * ${s_unit_qty}${s_unit}`
+        }
+        if(!l_unit){
+            return `1${m_unit} * ${s_unit_qty}${s_unit}`
+        }
+    }
     
    
 
@@ -65,5 +74,6 @@ export   {
     gb_item_name_adj_type,
     gb_location,
     gb_adj_type,
-    calPackingQty
+    calPackingQty,
+    calPackingSize,
     };

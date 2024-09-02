@@ -13,7 +13,7 @@
                         <div class="col-4 d-grid"><button class="btn btn-sm text-dark" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button></div>
                  </div>
                    <div class="row g-2">
-                    <div class="col-12">
+                    <div class="col-12 vh-75 overflow-y-auto">
                         <table class="table table-bordered mb-0 table-hover">
                             <tbody class="small">
                                 <tr class="table-secondary text-center">

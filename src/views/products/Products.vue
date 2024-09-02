@@ -1,6 +1,6 @@
 <template lang="">       
  <div>           
-        <PageHeader page-title="Products code" page-code="products" :msg-type="msg.type" :msg-info="msg.info"/>
+        <PageHeader page-title="Medicine code" page-code="medicineCode" :msg-type="msg.type" :msg-info="msg.info"/>
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">   
                 <div class="col-sm-2 d-grid">
@@ -58,16 +58,16 @@
                                             </td>                                     
                                         </tr>     
                                                                 
-                                    <tr class="text-center"  v-if="products.length > 0"  v-for="(p, i) in products" :key="p.id" @click="setEdit(i)"  @keypress.enter="saveEdit" :class="{'table-secondary' : editItem.id === p.id}">                                    
+                                    <tr class="text-center"  v-if="products.length > 0"  v-for="(p, i) in products" :key="p.id" @click="setEdit(i)" :class="{'table-secondary' : editItem.id === p.id}">                                    
                                         <td :class="{'table-secondary': sort_item ==='code_no'}" class="p-0 col-1 position-relative">
                                             <a class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeProduct(i, p)"><i class="fa-solid fa-square-minus"></i></a>                                                                                       
                                             <span>
-                                                <input type="text" class="form-control-plaintext text-center " v-model="p.code_no">
+                                                <input @keypress.enter="saveEdit" @paste="pasteEdit" type="text" class="form-control-plaintext text-center " v-model="p.code_no">
                                             </span>
                                         </td>
                                         <td :class="{'table-secondary': sort_item ==='item_name'}" class="p-0 col-2">
                                             <span>
-                                                <input type="text" class="form-control-plaintext ms-2" v-model="p.item_name">
+                                                <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext ms-2" v-model="p.item_name">
                                             </span>
                                         </td>                                       
                                     </tr>
@@ -99,7 +99,7 @@
                                         </td>
                                     </tr>
                                     <tr class="table-info">
-                                        <td class="col-1">Packing size <span class="float-end"><i class="fa-solid fa-caret-right"></i></span></td>
+                                        <td class="col-1 py-1">Packing size <span class="float-end"><i class="fa-solid fa-caret-right"></i></span></td>
                                         <td colspan="3" class="text-center col-2" data-bs-toggle="modal" data-bs-target="#selectPackingSizeModal">
                                             <div class="" v-if="Object.keys(editItem.packing_size).length" >
                                                     <span v-if="editItem.packing_size.largest_unit">1{{editItem.packing_size.largest_unit}} * </span>
@@ -109,7 +109,7 @@
                                         </td>
                                     </tr>
                                     <tr class="table-secondary">
-                                        <td>Shop Qty</td>                                       
+                                        <td class="py-1">Shop Qty</td>                                       
                                         <td class="text-center" colspan="3">
                                             <div  v-if="editItem.packing_size">
                                                 {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            
@@ -117,7 +117,7 @@
                                         </td>
                                     </tr>    
                                     <tr class="table-primary">
-                                        <td class="">Main Qty</td>                                      
+                                        <td class="py-1">Main Qty</td>                                      
                                         <td class="text-center" colspan="3">
                                             <div  v-if="editItem.packing_size">
                                                 {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.main_qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            
@@ -196,8 +196,8 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td colspan="4">
-                                            <button class="btn btn-sm" @click="saveEdit">                     
+                                        <td colspan="4" class="p-0 text-end">
+                                            <button class="btn btn-sm" @click="savePrice">                     
                                             <span v-if="!isSavingEdit"><i class="fa-solid fa-hard-drive"></i> Save</span>
                                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSavingEdit"></span>
                                              </button>
@@ -301,11 +301,28 @@ export default {
         calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
             return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
-        
+        pasteEdit(){
+            setTimeout(()=>{
+                this.saveEdit();
+            },300)
+        },
+        async saveEdit(){
+            const updateDocument=doc(db, "products", this.editItem.id)
+                await updateDoc(updateDocument, {
+                    item_name : this.editItem.item_name,
+                    code_no: this.editItem.code_no,                  
+                 })  
+        },
         setPackingSize(p){
             this.editItem.packing_size=p;
-            this.saveEdit();
+           this.savePackingSize();
         } ,
+        async savePackingSize(){
+            const updateDocument=doc(db, "products", this.editItem.id)
+                await updateDoc(updateDocument, {
+                    packing_size : this.editItem.packing_size,                  
+                 })  
+        },
         async removeProduct(i, p){
             const cf=confirm(`Are you sure ? delete the product code : ${p.item_name} `)
             if(!cf) return false;
@@ -316,6 +333,7 @@ export default {
             this.msg.info="Product code delete successful"
         },
         async saveCode(){
+            this.saveEdit();
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
             this.isSaving=true;
@@ -351,17 +369,17 @@ export default {
             this.isUpdating=true;
             this.fetchProducts();
         },
-       async saveEdit(){
+       async savePrice(){
         this.isSavingEdit=true;
             const updateDocument=doc(db, "products", this.editItem.id)
                 await updateDoc(updateDocument, {
-                    packing_size : this.editItem.packing_size,
                     pur_price: this.editItem.pur_price,
                     retail_price: this.editItem.retail_price,
                     whole_sale_price: this.editItem.whole_sale_price,
                  })  
             this.isSavingEdit=false;
         },
+       
         calRetailPrice(unit){
             const er=this.editItem.retail_price;
             const ep=this.editItem.packing_size;

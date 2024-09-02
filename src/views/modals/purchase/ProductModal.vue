@@ -57,17 +57,13 @@
                                                     <td class="text-center">{{p.code_no}}</td>
                                                     <td>{{p.item_name}}</td>
                                                     <td class="col-1">
-                                                        <span v-if="p.parent_unit && p.child_unit">1{{p.parent_unit}} * {{p.item_per_package}}{{p.child_unit}}</span>
+                                                        {{calPackingSize(p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit, p.packing_size.medium_qty, p.packing_size.smallest_qty)}}
                                                     </td>
                                                     <td class="text-end col-1">
-                                                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0">{{calQtyL(p.qty, p.item_per_package)}}{{p.parent_unit}}</span>
-                                                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0 && calQtyS(p.qty, p.item_per_package) > 0">, </span>
-                                                        <span v-if="calQtyS(p.qty, p.item_per_package) > 0">{{calQtyS(p.qty, p.item_per_package)}}{{p.child_unit}}</span>                
+                                                        {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                             
                                                     </td>                                                  
                                                     <td class="text-end col-1">
-                                                        <span v-if="calQtyL(p.main_qty, p.item_per_package) > 0">{{calQtyL(p.main_qty, p.item_per_package)}}{{p.parent_unit}}</span>
-                                                        <span v-if="calQtyL(p.main_qty, p.item_per_package) > 0 && calQtyS(p.main_qty, p.item_per_package) > 0">, </span>
-                                                        <span v-if="calQtyS(p.main_qty, p.item_per_package) > 0">{{calQtyS(p.main_qty, p.item_per_package)}}{{p.child_unit}}</span>                
+                                                        {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.main_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -154,11 +150,11 @@ export default {
       
     },
     methods:{
-        calQtyL(qty,ipp){
-            return hp.calQtyL(qty,ipp)
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
-        calQtyS(qty, ipp){
-            return hp.calQtyS(qty,ipp)
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
         updateProducts(){
                 this.isUpdating=true;
