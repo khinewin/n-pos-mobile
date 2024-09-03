@@ -16,20 +16,20 @@
             <div class="card shadow min-vh-75">
                 <div  class="card-body p-2">
                     <form @submit.prevent="savePurchase">
-                        <div class="row justify-content-end">
-                            <div class="col-sm-6 col-lg-4">
+                        <div class="row justify-content-end mb-2">
+                            <div class="col-sm-6">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4 p-2">Voucher no. :</td>
-                                            <td class="col-8 py-0">
-                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
+                                            <td class="text-end col-6 py-1">Voucher no. :</td>
+                                            <td class="col-6 py-0">
+                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext form-control-sm  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end col-4 p-2">Location :</td>
-                                            <td class="col-8">
-                                                <select class="form-control-plaintext" v-model="location">
+                                            <td class="text-end py-1">Location :</td>
+                                            <td class="">
+                                                <select class="form-control-plaintext form-control-sm border-bottom" v-model="location">
                                                     <option value="Main">Main</option>
                                                     <option value="Shop">Shop</option>
                                                 </select>
@@ -38,32 +38,33 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="col-sm-6 col-lg-4">
+                            <div class="col-sm-6">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>                                       
                                         <tr>
-                                            <td class="text-end pt-2">Pur date :</td>
-                                            <td class="py-0">
-                                                <input type="date" :class="{'border-0 border-bottom border-danger' : v$.pur_date.$errors.length > 0}"  v-model="pur_date" class="form-control-plaintext border-bottom" id="pur_date" placeholder="Date">                                                
+                                            <td class="text-end py-1 col-6">Pur date :</td>
+                                            <td class="py-0 col-6">
+                                                <input type="date" :class="{'border-0 border-bottom border-danger' : v$.pur_date.$errors.length > 0}"  v-model="pur_date" class="form-control-plaintext form-control-sm border-bottom" id="pur_date" placeholder="Date">                                                
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end pt-2">Supplier :</td>
+                                            <td class="text-end py-1">Supplier :</td>
                                             <td class="py-0">
-                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.supplier.name.$errors.length > 0}"  v-model="supplier.name" data-bs-toggle="modal" data-bs-target="#searchSupplier"  class="form-control-plaintext border-bottom">                                                
+                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.supplier.name.$errors.length > 0}"  v-model="supplier.name" data-bs-toggle="modal" data-bs-target="#searchSupplier"  class="form-control-plaintext form-control-sm border-bottom">                                                
                                             </td>
                                         </tr>
                                     </tbody>
                               </table>
                             </div>
                         </div>
-                        <button  type="button" :class="{'text-danger':v$.storePurchase.$errors.length > 0}"  class="btn btn-sm"   data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i></button>
-                        <table class="table table-bordered mb-0  table-hover">
+                        <table class="table table-bordered mb-0  table-hover" :class="{'border-danger':v$.storePurchase.$errors.length > 0}" >
                             <tbody>
                                 <tr class="small text-center fw-bold table-secondary">
-                                    <td class="col-1">Code</td>
-                                    <td class="col-2">Descrption</td>
-                                    <td class="col-1">Exp. date</td>     
+                                    <td class="col-1"> 
+                                        Code
+                                    </td>
+                                    <td class="col-2 " data-bs-toggle="modal" data-bs-target="#searchCode" style="cursor: context-menu;" ><i class="fa-solid fa-circle-plus"></i> Description</td>
+                                    <td class="col-1 ">Exp. date</td>     
                                     <td class="col-1">Packing size</td>                              
                                     <td class="col-1" colspan="1">Qty</td>
                                     <td class="col-2" colspan="2">Unit price</td>                                    
@@ -81,7 +82,7 @@
                                     </td>
                                     <td class="pt-2">{{st.item_name}}</td>
                                     <td class="p-0">
-                                        <input @change="setExpDate(st.id)"  type="date"  v-model="st.tmp_exp_date" class="form-control-plaintext text-center"  placeholder="Exp. date">                                   
+                                        <input @change="setExpDate(st.id)"  type="date"  v-model="st.tmp_exp_date" class="form-control-plaintext form-control-sm text-center"  placeholder="Exp. date">                                   
                                     </td>
                                     <td class="pt-2">
                                         {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
@@ -90,10 +91,10 @@
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.pur_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>                                                                   
                                     <td class="p-0">
-                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.qty_pur_price" class="form-control-plaintext  text-center" placeholder="Price">                                        
+                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.qty_pur_price" class="form-control-plaintext form-control-sm  text-center" placeholder="Price">                                        
                                     </td>
                                     <td class="p-0">
-                                        <select @change="calEdit" class="form-control-plaintext text-center" v-model="st.qty_pur_price_unit">
+                                        <select @change="calEdit" class="form-control-plaintext form-control-sm text-center" v-model="st.qty_pur_price_unit">
                                             <option  v-for="pu in onlyString(st.packing_size)">{{pu}}</option>
                                         </select>
                                     </td>
@@ -121,7 +122,7 @@
                                 <tr class="small">
                                     <td colspan="10" class="text-end pt-2">Extra discount</td>
                                     <td class="text-end">
-                                        <input  type="number" @keyup="calTotal"  v-model="extra_discount" class="form-control-plaintext  text-end" placeholder="0">
+                                        <input  type="number" @keyup="calTotal"  v-model="extra_discount" class="form-control-plaintext form-control-sm  text-end" placeholder="0">
                                     </td>
                                 </tr>
                                 <tr class="small">
@@ -153,34 +154,37 @@
                         </div>
                     </div>
                     <div>
-                        <table class="table table-bordered" v-if="Object.keys(editItem).length">
+                        <table class="table table-bordered mb-0" v-if="Object.keys(editItem).length">
                             <tbody>
+                                <tr>
+                                    <td colspan="2" class="text-center p-2" >{{editItem.item_name}}</td>
+                                </tr>
                                 <tr v-if="editItem.packing_size.largest_unit">
                                     <td class="p-0">
-                                        <input type="number" v-model="editItem.pur_l_qty" class="form-control-plaintext text-center">
+                                        <input type="number" v-model="editItem.pur_l_qty" class="form-control-plaintext form-control-sm text-center">
                                     </td>
                                     <td class="p-0">
-                                        <select class="form-control-plaintext text-center" v-model="editItem.pur_l_unit">
+                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.pur_l_unit">
                                                 <option selected>{{editItem.packing_size.largest_unit}}</option>
                                         </select>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="p-0">
-                                        <input type="number" v-model="editItem.pur_m_qty" class="form-control-plaintext text-center">
+                                        <input type="number" v-model="editItem.pur_m_qty" class="form-control-plaintext form-control-sm text-center">
                                     </td>
                                     <td class="p-0">
-                                        <select class="form-control-plaintext text-center" v-model="editItem.pur_m_unit">
+                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.pur_m_unit">
                                                 <option selected>{{editItem.packing_size.medium_unit}}</option>
                                         </select>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="p-0">
-                                        <input type="number" v-model="editItem.pur_s_qty" class="form-control-plaintext text-center">
+                                        <input type="number" v-model="editItem.pur_s_qty" class="form-control-plaintext form-control-sm text-center">
                                     </td>
                                     <td class="p-0">
-                                        <select class="form-control-plaintext text-center" v-model="editItem.pur_s_unit">
+                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.pur_s_unit">
                                                 <option selected>{{editItem.packing_size.smallest_unit}}</option>
                                         </select>
                                     </td>
@@ -218,13 +222,16 @@
                         <table class="table table-bordered" v-if="Object.keys(editItem).length">
                             <tbody v-if="editItem.amount">
                                 <tr>
+                                    <td colspan="2" class="text-center p-2" >{{editItem.item_name}}</td>
+                                </tr>
+                                <tr>
                                     <td class="p-0">
-                                        <select @change="calDiscount" class="form-control-plaintext text-center" v-model="editItem.dis_qty_unit">
+                                        <select @change="calDiscount" class="form-control-plaintext form-control-sm text-center" v-model="editItem.dis_qty_unit">
                                                 <option  v-for="pu in onlyString(editItem.packing_size)">{{pu}}</option>
                                         </select>
                                     </td>
                                     <td class="p-0">
-                                        <input type="number" @change="calDiscount" @keyup="calDiscount" v-model="editItem.dis_qty" class="form-control-plaintext text-center">
+                                        <input type="number" @change="calDiscount" @keyup="calDiscount" v-model="editItem.dis_qty" class="form-control-plaintext form-control-sm text-center">
                                     </td>                                    
                                 </tr>
                                 <tr>
@@ -232,7 +239,7 @@
                                         %
                                     </td>
                                     <td class="p-0">
-                                        <input @keyup="calDiscount" @change="calDiscount" type="number" v-model="editItem.dis_percent" class="form-control-plaintext text-center">
+                                        <input @keyup="calDiscount" @change="calDiscount" type="number" v-model="editItem.dis_percent" class="form-control-plaintext form-control-sm text-center">
                                     </td>                                    
                                 </tr>
                                 <tr>
@@ -240,7 +247,7 @@
                                         $
                                     </td>
                                     <td class="p-0">
-                                        <input @keyup="calDiscount" @change="calDiscount" type="number" v-model="editItem.dis_amount" class="form-control-plaintext text-center">
+                                        <input @keyup="calDiscount" @change="calDiscount" type="number" v-model="editItem.dis_amount" class="form-control-plaintext form-control-sm text-center">
                                     </td>                                    
                                 </tr>
                                 <tr>
@@ -261,11 +268,12 @@
  import PageHeader from "@/views/partials/PageHeader.vue"
  import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query, increment} from 'firebase/firestore'
+import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query, increment, orderBy} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/purchase/ProductModal.vue'
 import SupplierModal from '@/views/modals/purchase/SupplierModal.vue'
 import * as hp from "@/lib/helper"
+import * as ss from "@/lib/snapshot/products"
 
 export default {
     components: {
@@ -303,6 +311,9 @@ export default {
             total_price:0,
             grand_total_price:0,
 
+            code_no:"",
+            products:[],
+
             location: "Main",
 
         
@@ -333,13 +344,15 @@ export default {
             },deep:true
         }
     },
-    created() {     
-      
+    mounted() {           
         this.voucher_no=new Date().getTime();
         this.pur_date=new Date().toISOString().substr(0, 10)
+
+      
     },
     
     methods:{
+       
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
@@ -408,7 +421,6 @@ export default {
                             return ft[1]==e.dis_qty_unit;
                         })  
                        const dis_unit=d_units[0][0]  
-                       console.log(dis_unit)
                        let discount=0;
                        if(dis_unit=="largest_unit"){
                            discount=e.pur_price.largest_unit * e.dis_qty

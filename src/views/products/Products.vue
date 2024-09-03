@@ -44,17 +44,13 @@
                         <div class="card-body p-2 table-responsive ">
                             <div>
                                 <table class="table table-bordered mb-0">
-                                    <tbody>
-                                        <tr class="table-secondary" style="cursor: context-menu;">
-                                            <td class="text-center col-1" @click="sortProducts('code_no')"><i class="fa-solid fa-sort"></i> Code</td>
-                                            <td @click="sortProducts('item_name')" class="col-2"><i class="fa-solid fa-sort"></i> Description</td>                                       
-                                        </tr>                               
+                                    <tbody>                                                                     
                                         <tr>
                                             <td>
-                                                <input placeholder="Code"  type="text" v-model="code_no" class="form-control-plaintext  text-center">
+                                                <input placeholder="Code"  type="text" v-model="code_no" class="form-control-plaintext form-control-sm  text-center">
                                             </td>
                                             <td>
-                                                <input placeholder="Description" @keypress.enter="saveCode" :class="{'border-danger' : v$.item_name.$errors.length}"  type="text" v-model="item_name" class="form-control-plaintext ">
+                                                <input placeholder="Description" @keypress.enter="saveCode" :class="{'border-danger' : v$.item_name.$errors.length}"  type="text" v-model="item_name" class="form-control-plaintext form-control-sm ">
                                             </td>                                     
                                         </tr>     
                                                                 
@@ -62,12 +58,12 @@
                                         <td :class="{'table-secondary': sort_item ==='code_no'}" class="p-0 col-1 position-relative">
                                             <a class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeProduct(i, p)"><i class="fa-solid fa-square-minus"></i></a>                                                                                       
                                             <span>
-                                                <input @keypress.enter="saveEdit" @paste="pasteEdit" type="text" class="form-control-plaintext text-center " v-model="p.code_no">
+                                                <input @keypress.enter="saveEdit" @paste="pasteEdit" type="text" class="form-control-plaintext form-control-sm text-center " v-model="p.code_no">
                                             </span>
                                         </td>
                                         <td :class="{'table-secondary': sort_item ==='item_name'}" class="p-0 col-2">
                                             <span>
-                                                <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext ms-2" v-model="p.item_name">
+                                                <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext form-control-sm ms-2" v-model="p.item_name">
                                             </span>
                                         </td>                                       
                                     </tr>
@@ -143,17 +139,17 @@
                                         <td class="pt-2">Pur price</td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                            <input :disabled="!editItem.packing_size.largest_unit" @keyup="calPurPrice('largest_unit')" type="number" v-model="editItem.pur_price.largest_unit" class="form-control-plaintext text-center">
+                                            <input :disabled="!editItem.packing_size.largest_unit" @keyup="calPurPrice('largest_unit')" type="number" v-model="editItem.pur_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                            <input :disabled="!editItem.packing_size.medium_unit"  @keyup="calPurPrice('medium_unit')"  type="number" v-model="editItem.pur_price.medium_unit" class="form-control-plaintext text-center">
+                                            <input :disabled="!editItem.packing_size.medium_unit"  @keyup="calPurPrice('medium_unit')"  type="number" v-model="editItem.pur_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                                <input :disabled="!editItem.packing_size.smallest_unit" @keyup="calPurPrice('smallest_unit')" type="number" v-model="editItem.pur_price.smallest_unit" class="form-control-plaintext text-center">
+                                                <input :disabled="!editItem.packing_size.smallest_unit" @keyup="calPurPrice('smallest_unit')" type="number" v-model="editItem.pur_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>                                        
                                     </tr>
@@ -161,17 +157,17 @@
                                         <td class="pt-2">Retail price</td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                            <input :disabled="!editItem.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="editItem.retail_price.largest_unit" class="form-control-plaintext text-center">
+                                            <input :disabled="!editItem.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="editItem.retail_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                            <input :disabled="!editItem.packing_size.medium_unit"  @keyup="calRetailPrice('medium_unit')"  type="number" v-model="editItem.retail_price.medium_unit" class="form-control-plaintext text-center">
+                                            <input :disabled="!editItem.packing_size.medium_unit"  @keyup="calRetailPrice('medium_unit')"  type="number" v-model="editItem.retail_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                                <input :disabled="!editItem.packing_size.smallest_unit" @keyup="calRetailPrice('smallest_unit')" type="number" v-model="editItem.retail_price.smallest_unit" class="form-control-plaintext text-center">
+                                                <input :disabled="!editItem.packing_size.smallest_unit" @keyup="calRetailPrice('smallest_unit')" type="number" v-model="editItem.retail_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>                                        
                                     </tr>
@@ -179,24 +175,30 @@
                                         <td class="pt-2">Whole sale price</td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                            <input :disabled="!editItem.packing_size.largest_unit" @keyup="calWholesalePrice('largest_unit')" type="number" v-model="editItem.whole_sale_price.largest_unit" class="form-control-plaintext text-center">
+                                            <input :disabled="!editItem.packing_size.largest_unit" @keyup="calWholesalePrice('largest_unit')" type="number" v-model="editItem.whole_sale_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                            <input :disabled="!editItem.packing_size.medium_unit"  @keyup="calWholesalePrice('medium_unit')"  type="number" v-model="editItem.whole_sale_price.medium_unit" class="form-control-plaintext text-center">
+                                            <input :disabled="!editItem.packing_size.medium_unit"  @keyup="calWholesalePrice('medium_unit')"  type="number" v-model="editItem.whole_sale_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                                <input :disabled="!editItem.packing_size.smallest_unit" @keyup="calWholesalePrice('smallest_unit')" type="number" v-model="editItem.whole_sale_price.smallest_unit" class="form-control-plaintext text-center">
+                                                <input :disabled="!editItem.packing_size.smallest_unit" @keyup="calWholesalePrice('smallest_unit')" type="number" v-model="editItem.whole_sale_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>                                        
                                     </tr>                                              
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td colspan="4" class="p-0 text-end">
+                                        <td class="small">
+                                            <div class="form-check form-switch">
+                                                <input v-model="auto_cal" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+                                                <label class="form-check-label" for="flexSwitchCheckChecked">Auto cal</label>
+                                              </div>                                              
+                                        </td>
+                                        <td colspan="3" class="p-0 text-end">
                                             <button class="btn btn-sm" @click="savePrice">                     
                                             <span v-if="!isSavingEdit"><i class="fa-solid fa-hard-drive"></i> Save</span>
                                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSavingEdit"></span>
@@ -256,6 +258,7 @@ export default {
             isSavingEdit:false,
             isDeleting:false,
             selected_items:[],
+            auto_cal:true,
             msg : {
                 type :"",
                 info :"",
@@ -383,55 +386,61 @@ export default {
         calRetailPrice(unit){
             const er=this.editItem.retail_price;
             const ep=this.editItem.packing_size;
-            switch(unit){
-                case "largest_unit":
-                    this.editItem.retail_price.medium_unit = Math.floor(er.largest_unit / ep.medium_qty)
-                    this.editItem.retail_price.smallest_unit = Math.floor((er.largest_unit / ep.medium_qty) / ep.smallest_qty)
-                break;
-                case "medium_unit":
-                    this.editItem.retail_price.largest_unit = Math.floor(er.medium_unit * ep.medium_qty)
-                    this.editItem.retail_price.smallest_unit = Math.floor(er.medium_unit / ep.smallest_qty)
-                break;
-                case "smallest_unit":
-                    this.editItem.retail_price.largest_unit = Math.floor((er.smallest_unit * ep.smallest_qty) * ep.medium_qty)
-                    this.editItem.retail_price.medium_unit = Math.floor(er.smallest_unit * ep.smallest_qty)
-                break;
+            if(this.auto_cal){
+                switch(unit){
+                    case "largest_unit":
+                        this.editItem.retail_price.medium_unit = Math.floor(er.largest_unit / ep.medium_qty)
+                        this.editItem.retail_price.smallest_unit = Math.floor((er.largest_unit / ep.medium_qty) / ep.smallest_qty)
+                    break;
+                    case "medium_unit":
+                        this.editItem.retail_price.largest_unit = Math.floor(er.medium_unit * ep.medium_qty)
+                        this.editItem.retail_price.smallest_unit = Math.floor(er.medium_unit / ep.smallest_qty)
+                    break;
+                    case "smallest_unit":
+                        this.editItem.retail_price.largest_unit = Math.floor((er.smallest_unit * ep.smallest_qty) * ep.medium_qty)
+                        this.editItem.retail_price.medium_unit = Math.floor(er.smallest_unit * ep.smallest_qty)
+                    break;
+                }
             }
         },
         calPurPrice(unit){
             const er=this.editItem.pur_price;
             const ep=this.editItem.packing_size;
-            switch(unit){
-                case "largest_unit":
-                    this.editItem.pur_price.medium_unit = Math.floor(er.largest_unit / ep.medium_qty)
-                    this.editItem.pur_price.smallest_unit = Math.floor((er.largest_unit / ep.medium_qty) / ep.smallest_qty)
-                break;
-                case "medium_unit":
-                    this.editItem.pur_price.largest_unit = Math.floor(er.medium_unit * ep.medium_qty)
-                    this.editItem.pur_price.smallest_unit = Math.floor(er.medium_unit / ep.smallest_qty)
-                break;
-                case "smallest_unit":
-                    this.editItem.pur_price.largest_unit = Math.floor((er.smallest_unit * ep.smallest_qty) * ep.medium_qty)
-                    this.editItem.pur_price.medium_unit = Math.floor(er.smallest_unit * ep.smallest_qty)
-                break;
+            if(this.auto_cal){
+                switch(unit){
+                    case "largest_unit":
+                        this.editItem.pur_price.medium_unit = Math.floor(er.largest_unit / ep.medium_qty)
+                        this.editItem.pur_price.smallest_unit = Math.floor((er.largest_unit / ep.medium_qty) / ep.smallest_qty)
+                    break;
+                    case "medium_unit":
+                        this.editItem.pur_price.largest_unit = Math.floor(er.medium_unit * ep.medium_qty)
+                        this.editItem.pur_price.smallest_unit = Math.floor(er.medium_unit / ep.smallest_qty)
+                    break;
+                    case "smallest_unit":
+                        this.editItem.pur_price.largest_unit = Math.floor((er.smallest_unit * ep.smallest_qty) * ep.medium_qty)
+                        this.editItem.pur_price.medium_unit = Math.floor(er.smallest_unit * ep.smallest_qty)
+                    break;
+                }
             }
         },
         calWholesalePrice(unit){
             const er=this.editItem.whole_sale_price;
             const ep=this.editItem.packing_size;
-            switch(unit){
-                case "largest_unit":
-                    this.editItem.whole_sale_price.medium_unit = Math.floor(er.largest_unit / ep.medium_qty)
-                    this.editItem.whole_sale_price.smallest_unit = Math.floor((er.largest_unit / ep.medium_qty) / ep.smallest_qty)
-                break;
-                case "medium_unit":
-                    this.editItem.whole_sale_price.largest_unit = Math.floor(er.medium_unit * ep.medium_qty)
-                    this.editItem.whole_sale_price.smallest_unit = Math.floor(er.medium_unit / ep.smallest_qty)
-                break;
-                case "smallest_unit":
-                    this.editItem.whole_sale_price.largest_unit = Math.floor((er.smallest_unit * ep.smallest_qty) * ep.medium_qty)
-                    this.editItem.whole_sale_price.medium_unit = Math.floor(er.smallest_unit * ep.smallest_qty)
-                break;
+            if(this.auto_cal){
+                switch(unit){
+                    case "largest_unit":
+                        this.editItem.whole_sale_price.medium_unit = Math.floor(er.largest_unit / ep.medium_qty)
+                        this.editItem.whole_sale_price.smallest_unit = Math.floor((er.largest_unit / ep.medium_qty) / ep.smallest_qty)
+                    break;
+                    case "medium_unit":
+                        this.editItem.whole_sale_price.largest_unit = Math.floor(er.medium_unit * ep.medium_qty)
+                        this.editItem.whole_sale_price.smallest_unit = Math.floor(er.medium_unit / ep.smallest_qty)
+                    break;
+                    case "smallest_unit":
+                        this.editItem.whole_sale_price.largest_unit = Math.floor((er.smallest_unit * ep.smallest_qty) * ep.medium_qty)
+                        this.editItem.whole_sale_price.medium_unit = Math.floor(er.smallest_unit * ep.smallest_qty)
+                    break;
+                }
             }
         },
         setEdit(i){

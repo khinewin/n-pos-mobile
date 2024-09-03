@@ -95,7 +95,6 @@ import db from '@/firebase/firestore'
 import * as ss from "@/lib/snapshot/sales"
 import * as hp from '@/lib/helper'
 export default {
-   sross:['storeSale'],
    data(){
        return{
            sales:[],

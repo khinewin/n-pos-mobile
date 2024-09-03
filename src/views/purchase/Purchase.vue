@@ -27,18 +27,18 @@
                 </div>
                 <div class=" card-body p-2 table-responsive">
                     <div class="row justify-content-end mb-2">
-                    <div class="col-sm-6 col-lg-4">
+                    <div class="col-sm-6 ">
                         <table class="table mb-0 table-borderless">
                             <tbody>
                                 <tr>
-                                    <td class=" col-2">Voucher no. <span class="float-end">:</span></td>
-                                    <td class="col-4" style="border-bottom: 1px dotted;">
+                                    <td class=" col-6 text-end">Voucher no. <span class="">:</span></td>
+                                    <td class="col-6" style="border-bottom: 1px dotted;">
                                         {{voucher_no}}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class=" col-2">Location <span class="float-end">:</span></td>
-                                    <td class="col-4"  style="border-bottom: 1px dotted;">
+                                    <td class=" text-end">Location <span class="">:</span></td>
+                                    <td class=""  style="border-bottom: 1px dotted;">
                                         {{location}}
                                     </td>
                                 </tr>
@@ -46,17 +46,19 @@
                             </tbody>
                       </table>
                     </div>
-                    <div class="col-sm-6 col-lg-4">
+                    <div class="col-sm-6">
                         <table class="table mb-0 table-borderless">
                             <tbody>                              
                                 <tr>
-                                    <td class="col-2">Pur date <span class="float-end">:</span></td>
-                                    <td class="col-4" v-if="pur_date"  style="border-bottom: 1px dotted;">
-                                        {{showTime(pur_date)}}
+                                    <td class="col-6 text-end">Pur date <span class="">:</span></td>
+                                    <td class="col-6"  style="border-bottom: 1px dotted;">
+                                        <div  v-if="pur_date">
+                                            {{showTime(pur_date)}}
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="">Supplier <span class="float-end">:</span></td>
+                                    <td class="text-end">Supplier <span class="">:</span></td>
                                     <td class=""  style="border-bottom: 1px dotted;">
                                         {{supplier_name}}
                                     </td>

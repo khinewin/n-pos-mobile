@@ -32,18 +32,41 @@
                                         </div>                               
                                 </div>
                               </div>
-                            <div class="row g-1" v-if="products.length > 0"  >                                
-                                <div class="col-6"  v-for="(p,i) in products" :key="p.id" @click="setCode(p)"  style="cursor:context-menu">
-                                        <div class="card" >
-                                            <div class="card-body  small  text-center" :class="[i%3===1 ? 'bg-secondary-subtle' : 'bg-info']">
-                                                    <div class="position-relative pt-2 mt-1">
-                                                        <span>{{p.code_no}}</span>
-                                                        <span class="position-absolute top-0 start-50 translate-middle badge bg-success p-1" :class="{'bg-danger' : p.qty <= 5, 'bg-warning': p.qty >=6 && p.qty <=10}" style="font-size: 12px;">
-                                                            {{p.qty ? Math.floor(p.qty / p.item_per_package) : 0}}*{{p.qty ? Math.floor(p.qty % p.item_per_package) : 0}}
-                                                        </span>
+                            <div class="row g-1" v-if="products.length > 0"  >               
+                                             
+                                <div class="col-12"  v-for="(p,i) in products" :key="p.id" @click="setCode(p)"  style="cursor:context-menu">
+                                        <div class="card">
+                                            <div class="card-body p-1 small  text-center" :class="[i%2===1 ? 'bg-secondary-subtle' : 'bg-info']">
+                                                    <div class="row g-1">
+                                                        <div class="col-6">
+                                                            {{p.code_no}}
+                                                        </div>
+                                                        <div class="col-6">
+                                                            {{p.item_name}}
+                                                        </div>
                                                     </div>
-                                                    <div>{{p.item_name}}</div>
-                                                    <div class="small">{{p.retail_price}}/{{p.whole_sale_price}} MMK</div>                                                    
+                                                    <div class="row g-1">
+                                                        <div class="col-6">
+                                                            {{calPackingSize(p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit, p.packing_size.medium_qty, p.packing_size.smallest_qty)}}
+                                                        </div> 
+                                                        <div class="col-6">
+                                                            {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                             
+                                                        </div>                                                                                                              
+                                                    </div>
+                                                    
+                                                    <div class="row g-1">
+                                                        <div class="col-6">
+                                                            <span v-if="p.retail_price.largest_unit">{{p.packing_size.largest_unit}}*{{p.retail_price.largest_unit}}, </span>
+                                                            <span v-if="p.retail_price.medium_unit">{{p.packing_size.medium_unit}}*{{p.retail_price.medium_unit}}, </span>
+                                                            <span v-if="p.retail_price.smallest_unit">{{p.packing_size.smallest_unit}}*{{p.retail_price.smallest_unit}} </span>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <span v-if="p.whole_sale_price.largest_unit">{{p.packing_size.largest_unit}}*{{p.whole_sale_price.largest_unit}}, </span>
+                                                            <span v-if="p.whole_sale_price.medium_unit">{{p.packing_size.medium_unit}}*{{p.whole_sale_price.medium_unit}}, </span>
+                                                            <span v-if="p.whole_sale_price.smallest_unit">{{p.packing_size.smallest_unit}}*{{p.whole_sale_price.smallest_unit}} </span>
+                                                        </div>
+                                                    </div>
+                                                    
                                             </div>
                                         </div>
                                 </div>
@@ -57,6 +80,7 @@
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query, onSnapshot } from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as ss from "@/lib/snapshot/products"
+import * as hp from "@/lib/helper"
 export default {  
     props:['saleItems'],
    data(){
@@ -105,6 +129,12 @@ export default {
        },       
    },
    methods:{
+    calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
+        },
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
+        },
        updateProducts(){
                 this.isBtnLoading=true
                this.fetchProducts();

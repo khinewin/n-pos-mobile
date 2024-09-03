@@ -43,49 +43,53 @@
                 <tbody class="small">
                     <tr class="text-center fw-bold">
                         <td class="col-1">No.</td>
-                        <td class="col-7">Description</td>
-                        <td class="col-1" v-if="isQtyL">Qty L</td>
-                        <td class="col-1" v-if="isQtyL">L Unit Price</td>
-                        <td class="col-1" v-if="isQtyS">Qty S</td>
-                        <td class="col-1" v-if="isQtyS">S Unit Price</td>
+                        <td class="col-6">Description</td>
+                        <td class="col-1">Qty</td>
+                        <td class="col-1">Unit Price</td>
                         <td class="col-1">Discount</td>
+                        <td class="col-1">Discount Amt</td>
                         <td class="col-1">Amount</td>
                     </tr>
                     <tr class="" v-if="data.saleItems.length > 0" v-for="(s, i) in data.saleItems" :key="s.id" >   
                         <td class="text-center">{{i+1}}</td>                     
-                        <td class="">{{s.item_name}}</td>
-                        <td class="text-center" v-if="isQtyL"><span v-if="s.sale_qty_l">{{s.sale_qty_l}} {{s.parent_unit}}</span></td>
-                        <td class="text-end" v-if="isQtyL"><span v-if="s.sale_qty_l">{{s.item_per_package * s.sale_price}}</span></td>
-                        <td class="text-center" v-if="isQtyS"><span v-if="s.sale_qty_s">{{s.sale_qty_s}} {{s.child_unit}}</span></td>
-                        <td class="text-end" v-if="isQtyS"><span v-if="s.sale_qty_s">{{s.sale_price}}</span></td>
-                        <td class="text-end">{{s.discount}}</td>
-                        <td class="text-end">{{s.sale_amount}}</td>
+                        <td class="">{{s.item_name}}</td> 
+                        <td class="text-center">
+                            {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
+                        </td>    
+                        <td class="text-center">{{s.qty_sale_price_unit}} * {{s.qty_sale_price}}</td>     
+                        <td class="text-center">
+                            <span v-if="s.dis_qty">{{s.dis_qty}}{{s.dis_qty_unit}}</span>
+                            <span v-if="s.dis_amount">{{s.dis_amount}}$</span>
+                            <span v-if="s.dis_percent">{{s.dis_percent}}%</span>     
+                        </td>         
+                        <td class=" text-end">{{s.discount}}</td>
+                        <td class=" text-end">{{s.final_amount}}</td>     
                     </tr>                        
               
                     <tr>
-                        <td :colspan="[isQtyL >0 && isQtyS > 0 ? 7 : 5]" class="text-end col-6 pe-2 " style="border-bottom-style: hidden;">Total amount</td>
-                        <td class="text-end col-6">{{data.total_amount}}</td>
+                        <td colspan="6"  class="text-end  pe-2 " style="border-bottom-style: hidden;">Total amount</td>
+                        <td class="text-end">{{data.total_amount}}</td>
                     </tr>                     
                     <tr>
-                        <td :colspan="[isQtyL >0 && isQtyS > 0 ? 7 : 5]" class="text-end pe-2 " style="border-bottom-style: hidden;">Discount</td>
+                        <td colspan="6" class="text-end pe-2 " style="border-bottom-style: hidden;">Extra discount</td>
                         <td class="text-end">
-                            {{data.discount}}
+                            {{data.extra_discount}}
                         </td>
                     </tr>
                     <tr>
-                        <td :colspan="[isQtyL >0 && isQtyS > 0 ? 7 : 5]" class="text-end pe-2 " style="border-bottom-style: hidden;">Charges</td>
-                        <td class="text-end">{{data.charges}}</td>
+                        <td colspan="6" class="text-end pe-2 " style="border-bottom-style: hidden;">Net amount</td>
+                        <td class="text-end">{{data.net_amount}}</td>
                     </tr>
                     <tr >
-                        <td :colspan="[isQtyL >0 && isQtyS > 0 ? 7 : 5]" class="text-end  pe-2 " style="border-bottom-style: hidden;">Pay</td>
+                        <td colspan="6" class="text-end  pe-2 " style="border-bottom-style: hidden;">Paid</td>
                         <td class="text-end">
-                            {{data.pay}}
+                            {{data.paid}}
                         </td>
                     </tr>
                     <tr>
-                        <td :colspan="[isQtyL >0 && isQtyS > 0 ? 7 : 5]" class="text-end  pe-2 " >Refunds</td>
+                        <td colspan="6"  class="text-end  pe-2 " >Change</td>
                         <td class="text-end ">
-                            {{data.refunds}}
+                            {{data.change}}
                         </td>
                     </tr>                           
                 </tbody>
@@ -125,12 +129,7 @@
                             {{data.customer.name}}
                         </td>
                     </tr>      
-                    <tr>
-                        <td class="">Phone <span class="">:</span></td>
-                        <td class="" style="border-bottom: 1px dotted;">
-                            {{data.customer.phone}}
-                        </td>
-                    </tr>                                               
+                                                           
                 </tbody>
           </table>
         </div>
@@ -140,8 +139,8 @@
                     <tr class="">
                         <td class="">No.</td>
                         <td class="">Description</td>
-                        <td class="" v-if="isQtyL">Qty L</td>
-                        <td class="" v-if="isQtyS">Qty S</td>
+                        <td class="" >Qty</td>
+                        <td class="" >Unit price</td>
                         <td class="">Discount</td>
                         <td class="">Amount</td>
                     </tr>
@@ -150,37 +149,39 @@
                     <tr class="" v-if="data.saleItems.length > 0" v-for="(s, i) in data.saleItems" :key="s.id" >   
                         <td class="text-center">{{i+1}}</td>                     
                         <td class="">{{s.item_name}}</td>
-                        <td class="" v-if="isQtyL"><span v-if="s.sale_qty_l">{{s.sale_qty_l}} {{s.parent_unit}}</span></td>
-                        <td class="" v-if="isQtyS"><span v-if="s.sale_qty_s">{{s.sale_qty_s}} {{s.child_unit}}</span></td>
+                        <td>                           
+                             {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
+                        </td>
+                        <td class="text-center">{{s.qty_sale_price_unit}} * {{s.qty_sale_price}}</td>    
                         <td class="text-end">{{s.discount}}</td>
-                        <td class="text-end">{{s.sale_amount}}</td>
+                        <td class="text-end">{{s.final_amount}}</td>
                     </tr>                        
                     </tbody>
                     <tbody class="text-end">
                     <tr>
-                        <td :colspan="[isQtyL >0 && isQtyS > 0 ? 5 : 4]" class=" " style="border-bottom-style: hidden;">Total amount</td>
+                        <td colspan="5" class=" " style="border-bottom-style: hidden;">Total amount</td>
                         <td class="">{{data.total_amount}}</td>
                     </tr>                     
                     <tr>
-                        <td :colspan="[isQtyL >0 && isQtyS > 0 ? 5 : 4]" class="" style="border-bottom-style: hidden;">Discount</td>
+                        <td colspan="5" class="" style="border-bottom-style: hidden;">Extra discount</td>
                         <td class="">
-                            {{data.discount}}
+                            {{data.extra_discount}}
                         </td>
                     </tr>
                     <tr>
-                        <td :colspan="[isQtyL >0 && isQtyS > 0 ? 5: 4]" class="" style="border-bottom-style: hidden;">Charges</td>
-                        <td class="">{{data.charges}}</td>
+                        <td colspan="5" class="" style="border-bottom-style: hidden;">Net amount</td>
+                        <td class="">{{data.net_amount}}</td>
                     </tr>
                     <tr >
-                        <td :colspan="[isQtyL >0 && isQtyS > 0 ? 5 : 4]" class="" style="border-bottom-style: hidden;">Pay</td>
+                        <td colspan="5" class="" style="border-bottom-style: hidden;">Paid</td>
                         <td class="">
-                            {{data.pay}}
+                            {{data.paid}}
                         </td>
                     </tr>
                     <tr>
-                        <td :colspan="[isQtyL >0 && isQtyS > 0 ? 5 : 4]" class="" >Refunds</td>
+                        <td colspan="5" class="" >Change</td>
                         <td class="">
-                            {{data.refunds}}
+                            {{data.change}}
                         </td>
                     </tr>                           
                 </tbody>
@@ -194,6 +195,7 @@
 import {Timestamp, collection, addDoc, doc, increment,  updateDoc} from 'firebase/firestore'
 import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
 import SmallPrintHeader from "@/views/partials/SmallPrintHeader.vue"
+import * as hp from "@/lib/helper"
 
 export default {
     props: ['data'],
@@ -208,23 +210,15 @@ export default {
     mounted() {
     },
     computed:{
-        isQtyL(){
-            let l=0
-            this.data.saleItems.map((sale)=>{
-                l +=sale.sale_qty_l
-            })
-            if(l>0) return true;      
-        },
-        isQtyS(){
-            let s=0
-            this.data.saleItems.map((sale)=>{
-                s +=sale.sale_qty_s
-            })
-            if(s>0) return true;                    
-        }
+       
     },
     methods:{
-      
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
+        },
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
+        },
         showPrintTime(t){
             const newT=Timestamp.fromDate(new Date(t))
             const date=newT.toDate()

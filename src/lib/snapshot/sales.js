@@ -1,19 +1,20 @@
 const sales=(arr)=>{
     let saleItems=[];
-    arr.forEach((doc) => {         
+    arr.forEach((doc) => {     
+        const data=doc.data();    
         let sale = {
             id: doc.id,
-            user: doc.data().user,
-            voucher_no: doc.data().voucher_no,
-            sale_date : doc.data().sale_date,
-            products : doc.data().products,    
-             charges: doc.data().charges,
-             pay:doc.data().pay,
-             discount: doc.data().discount,
-             refunds: doc.data().refunds,
-             total_amount:doc.data().total_amount,
-             sale_type: doc.data().sale_type,
-             customer : doc.data().customer,
+            user: data.user,
+            voucher_no: data.voucher_no,
+            sale_date : data.sale_date,
+            products : data.products,    
+             net_amount: data.net_amount,
+             paid:data.paid,
+             extra_discount: data.extra_discount,
+             change: data.change,
+             total_amount:data.total_amount,
+             sale_type: data.sale_type,
+             customer : data.customer,
         };                                     
         saleItems.push(sale); 
     })

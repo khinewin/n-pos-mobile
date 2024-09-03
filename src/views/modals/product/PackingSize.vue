@@ -15,22 +15,18 @@
                    <div class="row g-2">
                     <div class="col-12 vh-75 overflow-y-auto">
                         <table class="table table-bordered mb-0 table-hover">
-                            <tbody class="small">
-                                <tr class="table-secondary text-center">
-                                    <td>Packing name</td>
-                                    <td>Packing unit</td>
-                                </tr>      
+                            <tbody class="small">                                     
                                 <tr class="">
-                                    <td class="p-0"><input type="text" @keypress.enter="savePackingSize" v-model="packing_name" class="form-control-plaintext text-center"></td>
-                                    <td class="p-0"><input type="text" @keypress.enter="savePackingSize" v-model="packing_unit" class="form-control-plaintext text-center"></td>
+                                    <td class="p-0"><input placeholder="Packing name" type="text" @keypress.enter="savePackingSize" v-model="packing_name" class="form-control-plaintext form-control-sm text-center"></td>
+                                    <td class="p-0"><input placeholder="Packing unit" type="text" @keypress.enter="savePackingSize" v-model="packing_unit" class="form-control-plaintext form-control-sm text-center"></td>
                                 </tr>                                                                                       
                                 <tr  class="" v-if="packingSizes.length > 0"  v-for="p in packingSizes" :key="p.id" @mouseenter="setEdit(p)"  style="cursor:context-menu">
                                     <td class="p-0 position-relative">
                                         <a href="#!" class='text-danger position-absolute start-0 top-50 translate-middle ps-2' @click="removePackingSize(p)"><i class="fa-solid fa-square-minus"></i></a>
-                                        <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center" v-model="p.packing_name">
+                                        <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext form-control-sm text-center" v-model="p.packing_name">
                                         </td>
                                     <td class="text-center p-0">
-                                        <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center" v-model="p.packing_unit">
+                                        <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext form-control-sm text-center" v-model="p.packing_unit">
                                     </td>
                                 </tr>
                             </tbody>
