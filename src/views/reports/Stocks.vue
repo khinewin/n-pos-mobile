@@ -28,13 +28,13 @@
             </div>            
             <div class="col-12">                   
                     <div v-if="reportType==='by_date'">
-                        <StocksByDate :fromDate="fromDate"  :toDate="toDate" :location="location" />
+                        <StocksByDate :fromDate="fromDate"  :toDate="toDate" :location="location" :code_no="code_no" />
                     </div>
                     <div v-if="reportType==='by_voucher'">
-                        <StocksByVoucher :fromDate="fromDate"  :toDate="toDate" :voucher_no="voucher_no" :location="location" />
+                        <StocksByVoucher :fromDate="fromDate"  :toDate="toDate" :voucher_no="voucher_no" :location="location" :code_no="code_no" />
                     </div>
                     <div v-if="reportType==='by_description'">
-                        <StocksByDescription :fromDate="fromDate"  :toDate="toDate" :location="location"/>
+                        <StocksByDescription :fromDate="fromDate"  :toDate="toDate" :location="location" :code_no="code_no"/>
                     </div>
             </div>
         </div>
@@ -60,6 +60,8 @@ export default {
             fromDate:this.$route.params['fromDate'],
             toDate:this.$route.params['toDate'],
             voucher_no: this.$route.query.voucher_no,
+            item_name: this.$route.query.item_name,
+            code_no: this.$route.query.code_no,
             displayFromDate:"",
             displayToDate:"",
             displayReportType:"",

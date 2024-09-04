@@ -4,60 +4,57 @@
             <tbody class="fw-bold text-center">
                 <tr><td rowspan="2" class="col-1">Date</td></tr>
                 <tr class="">
-                    <td class="">Code</td>
-                    <td>Description</td>
-                    <td>Packing size</td>
-                    <td class="">Qty</td>
-                    <td class="">Sale price</td>
-                    <td class="">Pur price</td>
-                    <td>Discount</td>
-                    <td class="">Sale amount</td>
-                    <td class="">Pur amount</td>
-                    <td class="">Profit</td>
+                    <td class="col-1">Code</td>
+                    <td class="col-2">Description</td>
+                    <td class="col-1 text-center">Packing size</td>                                                                                    
+                     <td class="col-1 text-center">Qty</td>
+                    <td class="col-1 text-center">Sale Amount</td>
+                    <td class="col-1 text-center">Pur Amount</td>
+                    <td class="col-1 text-center">Profit</td>
                 </tr>
             </tbody>
             <tbody v-if="reports.length > 0" v-for="r in reports" :key="r[0]">    
                 <tr><td class="text-center" :rowspan="r[1].length + 4">{{r[0]}}</td></tr>                                        
-                <tr v-for="item in r[1]" :key="item.code_no">
-                    <td class="col-1 text-center">{{item.code_no}}</td>
-                    <td class="col-2">{{item.item_name}}</td>
-                    <td class="col-1">
-                        1{{item.parent_unit}} * {{item.item_per_package}}{{item.child_unit}}
+                <tr v-for="p in r[1]" :key="p.code_no">
+                    <td class="col-1 text-center">{{p.code_no}}</td>
+                    <td class="col-2">{{p.item_name}}</td>
+                    <td class="">
+                        {{calPackingSize(p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit, p.packing_size.medium_qty, p.packing_size.smallest_qty)}}
                     </td>
-                    <td class="col-1 text-end">
-                       <span v-if="calQtyL(item.sale_qty, item.item_per_package) > 0">{{calQtyL(item.sale_qty, item.item_per_package)}}{{item.parent_unit}} </span>
-                        <span v-if="calQtyL(item.sale_qty, item.item_per_package) >0 && calQtyS(item.sale_qty, item.item_per_package) > 0">, </span>
-                        <span v-if="calQtyS(item.sale_qty, item.item_per_package)> 0">{{calQtyS(item.sale_qty, item.item_per_package)}}{{item.child_unit}}  </span>
+                    <td class="text-end"  >
+                        {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.sale_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
                     </td>
-                    <td class="col-1 text-end">{{item.sale_price}}</td>
-                    <td class="col-1 text-end">{{item.pur_price}}</td>
-                    <td class="col-1 text-end">{{item.discount}}</td>
-                    <td class="col-1 text-end">{{item.sale_amount}}</td>
-                    <td class="col-1 text-end">{{item.pur_amount}}</td>
-                    <td class="col-1 text-end">{{item.sale_amount - item.pur_amount}}</td>
+                    <td class="text-end">{{p.final_amount}}</td>
+                    <td class="text-end" >
+                           {{p.pur_amount}}
+                    </td>
+                    <td class="text-end">
+                            {{p.profit}}
+                    </td>
+                    
+                </tr>
+                <tr class="text-end">
+                    <td colspan="4" class=" fw-bold">Total</td>
+                    <td>{{r[2].sale_amount}}</td>
+                    <td>{{r[2].pur_amount}}</td>
+                    <td>{{r[2].profit_amount}}</td>
                 </tr>
                 <tr>
-                    <td colspan="7" class="text-end fw-bold">Total</td>
-                    <td class="text-end">{{r[2].sale_amount}}</td>
-                    <td class="text-end">{{r[2].pur_amount}}</td>
-                    <td class="text-end">{{r[2].profit_amount}}</td>
-                </tr>
-                <tr>
-                    <td colspan="9" class="text-end fw-bold">Extra discount</td>
+                    <td colspan="6" class="text-end fw-bold">Extra discount</td>
                     <td class="text-end">{{r[2].extra_discount}}</td>                  
                 </tr>
                 <tr>
-                    <td colspan="9" class="text-end fw-bold">Total profit</td>
+                    <td colspan="6" class="text-end fw-bold">Net profit</td>
                     <td class="text-end">{{r[2].profit_amount - r[2].extra_discount}}</td>                  
                 </tr>
             </tbody>
             <tbody  v-if="reports.length > 0"  class="">
                 <tr>
-                    <td class="text-end fw-bold" colspan="2">Total sale amount</td>
+                    <td class="text-end fw-bold" colspan="2">Grand total sale amount</td>
                     <td class="text-end">{{total_sale_amount}}</td>
                 </tr>                     
                 <tr>
-                    <td class="text-end fw-bold" colspan="2">Total pur amount</td>
+                    <td class="text-end fw-bold" colspan="2">Grand total pur amount</td>
                     <td class="text-end">{{total_pur_amount}}</td>
                 </tr>
                 <tr>
@@ -65,7 +62,7 @@
                     <td class="text-end">{{total_discount}}</td>
                 </tr>
                 <tr>
-                    <td class="text-end fw-bold" colspan="2">Total profit</td>
+                    <td class="text-end fw-bold" colspan="2">Grand total profit</td>
                     <td class="text-end">{{total_profit - total_discount}}</td>
                 </tr>
             </tbody>
@@ -143,29 +140,43 @@ export default {
       
     },
     methods:{
-        calQtyL(qty, ipp){
-            return hp.calQtyL(qty, ipp);
+        displayPrice(l_unit, m_unit, s_unit){
+            return hp.displayPrice(l_unit, m_unit, s_unit);
         },
-        calQtyS(qty, ipp){
-            return hp.calQtyS(qty, ipp)
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
+        },
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
         goBack(){
             this.$router.go(-1)
         },      
         displayReports(){                 
             let sales=[]
-            this.salesData.map((res)=>{    
-                    if(!this.code_no){
-                            this.total_discount += res.discount;
-                        }              
+            this.salesData.map((res)=>{                                
                     res.products.map((data)=>{
                         let index = sales.findIndex((item) => item.voucher_no == res.voucher_no);
                         if(index === -1){
-                             sales.push({...data, group_date : hp.showTime(res.sale_date), voucher_no: res.voucher_no, extra_discount: res.discount})
+                             sales.push({...data, group_date : hp.showTime(res.sale_date), voucher_no: res.voucher_no, extra_discount: res.extra_discount})
                         }else{
                             sales.push({...data, group_date : hp.showTime(res.sale_date), voucher_no: res.voucher_no, extra_discount: 0})
                         }
                     })
+            })
+
+            sales=sales.map((s)=>{
+                return {...s, 
+                    group_price: s.packing_size.largest_unit ? 
+                             `${s.retail_price.largest_unit},
+                             ${s.whole_sale_price.largest_unit}, 
+                             ${s.pur_price.largest_unit}` 
+                             : 
+                             `${s.retail_price.medium_unit},
+                             ${s.whole_sale_price.medium_unit},
+                             ${s.pur_price.medium_unit}
+                             `
+                }
             })
 
             if(this.code_no){
@@ -176,40 +187,35 @@ export default {
             let total_profit=0;
             let total_pur_amount=0;
             let total_sale_amount=0;
-           const gbc=gbd.map((res)=>{
-                const res1=Object.entries(hp.gb_item_name_sale_price(res[1]))
+            let total_discount=0
+           const gbc=gbd.map((ren)=>{
+                const res1=Object.entries(hp.gb_item_name_price(ren[1]))
                 const res2=res1.map((res)=>{
+                    const item_name=res[1][0].item_name;
                 let item={
-                    item_name: res[0],
+                    item_name: item_name,
                     sale_qty : 0,
                     code_no:"",
-                    sale_price:0,
-                    pur_price:0,
-                    sale_amount:0,
-                    pur_amount:0,
-                    profit: 0,
-                    item_per_package:0,
-                    child_unit:"",
-                    parent_unit:"",
-                    sale_qty_l:0,
-                    sale_qty_s:0,
-                    discount:0,
+                    profit: 0,               
                     extra_discount:0,
+                    packing_size: {},
+                    retail_price:{},
+                    whole_sale_price:{},
+                    pur_price:{},
+                    pur_amount:0,
+                    final_amount:0,
                 }                
                 res[1].map((ren)=>{
-                    item.item_per_package=ren.item_per_package;
-                    item.sale_qty += ren.sale_qty;
-                    item.code_no=ren.code_no;
-                    item.sale_price=ren.sale_price;
+                    item.packing_size=ren.packing_size;
+                    item.retail_price=ren.retail_price;
+                    item.whole_sale_price=ren.whole_sale_price;
                     item.pur_price=ren.pur_price;
-                    item.pur_amount +=ren.pur_price * ren.sale_qty;
-                    item.sale_amount += ren.sale_amount;
-                    item.profit += ren.sale_amount - (ren.pur_price * ren.sale_qty);
-                    item.child_unit=ren.child_unit;
-                    item.parent_unit=ren.parent_unit;
-                    item.sale_qty_l += ren.sale_qty_l;
-                    item.sale_qty_s +=ren.sale_qty_s;
-                    item.discount += ren.discount;
+                    item.final_amount +=ren.final_amount;
+                    item.sale_qty += ren.sale_qty;
+                    item.code_no=ren.code_no;                  
+                    item.pur_price=ren.pur_price;
+                    item.pur_amount +=ren.pur_price.smallest_unit * ren.sale_qty;
+                    item.profit += ren.final_amount - (ren.pur_price.smallest_unit * ren.sale_qty);                                
                     item.extra_discount += ren.extra_discount;
                 })
                 return item;
@@ -220,21 +226,23 @@ export default {
                 let profit_amount=0;
                 let extra_discount=0;
                 res2.map((res)=>{
-                    sale_amount += res.sale_amount;
+                    sale_amount += res.final_amount;
                     pur_amount += res.pur_amount;
-                    profit_amount += res.sale_amount - res.pur_amount;
+                    profit_amount += res.final_amount - res.pur_amount;
                     extra_discount += this.code_no ? 0 : res.extra_discount;
                 })
                 total_profit += profit_amount;
                 total_pur_amount += pur_amount;
                 total_sale_amount += sale_amount;
+                total_discount += extra_discount;
                 const res4={sale_amount, pur_amount, profit_amount, extra_discount}
-                const newData=[res[0],  [...res2],res4]    
+                const newData=[ren[0],  [...res2],res4]    
                 return newData;                             
            })           
            this.total_profit=total_profit;
            this.total_pur_amount=total_pur_amount;
            this.total_sale_amount=total_sale_amount;
+           this.total_discount =total_discount;
            this.reports=gbc;        
         },   
         async fetchSales(){

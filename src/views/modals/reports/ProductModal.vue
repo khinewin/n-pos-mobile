@@ -4,11 +4,11 @@
         <div class="modal-dialog modal-xl">
           <div class="modal-content">               
             <div>
-                <div class="card min-vh-100">
+                <div class="card">
                     <div class="card-body p-2">                                             
                         <div class="row g-1">
                             <div class="col-lg-3">
-                                <div class="card  shadow">
+                                <div class="card  shadow ">
                                     <div class="card-body p-2 small">
                                         <div class="row g-1">
                                             <div class="col-md-6 col-lg-12">
@@ -42,7 +42,7 @@
                                 </div>                                
                             </div>
                             <div class="col-lg-9 table-responsive">
-                                <div class="card shadow">
+                                <div class="card shadow vh-80 overflow-y-auto">
                                     <div class="card-body p-2">
                                         <table class="table table-bordered mb-0 table-hover">
                                             <tbody class="small">
@@ -50,25 +50,22 @@
                                                     <td class="col-1">Code</td>
                                                     <td class="col-2">Description</td>
                                                     <td class="col-1">Packing size</td>
-                                                    <td class="col-1">Shop qty</td>
-                                                    <td class="col-1">Main qty</td>
+                                                    <td class="col-1">Pharmacy Inv</td>
+                                                    <td class="col-1">Main Inv</td>
                                                 </tr>                                      
                                                 <tr class="" data-bs-dismiss="modal" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"   style="cursor:context-menu">
                                                     <td class="text-center">{{p.code_no}}</td>
                                                     <td>{{p.item_name}}</td>
-                                                    <td class="col-1">
-                                                        <span v-if="p.parent_unit && p.child_unit">1{{p.parent_unit}} * {{p.item_per_package}}{{p.child_unit}}</span>
+                                                    <td class="">
+                                                        {{calPackingSize(p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit, p.packing_size.medium_qty, p.packing_size.smallest_qty)}}
                                                     </td>
                                                     <td class="text-end col-1">
-                                                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0">{{calQtyL(p.qty, p.item_per_package)}}{{p.parent_unit}}</span>
-                                                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0 && calQtyS(p.qty, p.item_per_package) > 0">, </span>
-                                                        <span v-if="calQtyS(p.qty, p.item_per_package) > 0">{{calQtyS(p.qty, p.item_per_package)}}{{p.child_unit}}</span>                
-                                                    </td>                                                  
-                                                    <td class="text-end col-1">
-                                                        <span v-if="calQtyL(p.main_qty, p.item_per_package) > 0">{{calQtyL(p.main_qty, p.item_per_package)}}{{p.parent_unit}}</span>
-                                                        <span v-if="calQtyL(p.main_qty, p.item_per_package) > 0 && calQtyS(p.main_qty, p.item_per_package) > 0">, </span>
-                                                        <span v-if="calQtyS(p.main_qty, p.item_per_package) > 0">{{calQtyS(p.main_qty, p.item_per_package)}}{{p.child_unit}}</span>                
+                                                        {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                             
                                                     </td>
+                                                    <td class="text-end col-1">
+                                                        {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.main_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                             
+                                                    </td>
+                                                   
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -154,11 +151,11 @@ export default {
       
     },
     methods:{
-        calQtyL(qty,ipp){
-            return hp.calQtyL(qty,ipp)
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
-        calQtyS(qty, ipp){
-            return hp.calQtyS(qty,ipp)
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
         updateProducts(){
                 this.isUpdating=true;

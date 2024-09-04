@@ -14,16 +14,17 @@
                 <div class="d-none d-print-block">
                     <LargePrintHeader />
                 </div>
-                <h6>Reports products code {{displayReportType}}</h6>
+                <h6>Reports medicine code {{displayReportType}}</h6>
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="" v-if="code_no">Code : {{item_name}}</div>
                     </div>
                     <div class="col-sm-2">
                         <div class="" v-if="gt_equal || lt_equal">Balance : 
-                            <span v-if="gt_equal">>= {{gt_equal}}</span> 
+                            <span v-if="gt_equal">>= {{gt_equal}} </span> 
                             <span v-if="gt_equal && lt_equal"> and </span>
-                            <span v-if="lt_equal"><= {{lt_equal}}</span>
+                            <span v-if="lt_equal"><= {{lt_equal}} </span>
+                            <span class="ms-2"> {{packing_unit}}</span>
                         </div>
                     </div> 
                     <div class="col-sm-2">
@@ -36,16 +37,16 @@
             </div>            
             <div class="col-12">                   
                     <div v-if="reportType==='stock_list'">
-                        <StockList :location="location" :code_no="code_no" :lt_equal="lt_equal" :gt_equal="gt_equal"  />
+                        <StockList :location="location" :code_no="code_no" :lt_equal="lt_equal" :gt_equal="gt_equal" :packing_unit="packing_unit" />
                     </div>        
                     <div v-if="reportType==='stock_list_sale_price'">
-                        <StockList :sale_price="true" :location="location" :code_no="code_no"  :lt_equal="lt_equal" :gt_equal="gt_equal" />
+                        <StockList :sale_price="true" :location="location" :code_no="code_no"  :lt_equal="lt_equal" :gt_equal="gt_equal"  :packing_unit="packing_unit" />
                     </div>
                     <div v-if="reportType==='stock_list_pur_price'">
-                        <StockList :pur_price="true" :location="location" :code_no="code_no"  :lt_equal="lt_equal" :gt_equal="gt_equal" />
+                        <StockList :pur_price="true" :location="location" :code_no="code_no"  :lt_equal="lt_equal" :gt_equal="gt_equal"  :packing_unit="packing_unit" />
                     </div>   
                     <div v-if="reportType==='stock_list_pur_sale_price'">
-                        <StockList :pur_price="true" :sale_price="true" :location="location"  :code_no="code_no"  :lt_equal="lt_equal" :gt_equal="gt_equal"/>
+                        <StockList :pur_price="true" :sale_price="true" :location="location"  :code_no="code_no"  :lt_equal="lt_equal" :gt_equal="gt_equal"  :packing_unit="packing_unit"/>
                     </div>        
             </div>
         </div>
@@ -70,6 +71,7 @@ export default {
             item_name: this.$route.query["item_name"],
             gt_equal: this.$route.query.gt_equal,    
             lt_equal: this.$route.query.lt_equal,    
+            packing_unit: this.$route.query.packing_unit,
             displayDate:"",
             displayReportType:"",
             reports:[],

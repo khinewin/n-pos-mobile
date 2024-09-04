@@ -50,7 +50,7 @@
                             <div v-if="products.length >1">
                                 <GChart
                                 :settings="{ packages: ['corechart', 'table', 'map'] }"
-                                type="LineChart"
+                                type="ColumnChart"
                                 :data="products"
                                 :options="chartOptions"
                             />
@@ -196,7 +196,12 @@ export default {
             let sales=[]
             this.salesMonthlyData.map((res)=>{                  
                     res.products.map((data)=>{
-                        sales.push({...data, group_month : this.monthlyShowTime(res.sale_date)})
+                        let index = sales.findIndex((item) => item.voucher_no == res.voucher_no);
+                        if(index === -1){
+                             sales.push({...data, group_month : this.monthlyShowTime(res.sale_date), voucher_no: res.voucher_no, extra_discount: res.extra_discount})
+                        }else{
+                            sales.push({...data, group_month : this.monthlyShowTime(res.sale_date), voucher_no: res.voucher_no, extra_discount: 0})
+                        }
                     })
             })
             const gbm=Object.entries(hp.gb_month(sales))             
@@ -205,10 +210,11 @@ export default {
                     let sale_amount=0;
                     let pur_amount=0;
                     let profit=0;
+
                     res[1].map((r)=>{
-                            sale_amount += r.sale_amount
-                            pur_amount +=r.pur_amount;
-                            profit += r.sale_amount - r.pur_amount;                         
+                            sale_amount += r.final_amount
+                            pur_amount +=r.pur_price.smallest_unit * r.sale_qty;
+                            profit += (r.final_amount - (r.pur_price.smallest_unit * r.sale_qty)) - r.extra_discount;                         
                     })
                    return [date, pur_amount, sale_amount, profit]
             })
@@ -216,7 +222,7 @@ export default {
                     const date=res[0];
                     let sale_amount=0;
                     res[1].map((r)=>{
-                        sale_amount += r.sale_amount                     
+                        sale_amount += r.final_amount                     
                     })
                    return [date,sale_amount]
             })
@@ -251,7 +257,12 @@ export default {
             let sales=[]
             this.salesData.map((res)=>{              
                     res.products.map((data)=>{
-                        sales.push({...data, group_date : this.topQtyShowTime(res.sale_date)})
+                        let index = sales.findIndex((item) => item.voucher_no == res.voucher_no);
+                        if(index === -1){
+                             sales.push({...data, group_date : this.topQtyShowTime(res.sale_date), voucher_no: res.voucher_no, extra_discount: res.extra_discount})
+                        }else{
+                            sales.push({...data, group_date : this.topQtyShowTime(res.sale_date), voucher_no: res.voucher_no, extra_discount: 0})
+                        }
                     })
             })
             const gbd=Object.entries(hp.gb_date(sales))
@@ -263,9 +274,9 @@ export default {
                         profit: 0,
                     }                            
                     res[1].map((r)=>{  
-                            item.sale_amount += r.sale_amount
-                            item.pur_amount +=r.pur_amount;
-                            item.profit += (r.sale_amount - r.pur_amount);    
+                            item.sale_amount += r.final_amount
+                            item.pur_amount +=r.pur_price.smallest_unit * r.sale_qty;
+                           item.profit += (r.final_amount - (r.pur_price.smallest_unit * r.sale_qty)) - r.extra_discount;  
                     })                    
                    return [item.date, item.pur_amount, item.sale_amount, item.profit]
             })

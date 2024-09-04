@@ -16,13 +16,13 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody class="small">  
                                         <tr>
-                                            <td class="col-4 pb-0 fw-bold">Voucher no. <span class="float-end">:</span></td>
+                                            <td class="col-4 pb-0 fw-bold text-end">Voucher no. <span class="">:</span></td>
                                             <td class="col-8  ps-2 pb-0" style="border-bottom: 1px dotted;">
                                                 {{sale.voucher_no}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="pb-0 fw-bold">Date <span class="float-end">:</span></td>
+                                            <td class="pb-0 fw-bold text-end">Date <span class="">:</span></td>
                                             <td class=" ps-2 pb-0" style="border-bottom: 1px dotted;">
                                                <span>{{showTime(sale.sale_date)}}</span>
                                             </td>
@@ -34,13 +34,13 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody class="small">                                     
                                         <tr>
-                                            <td class="  col-4 pb-0 fw-bold">Name <span class="float-end">:</span></td>
+                                            <td class="  col-4 pb-0 fw-bold text-end">Name <span class="">:</span></td>
                                             <td class=" ps-2 col-8 pb-0" style="border-bottom: 1px dotted;">
                                                 {{sale.customer.name}}
                                             </td>
                                         </tr>      
                                         <tr>
-                                            <td class="pb-0 fw-bold">Phone <span class="float-end">:</span></td>
+                                            <td class="pb-0 fw-bold text-end">Phone <span class="">:</span></td>
                                             <td class=" ps-2 pb-0" style="border-bottom: 1px dotted;">
                                                 {{sale.customer.phone}}
                                             </td>
@@ -53,55 +53,58 @@
                                     <tbody class="">
                                         <tr class="text-center fw-bold">
                                             <td class="col-1">No.</td>
-                                            <td class="col-5">Description</td>
-                                            <td class="col-2">Packing size</td>
-                                            <td class="col-1">Qty</td>
-                                            <td class="col-1 ">Unit price</td>
-                                            <td class="col-1">Discount</td>
-                                            <td class="col-1">Amount</td>
+                                            <td class="col-2">Description</td>
+                                            <td class="col-1 text-center">Packing size</td>                                                                                    
+                                            <td class="col-1 text-center">Qty</td>
+                                            <td class="col-1 text-center">Unit price</td>
+                                            <td class="col-1 text-center">Amount</td>
+                                            <td class="col-1 text-center">Discount</td>
+                                            <td class="col-1 text-center">Final amount</td>
                                         </tr>
                                         <tr class="" v-if="sale.products.length > 0" v-for="(s, i) in sale.products" :key="s.id" >     
                                             <td class="text-center">{{i+1}}</td>                   
                                             <td class="">{{s.item_name}}</td>
                                             <td class="">
-                                                1{{s.parent_unit}} * {{s.item_per_package}}{{s.child_unit}}
-                                            </td>
-                                            <td class="text-end">
-                                                <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}}{{s.parent_unit}}</span>
-                                                <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0">, </span>
-                                                <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}}{{s.child_unit}}</span>
-
-                                            </td>
-                                            <td class="text-end">{{s.sale_price}}</td>
-                                            <td class="text-end">{{s.discount}}</td>
-                                            <td class="text-end">{{s.sale_amount}}</td>
+                                                {{calPackingSize(s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit, s.packing_size.medium_qty, s.packing_size.smallest_qty)}}
+                                            </td>                                        
+                                            <td class="text-center" >
+                                                {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
+                                            </td>                                            
+                                            <td class="text-center">
+                                                {{s.qty_sale_price_unit}}' {{s.qty_sale_price}}
+                                            </td>                                         
+                                           
+                                            <td class=" text-end">{{s.amount}}</td>
+                                            <td class=" text-end">{{s.discount}}</td>
+                                            <td class=" text-end">{{s.final_amount}}</td>
+                                           
                                         </tr>                        
                                     </tbody>
                                     <tbody>
                                         <tr>
-                                            <td colspan="6" class="text-end col-6 pe-2 " style="border-bottom-style: hidden;">Total amount</td>
-                                            <td class="text-end col-6 ">{{sale.total_amount}}</td>
+                                            <td colspan="7" class="text-end pe-2 " style="border-bottom-style: hidden;">Total amount</td>
+                                            <td class="text-end ">{{sale.total_amount}}</td>
                                         </tr>                     
                                         <tr>
-                                            <td colspan="6" class="text-end  pe-2 " style="border-bottom-style: hidden;">Discount</td>
+                                            <td colspan="7" class="text-end  pe-2 " style="border-bottom-style: hidden;">Extra discount</td>
                                             <td class="text-end ">
-                                                {{sale.discount}}
+                                                {{sale.extra_discount}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="6" class="text-end   pe-2 " style="border-bottom-style: hidden;">Charges</td>
-                                            <td class="text-end ">{{sale.charges}}</td>
+                                            <td colspan="7" class="text-end   pe-2 " style="border-bottom-style: hidden;">Net amount</td>
+                                            <td class="text-end ">{{sale.net_amount}}</td>
                                         </tr>
                                         <tr >
-                                            <td colspan="6" class="text-end   pe-2 " style="border-bottom-style: hidden;">Pay</td>
+                                            <td colspan="7" class="text-end   pe-2 " style="border-bottom-style: hidden;">Paid</td>
                                             <td class="text-end">
-                                                {{sale.pay}}
+                                                {{sale.paid}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="6" class="text-end   pe-2 " >Refunds</td>
+                                            <td colspan="7" class="text-end   pe-2 " >Change</td>
                                             <td class="text-end ">
-                                                {{sale.refunds}}
+                                                {{sale.change}}
                                             </td>
                                         </tr>                           
                                     </tbody>
@@ -174,11 +177,14 @@ export default {
       
     },
     methods:{
-        calQtyL(qty, ipp){
-            return hp.calQtyL(qty,ipp)
+        displayPrice(l_unit, m_unit, s_unit){
+            return hp.displayPrice(l_unit, m_unit, s_unit);
         },
-        calQtyS(qty, ipp){
-            return hp.calQtyS(qty,ipp)
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
+        },
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
         showTime(t){
             return hp.showTime(t);

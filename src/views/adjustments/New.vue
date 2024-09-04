@@ -16,51 +16,45 @@
             <div class="card shadow">
                 <div class="card-body p-2">
                     <form @submit.prevent="saveAdjustment">
-                        <div class="row justify-content-end">
-                            <div class="col-sm-10 col-lg-8">
+                        <div class="row justify-content-end mb-2">
+                            <div class="col-sm-12">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-2 pt-2 fw-bold">Location :</td>
+                                            <td class="text-end col-2 py-1">Location :</td>
                                             <td class="col-2 py-0">
-                                                <select v-model="location" class="form-control-plaintext text-center" :disabled="storeItems.length > 0">
+                                                <select v-model="location" class="form-control-plaintext form-control-sm  border-bottom" :disabled="storeItems.length > 0">
                                                     <option>Main</option>
-                                                    <option>Shop</option>
+                                                    <option>Pharmacy</option>
                                                 </select>
                                             </td>
-                                            <td class="text-end col-2 pt-2 fw-bold">Voucher no. :</td>
+                                            <td class="text-end col-2 py-1">Voucher no. :</td>
                                             <td class="col-2 py-0">
-                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
+                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext form-control-sm  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
                                             </td>                                       
-                                            <td class="col-2 text-end pt-2 fw-bold">Date :</td>
+                                            <td class="col-2 text-end py-1">Date :</td>
                                             <td class="col-2 py-0">
-                                                <input type="date" :class="{'border-0 border-bottom border-danger' : v$.created_at.$errors.length > 0}"  v-model="created_at" class="form-control-plaintext border-bottom" id="created_at" placeholder="Date">                                                
+                                                <input type="date" :class="{'border-0 border-bottom border-danger' : v$.created_at.$errors.length > 0}"  v-model="created_at" class="form-control-plaintext form-control-sm border-bottom" id="created_at" placeholder="Date">                                                
                                             </td>
                                         </tr>                                       
                                     </tbody>
                               </table>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-2">
-                                <button  type="button" :class="{'text-danger':v$.storeItems.$errors.length > 0}"  class="btn btn-sm"   data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i></button>
-                            </div>                            
-                        </div>
+                       
                         <div class="vh-60 overflow-y-auto">
                         <table class="table table-bordered  mb-0 table-hover">
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
-                                    <td class="col-2">Description</td>
+                                    <td class="col-2" data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Description</td>
+                                    <td class="col-1">Packing size</td>
                                     <td class="col-1">Before Adj</td>
                                     <td class="col-1">Adj type</td>
                                     <td class="col-1">Qty</td>      
                                     <td class="col-1">After Adj</td>   
                                     <td class="col-1">RTS/RFS</td>                          
-                                    <td class="col-1">Remark</td>   
-                                    <td class="col-1">Retail Amt</td>    
-                                    <td class="col-1">WS Amt</td> 
-                                    <td class="col-1">Pur Amt</td>                                                           
+                                    <td class="col-2">Remark</td>                                                                                       
                                 </tr>
                                 <tr class="" v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id"  @mouseenter="setEdit(i)">
                                     <td class="text-center position-relative pt-2">
@@ -68,36 +62,36 @@
                                             <a class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                     </td>
                                     <td class="pt-2">{{st.item_name}}</td>
-                                    <td class="pt-2 text-center">{{st.before_adj_qty}}</td>
+                                    <td class="pt-2">
+                                        {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
+                                    </td>
+                                    <td class="pt-2 text-center">
+                                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.before_adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                                    </td>
                                     <td>
-                                        <select v-model="st.adj_type" class="text-center form-control-plaintext" @change="calEdit">
+                                        <select v-model="st.adj_type" class="text-center form-control-plaintext form-control-sm" @change="setAdjQty">
                                             <option>Increment</option>
                                             <option>Decrement</option>
                                         </select>
                                     </td>
-                                    <td class="text-center p-0">
-                                            <input min="0" :max="[location=='Main' ? st.main_qty : st.qty]" @change="calEdit" @keyup="calEdit"  type="number"  v-model="st.adj_qty" class="form-control-plaintext form-control-sm text-center"  placeholder="Qty">
+                                    <td class="text-center pt-2" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>     
-                                    <td class="pt-2 text-center">{{st.after_adj_qty}}</td>      
+                                    <td class="pt-2 text-center">
+                                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.after_adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                                    </td>      
                                     <td class="p-0">
-                                        <select class="form-control-plaintext text-center" v-model="st.rts_rfs">
+                                        <select class="form-control-plaintext form-control-sm text-center" v-model="st.rts_rfs">
                                             <option>Yes</option>
                                             <option>No</option>
                                         </select>
                                     </td>                                                         
                                     <td class="p-0">
-                                        <input  type="text" v-model="st.remark" class="form-control-plaintext form-control-sm text-center" placeholder="Remark">                                       
+                                        <input  type="text" v-model="st.remark" class="form-control-plaintext form-control-sm form-control-sm text-center" placeholder="Remark">                                       
                                     </td>              
-                                    <td class="text-end pt-2">{{st.retail_amount}}</td> 
-                                    <td class="text-end pt-2">{{st.whole_sale_amount}}</td> 
-                                    <td class="text-end pt-2">{{st.pur_amount}}</td>                                                                                 
+                                                                                            
                                 </tr>         
-                                <tr>
-                                    <td colspan="8" class="text-end fw-bold">Total</td>
-                                    <td class="text-end">{{total_retail_amount}}</td>
-                                    <td class="text-end">{{total_pur_amount}}</td>
-                                    <td class="text-end">{{total_whole_sale_amount}}</td>
-                                </tr>                                                                                                         
+                                                                                                                                      
                             </tbody>
                         </table> 
                         </div>                                                                                                                   
@@ -106,7 +100,65 @@
         </div>
         </div>
         </div>
-        
+        <!-- set qty Modal -->
+        <div class="modal fade" id="setQtyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+            <div class="modal-content">               
+                <div class="modal-body p-2">
+                    <div class="row text-end mb-2">                       
+                        <div class="col-6">
+                            <button type="button" class="btn btn-sm" @click="setAdjQty" data-bs-dismiss="modal">
+                                <span ><i class="fa-solid fa-hard-drive"></i> Save</span>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                        </div>
+                    </div>
+                    <div>
+                        <table class="table table-bordered mb-0" v-if="Object.keys(editItem).length">
+                            <tbody>
+                                <tr>
+                                    <td colspan="2" class="text-center p-2" >{{editItem.item_name}}</td>
+                                </tr>
+                                <tr v-if="editItem.packing_size.largest_unit">
+                                    <td class="p-0">
+                                        <input type="number" v-model="editItem.adj_l_qty" class="form-control-plaintext form-control-sm text-center">
+                                    </td>
+                                    <td class="p-0">
+                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.adj_l_unit">
+                                                <option selected>{{editItem.packing_size.largest_unit}}</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0">
+                                        <input type="number" v-model="editItem.adj_m_qty" class="form-control-plaintext form-control-sm text-center">
+                                    </td>
+                                    <td class="p-0">
+                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.adj_m_unit">
+                                                <option selected>{{editItem.packing_size.medium_unit}}</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0">
+                                        <input type="number" v-model="editItem.adj_s_qty" class="form-control-plaintext form-control-sm text-center">
+                                    </td>
+                                    <td class="p-0">
+                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.adj_s_unit">
+                                                <option selected>{{editItem.packing_size.smallest_unit}}</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>                
+            </div>
+            </div>
+        </div>
+        <!--end qty modal-->  
     </div>
 </template>
 <script>
@@ -116,6 +168,8 @@ import { required, email ,helpers} from '@vuelidate/validators'
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query, increment} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/purchase/ProductModal.vue'
+import * as hp from "@/lib/helper"
+
 export default {
     components: {
         PageHeader, ProductModal
@@ -134,7 +188,7 @@ export default {
         return{       
             voucher_no:"", 
             created_at:"",         
-            location: "Shop",
+            location: "Pharmacy",
             adj_item: {},
             storeItems: [],
             editItem: {},          
@@ -175,52 +229,67 @@ export default {
     },
     
     methods:{
-        setExpDate(id){
-            this.editItem.exp_date=Timestamp.fromDate(new Date(this.editItem.tmp_exp_date))
-        },
+        setAdjQty(){
+            const e=this.editItem;
+                let adj_qty=0;              
+                adj_qty += e.adj_l_qty ? e.adj_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
+                adj_qty += e.adj_m_qty ? e.adj_m_qty * e.packing_size.smallest_qty: 0;
+                adj_qty += e.adj_s_qty ? e.adj_s_qty : 0;
+                e.adj_qty=adj_qty;
+               return this.storeItems.map((f)=>{   
+                    if(f.id===e.id){
+                        f.adj_qty=adj_qty,
+                        f.adj_l_qty =e.adj_l_qty ? e.adj_l_qty : 0,
+                        f.adj_m_qty= e.adj_m_qty ? e.adj_m_qty : 0,
+                        f.adj_s_qty= e.adj_s_qty  ? e.adj_s_qty  : 0
 
-        calEdit(){
-            const oei=this.editItem;
-           return this.storeItems.map((f)=>{
-                if(f.id===oei.id){
-                    if(this.location==="Main"){
-                        f.adj_qty=f.adj_type=="Decrement" ? f.adj_qty > f.main_qty ? f.main_qty : f.adj_qty : f.adj_qty;
-                    }else{
-                        f.adj_qty=f.adj_type=="Decrement" ? f.adj_qty > f.qty ? f.qty : f.adj_qty : f.adj_qty;
-                    }
-                    f.retail_amount=f.adj_qty * f.retail_price;                  
-                    f.pur_amount=f.adj_qty * f.pur_price;
-                    f.whole_sale_amount=f.adj_qty * f.whole_sale_price;
-                    if(this.location==="Main"){
-                        f.after_adj_qty=f.adj_type =="Increment" ? f.main_qty + f.adj_qty : f.main_qty - f.adj_qty;
-                    }else{
-                        f.after_adj_qty=f.adj_type =="Increment" ? f.qty + f.adj_qty : f.qty - f.adj_qty;
-                    }
-                }
-            }) && this.calTotal();
-                 
-        },
-        calTotal(){
-            this.total_retail_amount=this.storeItems.reduce((accu, cur)=>accu + cur.retail_amount,0)   
-            this.total_pur_amount=this.storeItems.reduce((accu, cur)=>accu + cur.pur_amount,0) 
-            this.total_whole_sale_amount=this.storeItems.reduce((accu, cur)=>accu + cur.whole_sale_amount,0) 
+                        e.after_adj_qty=f.adj_type=="Increment" ? e.before_adj_qty + e.adj_qty : e.before_adj_qty - e.adj_qty;
 
-        },     
-     
+                        f.after_adj_qty=e.after_adj_qty;
+                    }
+               }) 
+        },
         setEdit(i){
             const item=this.storeItems[i];
-            this.editItem=item;
-        },            
-     
+            this.editItem={...item, 
+                adj_l_unit: item.packing_size.largest_unit,
+                adj_m_unit: item.packing_size.medium_unit,
+                adj_s_unit: item.packing_size.smallest_unit,
+                adj_l_qty: item.adj_l_qty ? item.adj_l_qty : 0,
+                adj_m_qty: item.adj_m_qty ? item.adj_m_qty : 0,
+                adj_s_qty: item.adj_s_qty  ? item.adj_s_qty  : 0
+                
+            };
+        },
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
+        },
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
+        },
+        onlyString(p){
+           if(p.largest_unit){
+            return {
+                largest_unit : p.largest_unit,
+                 medium_unit: p.medium_unit, 
+                 smallest_unit:p.smallest_unit
+                }
+           }
+           if(!p.largest_unit){
+            return {
+                 medium_unit: p.medium_unit, 
+                 smallest_unit:p.smallest_unit
+                }
+           }
+        },
         removeStoreItem(i){
             this.storeItems.splice(i, 1)
-            this.calEdit();
         },
         storingItem(){           
             this.storeItems.push(this.adj_item)   
          },
         setCode(p){           
-            this.adj_item={...p, before_adj_qty: this.location=='Main' ? p.main_qty : p.qty, adj_qty:0, after_adj_qty : 0, rts_rfs: "No"};
+            this.adj_item={...p, before_adj_qty: this.location=='Main' ? p.main_qty : p.qty, adj_qty:0, after_adj_qty : 0, rts_rfs: "No" , adj_type: "Decrement"};
             const s=this.storeItems;
             let temStore=[]
             for(let i=0; i<s.length; i++){
@@ -231,7 +300,6 @@ export default {
                 this.storingItem();
             }
             this.editItem=p;
-            this.calEdit();           
         },
        async saveAdjustment(){
           const validattion = await this.v$.$validate()
@@ -275,7 +343,7 @@ export default {
             this.created_at=new Date().toISOString().substr(0, 10)         
             this.storeItems=[]
             this.adj_item=null
-            this.editItem=null
+            this.editItem={}
             this.total_retail_amount=0
             this.total_pur_amout=0;
             this.v$.$reset()

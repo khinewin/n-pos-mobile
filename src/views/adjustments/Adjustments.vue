@@ -6,9 +6,9 @@
                 <div class="col-sm-2 d-grid">
                     <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print</button>
                 </div>                
-                <div class="col-sm-2 d-grid">
+                <!--<div class="col-sm-2 d-grid">
                         <button @click="goEdit" class="btn btn-sm" :class="{'disabled': !voucher_no || stock_user.uid !== user.uid}"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                </div>
+                </div>-->
                 <div class="col-sm-2 d-grid">
                         <router-link :to="{name : 'NewAdjustment'}" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New</router-link>
                 </div>
@@ -26,25 +26,22 @@
                 </div>
                 <div class="card-body p-2">
                         <div class="row justify-content-end mb-2">
-                            <div class="col-sm-10 col-lg-8">
+                            <div class="col-sm-12">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-2 pt-2 fw-bold">Location :</td>
-                                            <td class="col-2 py-0">
-                                                <select v-model="location" class="form-control-plaintext text-center" :disabled="storeItems.length > 0">
-                                                    <option>Main</option>
-                                                    <option>Shop</option>
-                                                </select>
+                                            <td class="text-end py-1 col-2">Location :</td>
+                                            <td class="col-2 py-1">
+                                                    {{location}}
                                             </td>
 
-                                            <td class="text-end col-2 fw-bold pt-2">Voucher no. :</td>
-                                            <td class="col-2 pt-2">
+                                            <td class="text-end col-2 py-1">Voucher no. :</td>
+                                            <td class="col-2 py-1">
                                                 {{voucher_no}}
                                             </td>
                                      
-                                            <td class="text-end col-2 fw-bold pt-2">Date :</td>
-                                            <td class="pt-2 col-2">
+                                            <td class="text-end col-2 py-1">Date :</td>
+                                            <td class="py-1 col-2">
                                                <span v-if="created_at"> {{showTime(created_at)}}</span>
                                             </td>
                                         </tr>
@@ -59,56 +56,43 @@
                                     <tr class="text-center fw-bold table-secondary">
                                         <td class="col-1">Code</td>
                                         <td class="col-2">Description</td>
+                                        <td class="col-1">Packing size</td>
                                         <td class="col-1">Before Adj</td>
                                         <td class="col-1">Adj type</td>
                                         <td class="col-1">Qty</td>      
                                         <td class="col-1">After Adj</td>   
                                         <td class="col-1">RTS/RFS</td>                          
-                                        <td class="col-1">Remark</td>   
-                                        <td class="col-1">Retail Amt</td>     
-                                        <td class="col-1">WS Amt</td>    
-                                        <td class="col-1">Pur Amt</td>                                                           
+                                        <td class="col-2">Remark</td>                                                           
                                 </tr>
                                 <tr class=""v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id">
                                     <td class="text-center">
                                             {{st.code_no}}                                           
                                     </td>
                                     <td class="">{{st.item_name}}</td>
-                                    <td class="text-center">                                      
-                                         <span>{{st.before_adj_qty}}</span>
+                                    <td class="">
+                                        {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                     </td>
-                                    <td class="text-center">
-                                        {{st.adj_type}}
+                                    <td class=" text-center">
+                                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.before_adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>
-                                    <td class="text-end">                                      
-                                         <span>{{st.adj_qty}}</span>
+                                    <td>
+                                      {{st.adj_type}}
                                     </td>
-                                    <td class="text-end">                                      
-                                        <span>{{st.after_adj_qty}}</span>
-                                   </td>
-                                    <td class="text-center">                                      
-                                        <span>{{st.rts_rfs}}</span>
-                                   </td>
-                                    <td class="">                                      
-                                         <span>{{st.remark}}</span>
+                                    <td class="text-center" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                                    </td>     
+                                    <td class=" text-center">
+                                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.after_adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                                    </td>      
+                                    <td class="">
+                                        {{st.rts_rfs}}
+                                    </td>                                                         
+                                    <td class="">
+                                        {{st.remark}}
                                     </td>
-                                    <td class="text-end">                                      
-                                        <span>{{st.retail_amount}}</span>
-                                   </td>  
-                                   <td class="text-end">                                      
-                                        <span>{{st.whole_sale_amount}}</span>
-                                    </td>                                   
-                                    <td class="text-end">                                      
-                                        <span>{{st.pur_amount}}</span>
-                                    </td>
-                                 
+                                                 
                                 </tr>
-                                <tr class="small">
-                                    <td colspan="8" class="text-end fw-bold">Total</td>
-                                    <td class="text-end">{{total_retail_amount}}</td>        
-                                    <td class="text-end">{{total_whole_sale_amount}}</td>                                                           
-                                    <td class="text-end">{{total_pur_amount}}</td>
-                                </tr>                                                                                         
+                                                                                                                  
                             </tbody>
                         </table>      
                         </div>                                                                                                              
@@ -182,6 +166,12 @@ export default {
     },
     
     methods:{    
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
+        },
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
+        },
         async print () {
         // Pass the element id here
          await this.$htmlToPaper('printMe');

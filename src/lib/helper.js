@@ -1,6 +1,6 @@
 const groupBy = keys => array =>
     array.reduce((objectsByKeyValue, obj) => {
-        const value = keys.map(key => obj[key]).join('-');
+        const value = keys.map(key => obj[key])
         objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
         return objectsByKeyValue;
 }, {});
@@ -11,6 +11,14 @@ const showTime=(t)=>{
     const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
     return formattedDate;
 };
+
+const displayPrice=(l_unit, m_unit, s_unit)=>{
+    if(l_unit){
+        return `${l_unit} * ${m_unit} * ${s_unit}`
+    }else{
+        return `${m_unit} * ${s_unit}`
+    }
+}
 
 
     const calPackingQty=(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit)=>{
@@ -49,7 +57,7 @@ const showTime=(t)=>{
 
 const gb_date=groupBy(['group_date'])
 const gb_item_name_sale_price=groupBy(['item_name', 'sale_price'])
-const gb_item_name_retail_price=groupBy(['item_name', 'retail_price']);
+const gb_item_name_price=groupBy(['item_name', 'group_price']);
 const gb_month=groupBy(['group_month'])
 const gb_customer=groupBy(['group_customer'])
 const gb_supplier=groupBy(['group_supplier'])
@@ -68,7 +76,7 @@ export   {
     gb_item_name_sale_price,
     gb_customer, 
     gb_supplier,
-    gb_item_name_retail_price,
+    gb_item_name_price,
     gb_item_name_pur_price,
     gb_exp_date,
     gb_item_name_adj_type,
@@ -76,4 +84,5 @@ export   {
     gb_adj_type,
     calPackingQty,
     calPackingSize,
+    displayPrice,
     };

@@ -36,45 +36,39 @@
                                     <td class="col-1">Packing size</td>
                                     <td class="col-1 " v-if="location=='Main' || location=='All'">Main Qty</td>         
                                     <td class="col-1" v-if="location=='Shop' || location=='All'">Shop Qty</td>                          
-                                    <td class="col-1 ">RT price</td>
-                                    <td class="col-1 ">WS price</td>
-                                    <td class="col-1" v-if="location=='Main' || location=='All'">Main RT Amt</td>                                    
-                                    <td class="col-1" v-if="location=='Main' || location=='All'">Main WS Am</td>                                    
-                                    <td class="col-1" v-if="location=='Shop' || location=='All'">Shop RT Amt</td>                                    
-                                    <td class="col-1" v-if="location=='Shop' || location=='All'">Shop WS Am</td>      
+                                    <td class="col-1">Pur price</td>
+                                    <td class="col-1">Retail price</td>
+                                    <td class="col-1">Wholesale price</td>  
                                 </tr>
-                                <tr class=""v-if="stock.products.length > 0" v-for="(st, i) in stock.products" :key="st.id">
+                                <tr class=""v-if="stock.products.length > 0" v-for="(p, i) in stock.products" :key="p.id">
                                     <td class="text-center">                                       
-                                            {{st.code_no}}                                                                                                          
+                                            {{p.code_no}}                                                                                                          
                                     </td>                                   
-                                    <td class="">{{st.item_name}}</td>
-                                    <td class="">                 
-                                        1{{st.parent_unit}} * {{st.item_per_package}}{{st.child_unit}}
+                                    <td class="">{{p.item_name}}</td>
+                                    <td class="">
+                                        {{calPackingSize(p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit, p.packing_size.medium_qty, p.packing_size.smallest_qty)}}
                                     </td>
-                                    <td class="text-end" v-if="location=='Main' || location=='All'">
-                                        <span v-if="calQtyL(st.main_qty, st.item_per_package) > 0">{{calQtyL(st.main_qty, st.item_per_package)}}{{st.parent_unit}} </span>
-                                         <span v-if="calQtyL(st.main_qty, st.item_per_package) >0 && calQtyS(st.main_qty, st.item_per_package) > 0">, </span>
-                                         <span v-if="calQtyS(st.main_qty, st.item_per_package)> 0">{{calQtyS(st.main_qty, st.item_per_package)}}{{st.child_unit}}  </span>
-                                     </td>
-                                    <td class="text-end" v-if="location=='Shop' || location=='All'">
-                                       <span v-if="calQtyL(st.qty, st.item_per_package) > 0">{{calQtyL(st.qty, st.item_per_package)}}{{st.parent_unit}}</span>
-                                        <span v-if="calQtyL(st.qty, st.item_per_package) >0 && calQtyS(st.qty, st.item_per_package) > 0">, </span>
-                                        <span v-if="calQtyS(st.qty, st.item_per_package)> 0">{{calQtyS(st.qty, st.item_per_package)}}{{st.child_unit}}  </span>
-                                    </td>                            
-                                    <td class="text-end">{{st.retail_price}}</td>
-                                    <td class="text-end">{{st.whole_sale_price}}</td>
-                                    <td class="text-end" v-if="location=='Main' || location=='All'">{{st.main_retail_amount}}</td>
-                                    <td class="text-end" v-if="location=='Main' || location=='All'">{{st.main_whole_sale_amount}}</td>
-                                    <td class="text-end" v-if="location=='Shop' || location=='All'">{{st.retail_amount}}</td>
-                                    <td class="text-end" v-if="location=='Shop' || location=='All'">{{st.whole_sale_amount}}</td>                                                
-                                </tr>
-                                <tr class="small">
-                                    <td :colspan="[location== 'All' ? 7 : 4]" class="text-end fw-bold">Total</td>
-                                    <td class="text-end">{{stock.total_main_retail_amount}}</td>
-                                    <td class="text-end">{{stock.total_main_whole_sale_amount}}</td>
-                                    <td class="text-end">{{stock.total_main_retail_amount}}</td>
-                                    <td class="text-end">{{stock.total_main_whole_sale_amount}}</td>
-                                </tr>                                                                                         
+                                    <td class="text-end"  v-if="location =='All' || location=='Main'">
+                                        {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.main_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
+                                    </td>
+                                    <td class="text-end" v-if="location =='All' || location=='Pharmacy'">
+                                        {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
+                                    </td>
+                                    <td class="text-end" >
+                                            {{displayPrice(p.pur_price.largest_unit, p.pur_price.medium_unit, p.pur_price.smallest_unit)}}
+                                    </td>
+                                    <td class="text-end">
+                                             {{displayPrice(p.retail_price.largest_unit, p.retail_price.medium_unit, p.retail_price.smallest_unit)}}
+                                    </td>
+                                    <td class="text-end">
+                                            {{displayPrice(p.whole_sale_price.largest_unit, p.whole_sale_price.medium_unit, p.whole_sale_price.smallest_unit)}}
+                                    </td>                                   
+                                </tr>    
+                                <tr>
+                                    <td :colspan="[location=='All' ? 6 : 5]" class="text-end fw-bold">Total amount</td>
+                                    <td class="text-end ">{{stock.retail_amount}}</td>
+                                    <td class="text-end ">{{stock.whole_sale_amount}}</td>
+                                </tr>                                                                                     
                             </tbody>
                         </table>                                     
                     </div>
@@ -89,7 +83,7 @@ import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/stocks"
 export default {
-    props:['fromDate', 'toDate', 'voucher_no', 'location'],
+    props:['fromDate', 'toDate', 'voucher_no', 'location', 'code_no'],
     components: {
     },  
     data(){
@@ -144,11 +138,14 @@ export default {
       
     },
     methods:{
-        calQtyL(qty, ipp){
-            return hp.calQtyL(qty, ipp);
+        displayPrice(l_unit, m_unit, s_unit){
+            return hp.displayPrice(l_unit, m_unit, s_unit);
         },
-        calQtyS(qty, ipp){
-            return hp.calQtyS(qty, ipp)
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
+        },
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
         goBack(){
             this.$router.go(-1)
@@ -167,8 +164,29 @@ export default {
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
             }
             const snapShot=await getDocs(query_url)
-            const stockItems=ss.stocks(snapShot);                     
-            this.reports=stockItems;
+            let stockItems=ss.stocks(snapShot);  
+           
+            if(this.code_no){            
+                stockItems=stockItems.map((st)=>{
+                    const data=st.products.filter((f)=>{
+                        return f.code_no==this.code_no
+                    })
+                    return {...st, products : data}
+                })
+            }
+
+            stockItems=stockItems.map((i)=>{
+                let retail_amount=0;
+                let whole_sale_amount=0;
+                i.products.map((rep)=>{
+                    retail_amount +=this.location=="All" ? (rep.qty + rep.main_qty) * rep.retail_price.smallest_unit : this.location=="Main" ? rep.main_qty * rep.retail_price.smallest_unit : rep.qty * rep.retail_price.smallest_unit ;
+                    whole_sale_amount += this.location=="All" ? rep.whole_sale_price.smallest_unit * (rep.qty + rep.main_qty) : this.location=="Main" ? rep.whole_sale_price.smallest_unit *rep.main_qty : rep.whole_sale_price.smallest_unit *rep.qty;
+
+                })
+                return {...i, retail_amount: retail_amount, whole_sale_amount: whole_sale_amount}
+            })           
+            this.reports=stockItems; 
+
             this.isLoading=false;
         }
     }

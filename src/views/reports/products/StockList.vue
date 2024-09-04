@@ -6,33 +6,36 @@
                     <td class="col-1"  @click="sortProducts('code_no')"> Code</td>
                     <td class="col-2"  @click="sortProducts('item_name')"> Description</td>
                     <td class="col-1">Packing size</td>
-                    <td class="col-1" @click="sortProducts('main_qty')" v-if="location =='All' || location=='Main'">Main Qty</td>
-                    <td class="col-1" @click="sortProducts('qty')" v-if="location =='All' || location=='Shop'"> Shop Qty</td>
+                    <td class="col-1" @click="sortProducts('main_qty')" v-if="location =='All' || location=='Main'">Main Inv</td>
+                    <td class="col-1" @click="sortProducts('qty')" v-if="location =='All' || location=='Pharmacy'"> Pharmacy Inv</td>
+                    <td class="col-1"  v-if="pur_price"  @click="sortProducts('pur_price')"> Pur price</td>
                     <td class="col-1" v-if="sale_price"  @click="sortProducts('retail_price')"> Retail price</td>
                     <td class="col-1" v-if="sale_price"  @click="sortProducts('whole_sale_price')"> Wholesale price</td>
-                    <td class="col-1"  v-if="pur_price"  @click="sortProducts('pur_price')"> Pur price</td>
                 </tr>   
             </tbody>  
             <tbody>                                                  
                 <tr class="" v-if="reports.length > 0"  v-for="(p, i) in reports" :key="p.id" >                                    
                     <td class="text-center">{{p.code_no}}</td>
                     <td >{{p.item_name}}</td>
-                    <td>
-                        1{{p.parent_unit}} * {{p.item_per_package}}{{p.child_unit}}
+                    <td class="">
+                        {{calPackingSize(p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit, p.packing_size.medium_qty, p.packing_size.smallest_qty)}}
                     </td>
-                    <td class="text-end" v-if="location =='All' || location=='Main'">
-                        <span v-if="calQtyL(p.main_qty, p.item_per_package) > 0">{{calQtyL(p.main_qty, p.item_per_package)}}{{p.parent_unit}}</span>
-                        <span v-if="calQtyL(p.main_qty, p.item_per_package) > 0 && calQtyS(p.main_qty, p.item_per_package) > 0">, </span>
-                        <span v-if="calQtyS(p.main_qty, p.item_per_package) > 0">{{calQtyS(p.main_qty, p.item_per_package)}}{{p.child_unit}}</span>
+                    <td class="text-end"  v-if="location =='All' || location=='Main'">
+                        {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.main_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
                     </td>
-                    <td class="text-end" v-if="location =='All' || location=='Shop'">
-                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0">{{calQtyL(p.qty, p.item_per_package)}}{{p.parent_unit}}</span>
-                        <span v-if="calQtyL(p.qty, p.item_per_package) > 0 && calQtyS(p.qty, p.item_per_package) > 0">, </span>
-                        <span v-if="calQtyS(p.qty, p.item_per_package) > 0">{{calQtyS(p.qty, p.item_per_package)}}{{p.child_unit}}</span>
-                    </td>                                            
-                    <td v-if="sale_price" class="text-end">{{p.retail_price}}</td>
-                    <td v-if="sale_price" class="text-end">{{p.whole_sale_price}}</td>
-                    <td v-if="pur_price" class="text-end">{{p.pur_price}}</td>                                
+                    <td class="text-end" v-if="location =='All' || location=='Pharmacy'">
+                        {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
+                    </td>
+                    <td class="text-end"  v-if="pur_price"  >
+                        {{displayPrice(p.pur_price.largest_unit, p.pur_price.medium_unit, p.pur_price.smallest_unit)}}
+                    </td>
+                    <td class="text-end"  v-if="sale_price" >
+                            {{displayPrice(p.retail_price.largest_unit, p.retail_price.medium_unit, p.retail_price.smallest_unit)}}
+                    </td>
+                    <td class="text-end"  v-if="sale_price" >
+                            {{displayPrice(p.whole_sale_price.largest_unit, p.whole_sale_price.medium_unit, p.whole_sale_price.smallest_unit)}}
+                    </td>
+                                                    
                 </tr>
             </tbody>
         </table>
@@ -51,7 +54,7 @@
     import * as lib from "@/lib/snapshot/products"
     import * as hp from '@/lib/helper'
     export default {
-    props: ['sale_price','pur_price', 'location', 'code_no', 'gt_equal', 'lt_equal'],
+    props: ['sale_price','pur_price', 'location', 'code_no', 'gt_equal', 'lt_equal', 'packing_unit'],
     data(){
         return {
             isLoading:false,
@@ -79,12 +82,14 @@
         }
     },
     methods: {
-        
-        calQtyL(qty,ipp){
-            return hp.calQtyL(qty,ipp)
+        displayPrice(l_unit, m_unit, s_unit){
+            return hp.displayPrice(l_unit, m_unit, s_unit);
         },
-        calQtyS(qty, ipp){
-            return hp.calQtyS(qty,ipp)
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
+        },
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
        
        filterProduct(){
@@ -93,7 +98,7 @@
                     this.reports=this.reports.filter((f)=>{
                         return f.main_qty >= Number(this.gt_equal) && f.main_qty <= Number(this.lt_equal)
                     })
-                }else if(this.location=="Shop"){
+                }else if(this.location=="Pharmacy"){
                     this.reports=this.reports.filter((f)=>{
                         return f.qty >= Number(this.gt_equal) && f.qty <= Number(this.lt_equal)
                     })
@@ -109,7 +114,7 @@
                     this.reports=this.reports.filter((f)=>{
                         return f.main_qty >= Number(this.gt_equal)
                     })
-                }else if(this.location=="Shop"){
+                }else if(this.location=="Pharmacy"){
                     this.reports=this.reports.filter((f)=>{
                         return f.qty >= Number(this.gt_equal)
                     })
@@ -119,12 +124,12 @@
                     })
                 }
             }else
-            if(this.lt_equal){
+            if(this.lt_equal){                
                 if(this.location=="Main"){
                     this.reports=this.reports.filter((f)=>{
                         return f.main_qty <= Number(this.lt_equal)
                     })
-                }else if(this.location=="Shop"){
+                }else if(this.location=="Pharmacy"){
                     this.reports=this.reports.filter((f)=>{
                         return f.qty <= Number(this.lt_equal)
                     })
@@ -181,13 +186,13 @@
                             return a.code_no - b.code_no;
                         break;
                         case "retail_price":
-                            return a.retail_price - b.retail_price;
+                            return a.retail_price.largest_unit - b.retail_price.largest_unit;
                         break;
                         case "whole_sale_price":
-                           return  a.whole_sale_price - b.whole_sale_price;
+                           return  a.whole_sale_price.largest_unit - b.whole_sale_price.largest_unit;
                         break;
                         case "pur_price":
-                           return  a.pur_price - b.pur_price;
+                           return  a.pur_price.largest_unit - b.pur_price.largest_unit;
                         break;
                     }
                 })
@@ -213,13 +218,13 @@
                             return a.code_no + b.code_no;
                         break;
                         case "retail_price":
-                            return a.retail_price + b.retail_price;
+                            return a.retail_price.largest_unit + b.retail_price.largest_unit;
                         break;
                         case "whole_sale_price":
-                           return  a.whole_sale_price + b.whole_sale_price;
+                           return  a.whole_sale_price.largest_unit+ b.whole_sale_price.largest_unit;
                         break;
                         case "pur_price":
-                           return  a.pur_price + b.pur_price;
+                           return  a.pur_price.largest_unit + b.pur_price.largest_unit;
                         break;
                     }
                 })

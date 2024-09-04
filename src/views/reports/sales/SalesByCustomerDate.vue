@@ -13,47 +13,45 @@
                                     <table class="table table-bordered mb-0 border-dark table-hover " style="border-style: hidden;">
                                         <thead>
                                             <tr class="fw-bold text-center">
-                                                <td >Code</td>
-                                                <td >Description</td>
-                                                <td>Packing size</td>
-                                                <td >Qty</td>
-                                                <td >Sale price</td>
-                                                <td>Discount</td>
-                                                <td >Sale amount</td>
-                                                <td>Pur Amount</td>
-                                                <td>Profit</td>
+                                                <td class="col-1">Code</td>
+                                                <td class="col-2">Description</td>
+                                                <td class="col-1">Packing size</td>
+                                                <td class="col-1 text-center">Qty</td>
+                                                <td class="col-1 text-center">Sale Amount</td>
+                                                <td class="col-1 text-center">Pur Amount</td>
+                                                <td class="col-1 text-center">Profit</td>
                                             </tr>
                                         </thead>
                                         <tbody>                                            
-                                            <tr v-for="s in res[1]" :key="s.code_no">
-                                                <td class="col-1 text-center">{{s.code_no}}</td>
-                                                <td class="col-2">{{s.item_name}}</td>
-                                                <td class="col-1">
-                                                    1{{s.parent_unit}} * {{s.item_per_package}}{{s.child_unit}}
+                                            <tr v-for="p in res[1]" :key="p.code_no">
+                                                <td class="col-1 text-center">{{p.code_no}}</td>
+                                                <td class="col-2">{{p.item_name}}</td>
+                                                <td class="">
+                                                    {{calPackingSize(p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit, p.packing_size.medium_qty, p.packing_size.smallest_qty)}}
                                                 </td>
-                                                <td class="text-end col-1">
-                                                    <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0">{{calQtyL(s.sale_qty, s.item_per_package)}}{{s.parent_unit}}</span>
-                                                    <span v-if="calQtyL(s.sale_qty, s.item_per_package) > 0 && calQtyS(s.sale_qty, s.item_per_package) > 0">, </span>
-                                                    <span v-if="calQtyS(s.sale_qty, s.item_per_package) > 0">{{calQtyS(s.sale_qty, s.item_per_package)}} {{s.child_unit}}</span>                
+                                                <td class="text-end"  >
+                                                    {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.sale_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
                                                 </td>
-                                                <td class="col-1 text-end">{{s.sale_price}}</td>
-                                                <td class="col-1 text-end">{{s.discount}}</td>
-                                                <td class="col-1 text-end">{{s.sale_amount}}</td>
-                                                <td class="col-1 text-end">{{s.pur_amount}}</td>
-                                                <td class="col-1 text-end">{{s.profit}}</td>
+                                                <td class="text-end">{{p.final_amount}}</td>
+                                                <td class="text-end" >
+                                                       {{p.pur_amount}}
+                                                </td>
+                                                <td class="text-end">
+                                                        {{p.profit}}
+                                                </td>
                                             </tr>
                                             <tr>
-                                                <td colspan="6" class="text-end fw-bold">Total</td>
+                                                <td colspan="4" class="text-end fw-bold">Total</td>
                                                 <td class="text-end">{{res[2].sale_amount}}</td>
                                                 <td class="text-end">{{res[2].pur_amount}}</td>
                                                 <td class="text-end">{{res[2].profit_amount}}</td>
                                             </tr>
                                             <tr>
-                                                <td colspan="8" class="text-end fw-bold">Extra discount</td>
+                                                <td colspan="6" class="text-end fw-bold">Extra discount</td>
                                                 <td class="text-end">{{res[2].extra_discount}}</td>                  
                                             </tr>
                                             <tr>
-                                                <td colspan="8" class="text-end fw-bold">Total profit</td>
+                                                <td colspan="6" class="text-end fw-bold">Total profit</td>
                                                 <td class="text-end">{{res[2].profit_amount - res[2].extra_discount}}</td>                  
                                             </tr>
                                         </tbody>
@@ -63,23 +61,47 @@
                             </tbody>
                         </table>
                     </td>
-                </tr>                                                     
+                </tr>     
                 <tr>
-                    <td class="text-end fw-bold">Total sale amount</td>
+                    <td colspan="2" class="p-0" style="border-style: hidden;">
+                        <table class="table table-bordered border-dark mb-0 table-group-divider table-hover">
+                            <tbody>
+                                <tr>
+                                    <td class="text-end fw-bold col-10">Grand total sale amount</td>
+                                    <td class="text-end col-2">{{total_sale_amount}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end fw-bold">Grand total pur amount</td>
+                                    <td class="text-end">{{total_pur_amount}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end fw-bold">Total discount</td>
+                                    <td class="text-end">{{total_discount}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end fw-bold">Grand total profit</td>
+                                    <td class="text-end">{{total_profit - total_discount}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>                                                
+                <!--<tr>
+                    <td class="text-end fw-bold">Grand total sale amount</td>
                     <td class="text-start">{{total_sale_amount}}</td>
                 </tr>
                 <tr>
-                    <td class="text-end fw-bold">Total pur amount</td>
+                    <td class="text-end fw-bold">Grand total pur amount</td>
                     <td class="text-start">{{total_pur_amount}}</td>
                 </tr>
                 <tr>
-                    <td class="text-end fw-bold">Discount</td>
+                    <td class="text-end fw-bold">Total discount</td>
                     <td class="text-start">{{total_discount}}</td>
                 </tr>
                 <tr>
-                    <td class="text-end fw-bold">Total profit</td>
+                    <td class="text-end fw-bold">Grand total profit</td>
                     <td class="text-start">{{total_profit - total_discount}}</td>
-                </tr> 
+                </tr>--> 
               
             </tbody>
         </table>
@@ -161,11 +183,14 @@ export default {
       
     },
     methods:{
-        calQtyL(qty,ipp){
-            return hp.calQtyL(qty,ipp)
+        displayPrice(l_unit, m_unit, s_unit){
+            return hp.displayPrice(l_unit, m_unit, s_unit);
         },
-        calQtyS(qty, ipp){
-            return hp.calQtyS(qty,ipp)
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
+        },
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
         showTime(t){
             return hp.showTime(t);
@@ -177,7 +202,7 @@ export default {
             let sales=[]
             this.salesData.map((res)=>{   
                 if(!this.code_no){
-                        this.total_discount += res.discount
+                        this.total_discount += res.extra_discount
                     }                                       
                     res.products.map((data)=>{
                         let index = sales.findIndex((item) => item.voucher_no == res.voucher_no);
@@ -187,7 +212,7 @@ export default {
                             customer_code: res.customer.code,
                             group_date :  this.showTime(res.sale_date),
                             extra_discount : res.discount,
-                             voucher_no: res.voucher_no, extra_discount: res.discount})
+                             voucher_no: res.voucher_no, extra_discount: res.extra_discount})
                         }else{
                             sales.push({...data, group_customer:  `${res.customer.name}`,
                             customer_code: res.customer.code,
@@ -196,6 +221,19 @@ export default {
                             voucher_no: res.voucher_no, extra_discount: 0})
                         }
                     })
+            })
+            sales=sales.map((s)=>{
+                return {...s, 
+                    group_price: s.packing_size.largest_unit ? 
+                             `${s.retail_price.largest_unit},
+                             ${s.whole_sale_price.largest_unit}, 
+                             ${s.pur_price.largest_unit}` 
+                             : 
+                             `${s.retail_price.medium_unit},
+                             ${s.whole_sale_price.medium_unit},
+                             ${s.pur_price.medium_unit}
+                             `
+                }
             })
             if(this.code_no){
                 sales=sales.filter((f)=>f.code_no === Number(this.code_no))
@@ -210,35 +248,33 @@ export default {
                 const gbd=Object.entries(hp.gb_date(res[1]))
                 const gbc=gbd.map((red)=>{
                     const date=red[0]
-                    const gbItem=Object.entries(hp.gb_item_name_sale_price(red[1]))
+                    const gbItem=Object.entries(hp.gb_item_name_price(red[1]))
                     const res2=gbItem.map((res)=>{
-                            let item={
-                                item_name: res[0],
-                                sale_qty : 0,
-                                code_no:"",
-                                sale_price:0,
-                                pur_price:0,
-                                sale_amount:0,
-                                pur_amount:0,
-                                profit: 0,
-                                item_per_package:0,
-                                child_unit:"",
-                                parent_unit:"",
-                                discount:0,
-                                extra_discount : 0,
-                            }                
+                        const item_name=res[1][0].item_name;
+                        let item={
+                            item_name: item_name,
+                            sale_qty : 0,
+                            code_no:"",
+                            profit: 0,               
+                            extra_discount:0,
+                            packing_size: {},
+                            retail_price:{},
+                            whole_sale_price:{},
+                            pur_price:{},
+                            pur_amount:0,
+                            final_amount:0,
+                        }               
                             res[1].map((ren)=>{
-                                item.item_per_package=ren.item_per_package;
-                                item.sale_qty += ren.sale_qty;
-                                item.code_no=ren.code_no;
-                                item.sale_price=ren.sale_price;
+                                item.packing_size=ren.packing_size;
+                                item.retail_price=ren.retail_price;
+                                item.whole_sale_price=ren.whole_sale_price;
                                 item.pur_price=ren.pur_price;
-                                item.pur_amount +=ren.pur_price * ren.sale_qty;
-                                item.sale_amount += ren.sale_amount;
-                                item.profit += ren.sale_amount - (ren.pur_price * ren.sale_qty);
-                                item.discount += ren.discount;
-                                item.child_unit=ren.child_unit;
-                                item.parent_unit=ren.parent_unit;
+                                item.final_amount +=ren.final_amount;
+                                item.sale_qty += ren.sale_qty;
+                                item.code_no=ren.code_no;                  
+                                item.pur_price=ren.pur_price;
+                                item.pur_amount +=ren.pur_price.smallest_unit * ren.sale_qty;
+                                item.profit += ren.final_amount - (ren.pur_price.smallest_unit * ren.sale_qty);                                
                                 item.extra_discount += ren.extra_discount;
                             })
                         return item;
@@ -248,10 +284,10 @@ export default {
                         let profit_amount=0;
                         let extra_discount=0;
                         res2.map((res)=>{
-                            sale_amount += res.sale_amount;
+                            sale_amount += res.final_amount;
                             pur_amount += res.pur_amount;
-                            profit_amount += res.sale_amount - res.pur_amount;
-                            extra_discount += res.extra_discount;
+                            profit_amount += res.final_amount - res.pur_amount;
+                            extra_discount += this.code_no ? 0 : res.extra_discount;
                         })
                         total_pur_amount +=pur_amount;
                         total_sale_amount += sale_amount;

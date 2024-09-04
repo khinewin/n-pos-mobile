@@ -25,7 +25,7 @@
                                     <div class="form-floating mb-2">
                                         <select v-model="from_location" class="form-select form-select-sm" id="from_location">
                                             <option>Main</option>
-                                            <option>Shop</option>
+                                            <option>Pharmacy</option>
                                         </select>
                                         <label for="from_location">From location</label>
                                     </div>  
@@ -34,14 +34,14 @@
                                     <div class="form-floating mb-2">
                                         <select v-model="to_location" class="form-select form-select-sm" id="to_location">
                                             <option>Main</option>
-                                            <option>Shop</option>
+                                            <option>Pharmacy</option>
                                         </select>
                                         <label for="to_location">To location</label>
                                     </div>    
                                 </div>
                             </div> 
                             <div class="row g-2">
-                                <div class="col-6">
+                                <div class="col-5">
                                     <div class="mb-2 input-group">
                                         <div class="form-floating ">
                                             <input  type="number" class="form-control form-control-sm" id="gt_equal" v-model="gt_equal" placeholder=">=">
@@ -50,7 +50,7 @@
                                         <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-5">
                                     <div class="mb-2 input-group">
                                         <div class="form-floating ">
                                             <input  type="number" class="form-control form-control-sm" id="lt_equal" v-model="lt_equal" placeholder="<=">
@@ -59,12 +59,22 @@
                                         <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
                                     </div>
                                 </div>
+                                <div class="col-2">
+                                    <div class="form-floating">
+                                        <select v-model="packing_unit" id="packing_unit" disabled class="form-select form-select-sm text-center">
+                                            <option>L Unit </option>
+                                            <option>M Unit</option>
+                                            <option>S Unit</option>
+                                        </select>
+                                        <label for="packing_unit">Packing unit</label>
+                                    </div>
+                                </div>
                                </div>
                             <div class="form-floating mb-2">
                                 <select v-model="location" class="form-select form-select-sm">
                                     <option>All</option>
                                     <option>Main</option>
-                                    <option>Shop</option>
+                                    <option>Pharmacy</option>
                                 </select>
                                 <label for="location">Location</label>
                             </div>    
@@ -145,7 +155,7 @@
                                           <!-- Stock dropend button -->
                                           <div class="btn-group dropend">
                                             <button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                                Product code
+                                                Medicine code
                                             </button>                               
                                             <ul class="dropdown-menu py-0">                                  
                                                 <li class="list-group-item" v-for="sl in products" :key="sl.code">                                     
@@ -260,7 +270,7 @@ export default {
             gt_equal:null,
             lt_equal:null,
             from_location:"Main",
-            to_location:"Shop",
+            to_location:"Pharmacy",
             from_date:"",
             item_name:"",
             location: "All",
@@ -268,6 +278,7 @@ export default {
             item_name:"",
             to_date:"",
             voucher_no:"",
+            packing_unit:"S Unit",
             supplier: {
                 name: "",
             },
@@ -364,7 +375,7 @@ export default {
             this.lt_equal=null;
             this.gt_equal=null;
             this.from_location="Main";
-            this.to_location="Shop";
+            this.to_location="Pharmacy";
             this.location="All";
         },
         setCustomer(c){
@@ -382,13 +393,13 @@ export default {
         reportProducts(r_type){
             this.$router.push({name: "ReportsProduct", params :{"reportType": r_type, "location": this.location},
             query : { "code_no": this.code_no ? this.code_no : null, "item_name": this.item_name ? this.item_name : null,
-            gt_equal : this.gt_equal , lt_equal : this.lt_equal
+            gt_equal : this.gt_equal , lt_equal : this.lt_equal, packing_unit: this.packing_unit
             }
            })
         },
         reportStocks(r_type){                     
             this.$router.push({name: "ReportsStocks", params :{"reportType": r_type, "fromDate": this.from_date, "toDate": this.to_date, "location": this.location},
-            query : {voucher_no: this.voucher_no
+            query : {voucher_no: this.voucher_no, code_no: this.code_no, item_name: this.item_name
             }})
         },
         
