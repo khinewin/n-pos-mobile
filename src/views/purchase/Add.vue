@@ -31,7 +31,7 @@
                                             <td class="">
                                                 <select class="form-control-plaintext form-control-sm border-bottom" v-model="location">
                                                     <option value="Main">Main</option>
-                                                    <option value="Shop">Shop</option>
+                                                    <option value="Pharmacy">Pharmacy</option>
                                                 </select>
                                             </td>
                                         </tr>
@@ -588,7 +588,7 @@ export default {
                      pur_price: p.pur_price
                  })
                 }
-                 if(this.location==="Shop"){
+                 if(this.location==="Pharmacy"){
                     await updateDoc(updateDocument, {
                      qty : increment(pur_qty),
                      pur_price: p.pur_price,

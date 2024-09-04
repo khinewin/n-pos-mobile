@@ -50,8 +50,8 @@
                                                     <td class="col-1">Code</td>
                                                     <td class="col-2">Description</td>
                                                     <td class="col-1">Packing size</td>
-                                                    <td class="col-1">Shop qty</td>
-                                                    <td class="col-1">Main qty</td>
+                                                    <td class="col-1">Pharmacy Inv</td>
+                                                    <td class="col-1">Main Inv</td>
                                                 </tr>                                      
                                                 <tr class="" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"   style="cursor:context-menu">
                                                     <td class="text-center">{{p.code_no}}</td>

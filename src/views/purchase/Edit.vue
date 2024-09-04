@@ -31,7 +31,7 @@
                                             <td class="">
                                                 <select class="form-control-plaintext form-control-sm border-bottom" v-model="location" disabled>
                                                     <option value="Main">Main</option>
-                                                    <option value="Shop">Shop</option>
+                                                    <option value="Pharmacy">Pharmacy</option>
                                                 </select>
                                             </td>
                                         </tr>
@@ -621,7 +621,7 @@ export default {
                     const pur_qty=p.pur_qty;     
                     const old_pur_qty=p.old_pur_qty;          
                     const updateDocument=doc(db, "products", id)
-                    if(this.location==="Shop"){
+                    if(this.location==="Pharmacy"){
                         await updateDoc(updateDocument, {                      
                         qty : pur_qty > old_pur_qty ? increment(pur_qty-old_pur_qty) : increment(- (old_pur_qty - pur_qty)),
                         pur_price: p.pur_price,

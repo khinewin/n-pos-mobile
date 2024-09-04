@@ -50,7 +50,7 @@
                                                     <td class="col-1">Code</td>
                                                     <td class="col-2">Description</td>
                                                     <td class="col-1">Packing size</td>
-                                                    <td class="col-1">Shop qty</td>
+                                                    <td class="col-1">Pharmacy Inv</td>
                                                     <td class="col-2" v-if="sale_type=='retail'">Retail price</td>
                                                     <td class="col-2" v-if="sale_type=='whole_sale'">Wholesale price</td>
 

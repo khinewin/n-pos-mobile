@@ -304,7 +304,7 @@
 import { required, email ,helpers} from '@vuelidate/validators'
 import {Timestamp, collection, addDoc, doc, increment,  updateDoc, query, where, orderBy, getDocs} from 'firebase/firestore'
 import db from '@/firebase/firestore'
-import Products from "@/views/sales/Products.vue"
+//import Products from "@/views/sales/Products.vue"
 import SalesModal from "@/views/modals/sales/SalesModal.vue"
 import CustomerModal from "@/views/modals/sales/CustomerModal.vue"
 import Print from "@/views/sales/Print.vue"
@@ -313,7 +313,7 @@ import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/products"
 export default {
     components: {
-        PageHeader, Products,SalesModal,CustomerModal,Print, ProductModal
+        PageHeader,SalesModal,CustomerModal,Print, ProductModal
     },
     setup () {
         return { v$: useVuelidate() }

@@ -105,7 +105,7 @@
                                         </td>
                                     </tr>
                                     <tr class="table-secondary">
-                                        <td class="py-1">Shop Qty</td>                                       
+                                        <td class="py-1">Pharmacy inventory</td>                                       
                                         <td class="text-center" colspan="3">
                                             <div  v-if="editItem.packing_size">
                                                 {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            
@@ -113,7 +113,7 @@
                                         </td>
                                     </tr>    
                                     <tr class="table-primary">
-                                        <td class="py-1">Main Qty</td>                                      
+                                        <td class="py-1">Main inventory</td>                                      
                                         <td class="text-center" colspan="3">
                                             <div  v-if="editItem.packing_size">
                                                 {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.main_qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            
@@ -172,7 +172,7 @@
                                         </td>                                        
                                     </tr>
                                     <tr class="">
-                                        <td class="pt-2">Whole sale price</td>
+                                        <td class="pt-2">Wholesale price</td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
                                             <input :disabled="!editItem.packing_size.largest_unit" @keyup="calWholesalePrice('largest_unit')" type="number" v-model="editItem.whole_sale_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
@@ -194,7 +194,7 @@
                                     <tr>
                                         <td class="small">
                                             <div class="form-check form-switch">
-                                                <input v-model="auto_cal" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+                                                <input  v-model="editItem.auto_cal" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
                                                 <label class="form-check-label" for="flexSwitchCheckChecked">Auto cal</label>
                                               </div>                                              
                                         </td>
@@ -228,6 +228,8 @@ import * as ss from "@/lib/snapshot/products"
 import PackingSizeModal from "@/views/modals/product/PackingSize.vue";
 import SelectPackingSizeModal from "@/views/modals/product/SelectPackingSize.vue";
 import * as hp from "@/lib/helper"
+import * as cp from "@/lib/cal_price"
+
 
 export default {
     components: {
@@ -379,70 +381,21 @@ export default {
                     pur_price: this.editItem.pur_price,
                     retail_price: this.editItem.retail_price,
                     whole_sale_price: this.editItem.whole_sale_price,
+                    auto_cal: this.editItem.auto_cal,
                  })  
             this.isSavingEdit=false;
         },
-       
+
         calRetailPrice(unit){
-            const er=this.editItem.retail_price;
-            const ep=this.editItem.packing_size;
-            if(this.auto_cal){
-                switch(unit){
-                    case "largest_unit":
-                        this.editItem.retail_price.medium_unit = Math.floor(er.largest_unit / ep.medium_qty)
-                        this.editItem.retail_price.smallest_unit = Math.floor((er.largest_unit / ep.medium_qty) / ep.smallest_qty)
-                    break;
-                    case "medium_unit":
-                        this.editItem.retail_price.largest_unit = Math.floor(er.medium_unit * ep.medium_qty)
-                        this.editItem.retail_price.smallest_unit = Math.floor(er.medium_unit / ep.smallest_qty)
-                    break;
-                    case "smallest_unit":
-                        this.editItem.retail_price.largest_unit = Math.floor((er.smallest_unit * ep.smallest_qty) * ep.medium_qty)
-                        this.editItem.retail_price.medium_unit = Math.floor(er.smallest_unit * ep.smallest_qty)
-                    break;
-                }
-            }
-        },
-        calPurPrice(unit){
-            const er=this.editItem.pur_price;
-            const ep=this.editItem.packing_size;
-            if(this.auto_cal){
-                switch(unit){
-                    case "largest_unit":
-                        this.editItem.pur_price.medium_unit = Math.floor(er.largest_unit / ep.medium_qty)
-                        this.editItem.pur_price.smallest_unit = Math.floor((er.largest_unit / ep.medium_qty) / ep.smallest_qty)
-                    break;
-                    case "medium_unit":
-                        this.editItem.pur_price.largest_unit = Math.floor(er.medium_unit * ep.medium_qty)
-                        this.editItem.pur_price.smallest_unit = Math.floor(er.medium_unit / ep.smallest_qty)
-                    break;
-                    case "smallest_unit":
-                        this.editItem.pur_price.largest_unit = Math.floor((er.smallest_unit * ep.smallest_qty) * ep.medium_qty)
-                        this.editItem.pur_price.medium_unit = Math.floor(er.smallest_unit * ep.smallest_qty)
-                    break;
-                }
-            }
+            return cp.calRetailPrice(unit, this.editItem);
         },
         calWholesalePrice(unit){
-            const er=this.editItem.whole_sale_price;
-            const ep=this.editItem.packing_size;
-            if(this.auto_cal){
-                switch(unit){
-                    case "largest_unit":
-                        this.editItem.whole_sale_price.medium_unit = Math.floor(er.largest_unit / ep.medium_qty)
-                        this.editItem.whole_sale_price.smallest_unit = Math.floor((er.largest_unit / ep.medium_qty) / ep.smallest_qty)
-                    break;
-                    case "medium_unit":
-                        this.editItem.whole_sale_price.largest_unit = Math.floor(er.medium_unit * ep.medium_qty)
-                        this.editItem.whole_sale_price.smallest_unit = Math.floor(er.medium_unit / ep.smallest_qty)
-                    break;
-                    case "smallest_unit":
-                        this.editItem.whole_sale_price.largest_unit = Math.floor((er.smallest_unit * ep.smallest_qty) * ep.medium_qty)
-                        this.editItem.whole_sale_price.medium_unit = Math.floor(er.smallest_unit * ep.smallest_qty)
-                    break;
-                }
-            }
+            return cp.calWholesalePrice(unit,this.editItem);
         },
+        calPurPrice(unit){
+            return cp.calPurPrice(unit, this.editItem);
+        },
+       
         setEdit(i){
             this.editItem=this.products[i];
             this.$store.dispatch("setProduct", this.editItem)

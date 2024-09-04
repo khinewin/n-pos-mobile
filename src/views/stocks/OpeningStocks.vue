@@ -31,14 +31,14 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4 fw-bold">Voucher no. :</td>
-                                            <td class="col-8">
+                                            <td class="text-end col-6 py-1">Voucher no. :</td>
+                                            <td class="col-6 py-1">
                                                 {{voucher_no}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end fw-bold">Date :</td>
-                                            <td class="">
+                                            <td class="text-end py-1">Date :</td>
+                                            <td class="py-1">
                                                <span v-if="created_at"> {{showTime(created_at)}}</span>
                                             </td>
                                         </tr>
@@ -53,62 +53,41 @@
                                     <td class="col-1 ">Code</td>
                                     <td class="col-1">Desc</td>
                                     <td class="col-1">Packing size</td>
-                                    <td class="col-1 ">Main Qty</td>         
-                                    <td class="col-1">Shop Qty</td>                          
-                                    <td class="col-1 ">RT price</td>
-                                    <td class="col-1 ">WS price</td>
+                                    <td class="col-1">Main Inv</td>     
+                                    <td class="col-1">Pharmacy Inv</td>   
                                     <td class="col-1">Pur price</td>
-                                    <td class="col-1">Main RT Amt</td>                                    
-                                    <td class="col-1">Main WS Am</td>                                    
-                                    <td class="col-1">Shop RT Amt</td>                                    
-                                    <td class="col-1">Shop WS Amt</td>
+                                    <td class="col-1">Retail price</td>
+                                    <td class="col-1">Wholesale price</td>      
                                 </tr>
                                 <tr class=""v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id">
                                     <td class="text-center">
                                             {{st.code_no}}                                           
                                     </td>
                                     <td class="text-start">{{st.item_name}}</td>
-                                    <td class="">1{{st.parent_unit}} * {{st.item_per_package}}{{st.child_unit}}</td>
-                                    <td class="col-1 text-end">
-                                        <span v-if="calQtyL(st.main_qty, st.item_per_package) > 0">{{calQtyL(st.main_qty, st.item_per_package)}}{{st.parent_unit}} </span>
-                                         <span v-if="calQtyL(st.main_qty, st.item_per_package) >0 && calQtyS(st.main_qty, st.item_per_package) > 0">, </span>
-                                         <span v-if="calQtyS(st.main_qty, st.item_per_package)> 0">{{calQtyS(st.main_qty, st.item_per_package)}}{{st.child_unit}}  </span>
-                                     </td>
-                                    <td class="col-1 text-end">
-                                        <span v-if="calQtyL(st.qty, st.item_per_package) > 0">{{calQtyL(st.qty, st.item_per_package)}}{{st.parent_unit}} </span>
-                                         <span v-if="calQtyL(st.qty, st.item_per_package) >0 && calQtyS(st.qty, st.item_per_package) > 0">, </span>
-                                         <span v-if="calQtyS(st.qty, st.item_per_package)> 0">{{calQtyS(st.qty, st.item_per_package)}}{{st.child_unit}}  </span>
-                                     </td>
-                                    <td class="text-end">                                      
-                                         <span>{{st.retail_price}}</span>
+                                    <td class="">
+                                        {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                     </td>
-                                    <td class="text-end">                                      
-                                        <span>{{st.whole_sale_price}}</span>
-                                   </td>
-                                   <td class="text-end">                                      
-                                     <span>{{st.pur_price}}</span>
+                                    <td class=" text-end">
+                                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.main_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                                    </td> 
+                                    <td class=" text-end">
+                                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                                    </td> 
+                                    <td class="text-end" >
+                                        <span v-if="st.packing_size.largest_unit"> {{st.pur_price.largest_unit}}' {{st.packing_size.largest_unit}}</span>
+                                        <span v-else>{{st.pur_price.medium_unit}}' {{st.packing_size.medium_unit}}</span>
+                                    </td>       
+                                    <td class="text-end ">
+                                        <span v-if="st.packing_size.largest_unit">{{st.retail_price.largest_unit}}' {{st.packing_size.largest_unit}} </span>
+                                        <span v-else>{{st.retail_price.medium_unit}}' {{st.packing_size.medium_unit}}</span>
                                     </td>
-                                   <td class="text-end">                                      
-                                        <span>{{st.main_retail_amount}}</span>
-                                    </td>
-                                    <td class="text-end">                                      
-                                        <span>{{st.main_whole_sale_amount}}</span>
-                                   </td>                                  
-                                    <td class="text-end">                                      
-                                        <span>{{st.retail_amount}}</span>
-                                   </td>                                  
-                               <td class="text-end">                                      
-                                   <span>{{st.whole_sale_amount}}</span>
-                              </td>
+                                    <td class="text-end">
+                                        <span v-if="st.packing_size.largest_unit">{{st.whole_sale_price.largest_unit}}' {{st.packing_size.largest_unit}} </span>
+                                        <span v-else>{{st.whole_sale_price.medium_unit}}' {{st.packing_size.medium_unit}}</span>
+                                    </td>                                          
                                  
                                 </tr>
-                                <tr class="small">
-                                    <td colspan="8" class="text-end fw-bold">Total</td>
-                                    <td class="text-end">{{total_main_retail_amount}}</td>
-                                    <td class="text-end">{{total_main_whole_sale_amount}}</td>
-                                    <td class="text-end">{{total_retail_amount}}</td>
-                                    <td class="text-end">{{total_whole_sale_amount}}</td>
-                                </tr>                                                                                         
+                                                                                                              
                             </tbody>
                         </table>                                                                                                                    
                 </form>               
@@ -152,12 +131,7 @@ export default {
             created_at:"",        
             stock_user:{},
             store_item: {},
-            storeItems: [],
-            total_retail_amount:0,
-            total_whole_sale_amount:0,    
-            total_main_retail_amount:0,
-            total_main_whole_sale_amount:0,
-            total_pur_amount:0,  
+            storeItems: [],         
             isLoading:false,
             msg : {
                 type :"",
@@ -183,11 +157,12 @@ export default {
     },
     
     methods:{    
-        calQtyL(qty, ipp){
-            return hp.calQtyL(qty, ipp);
+       
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
-        calQtyS(qty, ipp){
-            return hp.calQtyS(qty, ipp)
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
         async print () {
         // Pass the element id here
