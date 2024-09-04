@@ -70,6 +70,7 @@
                                 <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
                                     <td class="col-2">Description</td>
+                                    <td class="col-1">Packing size</td>
                                     <td class="col-1">From Loc Bal</td> 
                                     <td class="col-1">To Loc Bal</td> 
                                     <td class="col-1">Transfer Bal</td>
@@ -77,20 +78,31 @@
                                     <td class="col-1">After To Loc Bal</td> 
                                 </tr>
                                 <tr class="" v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id"  >
-                                    <td class="text-center pt-2">
+                                    <td class="text-center">
                                         <div class="position-relative">
                                             {{st.code_no}}                                           
-                                            <a class="text-danger position-absolute top-50 start-0 translate-middle p-2" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                         </div>                                    
                                     </td>
-                                    <td class="pt-2">{{st.item_name}}</td>
-                                    <td class="pt-2 text-center">{{from_location==="Main" ? st.main_qty : st.qty}}</td>
-                                    <td class="pt-2 text-center">{{to_location==="Main" ? st.main_qty : st.qty}}</td>
-                                    <td class="text-center p-0">
-                                        <input   min="0" :max="from_location==='Main' ? st.main_qty : st.qty"  type="number"  v-model="st.transfer_qty" class="form-control-plaintext  text-center"  placeholder="Qty">
+                                    <td class="">{{st.item_name}}</td>                                   
+                                    <td class="">
+                                        {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                     </td>
-                                    <td class="pt-2 text-center">{{from_location==="Main" ? st.main_qty - st.transfer_qty : st.qty - st.transfer_qty}}</td>
-                                    <td class="pt-2 text-center">{{to_location==="Main" ? st.main_qty + st.transfer_qty : st.qty + st.transfer_qty}}</td>                                                                                              
+                                    <td class="text-end">
+                                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.from_loc_bal, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                                    </td>
+                                    <td class="text-end">
+                                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.to_loc_bal, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                                    </td>
+                                    <td class="text-center" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.transfer_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                                    </td>
+                                    <td class="text-end">
+                                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.after_from_loc_bal, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                                    </td>
+                                    <td class="text-end">
+                                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.after_to_loc_bal, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                                    </td>
+                                                                                                                              
                                 </tr>                                                                                                              
                             </tbody>
                         </table>                                                                                                                    
@@ -163,6 +175,12 @@ export default {
     },
     
     methods:{
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
+        },
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
+        },
         async print () {
         // Pass the element id here
         await this.$htmlToPaper('printMe');

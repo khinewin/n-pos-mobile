@@ -196,6 +196,9 @@
                     <div>
                         <table class="table table-bordered" v-if="Object.keys(editItem).length">
                             <tbody>
+                                <tr>
+                                    <td colspan="2" class="p-2 text-center">{{editItem.item_name}}</td>
+                                </tr>
                                 <tr v-if="editItem.packing_size.largest_unit">
                                     <td class="p-0">
                                         <input @keyup="checkEditQty" type="number" v-model="editItem.sale_l_qty" class="form-control-plaintext form-control-sm text-center">
@@ -258,6 +261,9 @@
                     <div>
                         <table class="table table-bordered" v-if="Object.keys(editItem).length">
                             <tbody v-if="editItem.amount">
+                                <tr>
+                                    <td colspan="2" class="p-2 text-center">{{editItem.item_name}}</td>
+                                </tr>
                                 <tr>
                                     <td class="p-0">
                                         <select @change="calDiscount" class="form-control-plaintext form-control-sm text-center" v-model="editItem.dis_qty_unit">
@@ -676,8 +682,8 @@ export default {
                 this.saleItems=[],
                 this.store_item={},
                 this.total_amount=0,
-                this.charges=0,
-                this.discount=0,
+                this.extra_discount=0,
+                this.net_amount=0;
                 this.paid=0,
                 this.change=0
                 this.isNewSale=true;                

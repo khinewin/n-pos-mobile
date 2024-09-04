@@ -138,7 +138,7 @@
         </div>
         </div>
         </div>
-        <!-- pur price Modal -->
+        <!-- set qty Modal -->
         <div class="modal fade" id="setQtyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-sm">
             <div class="modal-content">               
@@ -196,7 +196,7 @@
             </div>
             </div>
         </div>
-        <!--end pur price modal-->  
+        <!--end qty modal-->  
         <!-- discount price Modal -->
         <div class="modal fade" id="setDiscountModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-sm">

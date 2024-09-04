@@ -35,28 +35,28 @@ const router = createRouter({
       path: '/',
       name: 'Welcome',
       component: Login,
-      meta : {title: "N-PRO-POS | Welcome"}
+      meta : {title: "N-Pharmacy | Welcome"}
 
     },
     {
       path: '/auth/login',
       name: 'Login',     
       component: Login,
-      meta : {title: "N-PRO-POS | User signin"}
+      meta : {title: "N-Pharmacy | User signin"}
 
     },
     {
       path: '/admin/dashboard',
       name: 'Dashboard',     
       component: Dashboard,
-      meta : {title: "N-PRO-POS | Admin dashboard"}
+      meta : {title: "N-Pharmacy | Admin dashboard"}
     },
     
     {
       path: '/sale',
       name: 'Sale',     
       component: Sale,
-      meta : {title: "N-PRO-POS | Sale"}
+      meta : {title: "N-Pharmacy | Sale"}
 
     },
     {
@@ -69,141 +69,141 @@ const router = createRouter({
       path: '/products',
       name: 'Products',     
       component: Products,
-      meta : {title: "N-PRO-POS | Products code"}
+      meta : {title: "N-Pharmacy | Medicine code"}
 
     },
     {
-      path: '/products/opening-stocks',
+      path: '/opening-stocks',
       name: 'OpeningStocks',     
       component: OpeningStocks,
-      meta : {title: "N-PRO-POS | Opening stocks"}
+      meta : {title: "N-Pharmacy | Opening stocks"}
 
     },
     {
-      path: '/products/opening-stocks/new',
+      path: '/opening-stocks/new',
       name: 'NewOpeningStocks',     
       component: NewOpeningStocks,
-      meta : {title: "N-PRO-POS | New opening stock"}
+      meta : {title: "N-Pharmacy | New opening stock"}
     },
     {
-      path: '/products/opening-stocks/:id/edit',
+      path: '/opening-stocks/:id/edit',
       name: 'EditOpeningStocks',     
       component: EditOpeningStocks,
-      meta : {title: "N-PRO-POS | Edit opening stock"}
+      meta : {title: "N-Pharmacy | Edit opening stock"}
     },
     {
       path: '/purchase',
       name: 'Purchase',     
       component: Purchase,
-      meta : {title: "N-PRO-POS | Purchase"}
+      meta : {title: "N-Pharmacy | Purchase"}
     },
     {
       path: '/purchase/:id/edit',
       name: 'EditPurchase',     
       component: EditPurchase,
-      meta : {title: "N-PRO-POS | Edit purchase"}
+      meta : {title: "N-Pharmacy | Edit purchase"}
     },
     {
       path: '/purchase/add',
       name: 'AddPurchase',     
       component: AddPurchase,
-      meta : {title: "N-PRO-POS | Add purchase"}    },
+      meta : {title: "N-Pharmacy | Add purchase"}    },
    
     {
       path: '/suppliers',
       name: 'Suppliers',     
       component: Suppliers,
-      meta : {title: "N-PRO-POS | Suppliers"}
+      meta : {title: "N-Pharmacy | Suppliers"}
     },
     {
       path: '/customers',
       name: 'Customers',     
       component: Customers,
-      meta : {title: "N-PRO-POS | Customers"}
+      meta : {title: "N-Pharmacy | Customers"}
     },
     {
       path: "/reports",
       name: "Reports",
       component: Reports,
-      meta : {title: "N-PRO-POS | Reports"}
+      meta : {title: "N-Pharmacy | Reports"}
     },
     {
       path: "/reports/products/:reportType/:location",
       name: "ReportsProduct",
       component: ReportProduct,
-      meta : {title: "N-PRO-POS | Report product code"}
+      meta : {title: "N-Pharmacy | Report product code"}
     },
     {
       path: "/reports/transfers/:reportType/:fromDate/:toDate/:from_location/:to_location",
       name: "ReportsTransfer",
       component: ReportsTransfers,
-      meta : {title: "N-PRO-POS | Report transfer location"}
+      meta : {title: "N-Pharmacy | Report transfer location"}
     },
     {
       path: "/reports/stocks/:reportType/:fromDate/:toDate/:location",
       name: "ReportsStocks",
       component: ReportStocks,
-      meta : {title: "N-PRO-POS | Report opening stock"}
+      meta : {title: "N-Pharmacy | Report opening stock"}
     },
     {
       path: "/reports/sales/:reportType/:fromDate/:toDate",
       name: "ReportsSales",
       component: ReportSales,
-      meta : {title: "N-PRO-POS | Report sales"}
+      meta : {title: "N-Pharmacy | Report sales"}
     },
     {
       path: "/reports/purchase/:reportType/:fromDate/:toDate/:location",
       name: "ReportsPurchase",
       component: ReportPurchase,
-      meta : {title: "N-PRO-POS | Report purchase"}
+      meta : {title: "N-Pharmacy | Report purchase"}
     },
     {
       path: "/reports/adjustments/:reportType/:fromDate/:toDate",
       name: "ReportsAdjustments",
       component: ReportAdjustments,
-      meta : {title: "N-PRO-POS | Report adjustments"}
+      meta : {title: "N-Pharmacy | Report adjustments"}
     },
     {
       path: '/transfers/:id/edit',
       name: 'EditTransfer',     
       component: EditTransfer,    
-      meta: { title: 'N-PRO-POS | Edit transfer' },
+      meta: { title: 'N-Pharmacy | Edit transfer' },
     },
     {
       path: '/transfers/new',
       name: 'AddTransfer',     
       component: NewTransfer,    
-      meta: { title: 'N-PRO-POS | New transfer' },
+      meta: { title: 'N-Pharmacy | New transfer' },
     },
     {
       path: '/transfers',
       name: 'Transfers',     
       component: Transfers,    
-      meta: { title: 'N-PRO-POS | Transfers' },
+      meta: { title: 'N-Pharmacy | Transfers' },
     },
     {
       path: '/adjustments',
       name: 'Adjustments',     
       component: Adjustments,
-      meta : {title: "N-PRO-POS | Adjustments"}
+      meta : {title: "N-Pharmacy | Adjustments"}
     },
     {
       path: '/adjustments/add',
       name: 'NewAdjustment',     
       component: NewAdjustment,
-      meta : {title: "N-PRO-POS | New adjustment"}
+      meta : {title: "N-Pharmacy | New adjustment"}
     },
     {
       path: '/adjustments/:id/edit',
       name: 'EditAdjustment',     
       component: EditAdjustment,
-      meta : {title: "N-PRO-POS | Edit adjustments"}
+      meta : {title: "N-Pharmacy | Edit adjustments"}
     },
     {
       path: '/user/profile',
       name: 'Profile',     
       component: Profile,    
-      meta: { title: 'N-PRO-POS | User profile' },
+      meta: { title: 'N-Pharmacy | User profile' },
     }
   ], 
 })

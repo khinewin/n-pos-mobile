@@ -56,7 +56,7 @@
                         <td class="text-center">
                             {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
                         </td>    
-                        <td class="text-center">{{s.qty_sale_price_unit}} * {{s.qty_sale_price}}</td>     
+                        <td class="text-end">{{s.qty_sale_price}}' {{s.qty_sale_price_unit}} </td>     
                         <td class="text-center">
                             <span v-if="s.dis_qty">{{s.dis_qty}}{{s.dis_qty_unit}}</span>
                             <span v-if="s.dis_amount">{{s.dis_amount}}$</span>
