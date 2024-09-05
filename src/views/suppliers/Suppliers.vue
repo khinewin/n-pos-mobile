@@ -22,11 +22,11 @@
                                     <label for="search_by_code" class="small">Code</label>
                                 </div>
                                 <div class="form-floating col-sm-4 col-lg-12">
-                                    <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchSuppliers" placeholder="Description" class="form-control form-control-sm">
+                                    <input type="search" id="search_by_name" v-model="search_by_name" @keypress.enter="searchSuppliers" placeholder="Description" class="form-control form-control-sm">
                                     <label for="search_by_name" class="small">Name</label>
                                 </div> 
                                 <div class="form-floating col-sm-4 col-lg-12">
-                                    <input type="search" id="search_by_company" v-model="search_by_company" @keyup="searchSuppliers" placeholder="Company" class="form-control form-control-sm">
+                                    <input type="search" id="search_by_company" v-model="search_by_company" @keypress.enter="searchSuppliers" placeholder="Company" class="form-control form-control-sm">
                                     <label for="search_by_company" class="small">Company</label>
                                  </div> 
                             </div>
@@ -76,13 +76,13 @@
                                                 {{p.code}}
                                             </td>
                                            <td :class="{'table-secondary': sort_item ==='name'}" class="p-0">
-                                                <input @keyup="saveEdit" type="text" class="form-control-plaintext text-center m-0" v-model="p.name">
+                                                <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center m-0" v-model="p.name">
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='phone'}" class="p-0">
-                                            <input @keyup="saveEdit" type="text" class="form-control-plaintext text-center  m-0" v-model="p.phone">
+                                            <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center  m-0" v-model="p.phone">
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='company'}" class="p-0">
-                                            <input @keyup="saveEdit" type="text" class="form-control-plaintext text-center m-0" v-model="p.company">
+                                            <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center m-0" v-model="p.company">
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='created_at'}" class="pt-2">{{showTime(p.created_at)}}</td>
                                        </tr>
@@ -109,7 +109,7 @@
    import PageHeader from "@/views/partials/PageHeader.vue"
     import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-   import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
+   import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy, onSnapshot } from 'firebase/firestore'
    import db from '@/firebase/firestore'
    import * as lib from '@/lib/snapshot/suppliers'
    import * as hp from '@/lib//helper'
@@ -160,8 +160,8 @@ import { required, email ,helpers} from '@vuelidate/validators'
        mounted() {
         const name=document.getElementById("name");
         name.focus();
-        this.code= new Date().getTime()
        },
+      
        computed:{
            user(){
                return this.$store.getters.user;
@@ -186,12 +186,39 @@ import { required, email ,helpers} from '@vuelidate/validators'
            }
        },
        methods:{
+        resetInput(){
+            this.name="";
+            this.phone="";
+            this.code= "";
+            this.created_at="";
+            this.company="";
+            this.isSaving=false;
+            this.isLoading=false;
+            this.isUpdating=false;
+            this.v$.$reset()
+        },
+        async fetchSuppliers(){      
+                const query_url=query(collection(db, "suppliers"), orderBy("created_at", "desc"));
+                onSnapshot(query_url, async(snapShot) =>{
+                    const isLocal=snapShot.metadata.fromCache;
+                    if(isLocal){
+                        this.msg.type="error";
+                        this.msg.info="You are now in offline mode"
+                    }
+                    const suppliers=lib.suppliers(snapShot);   
+                    this.suppliersData=suppliers;
+                    this.searchSuppliers();
+                    this.resetInput();    
+                    console.log("wok")                  
+                   });
+           
+           } ,
         async removeSupplier(i, p){
             const cf=confirm(`Are you sure ? delete the supplier : ${p.name} `)
             if(!cf) return false;
             const document=doc(db, "suppliers", p.id)     
-            await deleteDoc(document) //if no items delete document;
-            this.fetchSuppliers();  
+            await deleteDoc(document)
+         //   this.fetchSuppliers();  
             this.msg.type="success";
             this.msg.info="Supplier delete successful"
         },
@@ -205,27 +232,17 @@ import { required, email ,helpers} from '@vuelidate/validators'
             const data={
                 user: {uid:this.user.uid, email:this.user.email},
                 name: this.name, 
-                code : this.code,
+                code: new Date().getTime(),
                 phone: this.phone,
                 company: this.company,
                 created_at : created_at,               
             }
-            const result=await addDoc(dataCollection, data);
-            if(result){
-                this.msg.type="success";
-                this.msg.info="Supplier save successful."
-            }else{
-                this.msg.type="error";
-                this.msg.info="Supplier save failed."
-            }
-            this.fetchSuppliers();
-            this.name="";
-            this.phone="";
-            this.code= new Date().getTime()
-            this.created_at="";
-            this.company="";
-            this.isSaving=false;
-            this.v$.$reset()
+            await addDoc(dataCollection, data);
+   
+            this.msg.type="success";
+            this.msg.info="Supplier save successful."
+        
+           
         },
            updateSuppliers(){
                this.isUpdating=true;
@@ -331,24 +348,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                }            
            },
            
-           async fetchSuppliers(){                    
-               const query_url = query(collection(db, "suppliers"), orderBy("created_at", "desc"));
-               const snapShot=await getDocs(query_url)       
-               this.suppliers=[];    
-               if(snapShot._snapshot.docChanges.length <=0){
-                   this.msg.type='error' 
-                   this.msg.info='Oops..., something went wrong!'
-                   this.isLoading=false;
-                   this.isUpdating=false;
-                   return false;
-               }
-               const suppliers=lib.suppliers(snapShot);   
-               this.suppliersData=suppliers;
-               this.suppliers=suppliers;
-               this.isLoading=false;
-               this.isUpdating=false;
-              // this.$store.dispatch("setsuppliers", this.suppliers)
-          } ,
+           
           showTime(t){
             return hp.showTime(t)
          }
