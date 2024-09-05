@@ -5,39 +5,37 @@
                 <tr><td class="col-1" rowspan="2">Exp. date</td></tr>
                 <tr>
                     <td class="col-1">Code</td>
-                    <td class="col-3">Description</td>
+                    <td class="col-2">Description</td>
                     <td class="col-1">Packing size</td>
                     <td class="col-1">Qty</td>
-                    <td class="col-1">Item price</td>
+                    <td class="col-1">Unit price</td>
                     <td class="col-1">Amount</td>
-                    <td class="col-1" colspan="3">Discount</td>                                              
+                    <td class="col-1">Discount</td>                                              
                     <td class="col-1">Price</td>
                 </tr>
             </tbody>
             <tbody v-if="reports.length >0" v-for="r in reports" :key="r[0]">   
                 <tr><td :rowspan="r[1].length + 2" class="text-center">{{r[0]}}</td></tr>                                         
-                <tr v-for="item in r[1]" :key="item.code_no">
-                    <td class="text-center">{{item.code_no}}</td>
-                    <td >{{item.item_name}}</td>
-                    <td class="">
-                        1{{item.parent_unit}} * {{item.item_per_package}}{{item.child_unit}}
+                <tr v-for="st in r[1]" :key="st.code_no">
+                    <td class="text-center">{{st.code_no}}</td>
+                    <td >{{st.item_name}}</td>
+                    <td class="col-1">
+                        {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
+                     </td>
+                    <td class="text-end">
+                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.pur_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                     </td>
-                    <td class=" text-end">
-                        <span v-if="calQtyL(item.pur_qty, item.item_per_package) > 0">{{calQtyL(item.pur_qty, item.item_per_package)}}{{item.parent_unit}}</span>
-                        <span v-if="calQtyL(item.pur_qty, item.item_per_package) >0 && calQtyS(item.pur_qty, item.item_per_package) > 0">, </span>
-                        <span v-if="calQtyS(item.pur_qty, item.item_per_package)> 0">{{calQtyS(item.pur_qty, item.item_per_package)}}{{item.child_unit}} </span>
-                    </td>
-                    <td  class="text-end">{{item.pur_price}}</td>
-                    <td class="text-end">{{item.amount}}</td>
-                    <td  class="text-center">{{item.dis_qty}}</td>
-                    <td class="text-center">{{item.dis_percent}}</td>
-                    <td class="text-end">{{item.dis_amount}}</td>
-                    <td class="text-end">{{item.price}}</td>
+                    <td class="text-center">
+                        {{st.qty_pur_price}}' {{st.qty_pur_price_unit}}
+                    </td>                   
+                    <td class="text-end">{{st.amount}}</td>
+                    <td class="text-end">{{st.discount}}</td>
+                    <td class="text-end">{{st.price}}</td>
                 </tr>
                 <tr>
                     <td colspan="5" class="text-end fw-bold">Total</td>
                     <td class="text-end">{{r[2].amount}}</td>
-                    <td colspan="3" class="text-end">{{r[2].discount}}</td>                                                
+                    <td class="text-end">{{r[2].discount}}</td>                                                
                     <td class="text-end">{{r[2].price}}</td>
                 </tr>
             </tbody>
@@ -57,7 +55,7 @@ import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper.js"
 import * as ss from "@/lib/snapshot/purchases"
 export default {
-    props:['fromDate', 'toDate', 'supplier','location'],
+    props:['fromDate', 'toDate', 'supplier','location', 'code_no'],
     components: {
     },  
     data(){
@@ -117,11 +115,11 @@ export default {
       
     },
     methods:{
-        calQtyL(qty, ipp){
-            return hp.calQtyL(qty, ipp);
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
-        calQtyS(qty, ipp){
-            return hp.calQtyS(qty, ipp)
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
         goBack(){
             this.$router.go(-1)
@@ -141,6 +139,14 @@ export default {
                         }
                     })
             })
+            purchase=purchase.map((s)=>{
+                return {...s, 
+                    group_price: s.packing_size.largest_unit ? s.pur_price.largest_unit  :  s.pur_price.medium_unit                             
+                }
+            })
+            if(this.code_no){
+                purchase =purchase.filter((f)=>f.code_no === Number(this.code_no))
+            }  
             purchase.sort((a,b)=>a.expire_date - b.expire_date)
             const filter_purchase=purchase.filter((res)=>{
                 return res.expire_date >= from_date && res.expire_date <= to_date;
@@ -149,20 +155,26 @@ export default {
            const gbc=gbd.map((res)=>{
                 const res1=Object.entries(hp.gb_item_name_pur_price(res[1]))
                 const res2=res1.map((res)=>{
-                    let item={parent_unit:"", child_unit:"",item_name: res[0], code_no:"", discount:0, pur_qty:0, pur_price:0, amount:0, item_per_package:0, price:0, dis_qty:0, dis_amount:0, dis_percent:0}
+                    const item_name=res[1][0].item_name;
+                    let item={extra_discount:0,packing_size:"",
+                        item_name: item_name, code_no:"", 
+                        discount:0, 
+                        pur_qty:0, 
+                        qty_pur_price:0, 
+                        qty_pur_price_unit: "",
+                        amount:0,
+                        price:0,
+                      }
                     res[1].map((ren)=>{
                         item.code_no=ren.code_no;
                         item.pur_qty += ren.pur_qty;
                         item.amount += ren.amount;
-                        item.pur_price = ren.pur_price;
-                        item.item_per_package=ren.item_per_package;
-                        item.price += ren.price;
-                        item.dis_qty += ren.dis_qty;
-                        item.dis_percent += ren.dis_percent;
-                        item.dis_amount += ren.dis_amount;
-                        item.discount += ren.discount;
-                        item.parent_unit += ren.parent_unit;
-                        item.child_unit += ren.child_unit;
+                        item.qty_pur_price = ren.qty_pur_price;
+                        item.qty_pur_price_unit=ren.qty_pur_price_unit;
+                        item.packing_size=ren.packing_size;
+                        item.price += ren.price;                        
+                        item.discount += ren.discount ? ren.discount : 0;
+                        item.extra_discount += ren.extra_discount;
                     })
                     return item;
                 })

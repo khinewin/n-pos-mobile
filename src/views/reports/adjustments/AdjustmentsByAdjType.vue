@@ -4,76 +4,70 @@
             <tbody class=" text-center fw-bold">
                 <tr><td rowspan="2" class="col-1">Adj type</td></tr>
                 <tr class="">
+                    <td class="col-1">Date</td>
                     <td class="col-1">Code</td>
-                    <td class="col-1">Description</td>
+                    <td class="col-2">Description</td>
+                    <td class="col-1">Packing size</td>
                     <td class="col-1">Before Adj</td>
                     <td class="col-1">Location</td>
                     <td class="col-1">Qty</td>      
                     <td class="col-1">After Adj</td>   
                     <td class="col-1">RTS/RFS</td>                          
-                    <td class="col-1">Remark</td>   
-                    <td class="col-1">Retail Amt</td>    
-                    <td class="col-1">WS Amt</td> 
-                    <td class="col-1">Pur Amt</td>     
+                    <td class="col-1">Remark</td>                          
                 </tr>
             </tbody>
             <tbody  v-if="reports.length > 0" v-for="r in reports" :key="r[0]"> 
                 <tr><td :rowspan="r[1].length  + 2" class="text-center">{{r[0]}}</td></tr>                                           
                 <tr v-for="st in r[1]" :key="st.code_no">
+                    <td class="text-center">{{st.group_date}}</td>
                     <td class="text-center">
                         {{st.code_no}}                                           
                     </td>
-                    <td class="">{{st.item_name}}</td>
-                    <td class="text-center">                                      
-                        <span>{{st.before_adj_qty}}</span>
-                    </td>
+                    <td class="">{{st.item_name}}</td>   
                     <td class="">
-                        {{st.location}}
+                        {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                     </td>
-                    <td class="text-center">                                      
-                        <span>{{st.adj_qty}}</span>
+                    <td class=" text-end">
+                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.before_adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                     </td>
-                    <td class="text-center">                                      
-                        <span>{{st.after_adj_qty}}</span>
+                    <td class="text-center">
+                      {{st.adj_type}}
                     </td>
-                        <td class="text-center">                                      
-                            <span>{{st.rts_rfs}}</span>
-                    </td>
-                    <td class="">                                      
-                        <span>{{st.remark}}</span>
-                    </td>
-                    <td class="text-end">                                      
-                        <span>{{st.retail_amount}}</span>
-                    </td>
-                    <td class="text-end">                                      
-                        <span>{{st.whole_sale_amount}}</span>
-                    </td>                                   
-                    <td class="text-end">                                      
-                        <span>{{st.pur_amount}}</span>
-                    </td>
+                    <td class="text-center" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                    </td>     
+                    <td class=" text-end">
+                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.after_adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                    </td>      
+                    <td class="text-center">
+                        {{st.rts_rfs}}
+                    </td>                                                         
+                    <td class="">
+                        {{st.remark}}
+                    </td>               
+                </tr>
+                <tr class="text-center fw-bold">
+                    <td colspan="7"></td>
+                    <td>Pur amount</td>
+                    <td>Retail amount</td>
+                    <td>WS amount</td>
                 </tr>
                 <tr>
                     <td colspan="8" class="text-end fw-bold">Total</td>
+                    <td class="text-end">{{r[2].pur_amount}}</td>
                     <td class="text-end">{{r[2].retail_amount}}</td>
                   <td class="text-end">{{r[2].whole_sale_amount}}</td>
-                    <td class="text-end">{{r[2].pur_amount}}</td>
                 </tr>
             </tbody>
-            <tbody  v-if="reports.length > 0">
-              <tr>
-                    <td colspan="2" class="text-end fw-bold">Total retail amount</td>
-                    <td  class="text-end">{{total_retail_amount}}</td>
-                </tr>    
+            <tbody class="table-group-divider" v-if="reports.length">
                 <tr>
-                    <td colspan="2" class="fw-bold text-end">Total wholesale amount</td>
-                    <td class="text-end">{{total_whole_sale_amount}}</td>
-                </tr>      
-                <tr>
-                    <td colspan="2" class="fw-bold text-end">Total pur amount</td>
+                    <td colspan="8" class="text-end fw-bold">Grand total</td>
                     <td class="text-end">{{total_pur_amount}}</td>
+                    <td class="text-end">{{total_retail_amount}}</td>
+                    <td class="text-end">{{total_whole_sale_amount}}</td>
                 </tr>
-                    
             </tbody>
+            
         </table>
         <div v-if="isLoading">
             <div class="d-flex justify-content-center my-5">
@@ -152,6 +146,12 @@ export default {
       
     },
     methods:{
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
+        },
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
+        },
         goBack(){
             this.$router.go(-1)
         },
@@ -196,13 +196,13 @@ export default {
 
                 let res3={retail_amount:0, whole_sale_amount:0, pur_amount:0}
                 res[1].map((res)=>{
-                    res3.retail_amount += res.retail_amount;
-                    res3.pur_amount += res.pur_amount;        
-                    res3.whole_sale_amount += res.whole_sale_amount;          
+                    res3.retail_amount += res.retail_price.smallest_unit * res.adj_qty;
+                    res3.pur_amount += res.pur_price.smallest_unit * res.adj_qty;        
+                    res3.whole_sale_amount += res.whole_sale_price.smallest_unit * res.adj_qty;            
 
-                    retail_amount  += res.retail_amount;
-                    whole_sale_amount += res.whole_sale_amount;
-                    pur_amount += res.pur_amount;
+                    retail_amount += res.retail_price.smallest_unit * res.adj_qty;
+                    pur_amount += res.pur_price.smallest_unit * res.adj_qty;        
+                    whole_sale_amount += res.whole_sale_price.smallest_unit * res.adj_qty;    
                     return res;
                 })
                 

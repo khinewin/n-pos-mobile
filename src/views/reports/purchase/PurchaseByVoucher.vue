@@ -53,14 +53,13 @@
                         <tbody>
                             <tr class="small text-center fw-bold table-secondary">
                                 <td class="col-1">Code</td>
-                                <td class="col-2">Desc</td>
+                                <td class="col-2">Description</td>
                                 <td class="col-1">Exp. date</td>
                                 <td class="col-1">Packing size</td>
-                                <td class="col1">Qty</td>
-                                <td class="col-1">Item price</td>
-                                <td colspan="3" class="col-2">Discount</td>
+                                <td class="col-1">Qty</td>
+                                <td class="col-1">Unit price</td>
                                 <td class="col-1">Amount</td>
-                                <td class="col-1">Discount</td>
+                                <td class="col-1">Discount</td>                                              
                                 <td class="col-1">Price</td>
                             </tr>
                         </tbody>
@@ -71,36 +70,33 @@
                                 <td class="">                                   
                                      <span v-if="st.exp_date">{{showTime(st.exp_date)}}</span>
                                 </td>
-                                <td class=" text-start">
-                                    1{{st.parent_unit}} * {{st.item_per_package}}{{st.child_unit}}
+                                <td class="col-1">
+                                    {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
+                                 </td>
+                                <td class="text-end">
+                                    {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.pur_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                 </td>
-                                    <td class="text-end">
-                                       <span v-if="calQtyL(st.pur_qty, st.item_per_package) > 0">{{calQtyL(st.pur_qty, st.item_per_package)}}{{st.parent_unit}} </span>
-                                        <span v-if="calQtyL(st.pur_qty, st.item_per_package) >0 && calQtyS(st.pur_qty, st.item_per_package) > 0">, </span>
-                                        <span v-if="calQtyS(st.pur_qty, st.item_per_package)> 0">{{calQtyS(st.pur_qty, st.item_per_package)}}{{st.child_unit}}  </span>
-                                    </td>
-                                <td class="text-end">{{st.pur_price}}</td>
-                                <td>{{st.dis_qty}}</td>
-                                <td class="text-end">{{st.dis_percent}}</td>
-                                <td class="text-end">{{st.dis_amount}}</td>
+                                <td class="text-center">
+                                    {{st.qty_pur_price}}' {{st.qty_pur_price_unit}}
+                                </td>                   
                                 <td class="text-end">{{st.amount}}</td>
                                 <td class="text-end">{{st.discount}}</td>
-                                <td class="text-end">{{st.price}}</td>
+                                <td class="text-end">{{st.price}}</td>                               
                             </tr>
                             <tr class="small">
-                                <td colspan="9" class="text-end">Amount</td>
+                                <td colspan="8" class="text-end">Total amount</td>
                                 <td class="text-end">{{p.total_amount}}</td>
                             </tr>
                             <tr class="small">
-                                <td colspan="9" class="text-end">Discount</td>
+                                <td colspan="8" class="text-end">Total discount</td>
                                 <td class="text-end ">{{p.total_discount}}</td>
                             </tr>
                             <tr class="small">
-                                <td colspan="9" class="text-end">Extra discount</td>
+                                <td colspan="8" class="text-end">Extra discount</td>
                                 <td class="text-end">{{p.extra_discount}}</td>
                             </tr>
                             <tr class="small">
-                                <td colspan="9" class="text-end">Total price</td>
+                                <td colspan="8" class="text-end">Total price</td>
                                 <td class="text-end">{{p.total_price}}</td>
                             </tr>                           
                         </tbody>
@@ -174,11 +170,11 @@ export default {
       
     },
     methods:{
-        calQtyL(qty, ipp){
-            return hp.calQtyL(qty, ipp);
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
-        calQtyS(qty, ipp){
-            return hp.calQtyS(qty, ipp)
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
         goBack(){
             this.$router.go(-1)

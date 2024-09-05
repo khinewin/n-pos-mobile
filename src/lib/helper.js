@@ -56,6 +56,7 @@ const displayPrice=(l_unit, m_unit, s_unit)=>{
    
 
 const gb_date=groupBy(['group_date'])
+const gb_item_name=groupBy(['item_name'])
 const gb_item_name_sale_price=groupBy(['item_name', 'sale_price'])
 const gb_item_name_price=groupBy(['item_name', 'group_price']);
 const gb_month=groupBy(['group_month'])
@@ -73,6 +74,7 @@ export   {
     gb_code,
     gb_date, 
     gb_month, 
+    gb_item_name,
     gb_item_name_sale_price,
     gb_customer, 
     gb_supplier,
@@ -85,4 +87,5 @@ export   {
     calPackingQty,
     calPackingSize,
     displayPrice,
+    
     };

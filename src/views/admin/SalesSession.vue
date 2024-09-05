@@ -104,14 +104,14 @@
             yearlyReports(){
                 // for this year sales
                 this.salesYearlyData.map((res)=>{
-                    this.sales_this_year += res.charges;
+                    this.sales_this_year += res.total_amount;
                 })
                 //for totay sales
                 const today=this.showTime(Timestamp.fromDate(new Date()))
                 this.salesYearlyData.filter((f)=>{
                        const sale_date=this.showTime(f.sale_date)
                         if(sale_date === today){
-                                this.sales_today += f.charges;
+                                this.sales_today += f.total_amount;
                         }
                 })
                 // for this week
@@ -133,7 +133,7 @@
                 const last_day_week=Timestamp.fromDate(new Date(this.editShowTime(w.lastDay)))
                 this.salesYearlyData.filter((f)=>{
                         if(f.sale_date >= first_day_week && f.sale_date <= last_day_week){
-                                this.sales_this_week += f.charges;
+                                this.sales_this_week += f.total_amount;
                         }
                 })
                 //for this month
@@ -144,7 +144,7 @@
                 const last_day_month=Timestamp.fromDate(new Date(last_day))
                 this.salesYearlyData.filter((f)=>{
                         if(f.sale_date >= first_day_month && f.sale_date <= last_day_month){
-                                this.sales_this_month += f.charges;
+                                this.sales_this_month += f.total_amount;
                         }
                 })
             },

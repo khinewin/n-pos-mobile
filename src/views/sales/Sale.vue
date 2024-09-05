@@ -185,7 +185,7 @@
                 <div class="modal-body p-2">
                     <div class="row text-end mb-2">                       
                         <div class="col-6">
-                            <button type="button" class="btn btn-sm" @click="setSaleQty" data-bs-dismiss="modal">
+                            <button type="button" class="btn btn-sm" @click="setSaleQty" id="setSaleBtn"  data-bs-dismiss="modal">
                                 <span ><i class="fa-solid fa-hard-drive"></i> Save</span>
                             </button>
                         </div>
@@ -201,7 +201,7 @@
                                 </tr>
                                 <tr v-if="editItem.packing_size.largest_unit">
                                     <td class="p-0">
-                                        <input @keyup="checkEditQty" type="number" v-model="editItem.sale_l_qty" class="form-control-plaintext form-control-sm text-center">
+                                        <input @keyup="checkEditQty" @keypress.enter="pressSetSaleQty"  type="number" v-model="editItem.sale_l_qty" class="form-control-plaintext form-control-sm text-center">
                                     </td>
                                     <td class="p-0">
                                         <select  class="form-control-plaintext form-control-sm text-center" v-model="editItem.sale_l_unit">
@@ -211,7 +211,7 @@
                                 </tr>
                                 <tr>
                                     <td class="p-0">
-                                        <input @keyup="checkEditQty" type="number" v-model="editItem.sale_m_qty" class="form-control-plaintext form-control-sm text-center">
+                                        <input @keyup="checkEditQty" @keypress.enter="pressSetSaleQty" type="number" v-model="editItem.sale_m_qty" class="form-control-plaintext form-control-sm text-center">
                                     </td>
                                     <td class="p-0">
                                         <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.sale_m_unit">
@@ -221,7 +221,7 @@
                                 </tr>
                                 <tr>
                                     <td class="p-0">
-                                        <input @keyup="checkEditQty" type="number" v-model="editItem.sale_s_qty" class="form-control-plaintext form-control-sm text-center">
+                                        <input @keyup="checkEditQty" @keypress.enter="pressSetSaleQty" type="number" v-model="editItem.sale_s_qty" class="form-control-plaintext form-control-sm text-center">
                                     </td>
                                     <td class="p-0">
                                         <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.sale_s_unit">
@@ -244,7 +244,7 @@
                 <div class="modal-body p-2">
                     <div class="row text-end mb-2 justify-content-end">     
                         <div class="col-4" v-if="Object.keys(editItem).length">
-                            <button v-if="editItem.amount" type="button" @click="saveDiscount" class="btn btn-sm" :disabled="isLoading" data-bs-dismiss="modal">
+                            <button id="setDiscountBtn" v-if="editItem.amount" type="button" @click="saveDiscount" class="btn btn-sm" :disabled="isLoading" data-bs-dismiss="modal">
                                 <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save</span>
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                             </button>
@@ -271,7 +271,7 @@
                                         </select>
                                     </td>
                                     <td class="p-0">
-                                        <input type="number" @change="calDiscount" @keyup="calDiscount" v-model="editItem.dis_qty" class="form-control-plaintext form-control-sm text-center">
+                                        <input @keypress.enter="pressSetDiscountQty" type="number" @change="calDiscount" @keyup="calDiscount" v-model="editItem.dis_qty" class="form-control-plaintext form-control-sm text-center">
                                     </td>                                    
                                 </tr>
                                 <tr>
@@ -279,7 +279,7 @@
                                         %
                                     </td>
                                     <td class="p-0">
-                                        <input @keyup="calDiscount" @change="calDiscount" type="number" v-model="editItem.dis_percent" class="form-control-plaintext form-control-sm text-center">
+                                        <input @keypress.enter="pressSetDiscountQty"  @keyup="calDiscount" @change="calDiscount" type="number" v-model="editItem.dis_percent" class="form-control-plaintext form-control-sm text-center">
                                     </td>                                    
                                 </tr>
                                 <tr>
@@ -287,7 +287,7 @@
                                         $
                                     </td>
                                     <td class="p-0">
-                                        <input @keyup="calDiscount" @change="calDiscount" type="number" v-model="editItem.dis_amount" class="form-control-plaintext form-control-sm text-center">
+                                        <input @keypress.enter="pressSetDiscountQty" @keyup="calDiscount" @change="calDiscount" type="number" v-model="editItem.dis_amount" class="form-control-plaintext form-control-sm text-center">
                                     </td>                                    
                                 </tr>
                                 <tr>
@@ -406,6 +406,14 @@ export default {
         }
     },
     methods:{
+        pressSetSaleQty(){
+            const btn=document.getElementById("setSaleBtn");
+            btn.click();
+        },
+        pressSetDiscountQty(){
+            const btn=document.getElementById("setDiscountBtn");
+            btn.click();
+        },
         setCodeOnPaste(){
             setTimeout(()=>{                
             const item=this.products.filter((f)=>f.code_no==this.code_no);
@@ -495,7 +503,7 @@ export default {
             })
         },      
 
-        setSaleQty(){
+        setSaleQty(){           
             const e=this.editItem;
                 let sale_qty=0;
                 sale_qty += e.sale_l_qty ? e.sale_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;

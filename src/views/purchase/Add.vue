@@ -463,7 +463,7 @@ export default {
                 pur_s_unit: item.packing_size.smallest_unit,
                 pur_l_qty: item.pur_l_qty ? item.pur_l_qty : 0,
                 pur_m_qty: item.pur_m_qty ? item.pur_m_qty : 0,
-                pur_s_qty: item.pur_s_qty  ? item.pur_s_qty  : 0
+                pur_s_qty: item.pur_s_qty  ? item.pur_s_qty  : 0,
             };
         },
         calEdit(i){

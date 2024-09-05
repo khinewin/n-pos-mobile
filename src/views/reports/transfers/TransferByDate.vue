@@ -16,66 +16,27 @@
             </tbody>
             <tbody v-if="reports.length > 0" v-for="r in reports" :key="r[0]">     
                 <tr><td class="text-center" :rowspan="r[1].length + 1">{{r[0]}}</td></tr>                                       
-                <tr v-for="item in r[1]" :key="item.code_no">
-                    <td class="text-center">{{item.code_no}}</td>
-                    <td class="">{{item.item_name}}</td>
-                    <td class="">                 
-                            1{{item.parent_unit}} * {{item.item_per_package}}{{item.child_unit}}
+                <tr v-for="st in r[1]" :key="st.code_no">
+                    <td class="text-center">{{st.code_no}}</td>
+                    <td class="">{{st.item_name}}</td>
+                    <td class="">
+                        {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                     </td>
                     <td class="text-end">
-                       <span  v-if="from_location=='Main'">
-                        <span v-if="calQtyL(item.main_qty, item.item_per_package) > 0">{{calQtyL(item.main_qty, item.item_per_package)}}{{item.parent_unit}} </span>
-                        <span v-if="calQtyL(item.main_qty, item.item_per_package) >0 && calQtyS(item.main_qty, item.item_per_package) > 0">, </span>
-                        <span v-if="calQtyS(item.main_qty, item.item_per_package)> 0">{{calQtyS(item.main_qty, item.item_per_package)}}{{item.child_unit}}  </span>
-                       </span>
-                       <span v-if="from_location=='Shop'">
-                        <span v-if="calQtyL(item.qty, item.item_per_package) > 0">{{calQtyL(item.qty, item.item_per_package)}}{{item.parent_unit}} </span>
-                        <span v-if="calQtyL(item.qty, item.item_per_package) >0 && calQtyS(item.qty, item.item_per_package) > 0">, </span>
-                        <span v-if="calQtyS(item.qty, item.item_per_package)> 0">{{calQtyS(item.qty, item.item_per_package)}}{{item.child_unit}}  </span>
-                       </span>
-                     </td>
-                     <td class="text-end">
-                        <span  v-if="to_location=='Main'">
-                         <span v-if="calQtyL(item.main_qty, item.item_per_package) > 0">{{calQtyL(item.main_qty, item.item_per_package)}}{{item.parent_unit}} </span>
-                         <span v-if="calQtyL(item.main_qty, item.item_per_package) >0 && calQtyS(item.main_qty, item.item_per_package) > 0">, </span>
-                         <span v-if="calQtyS(item.main_qty, item.item_per_package)> 0">{{calQtyS(item.main_qty, item.item_per_package)}}{{item.child_unit}}  </span>
-                        </span>
-                        <span v-if="to_location=='Shop'">
-                         <span v-if="calQtyL(item.qty, item.item_per_package) > 0">{{calQtyL(item.qty, item.item_per_package)}}{{item.parent_unit}} </span>
-                         <span v-if="calQtyL(item.qty, item.item_per_package) >0 && calQtyS(item.qty, item.item_per_package) > 0">, </span>
-                         <span v-if="calQtyS(item.qty, item.item_per_package)> 0">{{calQtyS(item.qty, item.item_per_package)}}{{item.child_unit}}  </span>
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <span v-if="calQtyL(item.transfer_qty, item.item_per_package) > 0">{{calQtyL(item.transfer_qty, item.item_per_package)}}{{item.parent_unit}} </span>
-                        <span v-if="calQtyL(item.transfer_qty, item.item_per_package) >0 && calQtyS(item.transfer_qty, item.item_per_package) > 0">, </span>
-                        <span v-if="calQtyS(item.transfer_qty, item.item_per_package)> 0">{{calQtyS(item.transfer_qty, item.item_per_package)}}{{item.child_unit}}  </span>
-                      </td>
-                      <td class="text-end">
-                        <span  v-if="from_location=='Main'">
-                         <span v-if="calQtyL(item.main_qty -item.transfer_qty, item.item_per_package) > 0">{{calQtyL(item.main_qty-item.transfer_qty, item.item_per_package)}}{{item.parent_unit}} </span>
-                         <span v-if="calQtyL(item.main_qty -item.transfer_qty, item.item_per_package) >0 && calQtyS(item.main_qty-item.transfer_qty, item.item_per_package) > 0">, </span>
-                         <span v-if="calQtyS(item.main_qty-item.transfer_qty, item.item_per_package)> 0">{{calQtyS(item.main_qty-item.transfer_qty, item.item_per_package)}}{{item.child_unit}}  </span>
-                        </span>
-                        <span v-if="from_location=='Shop'">
-                         <span v-if="calQtyL(item.qty-item.transfer_qty, item.item_per_package) > 0">{{calQtyL(item.qty-item.transfer_qty, item.item_per_package)}}{{item.parent_unit}} </span>
-                         <span v-if="calQtyL(item.qty-item.transfer_qty, item.item_per_package) >0 && calQtyS(item.qty-item.transfer_qty, item.item_per_package) > 0">, </span>
-                         <span v-if="calQtyS(item.qty-item.transfer_qty, item.item_per_package)> 0">{{calQtyS(item.qty-item.transfer_qty, item.item_per_package)}}{{item.child_unit}}  </span>
-                        </span>
-                      </td>
-                      <td class="text-end">
-                        <span  v-if="to_location=='Main'">
-                         <span v-if="calQtyL(item.main_qty +item.transfer_qty, item.item_per_package) > 0">{{calQtyL(item.main_qty+item.transfer_qty, item.item_per_package)}}{{item.parent_unit}} </span>
-                         <span v-if="calQtyL(item.main_qty +item.transfer_qty, item.item_per_package) >0 && calQtyS(item.main_qty+item.transfer_qty, item.item_per_package) > 0">, </span>
-                         <span v-if="calQtyS(item.main_qty+item.transfer_qty, item.item_per_package)> 0">{{calQtyS(item.main_qty+item.transfer_qty, item.item_per_package)}}{{item.child_unit}}  </span>
-                        </span>
-                        <span v-if="to_location=='Shop'">
-                         <span v-if="calQtyL(item.qty+item.transfer_qty, item.item_per_package) > 0">{{calQtyL(item.qty+item.transfer_qty, item.item_per_package)}}{{item.parent_unit}} </span>
-                         <span v-if="calQtyL(item.qty+item.transfer_qty, item.item_per_package) >0 && calQtyS(item.qty+item.transfer_qty, item.item_per_package) > 0">, </span>
-                         <span v-if="calQtyS(item.qty+item.transfer_qty, item.item_per_package)> 0">{{calQtyS(item.qty+item.transfer_qty, item.item_per_package)}}{{item.child_unit}}  </span>
-                        </span>
-                      </td>
-                   
+                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.from_loc_bal, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                    </td>
+                    <td class="text-end">
+                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.to_loc_bal, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                    </td>
+                    <td class="text-center" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.transfer_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                    </td>
+                    <td class="text-end">
+                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.after_from_loc_bal, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                    </td>
+                    <td class="text-end">
+                        {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.after_to_loc_bal, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
+                    </td>                
                 </tr>                                          
             </tbody>
         </table> 
@@ -152,11 +113,11 @@ export default {
       
     },
     methods:{
-        calQtyL(qty, ipp){
-            return hp.calQtyL(qty, ipp);
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
-        calQtyS(qty, ipp){
-            return hp.calQtyS(qty, ipp)
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
         goBack(){
             this.$router.go(-1)
@@ -169,31 +130,15 @@ export default {
                         stocks.push({...data, group_date : this.showTime(res.created_at)})
                     })
             })    
-                     
             if(this.code_no){
                 stocks=stocks.filter((f)=>f.code_no === Number(this.code_no))
             }
-            const gbd=Object.entries(hp.gb_date(stocks))
-            const gbc=gbd.map((res)=>{
-                const res1=Object.entries(hp.gb_item_name_retail_price(res[1]))   
-                const res2=res1.map((ren)=>{
-                let item={main_qty:0, parent_unit:"", child_unit:"",item_name:ren[0], code_no:0, item_per_package:0, qty:0, transfer_qty:0}
-                ren[1].map((rep)=>{
-                    item.code_no=rep.code_no;
-                    item.item_per_package=rep.item_per_package;
-                    item.qty += rep.qty;    
-                    item.main_qty += rep.main_qty;            
-                    item.transfer_qty +=rep.transfer_qty;
-                    item.parent_unit=rep.parent_unit;
-                    item.child_unit=rep.child_unit;
-                })
-                return item;
-                }).sort((a,b)=>a.code_no - b.code_no)
-              
-                const newData=[res[0],  [...res2]]   
-                return newData
-            })          
-           this.reports=gbc;        
+            let gbd=Object.entries(hp.gb_date(stocks))  
+            gbd=gbd.map((res)=>{
+                const data=res[1].sort((a,b)=>a.code_no - b.code_no).reverse()
+                return [res[0], [...data]]
+            })       
+           this.reports=gbd;        
         },
         showTime(t){
             return hp.showTime(t)

@@ -17,7 +17,7 @@
                         <div v-if="monthlyPurchase.length > 1">
                             <GChart
                             :settings="{ packages: ['corechart', 'table', 'map'] }"
-                            type="AreaChart"
+                            type="PieChart"
                             :data="monthlyPurchase"
                             :options="monthlyChartOptions"
                         />
@@ -79,7 +79,7 @@ export default {
                     const date=res[0];
                     let total_price=0;
                     res[1].map((r)=>{
-                            total_price +=r.total_price;
+                            total_price +=r.total_amount;
                     })
                    return [date, total_price]
             })          

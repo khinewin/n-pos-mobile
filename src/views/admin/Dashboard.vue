@@ -19,7 +19,7 @@
             </div>
            <SalesSession />
            <PurchaseSession />
-           <div class="row g-0 mt-2">           
+           <div class="row g-0">           
             <div class="col-sm-2 col-lg-3 d-grid">
                 <router-link class="btn btn-sm" :to="{name : 'Sale'}" ><i class="fa-solid fa-cash-register"></i> Sale</router-link>
             </div>
@@ -45,7 +45,7 @@
                 <router-link :to="{name: 'Reports'}" class="btn btn-sm"><i class="fa-solid fa-chart-pie"></i> Reports</router-link>
             </div>
            </div>
-           <div class="row mt-1 g-2">
+           <div class="row g-2">
             <div class="col-lg-6">
                 <SalesChart />
             </div>

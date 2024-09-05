@@ -17,44 +17,41 @@
                                                         <td class="col-2">Description</td>
                                                         <td class="col-1">Packing size</td>
                                                         <td class="col-1">Qty</td>
-                                                        <td class="col-1">Item price</td>
+                                                        <td class="col-1">Unit price</td>
                                                         <td class="col-1">Amount</td>
-                                                        <td class="col-2" colspan="4">Discount</td>                                              
+                                                        <td class="col-1">Discount</td>                                              
                                                         <td class="col-1">Price</td>
                                                     </tr>
                                                 </tbody>
                                                 <tbody>                                            
-                                                    <tr v-for="item in res[1]" :key="item.code_no">
-                                                        <td class="text-center">{{item.code_no}}</td>
-                                                        <td >{{item.item_name}}</td>
+                                                    <tr v-for="st in res[1]" :key="st.code_no">
+                                                        <td class="text-center">{{st.code_no}}</td>
+                                                        <td >{{st.item_name}}</td>
                                                         <td class="col-1">
-                                                            1{{item.parent_unit}} * {{item.item_per_package}}{{item.child_unit}}
+                                                            {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
+                                                         </td>
+                                                        <td class="text-end">
+                                                            {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.pur_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                                         </td>
-                                                        <td class="col-1 text-end">
-                                                        <span v-if="calQtyL(item.pur_qty, item.item_per_package) > 0">{{calQtyL(item.pur_qty, item.item_per_package)}} {{item.parent_unit}} </span>
-                                                            <span v-if="calQtyL(item.pur_qty, item.item_per_package) >0 && calQtyS(item.pur_qty, item.item_per_package) > 0"> * </span>
-                                                            <span v-if="calQtyS(item.pur_qty, item.item_per_package)> 0">{{calQtyS(item.pur_qty, item.item_per_package)}} {{item.child_unit}}  </span>
-                                                        </td>
-                                                        <td class="text-end">{{item.pur_price}}</td>
-                                                        <td class="text-end">{{item.amount}}</td>
-                                                        <td class="text-center">{{item.dis_qty}}</td>
-                                                        <td class="text-center">{{item.dis_percent}}</td>
-                                                        <td class="text-end">{{item.dis_amount}}</td>
-                                                        <td class="text-end">{{item.discount}}</td>
-                                                        <td class="text-end">{{item.price}}</td>
+                                                        <td class="text-center">
+                                                            {{st.qty_pur_price}}' {{st.qty_pur_price_unit}}
+                                                        </td>                   
+                                                        <td class="text-end">{{st.amount}}</td>
+                                                        <td class="text-end">{{st.discount}}</td>
+                                                        <td class="text-end">{{st.price}}</td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="5" class="text-end fw-bold">Total</td>
                                                         <td class="text-end">{{res[2].amount}}</td>
-                                                        <td colspan="4" class="text-end">{{res[2].discount}}</td>                                                
+                                                        <td class="text-end">{{res[2].discount}}</td>                                                
                                                         <td class="text-end">{{res[2].price}}</td>
                                                     </tr>
                                                     <tr>
-                                                        <td colspan="10" class="text-end fw-bold">Extra discount</td>
+                                                        <td colspan="7" class="text-end fw-bold">Extra discount</td>
                                                         <td class="text-end">{{res[2].extra_discount}}</td>                                                        
                                                     </tr>
                                                     <tr>
-                                                        <td colspan="10" class="text-end fw-bold">Total price</td>
+                                                        <td colspan="7" class="text-end fw-bold">Total price</td>
                                                         <td class="text-end">{{res[2].price - res[2].extra_discount}}</td>                                                        
                                                     </tr>
                                                 </tbody>
@@ -66,22 +63,30 @@
                     
                     </td>
                 </tr>
-                <tr>
-                    <td class="text-end fw-bold">Total amount</td>
-                    <td class="text-start">{{total_amount}}</td>                                
-                </tr>                         
-                <tr>
-                    <td class="text-end fw-bold">Total discount</td>
-                    <td class="text-start">{{total_discount}}</td>
-                </tr>
-                <tr>
-                    <td class="text-end fw-bold">Extra discount</td>
-                    <td class="text-start">{{extra_discount}}</td>
-                </tr>
-                <tr>
-                    <td class="text-end fw-bold">Total price</td>
-                    <td class="text-start">{{total_price - extra_discount}}</td>
-                </tr>
+               <tr>
+                <td colspan="2" class="p-0" style="border-style: hidden;">
+                    <table class="table table-bordered border-dark table-hover" >
+                        <tbody class="table-group-divider">
+                            <tr>
+                                <td class="text-end fw-bold col-10" >Grand total amount</td>
+                                <td class="text-end col-2">{{total_amount}}</td>                                
+                            </tr>                         
+                            <tr>
+                                <td class="text-end fw-bold">Grand total discount</td>
+                                <td class="text-end">{{total_discount}}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-end fw-bold">Extra discount</td>
+                                <td class="text-end">{{extra_discount}}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-end fw-bold">Grand total price</td>
+                                <td class="text-end">{{total_price - extra_discount}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+               </tr>
             </tbody>
         </table>
         <div v-if="isLoading">
@@ -158,11 +163,11 @@ export default {
       
     },
     methods:{
-        calQtyL(qty, ipp){
-            return hp.calQtyL(qty, ipp);
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
-        calQtyS(qty, ipp){
-            return hp.calQtyS(qty, ipp)
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
         goBack(){
             this.$router.go(-1)
@@ -183,6 +188,11 @@ export default {
                         }
                      })
             })
+            purchase=purchase.map((s)=>{
+                return {...s, 
+                    group_price: s.packing_size.largest_unit ? s.pur_price.largest_unit  :  s.pur_price.medium_unit                             
+                }
+            })
             if(this.code_no){
                 purchase=purchase.filter((f)=>f.code_no === Number(this.code_no))
             }
@@ -197,22 +207,27 @@ export default {
                 const gbd=Object.entries(hp.gb_date(res[1])) 
                 const gbc=gbd.map((ren)=>{
                     const date=ren[0];
-                    const res1=Object.entries(hp.gb_item_name_pur_price(ren[1]))
+                    const res1=Object.entries(hp.gb_item_name_price(ren[1]))
                     const res2=res1.map((rep)=>{
-                        let item={extra_discount:0, parent_unit:"", child_unit:"",item_name: rep[0], code_no:"", discount:0, pur_qty:0, pur_price:0, amount:0, item_per_package:0, price:0, dis_qty:0, dis_amount:0, dis_percent:0}
+                        const item_name=res[1][0].item_name;
+                        let item={extra_discount:0,packing_size:"",
+                            item_name: item_name, code_no:"", 
+                            discount:0, 
+                            pur_qty:0, 
+                            qty_pur_price:0, 
+                            qty_pur_price_unit: "",
+                            amount:0,
+                            price:0,
+                        }
                         rep[1].map((r)=>{
                             item.code_no=r.code_no;
                             item.pur_qty += r.pur_qty;
                             item.amount += r.amount;
-                            item.pur_price = r.pur_price;
-                            item.item_per_package=r.item_per_package;
-                            item.price += r.price;
-                            item.dis_qty += r.dis_qty;
-                            item.dis_percent += r.dis_percent;
-                            item.dis_amount += r.dis_amount;
-                            item.discount += r.discount;
-                            item.parent_unit=r.parent_unit;
-                            item.child_unit=r.child_unit;
+                            item.qty_pur_price = r.qty_pur_price;
+                            item.qty_pur_price_unit=r.qty_pur_price_unit;
+                            item.packing_size=r.packing_size;
+                            item.price += r.price;                        
+                            item.discount += r.discount ? r.discount : 0;
                             item.extra_discount += r.extra_discount;
                         })
                         return item;                    

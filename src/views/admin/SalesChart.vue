@@ -17,7 +17,7 @@
                         <div v-if="monthlySales.length > 1">
                             <GChart
                             :settings="{ packages: ['corechart', 'table', 'map'] }"
-                            type="AreaChart"
+                            type="ColumnChart"
                             :data="monthlySales"
                             :options="monthlyChartOptions"
                         />

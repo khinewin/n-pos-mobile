@@ -100,14 +100,14 @@
             monthlyPurchaseReport(){
                 // for this month sales
                 this.purchaseYearlyData.map((res)=>{
-                    this.purchase_this_year += res.total_price;
+                    this.purchase_this_year += res.total_amount;
                 })
                 //for totay sales
                 const today=this.showTime(Timestamp.fromDate(new Date()))
                 this.purchaseYearlyData.filter((f)=>{
                        const pur_date=this.showTime(f.pur_date)
                         if(pur_date === today){
-                                this.purchase_today += f.total_price;
+                                this.purchase_today += f.total_amount;
                         }
                 })
                 // for this week
@@ -129,7 +129,7 @@
                 const last_day_week=Timestamp.fromDate(new Date(this.editShowTime(w.lastDay)))
                 this.purchaseYearlyData.filter((f)=>{
                         if(f.pur_date >= first_day_week && f.pur_date <= last_day_week){
-                                this.purchase_this_week += f.total_price;
+                                this.purchase_this_week += f.total_amount;
                         }
                 })
                 //for this month
@@ -140,7 +140,7 @@
                 const last_day_month=Timestamp.fromDate(new Date(last_day))
                 this.purchaseYearlyData.filter((f)=>{
                         if(f.pur_date >= first_day_month && f.pur_date <= last_day_month){
-                                this.purchase_this_month += f.total_price;
+                                this.purchase_this_month += f.total_amount;
                         }
                 })
     

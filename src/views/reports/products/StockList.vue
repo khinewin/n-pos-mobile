@@ -155,7 +155,6 @@
             }                             
            else{
                 const products=lib.products(snapShot)
-                this.reports=[];
                 this.reports=products;
                 this.isLoading=false;
                 this.filterProduct();
