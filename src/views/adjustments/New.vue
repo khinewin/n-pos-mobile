@@ -96,69 +96,11 @@
                         </table> 
                         </div>                                                                                                                   
                 </form>                        
-            <ProductModal @setCode="setCode" :storePurchase="storeItems" />
-        </div>
-        </div>
-        </div>
-        <!-- set qty Modal -->
-        <div class="modal fade" id="setQtyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog modal-sm">
-            <div class="modal-content">               
-                <div class="modal-body p-2">
-                    <div class="row text-end mb-2">                       
-                        <div class="col-6">
-                            <button type="button" class="btn btn-sm" @click="setAdjQty" data-bs-dismiss="modal">
-                                <span ><i class="fa-solid fa-hard-drive"></i> Save</span>
-                            </button>
-                        </div>
-                        <div class="col-6">
-                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button>
-                        </div>
-                    </div>
-                    <div>
-                        <table class="table table-bordered mb-0" v-if="Object.keys(editItem).length">
-                            <tbody>
-                                <tr>
-                                    <td colspan="2" class="text-center p-2" >{{editItem.item_name}}</td>
-                                </tr>
-                                <tr v-if="editItem.packing_size.largest_unit">
-                                    <td class="p-0">
-                                        <input type="number" v-model="editItem.adj_l_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="p-0">
-                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.adj_l_unit">
-                                                <option selected>{{editItem.packing_size.largest_unit}}</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="p-0">
-                                        <input type="number" v-model="editItem.adj_m_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="p-0">
-                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.adj_m_unit">
-                                                <option selected>{{editItem.packing_size.medium_unit}}</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="p-0">
-                                        <input type="number" v-model="editItem.adj_s_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="p-0">
-                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.adj_s_unit">
-                                                <option selected>{{editItem.packing_size.smallest_unit}}</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>                
-            </div>
+                </div>
             </div>
         </div>
-        <!--end qty modal-->  
+        <ProductModal @setCode="setCode" :storePurchase="storeItems" />
+        <setQtyModal @setQty="setAdjQty" :ei="editItem" />
     </div>
 </template>
 <script>
@@ -169,10 +111,12 @@ import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, o
 import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/purchase/ProductModal.vue'
 import * as hp from "@/lib/helper"
+import setQtyModal from "@/views/modals/setQtyModal.vue";
+
 
 export default {
     components: {
-        PageHeader, ProductModal
+        PageHeader, ProductModal,setQtyModal
     },
     setup () {
         return { v$: useVuelidate() }
@@ -232,16 +176,16 @@ export default {
         setAdjQty(){
             const e=this.editItem;
                 let adj_qty=0;              
-                adj_qty += e.adj_l_qty ? e.adj_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
-                adj_qty += e.adj_m_qty ? e.adj_m_qty * e.packing_size.smallest_qty: 0;
-                adj_qty += e.adj_s_qty ? e.adj_s_qty : 0;
+                adj_qty += e.input_l_qty ? e.input_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
+                adj_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty: 0;
+                adj_qty += e.input_s_qty ? e.input_s_qty : 0;
                 e.adj_qty=adj_qty;
                return this.storeItems.map((f)=>{   
                     if(f.id===e.id){
                         f.adj_qty=adj_qty,
-                        f.adj_l_qty =e.adj_l_qty ? e.adj_l_qty : 0,
-                        f.adj_m_qty= e.adj_m_qty ? e.adj_m_qty : 0,
-                        f.adj_s_qty= e.adj_s_qty  ? e.adj_s_qty  : 0
+                        f.input_l_qty =e.input_l_qty ? e.input_l_qty : 0,
+                        f.input_m_qty= e.input_m_qty ? e.input_m_qty : 0,
+                        f.input_s_qty= e.input_s_qty  ? e.input_s_qty  : 0
 
                         e.after_adj_qty=f.adj_type=="Increment" ? e.before_adj_qty + e.adj_qty : e.before_adj_qty - e.adj_qty;
 
@@ -251,13 +195,10 @@ export default {
         },
         setEdit(i){
             const item=this.storeItems[i];
-            this.editItem={...item, 
-                adj_l_unit: item.packing_size.largest_unit,
-                adj_m_unit: item.packing_size.medium_unit,
-                adj_s_unit: item.packing_size.smallest_unit,
-                adj_l_qty: item.adj_l_qty ? item.adj_l_qty : 0,
-                adj_m_qty: item.adj_m_qty ? item.adj_m_qty : 0,
-                adj_s_qty: item.adj_s_qty  ? item.adj_s_qty  : 0
+            this.editItem={...item,               
+                input_l_qty: item.input_l_qty ? item.input_l_qty : 0,
+                input_m_qty: item.input_m_qty ? item.input_m_qty : 0,
+                input_s_qty: item.input_s_qty  ? item.input_s_qty  : 0
                 
             };
         },

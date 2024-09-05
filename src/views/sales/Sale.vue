@@ -178,7 +178,7 @@
         </div>
         <!-- print item end-->
 
-         <!-- pur price Modal -->
+         <!-- pur price Modal 
          <div class="modal fade" id="setQtyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-sm">
             <div class="modal-content">               
@@ -201,7 +201,7 @@
                                 </tr>
                                 <tr v-if="editItem.packing_size.largest_unit">
                                     <td class="p-0">
-                                        <input @keyup="checkEditQty" @keypress.enter="pressSetSaleQty"  type="number" v-model="editItem.sale_l_qty" class="form-control-plaintext form-control-sm text-center">
+                                        <input @keyup="checkEditQty" @keypress.enter="pressSetSaleQty"  type="number" v-model="editItem.input_l_qty" class="form-control-plaintext form-control-sm text-center">
                                     </td>
                                     <td class="p-0">
                                         <select  class="form-control-plaintext form-control-sm text-center" v-model="editItem.sale_l_unit">
@@ -211,7 +211,7 @@
                                 </tr>
                                 <tr>
                                     <td class="p-0">
-                                        <input @keyup="checkEditQty" @keypress.enter="pressSetSaleQty" type="number" v-model="editItem.sale_m_qty" class="form-control-plaintext form-control-sm text-center">
+                                        <input @keyup="checkEditQty" @keypress.enter="pressSetSaleQty" type="number" v-model="editItem.input_m_qty" class="form-control-plaintext form-control-sm text-center">
                                     </td>
                                     <td class="p-0">
                                         <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.sale_m_unit">
@@ -221,7 +221,7 @@
                                 </tr>
                                 <tr>
                                     <td class="p-0">
-                                        <input @keyup="checkEditQty" @keypress.enter="pressSetSaleQty" type="number" v-model="editItem.sale_s_qty" class="form-control-plaintext form-control-sm text-center">
+                                        <input @keyup="checkEditQty" @keypress.enter="pressSetSaleQty" type="number" v-model="editItem.input_s_qty" class="form-control-plaintext form-control-sm text-center">
                                     </td>
                                     <td class="p-0">
                                         <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.sale_s_unit">
@@ -236,72 +236,10 @@
             </div>
             </div>
         </div>
-        <!--end pur price modal-->  
-        <!-- discount price Modal -->
-        <div class="modal fade" id="setDiscountModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog modal-sm">
-            <div class="modal-content">               
-                <div class="modal-body p-2">
-                    <div class="row text-end mb-2 justify-content-end">     
-                        <div class="col-4" v-if="Object.keys(editItem).length">
-                            <button id="setDiscountBtn" v-if="editItem.amount" type="button" @click="saveDiscount" class="btn btn-sm" :disabled="isLoading" data-bs-dismiss="modal">
-                                <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save</span>
-                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
-                            </button>
-                        </div>                  
-                        <div class="col-4" v-if="Object.keys(editItem).length">
-                            <button type="button" class="btn btn-sm" @click="clearDiscount" v-if="editItem.amount">
-                                <span><i class="fa-solid fa-broom"></i>  Clear</span>
-                            </button>
-                        </div>
-                        <div class="col-4">
-                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button>
-                        </div>
-                    </div>
-                    <div>
-                        <table class="table table-bordered" v-if="Object.keys(editItem).length">
-                            <tbody v-if="editItem.amount">
-                                <tr>
-                                    <td colspan="2" class="p-2 text-center">{{editItem.item_name}}</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-0">
-                                        <select @change="calDiscount" class="form-control-plaintext form-control-sm text-center" v-model="editItem.dis_qty_unit">
-                                                <option  v-for="pu in onlyString(editItem.packing_size)">{{pu}}</option>
-                                        </select>
-                                    </td>
-                                    <td class="p-0">
-                                        <input @keypress.enter="pressSetDiscountQty" type="number" @change="calDiscount" @keyup="calDiscount" v-model="editItem.dis_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>                                    
-                                </tr>
-                                <tr>
-                                    <td class="pt-2 text-center">
-                                        %
-                                    </td>
-                                    <td class="p-0">
-                                        <input @keypress.enter="pressSetDiscountQty"  @keyup="calDiscount" @change="calDiscount" type="number" v-model="editItem.dis_percent" class="form-control-plaintext form-control-sm text-center">
-                                    </td>                                    
-                                </tr>
-                                <tr>
-                                    <td class="pt-2 text-center">
-                                        $
-                                    </td>
-                                    <td class="p-0">
-                                        <input @keypress.enter="pressSetDiscountQty" @keyup="calDiscount" @change="calDiscount" type="number" v-model="editItem.dis_amount" class="form-control-plaintext form-control-sm text-center">
-                                    </td>                                    
-                                </tr>
-                                <tr>
-                                    <td class="p-1 text-end">Discount</td>
-                                    <td  class="p-1 text-center">{{editItem.discount}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>                
-            </div>
-            </div>
-        </div>
-        <!--end discount modal-->  
+    -->
+        <setQtyModal @setQty="setSaleQty" :ei="editItem" />
+        <setDiscountModal @saveDiscount="saveDiscount" :ei="editItem" />
+
     </div>
 </template>
 <script>
@@ -317,9 +255,12 @@ import Print from "@/views/sales/Print.vue"
 import ProductModal from "@/views/modals/sales/ProductModal.vue"
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/products"
+import setQtyModal from "@/views/modals/setQtyModal.vue";
+import setDiscountModal from "@/views/modals/setDiscountModal.vue";
+
 export default {
     components: {
-        PageHeader,SalesModal,CustomerModal,Print, ProductModal
+        PageHeader,SalesModal,CustomerModal,Print, ProductModal,setQtyModal,setDiscountModal,
     },
     setup () {
         return { v$: useVuelidate() }
@@ -410,10 +351,6 @@ export default {
             const btn=document.getElementById("setSaleBtn");
             btn.click();
         },
-        pressSetDiscountQty(){
-            const btn=document.getElementById("setDiscountBtn");
-            btn.click();
-        },
         setCodeOnPaste(){
             setTimeout(()=>{                
             const item=this.products.filter((f)=>f.code_no==this.code_no);
@@ -472,49 +409,20 @@ export default {
                 }
             }) && this.calTotal();
         },
-        calDiscount(){
-            const e=this.editItem;
-            return this.saleItems.map((f)=>{   
-                if(f.id===e.id){
-                    if(e.dis_amount){
-                        e.discount=e.dis_amount;
-                    }else if(e.dis_percent){
-                        e.discount=(f.amount * e.dis_percent) /100;
-                    }else if(e.dis_qty){      
-                        const arr=Object.entries(e.packing_size)               
-                        const d_units=arr.filter((ft)=>{
-                            return ft[1]==e.dis_qty_unit;
-                        })  
-                       const dis_unit=d_units[0][0]  
-                       let discount=0;
-                       if(dis_unit=="largest_unit"){
-                           discount=e.retail_price.largest_unit * e.dis_qty
-                       }else if(dis_unit=="medium_unit"){
-                            discount=e.retail_price.medium_unit * e.dis_qty;
-                       }else if(dis_unit=="smallest_unit"){
-                            discount=e.retail_price.smallest_unit * e.dis_qty;
-                       }    
-                       e.discount=discount;                        
-                    }
-                    else{
-                        e.discount=0;
-                    }
-                }
-            })
-        },      
-
+       
         setSaleQty(){           
+            this.checkEditQty();
             const e=this.editItem;
                 let sale_qty=0;
-                sale_qty += e.sale_l_qty ? e.sale_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
-                sale_qty += e.sale_m_qty ? e.sale_m_qty * e.packing_size.smallest_qty: 0;
-                sale_qty += e.sale_s_qty ? e.sale_s_qty : 0;
+                sale_qty += e.input_l_qty ? e.input_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
+                sale_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty: 0;
+                sale_qty += e.input_s_qty ? e.input_s_qty : 0;
                return this.saleItems.map((f)=>{   
                     if(f.id===e.id){
                         f.sale_qty=sale_qty,
-                        f.sale_l_qty =e.sale_l_qty ? e.sale_l_qty : 0,
-                        f.sale_m_qty= e.sale_m_qty ? e.sale_m_qty : 0,
-                        f.sale_s_qty= e.sale_s_qty  ? e.sale_s_qty  : 0
+                        f.input_l_qty =e.input_l_qty ? e.input_l_qty : 0,
+                        f.input_m_qty= e.input_m_qty ? e.input_m_qty : 0,
+                        f.input_s_qty= e.input_s_qty  ? e.input_s_qty  : 0
                     }
                }) &&
                e.qty_sale_price ? this.calEdit() : null;
@@ -522,13 +430,10 @@ export default {
      
         setEdit(i){
             const item=this.saleItems[i];
-            this.editItem={...item, 
-                sale_l_unit: item.packing_size.largest_unit,
-                sale_m_unit: item.packing_size.medium_unit,
-                sale_s_unit: item.packing_size.smallest_unit,
-                sale_l_qty: item.sale_l_qty ? item.sale_l_qty : 0,
-                sale_m_qty: item.sale_m_qty ? item.sale_m_qty : 0,
-                sale_s_qty: item.sale_s_qty  ? item.sale_s_qty  : 0
+            this.editItem={...item,               
+                input_l_qty: item.input_l_qty ? item.input_l_qty : 0,
+                input_m_qty: item.input_m_qty ? item.input_m_qty : 0,
+                input_s_qty: item.input_s_qty  ? item.input_s_qty  : 0
             };
         },
         calEdit(i){
@@ -716,9 +621,9 @@ export default {
             let isSufficient=true;
             const e=this.editItem
             let sale_qty=0;
-                sale_qty += e.sale_l_qty ? e.sale_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
-                sale_qty += e.sale_m_qty ? e.sale_m_qty * e.packing_size.smallest_qty: 0;
-                sale_qty += e.sale_s_qty ? e.sale_s_qty : 0;
+                sale_qty += e.input_l_qty ? e.input_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
+                sale_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty: 0;
+                sale_qty += e.input_s_qty ? e.input_s_qty : 0;
 
                 let bal_qty_largest_unit=Math.floor(e.qty / (e.packing_size.medium_qty * e.packing_size.smallest_qty));
                 let bal_qty_medium_unit=Math.floor((e.qty % (e.packing_size.medium_qty * e.packing_size.smallest_qty)) / e.packing_size.smallest_qty);
@@ -729,9 +634,9 @@ export default {
                     if(sale_qty > e.qty){
                         this.msg.type="error";
                         this.msg.info="Maximum  inventory"
-                        e.sale_l_qty = bal_qty_largest_unit ? bal_qty_largest_unit : 0;
-                        e.sale_m_qty = bal_qty_largest_unit ? 0 : bal_qty_medium_unit ? bal_qty_medium_unit : 0;
-                        e.sale_s_qty = bal_qty_largest_unit || bal_qty_medium_unit ? 0 : bal_qty_smallest_unit ? bal_qty_smallest_unit : 0;
+                        e.input_l_qty = bal_qty_largest_unit ? bal_qty_largest_unit : 0;
+                        e.input_m_qty = bal_qty_largest_unit ? 0 : bal_qty_medium_unit ? bal_qty_medium_unit : 0;
+                        e.input_s_qty = bal_qty_largest_unit || bal_qty_medium_unit ? 0 : bal_qty_smallest_unit ? bal_qty_smallest_unit : 0;
                     }                 
                 }
             });

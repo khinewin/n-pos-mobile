@@ -104,69 +104,12 @@
                         </table>                                                                                                                    
                 </form>               
           
-            <ProductModal @setCode="setCode" :storePurchase="storeItems" />
-        </div>
-        </div>
-        </div>
-        <!-- set qty Modal -->
-        <div class="modal fade" id="setQtyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog modal-sm">
-            <div class="modal-content">               
-                <div class="modal-body p-2">
-                    <div class="row text-end mb-2">                       
-                        <div class="col-6">
-                            <button type="button" class="btn btn-sm" @click="setTransferQty" data-bs-dismiss="modal">
-                                <span ><i class="fa-solid fa-hard-drive"></i> Save</span>
-                            </button>
-                        </div>
-                        <div class="col-6">
-                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button>
-                        </div>
-                    </div>
-                    <div>
-                        <table class="table table-bordered mb-0" v-if="Object.keys(editItem).length">
-                            <tbody>
-                                <tr>
-                                    <td colspan="2" class="text-center p-2" >{{editItem.item_name}}</td>
-                                </tr>
-                                <tr v-if="editItem.packing_size.largest_unit">
-                                    <td class="p-0">
-                                        <input type="number" v-model="editItem.transfer_l_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="p-0">
-                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.transfer_l_unit">
-                                                <option selected>{{editItem.packing_size.largest_unit}}</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="p-0">
-                                        <input type="number" v-model="editItem.transfer_m_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="p-0">
-                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.transfer_m_unit">
-                                                <option selected>{{editItem.packing_size.medium_unit}}</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="p-0">
-                                        <input type="number" v-model="editItem.transfer_s_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="p-0">
-                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.transfer_s_unit">
-                                                <option selected>{{editItem.packing_size.smallest_unit}}</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>                
-            </div>
+                </div>
             </div>
         </div>
-        <!--end qty modal-->  
+        <ProductModal @setCode="setCode" :storePurchase="storeItems" />
+        <setQtyModal @setQty="setTransferQty" :ei="editItem" />
+
     </div>
 </template>
 <script>
@@ -178,10 +121,12 @@ import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/purchase/ProductModal.vue'
 import * as ss from "@/lib/snapshot/products"
 import * as hp from '@/lib/helper'
+import setQtyModal from "@/views/modals/setQtyModal.vue";
+
 
 export default {
     components: {
-        PageHeader, ProductModal
+        PageHeader, ProductModal,setQtyModal
     },
     setup () {
         return { v$: useVuelidate() }
@@ -243,9 +188,9 @@ export default {
                 let transfer_qty=0;
                 let after_from_loc_bal=0;
                 let after_to_loc_bal=0;
-                transfer_qty += e.transfer_l_qty ? e.transfer_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
-                transfer_qty += e.transfer_m_qty ? e.transfer_m_qty * e.packing_size.smallest_qty: 0;
-                transfer_qty += e.transfer_s_qty ? e.transfer_s_qty : 0;
+                transfer_qty += e.input_l_qty ? e.input_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
+                transfer_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty: 0;
+                transfer_qty += e.input_s_qty ? e.input_s_qty : 0;
                 e.transfer_qty=transfer_qty;
 
                 after_from_loc_bal=e.from_loc_bal - e.transfer_qty;
@@ -256,9 +201,9 @@ export default {
                return this.storeItems.map((f)=>{   
                     if(f.id===e.id){
                         f.transfer_qty=transfer_qty,
-                        f.transfer_l_qty =e.transfer_l_qty ? e.transfer_l_qty : 0,
-                        f.transfer_m_qty= e.transfer_m_qty ? e.transfer_m_qty : 0,
-                        f.transfer_s_qty= e.transfer_s_qty  ? e.transfer_s_qty  : 0
+                        f.input_l_qty =e.input_l_qty ? e.input_l_qty : 0,
+                        f.input_m_qty= e.input_m_qty ? e.input_m_qty : 0,
+                        f.input_s_qty= e.input_s_qty  ? e.input_s_qty  : 0
                         f.after_from_loc_bal=e.after_from_loc_bal;
                         f.after_to_loc_bal=e.after_to_loc_bal;
                     }
@@ -268,13 +213,10 @@ export default {
      
         setEdit(i){
             const item=this.storeItems[i];
-            this.editItem={...item, 
-                transfer_l_unit: item.packing_size.largest_unit,
-                transfer_m_unit: item.packing_size.medium_unit,
-                transfer_s_unit: item.packing_size.smallest_unit,
-                transfer_l_qty: item.transfer_l_qty ? item.transfer_l_qty : 0,
-                transfer_m_qty: item.transfer_m_qty ? item.transfer_m_qty : 0,
-                transfer_s_qty: item.transfer_s_qty  ? item.transfer_s_qty  : 0
+            this.editItem={...item,                
+                input_l_qty: item.input_l_qty ? item.input_l_qty : 0,
+                input_m_qty: item.input_m_qty ? item.input_m_qty : 0,
+                input_s_qty: item.input_s_qty  ? item.input_s_qty  : 0
             };
         },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){

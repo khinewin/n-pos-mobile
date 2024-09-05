@@ -93,7 +93,7 @@
                                     <td class="text-end">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.to_loc_bal, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>
-                                    <td class="text-center" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                    <td class="text-center">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.transfer_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>
                                     <td class="text-end">
