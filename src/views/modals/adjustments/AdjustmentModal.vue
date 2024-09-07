@@ -72,7 +72,7 @@
      <!--end modal-->
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp, collection, onSnapshot, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as ss from "@/lib/snapshot/adjustments"
 export default {
@@ -157,14 +157,14 @@ export default {
      
     async fetchadjustments(){
        const query_url = query(collection(db, "adjustments"), orderBy("created_at", "desc"));
-       const snapShot=await getDocs(query_url)
-       const adjustments=ss.adjustments(snapShot);
-      
-        this.adjustmentsData=[];
+       onSnapshot(query_url, (snapShot)=>{
+        const adjustments=ss.adjustments(snapShot);      
         this.adjustmentsData=adjustments;
         this.isLoading=false;
         this.isUpdating=false;
         this.searchadjustments();
+       })
+       
       } ,
       showTime(t){
            const date=t.toDate()

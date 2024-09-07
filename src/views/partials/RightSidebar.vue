@@ -4,7 +4,7 @@
             <a href="#!" role="button " class="btn text-white" data-bs-dismiss="offcanvas" aria-label="Close">
               <i class="fa-solid fa-caret-right"></i>
             </a>
-            <h5 class="offcanvas-title text-white" id="rightSide"><span v-if="user !==null">{{user.email}}</span></h5>
+            <h5 class="offcanvas-title text-white" id="rightSide"><span v-if="user !==null">{{user.displayName}}</span></h5>
           </div>
           <div class="offcanvas-body ">      
             <ul class="list-group small ">

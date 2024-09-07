@@ -92,7 +92,7 @@
     import PageHeader from "@/views/partials/PageHeader.vue"
      import { useVuelidate  } from '@vuelidate/core'
     import { required, email ,helpers} from '@vuelidate/validators'
-    import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
+    import {Timestamp, onSnapshot, collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
     import db from '@/firebase/firestore'
     import * as ss from '@/lib/snapshot/suppliers'
     export default {
@@ -184,6 +184,22 @@
                            }) 
                 }
             },
+            async fetchSuppliers(){ 
+            const query_url=query(collection(db, "suppliers"), orderBy("created_at", "desc"));           
+                onSnapshot(query_url, async(snapShot) =>{                  
+                    const suppliers=ss.suppliers(snapShot);   
+                    this.suppliersData=suppliers;
+                    this.searchSuppliers();
+                    this.isLoading=false;
+                    this.isUpdating=false;
+            });                              
+        } ,
+           showTime(t){
+             const date=t.toDate()
+             const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+             const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
+             return formattedDate;
+         },
             sortSuppliers(sort){   
                 this.suppliers=[];
                 this.sort_item=sort;
@@ -244,30 +260,7 @@
                 }            
             },
             
-            async fetchSuppliers(){                    
-                const query_url = query(collection(db, "suppliers"), orderBy("created_at", "desc"));
-                const snapShot=await getDocs(query_url)           
-                if(snapShot._snapshot.docChanges.length <=0){
-                    this.msg.type='error' 
-                    this.msg.info='Oops..., something went wrong!'
-                    this.isLoading=false;
-                    this.isUpdating=false;
-                    return false;
-                }    
-                const suppliers=ss.suppliers(snapShot)
-                this.suppliers=[];
-                this.suppliersData=suppliers;
-                this.suppliers=suppliers;
-                this.isLoading=false;
-                this.isUpdating=false;
-               // this.$store.dispatch("setsuppliers", this.suppliers)
-           } ,
-           showTime(t){
-             const date=t.toDate()
-             const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-             const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-             return formattedDate;
-         }
+           
         },
         
     }

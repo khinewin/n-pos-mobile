@@ -143,7 +143,7 @@
  import PageHeader from "@/views/partials/PageHeader.vue"
  import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query, increment, deleteDoc} from 'firebase/firestore'
+import {Timestamp, collection, onSnapshot, addDoc, getDocs, doc, setDoc, where, updateDoc, query, increment, deleteDoc} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/purchase/ProductModal.vue'
 import SupplierModal from '@/views/modals/purchase/SupplierModal.vue'
@@ -212,6 +212,7 @@ export default {
    created() {
     this.voucher_no=this.$route.params.id;
      this.fetchPurchase();
+     this.checkDatabase();
    },
    watch:{
     msg:{
@@ -263,6 +264,7 @@ export default {
             this.total_price=0;
             this.tmpStorePurchase=[];
             this.removeItems=[];
+            this.location="";
         },
         setExpDate(id){
             const arr=this.storePurchase.filter((f)=>f.id==id)
@@ -292,10 +294,14 @@ export default {
         },
         async fetchPurchase(){
             const query_url = query(collection(db, "purchases"), where("voucher_no", "==", Number(this.voucher_no)));
-            const snapShot=await getDocs(query_url)
-            const purchase=ss.purchases(snapShot);      
-            this.setPurchaseItem(purchase[0])
-            this.isLoading=false;
+            onSnapshot(query_url, (snapShot)=>{
+                    const purchase=ss.purchases(snapShot);      
+                    if(purchase.length > 0){
+                        this.setPurchaseItem(purchase[0])
+                    }
+                    this.isLoading=false;
+                
+            })           
         },
    
         setSupplier(s){
@@ -390,6 +396,7 @@ export default {
                       
                     }else{
                         f.amount=0
+                        f.price=0
                     }
                 }
             }) && this.calTotal();
@@ -436,12 +443,40 @@ export default {
             }
            
         },
+
+        async checkDatabase(){ 
+            const query_url=query(collection(db, "purchases"));           
+                onSnapshot(query_url, async(snapShot) =>{
+                    snapShot.docChanges().forEach((change) => {    
+                            if(change.type==="modified"){
+                                if(change.doc.data().voucher_no==this.voucher_no){
+                                   // this.printSale();
+                                    this.msg.type="success";
+                                    this.msg.info="The purchase list has been updated."   
+                                    this.isLoading=false;
+                                }
+                            }
+                            if(change.type==="removed"){
+                                this.msg.type="success";
+                                this.msg.info="The voucher has been cancelled." 
+                                this.isLoading=false;
+                                this.clearItems();
+                            }
+                    });                                              
+            });                              
+        } ,
    
-        async savePurchase(){          
+        async savePurchase(){         
+            const isNotReady= this.storePurchase.filter((f)=>!f.price)
+            if(isNotReady.length) return false;
+             
             this.isLoading=true;
             this.msg.type="";
             this.msg.info="";
         
+            this.updateProducts();
+           this.updateStoreItem();
+
             const voucher={
                 voucher_no: this.voucher_no,
                 pur_date: Timestamp.fromDate(new Date(this.pur_date)),
@@ -453,7 +488,22 @@ export default {
                 total_price:this.total_price,
                 extra_discount: this.extra_discount,
                 grand_total_price: this.grand_total_price,
-            }                     
+                location: this.location
+            }                        
+
+            const saveDocument=doc(db, "purchases", this.id)
+            if(this.storePurchase.length <=0){
+                    await deleteDoc(saveDocument) //if no items delete document;
+            }else{
+                this.isLoading=false;
+                  await updateDoc(saveDocument, voucher) //save on purchases
+            }                                    
+        },
+        updateStoreItem(){
+            const updateStore=this.storePurchase.filter((f)=>f.pur_qty != 0)
+            this.storePurchase=updateStore;
+        },
+        updateProducts(){
             if(this.storePurchase.length > 0){ //update products qty increase or decrease
                     this.storePurchase.map(async (p)=>{
                     const id=p.id;
@@ -472,28 +522,8 @@ export default {
                         pur_price: p.pur_price,
                     })   
                     } 
-                })
-                //update old pur item with new pur item when not refresh
-                this.storePurchase.map((s)=>{
-                    return s.old_pur_qty=s.pur_qty;
-                })
-               this.storePurchase=this.storePurchase.filter((f)=>f.pur_qty != 0)
-            }
-            
-            const saveDocument=doc(db, "purchases", this.id)
-            if(this.storePurchase.length <=0){
-                    await deleteDoc(saveDocument) //if no items delete document;
-                    this.clearItems();
-            }else{
-                    await updateDoc(saveDocument, voucher) //save on purchases
-            }     
-                
-      
-            this.msg.type="success";
-            this.msg.info="Purchase update successful."          
-             
-            this.isLoading=false;      
-            this.v$.$reset()
+                })               
+            }            
         },
  
         editShowTime(t){

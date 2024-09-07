@@ -79,202 +79,32 @@
                                 </tr>                                                                                                                
                             </tbody>
                         </table>                                                                                                                    
-                </form>               
+                    </form>               
           
-            <ProductModal @setCode="setCode" :storePurchase="storeItems" />
-        </div>
-        </div>
-        </div>
-         <!-- setQty Modal -->
-         <div class="modal fade" id="setQtyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-            <div class="modal-content">               
-                <div class="modal-body p-2">
-                    <div class="row text-end mb-2">                       
-                        <div class="col-6">
-                            <button type="button" class="btn btn-sm" @click="saveQty" data-bs-dismiss="modal">
-                                <span ><i class="fa-solid fa-hard-drive"></i> Save</span>
-                            </button>
-                        </div>
-                        <div class="col-6">
-                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button>
-                        </div>
-                    </div>
-                    <div>
-                        <table class="table table-bordered mb-0" v-if="Object.keys(editItem).length">
-                            <tbody>
-                                <tr>
-                                    <td colspan="3" class="text-center p-2" >{{editItem.item_name}}</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-center col-2">Main Inventory</td>
-                                    <td class="text-center col-2">Pharmacy Inventory</td>
-                                    <td class="text-center col-1">Unit</td>
-                                </tr>
-                                <tr v-if="editItem.packing_size.largest_unit">
-                                    <td class="p-0">
-                                        <input type="number" v-model="editItem.main_l_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="p-0">
-                                        <input type="number" v-model="editItem.l_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="p-0">
-                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.packing_size.largest_unit">
-                                                <option selected>{{editItem.packing_size.largest_unit}}</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="p-0">
-                                        <input type="number" v-model="editItem.main_m_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="p-0">
-                                        <input type="number" v-model="editItem.m_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="p-0">
-                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.packing_size.medium_unit">
-                                                <option selected>{{editItem.packing_size.medium_unit}}</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="p-0">
-                                        <input type="number" v-model="editItem.main_s_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="p-0">
-                                        <input type="number" v-model="editItem.s_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="p-0">
-                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.packing_size.smallest_unit">
-                                                <option selected>{{editItem.packing_size.smallest_unit}}</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>                
-            </div>
+                </div>
             </div>
         </div>
-        <!--end setQty modal-->  
-        <!-- setPrices Modal -->
-        <div class="modal fade" id="setPricesModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-            <div class="modal-content">               
-                <div class="modal-body p-2">
-                    <div class="row mb-2">                                             
-                        <div class="col-12 text-end">
-                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button>
-                        </div>
-                    </div>
-                    <div>
-                        <table class="table table-bordered mb-0" v-if="Object.keys(editItem).length">
-                            <tbody>
-                                <tr>
-                                    <td colspan="4" class="text-center p-2" >{{editItem.item_name}}</td>
-                                </tr>
-                                <tr class="fw-bold">
-                                    <td class="col-1"></td>
-                                    <td class="text-center col-1">
-                                        <span v-if="Object.keys(editItem.packing_size).length">{{editItem.packing_size.largest_unit}}</span>
-                                        <span v-else>L unit</span>
-                                    </td>
-                                    <td class="text-center col-1">
-                                        <span v-if="Object.keys(editItem.packing_size).length">{{editItem.packing_size.medium_unit}}</span>
-                                        <span v-else>M unit</span>
-                                    </td>                                        
-                                    <td class="text-center col-1" >
-                                        <span v-if="Object.keys(editItem.packing_size).length">{{editItem.packing_size.smallest_unit}}</span>
-                                        <span v-else>S unit</span>
-                                    </td>
-                                </tr>       
-                                <tr class="">
-                                    <td class="pt-2">Pur price</td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                        <input :disabled="!editItem.packing_size.largest_unit" @keyup="calPurPrice('largest_unit')" type="number" v-model="editItem.pur_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
-                                    </td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                        <input :disabled="!editItem.packing_size.medium_unit"  @keyup="calPurPrice('medium_unit')"  type="number" v-model="editItem.pur_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
-                                    </td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                            <input :disabled="!editItem.packing_size.smallest_unit" @keyup="calPurPrice('smallest_unit')" type="number" v-model="editItem.pur_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
-                                    </td>                                        
-                                </tr>
-                                <tr class="">
-                                    <td class="pt-2">Retail price</td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                        <input :disabled="!editItem.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="editItem.retail_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
-                                    </td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                        <input :disabled="!editItem.packing_size.medium_unit"  @keyup="calRetailPrice('medium_unit')"  type="number" v-model="editItem.retail_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
-                                    </td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                            <input :disabled="!editItem.packing_size.smallest_unit" @keyup="calRetailPrice('smallest_unit')" type="number" v-model="editItem.retail_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
-                                    </td>                                        
-                                </tr>
-                                <tr class="">
-                                    <td class="pt-2">Wholesale price</td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                        <input :disabled="!editItem.packing_size.largest_unit" @keyup="calWholesalePrice('largest_unit')" type="number" v-model="editItem.whole_sale_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
-                                    </td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                        <input :disabled="!editItem.packing_size.medium_unit"  @keyup="calWholesalePrice('medium_unit')"  type="number" v-model="editItem.whole_sale_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
-                                    </td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                            <input :disabled="!editItem.packing_size.smallest_unit" @keyup="calWholesalePrice('smallest_unit')" type="number" v-model="editItem.whole_sale_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
-                                    </td>                                        
-                                </tr>  
-                                <tr>
-                                    <td class="ps-2 pt-2" colspan="4">
-                                        <div class="form-check form-switch">
-                                            <input @change="saveAutoCal" v-model="editItem.auto_cal" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
-                                            <label class="form-check-label" for="flexSwitchCheckChecked">Auto cal</label>
-                                          </div>                                              
-                                    </td>
-                                 </tr>               
-                            </tbody>
-                        </table>
-                    </div>
-                </div>                
-            </div>
-            </div>
-        </div>
-        <!--end setPrices modal-->  
+        <ProductModal @setCode="setCode" :storePurchase="storeItems" />
+        <SetQty :ei="editItem" @saveQty="saveQty" />
+        <SetPrice :ei="editItem" />
     </div>
 </template>
 <script>
  import PageHeader from "@/views/partials/PageHeader.vue"
  import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query, increment} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query, increment} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/purchase/ProductModal.vue'
+import SetQty from '@/views/modals/stocks/SetQty.vue'
+import SetPrice from '@/views/modals/stocks/SetPrice.vue'
 import * as ss from "@/lib/snapshot/stocks"
 import * as hp from '@/lib/helper';
 import * as cp from '@/lib/cal_price'
 
 export default {
     components: {
-        PageHeader, ProductModal
+        PageHeader, ProductModal,SetQty,SetPrice
     },
     setup () {
         return { v$: useVuelidate() }
@@ -305,26 +135,28 @@ export default {
     mounted() {
         this.voucher_no=this.$route.params.id;
         this.fetchStock();
+        this.checkDatabase();
     },  
     computed:{
         user(){
             return this.$store.getters.user;
         },        
     },
+    watch:{
+    msg:{
+            handler(val){
+                if(val.type){
+                    setTimeout(()=>{
+                        this.msg.type="";
+                        this.msg.info="";
+                    }, 3000)
+                }
+            },deep:true
+        }
+   },
    
     methods:{
 
-        calRetailPrice(unit){
-            return cp.calRetailPrice(unit, this.editItem);
-        },
-        calWholesalePrice(unit){
-            return cp.calWholesalePrice(unit,this.editItem);
-        },
-        calPurPrice(unit){
-            return cp.calPurPrice(unit, this.editItem);
-        },
-       
-     
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
@@ -409,10 +241,11 @@ export default {
         },
         async fetchStock(){
             const query_url = query(collection(db, "openingStocks"), where("voucher_no", "==", Number(this.voucher_no)));
-            const snapShot=await getDocs(query_url)
-            const stocks=ss.stocks(snapShot);
-            this.setItem(stocks[0])
-            this.isLoading=false;
+            onSnapshot(query_url, (snapShot)=>{
+                const stocks=ss.stocks(snapShot);
+                this.setItem(stocks[0])
+                this.isLoading=false;
+            })
         },
             
       
@@ -435,22 +268,39 @@ export default {
             }
            
         },
+        async checkDatabase(){ 
+            const query_url=query(collection(db, "openingStocks"));           
+                onSnapshot(query_url, async(snapShot) =>{
+                    snapShot.docChanges().forEach((change) => {    
+                            if(change.type==="modified"){
+                                if(change.doc.data().voucher_no==this.voucher_no){
+                                   // this.printSale();
+                                    this.msg.type="success";
+                                    this.msg.info="The opening stocks has been updated."   
+                                    this.isLoading=false;
+                                }
+                            }
+                    });                                              
+            });                              
+        } ,
        async saveStocks(){
           const validattion = await this.v$.$validate()
           if(!validattion) return false;
-            this.isLoading=true;
-            this.msg.type="";
-            this.msg.info="";
-        
+            this.isLoading=true;       
+            
+            this.updateProducts();
+            
             const voucher={
                 voucher_no: this.voucher_no,
                 created_at: Timestamp.fromDate(new Date(this.created_at)),           
                 products : this.storeItems,
                 user : {uid: this.user.uid, email:this.user.email},          
-            }      
-            
+            }     
+            this.isLoading=false;
             const saveDocument=doc(db, "openingStocks", this.id)
-            await setDoc(saveDocument, voucher)
+            await updateDoc(saveDocument, voucher)                     
+        },
+        updateProducts(){
             this.storeItems.map(async (p)=>{
                 const id=p.id;
                 const updateDocument=doc(db, "products", id)
@@ -463,10 +313,6 @@ export default {
                         auto_cal: p.auto_cal,
                  })    
             })
-            this.msg.type="success";
-            this.msg.info="Opening stocks update successful."                     
-            this.isLoading=false;          
-            this.v$.$reset()
         },
        
      

@@ -125,7 +125,7 @@
   </div>
   </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import { GChart } from 'vue-google-charts'
 import * as hp from "@/lib/helper"
@@ -247,11 +247,13 @@ export default {
              query_url = query(collection(db, "sales"),  
             where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date"));
             }
-            const snapShot=await getDocs(query_url)
-            let saleItems=ss.sales(snapShot);           
-            this.salesMonthlyData=saleItems;
-            this.monthlyReports();
-            this.isLoading=false;
+            onSnapshot(query_url, (snapShot)=>{
+                let saleItems=ss.sales(snapShot);           
+                this.salesMonthlyData=saleItems;
+                this.monthlyReports();
+                this.isLoading=false;
+            })
+           
         },
         dailyReports(){
             let sales=[]
@@ -289,8 +291,9 @@ export default {
             gbc.map((res)=>{                
                    let data={item_name:"", sale_qty: 0}
                     res[1].map((ren)=>{
+                            console.log(ren)
                             data.item_name=ren.item_name;
-                            data.sale_qty += ren.sale_qty;
+                            data.sale_qty += ren.packing_size.largest_unit ?  ren.sale_qty / (ren.packing_size.medium_qty * ren.packing_size.smallest_qty) : ren.sale_qty / ren.packing_size.smallest_qty;
                     })
                     result.push(data)
             })
@@ -318,11 +321,12 @@ export default {
              query_url = query(collection(db, "sales"),  
             where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date"));
             }
-            const snapShot=await getDocs(query_url)
-            const saleItems=ss.sales(snapShot)
-            this.salesData=saleItems;
-            this.dailyReports();
-            this.isLoading=false;
+            onSnapshot(query_url, (snapShot)=>{
+                const saleItems=ss.sales(snapShot)
+                this.salesData=saleItems;
+                this.dailyReports();
+                this.isLoading=false;
+            })           
         },
         showTime(t){
             return hp.showTime(t)

@@ -33,7 +33,7 @@
 import { GChart } from 'vue-google-charts'
 import * as hp from "@/lib/helper"
 import * as ss from '@/lib/snapshot/purchases'
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 export default {
     components:{
@@ -45,7 +45,7 @@ export default {
             purchaseMonthlyData:[],
             monthlyPurchase:[],
             monthlyChartOptions: {              
-                colors : ["red"]
+                colors : ["purple", "brown","green", "orange","gray", "blue","orange",]
             }
         }
     },
@@ -96,10 +96,11 @@ export default {
             const to_date=Timestamp.fromDate(new Date(theLast))
             const query_url= query(collection(db, "purchases"),  
             where("pur_date", ">=", from_date), where("pur_date", "<=", to_date), orderBy("pur_date"));            
-            const snapShot=await getDocs(query_url)
-            let purchaseItems=ss.purchases(snapShot);           
-            this.purchaseMonthlyData=purchaseItems;
-            this.monthlyReports();
+            onSnapshot(query_url,(snapShot)=>{
+                let purchaseItems=ss.purchases(snapShot);           
+                this.purchaseMonthlyData=purchaseItems;
+                this.monthlyReports();
+            })            
         },     
         monthlyShowTime(t){
             const date=t.toDate()

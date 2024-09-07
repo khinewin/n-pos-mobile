@@ -90,7 +90,7 @@
      <!--end modal-->
     </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp, collection, addDoc, getDocs, onSnapshot, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as ss from "@/lib/snapshot/sales"
 import * as hp from '@/lib/helper'
@@ -171,18 +171,22 @@ export default {
      
     async fetchSales(){
        const query_url = query(collection(db, "sales"), orderBy("sale_date", "desc"));
-       const snapShot=await getDocs(query_url)
-       const saleItems=ss.sales(snapShot);      
-       this.sales=[];
-       this.sales=saleItems;
-       this.salesData=saleItems;
-     //  this.$store.dissatch("setproducts", products)
-       this.isLoading=false;
-       this.isUpdating=false;
-     
+       onSnapshot(query_url, async(snapShot) =>{
+                    const isLocal=snapShot.metadata.fromCache;
+                    if(isLocal){
+                       this.isOffline="You are now in offline mode."
+                    }else{
+                        this.isOffline=false;
+                    }
+                    const sales=ss.sales(snapShot)       
+                    this.salesData=sales;
+                    this.searchSales();
+                    this.isLoading=false;
+                    this.isUpdating=false;
+            });        
       } ,
       showTime(t){
-           return hp.showTime(t)
+           return hp.showTimeHourShort(t)
        },
      removeAfterAt(email) {
         const parts = email.split('@');

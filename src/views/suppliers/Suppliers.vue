@@ -1,6 +1,6 @@
 <template lang="">       
     <div>           
-           <PageHeader page-title="Suppliers" page-code="suppliers" :msg-type="msg.type" :msg-info="msg.info"/>
+           <PageHeader page-title="Suppliers" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info"/>
            <div class="container-fluid">
                <div class="row mb-2 justify-content-end">                            
                 <div class="col-sm-2 d-grid">
@@ -22,11 +22,11 @@
                                     <label for="search_by_code" class="small">Code</label>
                                 </div>
                                 <div class="form-floating col-sm-4 col-lg-12">
-                                    <input type="search" id="search_by_name" v-model="search_by_name" @keypress.enter="searchSuppliers" placeholder="Description" class="form-control form-control-sm">
+                                    <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchSuppliers" placeholder="Description" class="form-control form-control-sm">
                                     <label for="search_by_name" class="small">Name</label>
                                 </div> 
                                 <div class="form-floating col-sm-4 col-lg-12">
-                                    <input type="search" id="search_by_company" v-model="search_by_company" @keypress.enter="searchSuppliers" placeholder="Company" class="form-control form-control-sm">
+                                    <input type="search" id="search_by_company" v-model="search_by_company" @keyup="searchSuppliers" placeholder="Company" class="form-control form-control-sm">
                                     <label for="search_by_company" class="small">Company</label>
                                  </div> 
                             </div>
@@ -109,7 +109,7 @@
    import PageHeader from "@/views/partials/PageHeader.vue"
     import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-   import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy, onSnapshot } from 'firebase/firestore'
+   import {disableNetwork ,Timestamp, collection, addDoc, setDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy, onSnapshot } from 'firebase/firestore'
    import db from '@/firebase/firestore'
    import * as lib from '@/lib/snapshot/suppliers'
    import * as hp from '@/lib//helper'
@@ -145,6 +145,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                editItem:{},
                isUpdating:false,
                isSaving:false,
+               isOffline:false,
                msg : {
                    type :"",
                    info :"",
@@ -155,11 +156,11 @@ import { required, email ,helpers} from '@vuelidate/validators'
            if(this.user !==null){
                this.isLoading=true;
                this.fetchSuppliers();
+               this.checkDatabase();
            }
        },
-       mounted() {
-        const name=document.getElementById("name");
-        name.focus();
+       async mounted() {
+     
        },
       
        computed:{
@@ -167,13 +168,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                return this.$store.getters.user;
            }
        },
-       watch:{
-           user(data){
-               if(data !==null){
-                   this.isLoading=true;
-                   this.fetchSuppliers();
-               }
-           },
+       watch:{        
            msg:{
                handler(val){
                    if(val.type){
@@ -197,64 +192,81 @@ import { required, email ,helpers} from '@vuelidate/validators'
             this.isUpdating=false;
             this.v$.$reset()
         },
-        async fetchSuppliers(){      
-                const query_url=query(collection(db, "suppliers"), orderBy("created_at", "desc"));
+        message(type){
+                this.msg.info=hp.message(type, "suppliers")
+                this.msg.type="success"                                                         
+        }, 
+        async checkDatabase(){ 
+            const query_url=query(collection(db, "suppliers"), orderBy("created_at", "desc"));           
                 onSnapshot(query_url, async(snapShot) =>{
-                    const isLocal=snapShot.metadata.fromCache;
-                    if(isLocal){
-                        this.msg.type="error";
-                        this.msg.info="You are now in offline mode"
-                    }
+                    const dc=snapShot._snapshot.docChanges;
+                    const user=this.user;
+                    snapShot.docChanges().forEach((change) => {                       
+                        const res=change.doc.data();   
+                            if(change.type==="added" && res.edit_user.uid==user.uid && dc.length===1){
+                                    this.message("added")
+                                    this.resetInput();    
+                                    hp.setAutoFocus("name")     
+                            }           
+                            if(change.type==="modified" && res.edit_user.type=="modified" && res.edit_user.uid==user.uid){
+                                    this.message("modified")
+                            }  
+                            if(change.type==="removed" && res.edit_user.type=="removed" && res.edit_user.uid==user.uid){
+                                    this.message("removed")
+                            }             
+                    });                 
+                    const isLocal=snapShot.metadata.formCache;                              
+            });                              
+        } ,
+        async fetchSuppliers(){ 
+            const query_url=query(collection(db, "suppliers"), orderBy("created_at", "desc"));           
+                onSnapshot(query_url, async(snapShot) =>{                  
                     const suppliers=lib.suppliers(snapShot);   
                     this.suppliersData=suppliers;
                     this.searchSuppliers();
-                    this.resetInput();    
-                    console.log("wok")                  
-                   });
-           
-           } ,
+                    this.isLoading=false;
+                    this.isUpdating=false;
+            });                              
+        } ,
         async removeSupplier(i, p){
             const cf=confirm(`Are you sure ? delete the supplier : ${p.name} `)
             if(!cf) return false;
+
+            const updateDocument=doc(db, "suppliers", p.id)
+            await updateDoc(updateDocument, {edit_user: {uid: this.user.uid, type: 'removed'}})  
+            
             const document=doc(db, "suppliers", p.id)     
-            await deleteDoc(document)
-         //   this.fetchSuppliers();  
-            this.msg.type="success";
-            this.msg.info="Supplier delete successful"
+            await deleteDoc(document)                           
         },
+     
         async saveSupplier(){
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
             this.isSaving=true;
             const date=this.created_at ? new Date(this.created_at) : new Date();
             const created_at=Timestamp.fromDate(date);
-            const dataCollection=collection(db, "suppliers", )
+            const dataCollection=collection(db, "suppliers")
+            this.code=this.code ? this.code : hp.g_code();
             const data={
-                user: {uid:this.user.uid, email:this.user.email},
+                user: {uid:this.user.uid, displayName:this.user.displayName},
                 name: this.name, 
-                code: new Date().getTime(),
+                code: this.code,
                 phone: this.phone,
                 company: this.company,
-                created_at : created_at,               
-            }
-            await addDoc(dataCollection, data);
-   
-            this.msg.type="success";
-            this.msg.info="Supplier save successful."
-        
-           
+                created_at : created_at,      
+                edit_user: {uid: this.user.uid, type: 'added'}         
+            }      
+            const docRef=await addDoc(dataCollection, data)                          
         },
            updateSuppliers(){
                this.isUpdating=true;
                this.fetchSuppliers();
            },
           async saveEdit(){
+                const item=this.suppliers.filter((f)=>f.id==this.editItem.id)
+                this.editItem={...item[0], edit_user:  {uid:this.user.uid, type: "modified"},}
                const updateDocument=doc(db, "suppliers", this.editItem.id)
-                   await updateDoc(updateDocument, {
-                       name : this.editItem.name,
-                       phone: this.editItem.phone,
-                       company: this.editItem.company
-                    })  
+                await updateDoc(updateDocument,this.editItem)           
            },
            setEdit(p){
                this.editItem=p;
@@ -284,10 +296,14 @@ import { required, email ,helpers} from '@vuelidate/validators'
                               if(i < 20){
                                   return p;
                               }
-                          }) 
+                    }) 
                }
-           },
-           sortSuppliers(sort){   
+           },                   
+           
+          showTime(t){
+            return hp.showTime(t)
+         },
+         sortSuppliers(sort){   
                this.suppliers=[];
                this.sort_item=sort;
                if(this.sortBy=="asc"){
@@ -347,11 +363,6 @@ import { required, email ,helpers} from '@vuelidate/validators'
                        
                }            
            },
-           
-           
-          showTime(t){
-            return hp.showTime(t)
-         }
        },
        
    }
@@ -360,55 +371,4 @@ import { required, email ,helpers} from '@vuelidate/validators'
        
    </style>
    
-   <!--
-                                               <ul class="list-group list-group-flush">
-                                   <li class="list-group-item list-group-item-action bg-secondary-subtle">
-                                       <div class="row">
-                                           <div class="col-lg-3">
-                                                   <div class="small fw-lighter mt-3">Code</div>
-                                           </div>
-                                           <div class="col-lg-5">
-                                                   <div class="small fw-lighter mt-3">Description</div>
-                                           </div>
-                                           <div class="col-lg-1">
-                                                   <div class="small fw-lighter mt-3">phone</div>
-                                           </div>
-                                           <div class="col-lg-3 small fw-lighter text-center">
-                                                   <div>Prices</div>
-                                                   <div class="row">
-                                                       <div class="col-4">Purchase</div>
-                                                       <div class="col-4">Regular sale</div>
-                                                       <div class="col-4">Whole sale</div>
-                                                   </div>
-                                           </div>
-                                   </div>
-                                   </li>
-                                   <li class="list-group-item" v-if="isLoading">
-                                       <div class="d-flex justify-content-center my-5">
-                                           <div class="spinner-border text-primary"  role="status">
-                                             <span class="visually-hidden">Loading...</span>
-                                           </div>
-                                         </div>
-                                   </li>
-                                   <li v-if="suppliers.length > 0" class="list-group-item list-group-item-action" v-for="p in suppliers" :key="p.id" >
-                                           <div class="row">
-                                                   <div class="col-lg-3 small">
-                                                           <div>{{p.code}}</div>
-                                                   </div>
-                                                   <div class="col-lg-5 small">
-                                                           <div>{{p.name}}</div>
-                                                   </div>
-                                                   <div class="col-lg-1 small">
-                                                           <div>{{p.phone}}</div>
-                                                   </div>
-                                                   <div class="col-lg-3 small fw-lighter text-center">
-                                                       <div class="row">
-                                                           <div class="col-4">{{p.purchase_price}}</div>
-                                                           <div class="col-4">{{p.regular_sale_price}}</div>
-                                                           <div class="col-4">{{p.created_at}}</div>
-                                                       </div>
-                                               </div>
-                                           </div>
-                                   </li>
-                           </ul>
-                       -->
+   

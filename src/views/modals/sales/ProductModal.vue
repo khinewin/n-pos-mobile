@@ -100,7 +100,7 @@
       <!--end modal-->
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
+import {Timestamp, collection, addDoc, getDocs, doc, onSnapshot, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as lib from "@/lib/snapshot/products"
 import * as hp  from "@/lib/helper"
@@ -146,18 +146,7 @@ export default {
                     this.fetchProducts();           
             }
         },
-        saleItems :{
-            handler(newVal){
-                if(Object.keys(newVal).length <=0){
-                    setTimeout(()=>{
-                        this.fetchProducts();
-                    }, 300)
-                }
-            },
-            deep: true,
-       },
-      
-      
+  
     },
     methods:{
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
@@ -212,13 +201,14 @@ export default {
       
         async fetchProducts(){
         const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
-        const snapShot=await getDocs(query_url)
-        const products=lib.products(snapShot)       
-        this.productsData=products;
-        this.$store.dispatch("setProducts", products)
-        this.isLoading=false;
-        this.isUpdating=false;
-        this.searchProducts();
+        onSnapshot(query_url, async(snapShot) =>{                  
+                    const products=lib.products(snapShot)       
+                    this.productsData=products;
+                    this.searchProducts();
+                    this.isLoading=false;
+                    this.isUpdating=false;
+            });        
+       
        } ,
        showTime(t){
             return hp.showTime(t)

@@ -146,7 +146,7 @@
  import PageHeader from "@/views/partials/PageHeader.vue"
  import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query, increment, orderBy} from 'firebase/firestore'
+import {Timestamp,onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query, increment, orderBy} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/purchase/ProductModal.vue'
 import SupplierModal from '@/views/modals/purchase/SupplierModal.vue'
@@ -227,8 +227,7 @@ export default {
     mounted() {           
         this.voucher_no=new Date().getTime();
         this.pur_date=new Date().toISOString().substr(0, 10)
-
-      
+        this.checkDatabase();      
     },
     
     methods:{
@@ -351,6 +350,7 @@ export default {
                       
                     }else{
                         f.amount=0
+                        f.price=0
                     }
                 }
             }) && this.calTotal();
@@ -390,12 +390,30 @@ export default {
             const result=temStore.indexOf(p.id)
             if(result < 0){
                 this.storingPurchase();
-            }
-           
+            }           
         },
+        async checkDatabase(){ 
+            const query_url=query(collection(db, "purchases"));           
+                onSnapshot(query_url, async(snapShot) =>{
+                    snapShot.docChanges().forEach((change) => {    
+                            if(change.type==="added"){
+                                if(change.doc.data().voucher_no==this.voucher_no){
+                                    this.updateProducts();
+                                   // this.printSale();
+                                    this.msg.type="success";
+                                    this.msg.info="The purchase list has been saved."   
+                                    this.clearPurchaseItem(); 
+                                }
+                            }
+                    });                                              
+            });                              
+        } ,
        async savePurchase(){
           const validattion = await this.v$.$validate()
           if(!validattion) return false;
+             const isNotReady= this.storePurchase.filter((f)=>!f.price)
+            if(isNotReady.length) return false;
+
             this.isLoading=true;
             this.msg.type="";
             this.msg.info="";
@@ -412,10 +430,12 @@ export default {
                 total_price:this.total_price,
                 extra_discount: this.extra_discount,
                 grand_total_price: this.grand_total_price,
-            }      
-            
+            }                 
             const saveDocument=collection(db, "purchases")
             await addDoc(saveDocument, voucher)
+                                               
+        },
+        updateProducts(){
             this.storePurchase.map(async (p)=>{
                 const id=p.id;
                 const pur_qty=p.pur_qty;               
@@ -432,10 +452,9 @@ export default {
                      pur_price: p.pur_price,
                  })
                 }    
-            })
-            this.msg.type="success";
-            this.msg.info="Purchase save successful."          
-             
+            })     
+        },
+        clearPurchaseItem(){
             this.isLoading=false;
             this.voucher_no=new Date().getTime();
             this.pur_date=new Date().toISOString().substr(0, 10)
@@ -449,7 +468,7 @@ export default {
             this.extra_discount=0
             this.grand_total_price=0;
             this.v$.$reset()
-        },
+        }
            
     }
 }

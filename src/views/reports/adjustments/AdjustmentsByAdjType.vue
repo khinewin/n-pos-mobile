@@ -80,7 +80,7 @@
     </div>
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/adjustments"
@@ -93,7 +93,7 @@ export default {
            
             reports:[],
           //  current_month:[],
-            stocksData:[],         
+            adjustmentsData:[],         
             total_retail_amount:0,
             total_pur_amount:0,
             total_whole_sale_amount:0,
@@ -158,7 +158,7 @@ export default {
       
         displayReports(){       
             let stocks=[]
-            this.stocksData.map((res)=>{            
+            this.adjustmentsData.map((res)=>{            
                     res.products.map((data)=>{
                         stocks.push({...data, group_date : this.showTime(res.created_at), location: res.location})
                     })
@@ -226,11 +226,12 @@ export default {
             const to_date=Timestamp.fromDate(new Date(this.toDate))
             const query_url = query(collection(db, "adjustments"), 
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
-            const shapShot=await getDocs(query_url)
-            const stockItems=ss.adjustments(shapShot);           
-            this.stocksData=stockItems;
-            this.displayReports();
-            this.isLoading=false;
+            onSnapshot(query_url, (snapShot)=>{
+                const items=ss.adjustments(snapShot)    
+                this.adjustmentsData=items;
+                this.displayReports();
+                this.isLoading=false;
+           })
         }
     }
 }

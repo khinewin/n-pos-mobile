@@ -77,7 +77,7 @@
 <script>
 import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import { getAuth,onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth,onAuthStateChanged, signInWithEmailAndPassword,updateProfile } from "firebase/auth";
 import Welcome from "@/views/Welcome.vue"
 export default {
     components:{
@@ -158,6 +158,7 @@ export default {
                    this.$store.dispatch("setAuthUser", res.user)
                     this.email="";
                     this.password="";
+                    if(!res.user.displayName) this.setUsername();
                     this.$router.push({name: "Dashboard"})
                 })
                 .catch((rej)=>{
@@ -165,6 +166,12 @@ export default {
                     this.message.error=rej.code
                 })
             }
+        },
+        async setUsername(){
+            const auth = getAuth();
+            updateProfile(auth.currentUser, {
+            displayName: "N-User",// photoURL: "https://example.com/jane-q-user/profile.jpg"
+            })
         },
         
     }

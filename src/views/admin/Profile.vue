@@ -1,7 +1,7 @@
 <template lang="">     
     <div>           
         <PageHeader page-title="User profile" page-code="profile"  :msg-type="msg.type" :msg-info="msg.info" />
-        <div class="container">
+        <div class="container vh-80 overflow-y-auto">
             <div class="row justify-content-center g-2" v-if="user !==null">
                 <div class="col-sm-10 col-md-8 col-lg-6">
                         <div class="card shadow mb-2"  >
@@ -11,7 +11,9 @@
                                         <tbody >
                                             <tr>
                                                 <td>Name <span class="float-end">:</span> </td>
-                                                <td>{{user.displayName ? user.displayName : "N-POS User1"}}</td>
+                                                <td>
+                                                    <input @keypress="saveUsername" type="text" class="form-control-plaintext form-control-sm" v-model="userName">
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td>E-mail <span class="float-end">:</span> </td>
@@ -78,7 +80,7 @@ import PageHeader from "@/views/partials/PageHeader.vue"
 import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers, sameAs } from '@vuelidate/validators'
 import * as hp from '@/lib/helper'
-import { getAuth, updatePassword } from "firebase/auth";
+import { getAuth, updatePassword, updateProfile } from "firebase/auth";
 
 export default {
     components: {
@@ -99,10 +101,14 @@ export default {
                 type:"",
                 info:"",
             },
+            userName: "",
             isUpdating:false,
             password: "",
             confirm_password:"",
         }
+    },
+    mounted(){
+        this.userName=this.user.displayName ? this.user.displayName : "N-User"
     },
     watch:{
         msg:{
@@ -111,7 +117,7 @@ export default {
                        setTimeout(()=>{
                            this.msg.type="";
                            this.msg.info="";
-                       }, 5000)
+                       }, 3000)
                    }
                },deep:true
            }
@@ -123,6 +129,18 @@ export default {
        
     },
     methods:{
+        async saveUsername(){
+            const auth = getAuth();
+            updateProfile(auth.currentUser, {
+            displayName: this.userName,// photoURL: "https://example.com/jane-q-user/profile.jpg"
+            }).then(() => {
+                this.msg.info="The user name has been saved";
+                this.msg.type="success"
+            }).catch((error) => {
+                this.msg.type="error"
+                this.msg.info="The user name set failed"
+            });
+        },
         async changePassword(){
             const validattion = await this.v$.$validate()
             if(!validattion) return false;

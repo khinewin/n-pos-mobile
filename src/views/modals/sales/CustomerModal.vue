@@ -101,8 +101,9 @@
    import PageHeader from "@/views/partials/PageHeader.vue"
     import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-   import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
+   import {Timestamp, collection, addDoc, onSnapshot, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
    import db from '@/firebase/firestore'
+   import * as ss from "@/lib/snapshot/customers"
    export default {
        components: {
                PageHeader
@@ -265,42 +266,21 @@ import { required, email ,helpers} from '@vuelidate/validators'
            
            async fetchCustomer(){                    
                const query_url = query(collection(db, "customers"), orderBy("created_at", "desc"));
-               const snapShot=await getDocs(query_url)           
-               if(snapShot._snapshot.docChanges.length <=0){
-                   this.msg.type='error' 
-                   this.msg.info='Oops..., something went wrong!'
-                   this.isLoading=false;
-                   this.isUpdating=false;
-                   return false;
-               }
-               const default_customer={
-                    id: 123456789,
-                    name: "Default Customer",
-                    code: 123456789,
-                    phone: "09xxxxxxxxx",
-                    address: "",
-                    created_at: Timestamp.fromDate(new Date())
-               }
-               let customers=[default_customer];
-               snapShot && snapShot.forEach((doc) => {         
-                   let cus = {
-                       id: doc.id,
-                       uid: doc.data().uid,
-                       name: doc.data().name,
-                       address : doc.data().address,
-                       created_at: doc.data().created_at,
-                       phone : doc.data().phone,
-                       code : doc.data().code,                                
-                   };                                
-                   customers.push(cus);                           
-                               
-               });
-               this.customers=[];
-               this.customersData=customers;
-               this.customers=customers;
-               this.isLoading=false;
-               this.isUpdating=false;
-              // this.$store.dispatch("setcustomers", this.customers)
+               onSnapshot(query_url, async(snapShot) =>{
+                    const isLocal=snapShot.metadata.fromCache;
+                    if(isLocal){
+                       this.isOffline="You are now in offline mode."
+                    }else{
+                        this.isOffline=false;
+                    }
+                    const customers=ss.customers(snapShot)       
+                    this.customersData=customers;
+                    this.searchCustomer();
+                    this.isLoading=false;
+                    this.isUpdating=false;
+            });  
+          
+               
           } ,
           showTime(t){
             const date=t.toDate()

@@ -1,6 +1,6 @@
 <template lang="">       
     <div>           
-           <PageHeader page-title="customers" page-code="customers" :msg-type="msg.type" :msg-info="msg.info"/>
+           <PageHeader page-title="customers" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info"/>
            <div class="container-fluid">
                <div class="row mb-2 justify-content-end">                            
                 <div class="col-sm-2 d-grid">
@@ -31,12 +31,12 @@
                                     </div> 
                                 </div>
                                  <div class="row mt-2">
-                                        <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="searchCustomer"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
-                                        <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateCustomer">
+                                        <div class="col-6 d-grid"><button class="btn btn-sm text-dark" @click="searchCustomer"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
+                                        <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateCustomer">
                                              <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
                                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
-                                        </button></div>
-                                        <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
+                                        </button></div>-->
+                                        <div class="col-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
                                  </div>
                             </div>
                        </div>                                                                                                           
@@ -55,10 +55,10 @@
                                        </tr>
                                        <tr>
                                             <td class="p-0">
-                                                <input type="text" v-model="code" class="form-control-plaintext text-center" id="code" placeholder="Code">                                                                                       
+                                                <input @keyperss.enter="saveCustomer"  type="text" v-model="code" class="form-control-plaintext text-center" id="code" placeholder="Code">                                                                                       
                                             </td>
                                             <td class="p-0">
-                                                <input @keyperss.enter="saveCustomer" type="text" v-model="name" :class="{'border-danger' : v$.name.$errors.length}" class="form-control-plaintext text-center" id="name" placeholder="Name">                                               
+                                                <input  @keyperss.enter="saveCustomer" type="text" v-model="name" :class="{'border-danger' : v$.name.$errors.length}" class="form-control-plaintext text-center" id="name" placeholder="Name">                                               
                                             </td>
                                             <td class="p-0">
                                                 <input @keypress.enter="saveCustomer" type="tel" v-model="phone"  :class="{'border-danger' : v$.phone.$errors.length}"  class="form-control-plaintext text-center" id="phone" placeholder="Phone">                                            
@@ -71,19 +71,19 @@
                                             </td>
                                         </tr>
                                        
-                                       <tr class="text-center" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id" @mouseenter="setEdit(i)" >                                            
+                                       <tr class="text-center" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id" @click="setEdit(p)" >                                            
                                            <td :class="{'table-secondary': sort_item ==='code'}" class="pt-2 position-relative">
                                             <a class="text-danger position-absolute start-0 top-50 translate-middle ps-2" href="#!" @click="removeCustomer(i, p)"><i class="fa-solid fa-square-minus"></i></a>                                                                                        
                                                 {{p.code}}
                                             </td>
                                            <td :class="{'table-secondary': sort_item ==='name'}" class="p-0">
-                                                <input  @keyup="saveEdit" type="text" class="form-control-plaintext text-center   m-0" v-model="p.name">
+                                                <input  @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center   m-0" v-model="p.name">
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='phone'}" class="p-0">
-                                            <input @keyup="saveEdit" type="text" class="form-control-plaintext text-center  m-0" v-model="p.phone">
+                                            <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center  m-0" v-model="p.phone">
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='address'}" class="p-0">
-                                            <input @keyup="saveEdit" type="text" class="form-control-plaintext text-center m-0" v-model="p.address">
+                                            <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center m-0" v-model="p.address">
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='created_at'}" class="pt-2">{{showTime(p.created_at)}}</td>
                                        </tr>
@@ -110,7 +110,7 @@
    import PageHeader from "@/views/partials/PageHeader.vue"
     import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-   import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
+   import {Timestamp, collection, addDoc, query, where, getDocs,onSnapshot, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
    import db from '@/firebase/firestore'
    import * as hp from "@/lib/helper"
    import * as ss from "@/lib/snapshot/customers"
@@ -146,6 +146,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                editItem:{},
                isUpdating:false,
                isSaving:false,
+               isOffline:false,
                msg : {
                    type :"",
                    info :"",
@@ -153,29 +154,22 @@ import { required, email ,helpers} from '@vuelidate/validators'
            }
        },
        created() {     
-           if(this.user !==null){
-               this.isLoading=true;
-               this.fetchCustomer();
-           }
+        
        },
        mounted() {
         const name=document.getElementById("name");
         name.focus();
-        this.code= new Date().getTime()
         this.created_at=new Date().toISOString().substr(0, 10)
+        this.checkDatabase();
+        this.isLoading=true;
+        this.fetchCustomer();
        },
        computed:{
            user(){
                return this.$store.getters.user;
            }
        },
-       watch:{
-           user(data){
-               if(data !==null){
-                   this.isLoading=true;
-                   this.fetchCustomer();
-               }
-           },
+       watch:{        
            msg:{
                handler(val){
                    if(val.type){
@@ -188,61 +182,52 @@ import { required, email ,helpers} from '@vuelidate/validators'
            }
        },
        methods:{
+      
         async removeCustomer(i, p){
             const cf=confirm(`Are you sure ? delete the customer : ${p.name} `)
             if(!cf) return false;
+
+            const updateDocument=doc(db, "customers", p.id)
+            await updateDoc(updateDocument, {edit_user: {uid: this.user.uid, type: 'removed'}})  
+            
             const document=doc(db, "customers", p.id)     
-            await deleteDoc(document) //if no items delete document;
-            this.fetchCustomer();  
-            this.msg.type="success";
-            this.msg.info="Customer delete successful"
+            await deleteDoc(document) 
+          
         },
         async saveCustomer(){
+            if(Object.keys(this.editItem).length) this.saveEdit();
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
             this.isSaving=true;
             const date=this.created_at ? new Date(this.created_at) : new Date();
+            this.code=this.code ? this.code : hp.g_code();
             const created_at=Timestamp.fromDate(date);
-            const dataCollection=collection(db, "customers", )
+            const dataCollection=collection(db, "customers")
+
             const data={
-                user: {uid:this.user.uid, email:this.user.email},
+                user: {uid:this.user.uid, displayName:this.user.displayName},
                 name: this.name, 
-                code : this.code,
+                code :  this.code,
                 phone: this.phone,
                 address: this.address,
-                created_at : created_at,               
+                created_at : created_at,            
+                edit_user: {uid: this.user.uid, type: 'added'}
             }
-            const result=await addDoc(dataCollection, data);
-            if(result){
-                this.msg.type="success";
-                this.msg.info="Customer save successful."
-            }else{
-                this.msg.type="error";
-                this.msg.info="Customer save failed."
-            }
-            this.fetchCustomer();
-            this.name="";
-            this.phone="";
-            this.code= new Date().getTime()
-            this.created_at=new Date().toISOString().substr(0, 10)
-            this.address="";
-            this.isSaving=false;
-            this.v$.$reset()
+            const result=await addDoc(dataCollection, data);         
+           
         },
-           updateCustomer(){
+        updateCustomer(){
                this.isUpdating=true;
                this.fetchCustomer();
-           },
+        },
           async saveEdit(){
+                const item=this.customers.filter((f)=>f.id==this.editItem.id)
+                this.editItem={...item[0], edit_user:  {uid:this.user.uid, type: "modified"},}
                const updateDocument=doc(db, "customers", this.editItem.id)
-                   await updateDoc(updateDocument, {
-                       name : this.editItem.name,
-                       phone: this.editItem.phone,
-                       address: this.editItem.address
-                    })  
+                await updateDoc(updateDocument,this.editItem)  
            },
-           setEdit(i){
-               this.editItem=this.customers[i];
+           setEdit(p){
+               this.editItem=p
            },
            clearSearch(){
                this.search_by_code="";
@@ -250,7 +235,46 @@ import { required, email ,helpers} from '@vuelidate/validators'
                this.search_by_address="";
                this.searchCustomer();
            },
-           searchCustomer(){
+
+        message(type){
+                this.msg.info=hp.message(type, "customer")
+                this.msg.type="success"                                                         
+        }, 
+         
+           async checkDatabase(){ 
+            const query_url=query(collection(db, "customers"), orderBy("created_at", "desc"));           
+                onSnapshot(query_url, async(snapShot) =>{
+                    const dc=snapShot._snapshot.docChanges;
+                    const user=this.user;
+                    snapShot.docChanges().forEach((change) => {                       
+                        const res=change.doc.data();   
+                            if(change.type==="added" && res.edit_user.uid==user.uid && dc.length===1){
+                                    this.message("added")
+                                    this.resetInput();    
+                                    hp.setAutoFocus("name")     
+                            }           
+                            if(change.type==="modified" && res.edit_user.type=="modified" && res.edit_user.uid==user.uid){
+                                    this.message("modified")
+                            }  
+                            if(change.type==="removed" && res.edit_user.type=="removed" && res.edit_user.uid==user.uid){
+                                    this.message("removed")
+                            }             
+                    });                 
+                    const isLocal=snapShot.metadata.formCache;                              
+            });                              
+        } ,
+           async fetchCustomer(){                    
+               const query_url = query(collection(db, "customers"), orderBy("created_at", "desc"));
+               onSnapshot(query_url, async(snapShot) =>{                    
+                    const customers=ss.customers(snapShot);           
+                    this.customersData=customers;
+                    this.searchCustomer();          
+                    this.isLoading=false;
+                    this.isUpdating=false;           
+            });     
+              
+          } ,
+          searchCustomer(){
                this.customers=[];
                if(this.search_by_code){
                    this.customers=this.customersData.filter((f)=>f.code===Number(this.search_by_code))
@@ -271,8 +295,22 @@ import { required, email ,helpers} from '@vuelidate/validators'
                               }
                           }) 
                }
+           },          
+           resetInput(){
+            this.name="";
+            this.phone="";
+            this.code= "";
+            this.created_at=new Date().toISOString().substr(0, 10)
+            this.address="";
+            this.isSaving=false;
+            this.isLoading=false;
+            this.isUpdating=false;
+            this.v$.$reset()
            },
-           sortCustomers(sort){   
+          showTime(t){
+            return hp.showTime(t)
+        },
+        sortCustomers(sort){   
                this.customers=[];
                this.sort_item=sort;
                if(this.sortBy=="asc"){
@@ -331,28 +369,6 @@ import { required, email ,helpers} from '@vuelidate/validators'
                    })
                }            
            },
-           
-           async fetchCustomer(){                    
-               const query_url = query(collection(db, "customers"), orderBy("created_at", "desc"));
-               const snapShot=await getDocs(query_url)    
-               this.customers=[];       
-               if(snapShot._snapshot.docChanges.length <=0){
-                   this.msg.type='error' 
-                   this.msg.info='Oops..., something went wrong!'
-                   this.isLoading=false;
-                   this.isUpdating=false;
-                   return false;
-               }   
-               const customers=ss.customers(snapShot);           
-               this.customersData=customers;
-               this.customers=customers;
-               this.isLoading=false;
-               this.isUpdating=false;
-              // this.$store.dispatch("setcustomers", this.customers)
-          } ,
-          showTime(t){
-            return hp.showTime(t)
-        }
        },
        
    }

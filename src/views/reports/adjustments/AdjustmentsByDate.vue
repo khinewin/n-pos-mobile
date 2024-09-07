@@ -31,7 +31,7 @@
                     <td class=" text-end">
                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.before_adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                     </td>
-                    <td>
+                    <td class="text-center">
                       {{st.adj_type}}
                     </td>
                     <td class="text-center" data-bs-toggle="modal" data-bs-target="#setQtyModal">
@@ -90,7 +90,7 @@
     </div>
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/adjustments"
@@ -103,7 +103,7 @@ export default {
            
             reports:[],
           //  current_month:[],
-            stocksData:[],         
+            adjsData:[],         
             total_retail_amount:0,
             total_pur_amount:0,
             total_whole_sale_amount:0,
@@ -168,7 +168,7 @@ export default {
       
         displayReports(){       
             let stocks=[]
-            this.stocksData.map((res)=>{            
+            this.adjsData.map((res)=>{            
                     res.products.map((data)=>{
                         stocks.push({...data, group_date : this.showTime(res.created_at), location: res.location})
                     })
@@ -225,7 +225,6 @@ export default {
                     pur_amount += res.pur_amount;
                    
                 })
-                console.log(res3)
                 
                 const newData=[...res, res3]       
                 total_pur_amount += pur_amount;
@@ -247,11 +246,13 @@ export default {
             const to_date=Timestamp.fromDate(new Date(this.toDate))
             const query_url = query(collection(db, "adjustments"), 
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
-            const shapShot=await getDocs(query_url)
-            const stockItems=ss.adjustments(shapShot);           
-            this.stocksData=stockItems;
-            this.displayReports();
-            this.isLoading=false;
+           onSnapshot(query_url,(snapShot)=>{
+                const adjItems=ss.adjustments(snapShot);           
+                this.adjsData=adjItems;
+                this.displayReports();
+                this.isLoading=false;
+           })
+           
         }
     }
 }

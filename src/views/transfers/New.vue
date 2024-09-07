@@ -23,7 +23,7 @@
                                         <tr>
                                             <td class="text-end col-6 py-1 ">From location :</td>
                                             <td class="col-6 py-0">
-                                                <select class="form-control-plaintext form-control-sm border-bottom" v-model="from_location" @change="handleFromLocation(from_location)">
+                                                <select :disabled="storeItems.length > 0" class="form-control-plaintext form-control-sm border-bottom" v-model="from_location" @change="handleFromLocation(from_location)">
                                                     <option value="Main">Main</option>
                                                     <option value="Pharmacy">Pharmacy</option>
                                                 </select>
@@ -32,7 +32,7 @@
                                         <tr>
                                             <td class="text-end py-1">To location :</td>
                                             <td class="py-0">
-                                                <select class="form-control-plaintext form-control-sm border-bottom" v-model="to_location" @change="handleToLocation(to_location)">
+                                                <select :disabled="storeItems.length > 0" class="form-control-plaintext form-control-sm border-bottom" v-model="to_location" @change="handleToLocation(to_location)">
                                                     <option value="Main">Main</option>
                                                     <option value="Pharmacy">Pharmacy</option>
                                                 </select>
@@ -116,7 +116,7 @@
  import PageHeader from "@/views/partials/PageHeader.vue"
  import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query, increment} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query, increment} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/purchase/ProductModal.vue'
 import * as ss from "@/lib/snapshot/products"
@@ -175,10 +175,10 @@ export default {
             },deep:true
         }
     },
-    created() {    
-      
+    created() {          
         this.voucher_no=new Date().getTime();
         this.created_at=new Date().toISOString().substr(0, 10)
+        this.checkDatabase();
     },
     
     methods:{
@@ -284,6 +284,22 @@ export default {
             }
            
         },
+        async checkDatabase(){ 
+            const query_url=query(collection(db, "transfers"));           
+                onSnapshot(query_url, async(snapShot) =>{
+                    snapShot.docChanges().forEach((change) => {    
+                            if(change.type==="added"){
+                                if(change.doc.data().voucher_no==this.voucher_no){
+                                    this.updateProducts();
+                                   // this.printSale();
+                                    this.msg.type="success";
+                                    this.msg.info="The new transfer items  has been saved."   
+                                    this.resetTransfer(); 
+                                }
+                            }
+                    });                                              
+            });                              
+        } ,
        async saveTransfers(){
           const validattion = await this.v$.$validate()
           if(!validattion) return false;
@@ -301,7 +317,18 @@ export default {
                 to_location: this.to_location,                     
             }      
             const saveDocument=collection(db, "transfers")
-            await addDoc(saveDocument, voucher)
+            await addDoc(saveDocument, voucher)                                                   
+        },
+        resetTransfer(){
+            this.isLoading=false;
+            this.isSaving=false;
+            this.voucher_no=new Date().getTime();
+            this.created_at=new Date().toISOString().substr(0, 10)         
+            this.storeItems=[]
+            this.transfer_item={}         
+            this.v$.$reset()
+        },
+        updateProducts(){
             this.storeItems.map(async (p)=>{
                 const id=p.id;
                 const updateDocument=doc(db, "products", id)
@@ -319,16 +346,6 @@ export default {
                 }
                  
             })
-            this.msg.type="success";
-            this.msg.info="Transfer items save successful."          
-             
-            this.isLoading=false;
-            this.isSaving=false;
-            this.voucher_no=new Date().getTime();
-            this.created_at=new Date().toISOString().substr(0, 10)         
-            this.storeItems=[]
-            this.transfer_item={}         
-            this.v$.$reset()
         },
 
        showTime(t){

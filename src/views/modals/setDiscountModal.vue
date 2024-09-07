@@ -86,7 +86,7 @@ export default {
             e.discount=0;           
         },
         
-        calDiscount(){
+        calDiscount(ev){
             const e=this.ei;
             if(e.dis_amount){
                         e.discount=e.dis_amount;

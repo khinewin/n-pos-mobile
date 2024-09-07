@@ -92,7 +92,7 @@
       <!--end modal-->
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
+import {Timestamp, collection, onSnapshot, addDoc, getDocs, doc, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as lib from "@/lib/snapshot/products"
 import * as hp  from "@/lib/helper"
@@ -209,13 +209,13 @@ export default {
       
         async fetchProducts(){
         const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
-        const snapShot=await getDocs(query_url)
-        const products=lib.products(snapShot)       
-        this.productsData=products;
-        this.$store.dispatch("setProducts", products)
-        this.isLoading=false;
-        this.isUpdating=false;
-        this.searchProducts();
+        onSnapshot(query_url, async(snapShot) =>{                  
+                    const products=lib.products(snapShot)       
+                    this.productsData=products;
+                    this.searchProducts();
+                    this.isLoading=false;
+                    this.isUpdating=false;
+            });              
        } ,
        showTime(t){
             return hp.showTime(t)
@@ -227,55 +227,3 @@ export default {
 <style lang="">
     
 </style>
-
- <!--
-                        <div class="card">
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item list-group-item-action bg-secondary-subtle">
-                                        <div class="row">
-                                            <div class="col-lg-3">
-                                                    <div class="small fw-lighter ">Code</div>
-                                            </div>
-                                            <div class="col-lg-5">
-                                                    <div class="small fw-lighter ">Description</div>
-                                            </div>
-                                            <div class="col-lg-1">
-                                                    <div class="small fw-lighter">Qty</div>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <div class="small fw-lighter">Created date</div>
-                                        </div>
-                                            
-                                    </div>
-                                    </li>
-                                 
-                                    <li class="list-group-item" v-if="isLoading">
-                                        <div class="d-flex justify-content-center my-5">
-                                            <div class="spinner-border text-primary"  role="status">
-                                              <span class="visually-hidden">Loading...</span>
-                                            </div>
-                                          </div>
-                                    </li>
-                             
-                                    <li v-if="products.length > 0" class="list-group-item list-group-item-action" v-for="p in products" :key="p.id" >
-                                            <div class="row" @click="setCode(p)" data-bs-dismiss="modal" style="cursor: context-menu;">
-                                                    <div class="col-lg-3 small">
-                                                            <div>{{p.code_no}}</div>
-                                                    </div>
-                                                    <div class="col-lg-5 small">
-                                                            <div>{{p.item_name}}</div>
-                                                    </div>
-                                                    <div class="col-lg-1 small">
-                                                            <div>{{p.qty}}</div>
-                                                    </div>
-                                                    <div class="col-lg-3 small">
-                                                        <div>{{showTime(p.created_at)}}</div>
-                                                    </div>
-                                            </div>
-                                    </li>
-                            </ul>
-                            </div>
-                        </div>
-                    -->
-                            

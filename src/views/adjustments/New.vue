@@ -107,7 +107,7 @@
  import PageHeader from "@/views/partials/PageHeader.vue"
  import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query, increment} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query, increment} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/purchase/ProductModal.vue'
 import * as hp from "@/lib/helper"
@@ -135,10 +135,8 @@ export default {
             location: "Pharmacy",
             adj_item: {},
             storeItems: [],
-            editItem: {},          
-            total_retail_amount:0,
-            total_pur_amount:0,       
-            total_whole_sale_amount:0, 
+            editItem: {},         
+           
             isLoading:false,
             isSaving:false,
             msg : {
@@ -166,10 +164,10 @@ export default {
                },deep:true
            }
     },
-    created() {     
-      
+    created() {           
         this.voucher_no=new Date().getTime();
         this.created_at=new Date().toISOString().substr(0, 10)
+        this.checkDatabase();
     },
     
     methods:{
@@ -242,6 +240,22 @@ export default {
             }
             this.editItem=p;
         },
+        async checkDatabase(){ 
+            const query_url=query(collection(db, "adjustments"));           
+                onSnapshot(query_url, async(snapShot) =>{
+                    snapShot.docChanges().forEach((change) => {    
+                            if(change.type==="added"){
+                                if(change.doc.data().voucher_no==this.voucher_no){
+                                    this.updateProducts();
+                                   // this.printSale();
+                                    this.msg.type="success";
+                                    this.msg.info="The new adjustment items has been saved."   
+                                    this.resetAdjustments(); 
+                                }
+                            }
+                    });                                              
+            });                              
+        } ,
        async saveAdjustment(){
           const validattion = await this.v$.$validate()
           if(!validattion) return false;
@@ -255,14 +269,23 @@ export default {
                 created_at: Timestamp.fromDate(new Date(this.created_at)),    
                 location: this.location,       
                 products : this.storeItems,
-                user : {uid: this.user.uid, email: this.user.email},
-                total_retail_amount:this.total_retail_amount,
-                total_pur_amount:this.total_pur_amount,         
-                total_whole_sale_amount: this.total_whole_sale_amount,
+                user : {uid: this.user.uid, email: this.user.email},              
             }      
             const saveDocument=collection(db, "adjustments")
-            await addDoc(saveDocument, voucher)
-            this.storeItems.map(async (p)=>{
+            await addDoc(saveDocument, voucher)                                
+        },   
+       resetAdjustments(){
+            this.isLoading=false;
+            this.isSaving=false;
+            this.voucher_no=new Date().getTime();
+            this.created_at=new Date().toISOString().substr(0, 10)         
+            this.storeItems=[]
+            this.adj_item=null
+            this.editItem={}           
+            this.v$.$reset()
+       }, 
+       updateProducts(){
+        this.storeItems.map(async (p)=>{
                 const id=p.id;
                 const updateDocument=doc(db, "products", id)
                 if(this.location==="Main"){
@@ -275,21 +298,7 @@ export default {
                  }) 
                 } 
             })
-            this.msg.type="success";
-            this.msg.info="Adjustment save successful."          
-             
-            this.isLoading=false;
-            this.isSaving=false;
-            this.voucher_no=new Date().getTime();
-            this.created_at=new Date().toISOString().substr(0, 10)         
-            this.storeItems=[]
-            this.adj_item=null
-            this.editItem={}
-            this.total_retail_amount=0
-            this.total_pur_amout=0;
-            this.v$.$reset()
-        },   
-       
+       },
         
        showTime(t){
             const date=t.toDate()

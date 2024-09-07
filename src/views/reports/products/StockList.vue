@@ -49,7 +49,7 @@
     </div>
 </template>
 <script>
-    import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore'
+    import {Timestamp, onSnapshot, collection, addDoc, query, where, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore'
     import db from '@/firebase/firestore'
     import * as lib from "@/lib/snapshot/products"
     import * as hp from '@/lib/helper'
@@ -147,19 +147,12 @@
             }else{
                  query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
             }
-            const snapShot=await getDocs(query_url)           
-            if(snapShot._snapshot.docChanges.length <=0){             
-                this.isLoading=false;
-                this.isUpdating=false;
-                return false;
-            }                             
-           else{
-                const products=lib.products(snapShot)
+           onSnapshot(query_url, (snapShot)=>{
+            const products=lib.products(snapShot)
                 this.reports=products;
                 this.isLoading=false;
                 this.filterProduct();
-           }
-           
+           })                                 
        } ,
        sortProducts(sort){   
             this.sort_item=sort;

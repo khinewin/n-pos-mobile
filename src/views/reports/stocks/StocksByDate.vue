@@ -56,7 +56,7 @@
     </div>
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/stocks"
@@ -204,11 +204,12 @@ export default {
             const to_date=Timestamp.fromDate(new Date(this.toDate))
             const query_url = query(collection(db, "openingStocks"), 
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
-            const shapShot=await getDocs(query_url)
-            const stockItems=ss.stocks(shapShot);           
-            this.stocksData=stockItems;
-            this.displayReports();
-            this.isLoading=false;
+            onSnapshot(query_url, (snapShot)=>{
+                const stockItems=ss.stocks(snapShot);           
+                this.stocksData=stockItems;
+                this.displayReports();
+                this.isLoading=false;
+            })           
         }
     }
 }

@@ -57,9 +57,10 @@
     </div>
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper"
+import * as ss from '@/lib/snapshot/purchases'
 export default {
     props:['fromDate', 'toDate','supplier', 'location', 'code_no'],
     components: {
@@ -235,28 +236,13 @@ export default {
                 query_url = query(collection(db, "purchases"),
                 where("pur_date", ">=", from_date), where("pur_date", "<=", to_date), orderBy("pur_date", "desc"));
             }
-            const shapShot=await getDocs(query_url)
-            let purchaseItems=[];
-            shapShot.forEach((doc) => {       
-                let purchase = {
-                    id: doc.id,
-                    uid: doc.data().uid,
-                    voucher_no: doc.data().voucher_no,
-                    products : doc.data().products,
-                    pur_date:doc.data().pur_date,
-                    supplier: doc.data().supplier,                
-                    total_discount: doc.data().total_discount,
-                    total_amount:doc.data().total_amount,
-                    total_price: doc.data().total_price,
-                    extra_discount: doc.data().extra_discount,
-                        
-                };               
-                                
-                purchaseItems.push(purchase);      
-            });
-            this.purchaseData=purchaseItems;
-            this.displayReports();
-            this.isLoading=false;
+            onSnapshot(query_url, (snapShot)=>{
+                const purchaseItems=ss.purchases(snapShot)
+                this.purchaseData=purchaseItems;
+                this.displayReports();
+                this.isLoading=false;
+           })
+           
         },
         showTime(t){
             return hp.showTime(t)

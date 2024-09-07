@@ -68,7 +68,7 @@
     </div>
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp,onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/adjustments"
@@ -177,11 +177,12 @@ export default {
             const to_date=Timestamp.fromDate(new Date(this.toDate))
             const query_url = query(collection(db, "adjustments"),
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
-            const snapShot=await getDocs(query_url)
-            const items=ss.adjustments(snapShot)    
-            this.adjustmentsData=items;
-            this.displayReports();
-            this.isLoading=false;
+           onSnapshot(query_url, (snapShot)=>{
+                const items=ss.adjustments(snapShot)    
+                this.adjustmentsData=items;
+                this.displayReports();
+                this.isLoading=false;
+           })
         }
     }
 }

@@ -72,7 +72,7 @@
      <!--end modal-->
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as ss from "@/lib/snapshot/stocks"
 export default {
@@ -158,14 +158,15 @@ export default {
      
     async fetchStocks(){
        const query_url = query(collection(db, "openingStocks"), orderBy("created_at", "desc"));
-       const snapShot=await getDocs(query_url)
-       const stocks=ss.stocks(snapShot);
-      
+       onSnapshot(query_url, (snapShot)=>{
+        const stocks=ss.stocks(snapShot);      
         this.stocksData=[];
         this.stocksData=stocks;
         this.isLoading=false;
         this.isUpdating=false;
         this.searchStocks();
+       })
+       
       } ,
       showTime(t){
            const date=t.toDate()

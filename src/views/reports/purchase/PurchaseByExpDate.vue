@@ -50,7 +50,7 @@
     </div>
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper.js"
 import * as ss from "@/lib/snapshot/purchases"
@@ -223,11 +223,12 @@ export default {
                 where("pur_date", ">=", prevDate), where("pur_date", "<=", nowDate),
                  orderBy("pur_date", "desc"));     
             }
-            const snapShot=await getDocs(query_url)
-            let purchaseItems=ss.purchases(snapShot)           
-            this.purchaseData=purchaseItems;
-            this.displayReports();
-            this.isLoading=false;
+            onSnapshot(query_url, (snapShot)=>{
+                const purchaseItems=ss.purchases(snapShot)
+                this.purchaseData=purchaseItems;
+                this.displayReports();
+                this.isLoading=false;
+           })
         }
     }
 }

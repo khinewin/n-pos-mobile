@@ -80,7 +80,7 @@
      
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper.js"
 import * as ss from "@/lib/snapshot/purchases"
@@ -270,11 +270,13 @@ export default {
                 query_url = query(collection(db, "purchases"),
                 where("pur_date", ">=", from_date), where("pur_date", "<=", to_date), orderBy("pur_date", "desc"));     
             }
-            const snapShot=await getDocs(query_url)
-            const purchaseItems=ss.purchases(snapShot)
-            this.purchaseData=purchaseItems;
-            this.displayReports();
-            this.isLoading=false;
+           onSnapshot(query_url, (snapShot)=>{
+                const purchaseItems=ss.purchases(snapShot)
+                this.purchaseData=purchaseItems;
+                this.displayReports();
+                this.isLoading=false;
+           })
+            
         }
     }
 }

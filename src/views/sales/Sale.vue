@@ -1,6 +1,6 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="Sale" page-code="sale" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader page-title="Sale" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                            
                 <div class="col-sm-4 lg-md-2 pt-1 ps-4 small">
@@ -90,7 +90,7 @@
                                             <td class="col-1 text-center">
                                                 <input @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext form-control-sm text-center" placeholder="Scan code here">
                                             </td>
-                                            <td class="col-2 text-center pt-2" data-bs-toggle="modal" data-bs-target="#searchCode" style="cursor: context-menu;">
+                                            <td id="description" class="col-2 text-center pt-2" data-bs-toggle="modal" data-bs-target="#searchCode" style="cursor: context-menu;">
                                                 <i class="fa-solid fa-circle-plus"></i> Description
                                             </td>  
                                             <td class="col-1 pt-2 text-center">Packing size</td>                                                                                    
@@ -115,7 +115,7 @@
                                             <td class="pt-2">
                                                 {{calPackingSize(s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit, s.packing_size.medium_qty, s.packing_size.smallest_qty)}}
                                             </td>                                        
-                                            <td class="pt-2 text-end" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                            <td class="pt-2 text-end" id="setQty" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                                 {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
                                             </td>                                            
                                             <td class="p-0">
@@ -126,7 +126,7 @@
                                                     <option  v-for="pu in onlyString(s.packing_size)">{{pu}}</option>
                                                 </select>
                                             </td>
-                                            <td class="pt-2 text-center" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
+                                            <td class="pt-2 text-center" id="setDiscount" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
                                                 <span v-if="s.dis_qty">{{s.dis_qty}}{{s.dis_qty_unit}}</span>
                                                 <span v-if="s.dis_amount">{{s.dis_amount}}$</span>
                                                 <span v-if="s.dis_percent">{{s.dis_percent}}%</span>      
@@ -152,7 +152,7 @@
                                         <tr>
                                             <td colspan="9" class="text-end pt-2">Paid</td>
                                             <td class="text-end p-0">
-                                                <input @click="setInput" @mouseleave="setInput" :disabled="!isNewSale" @keypress.enter="calPaid" @change="calPaid" @keyup="calPaid" type="number" v-model="paid" class="form-control-plaintext form-control-sm text-end m-0">
+                                                <input @click="setInput" @mouseleave="setInput" :disabled="!isNewSale" @keypress.enter="saveSale" @change="calPaid" @keyup="calPaid" type="number" v-model="paid" class="form-control-plaintext form-control-sm text-end m-0">
                                             </td>
                                         </tr>
                                         <tr>
@@ -175,68 +175,7 @@
         <!--Pritn item start-->
         <div class="d-none" id="printMe" v-if="saleItems.length > 0" >
                 <Print :data="printData" />
-        </div>
-        <!-- print item end-->
-
-         <!-- pur price Modal 
-         <div class="modal fade" id="setQtyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog modal-sm">
-            <div class="modal-content">               
-                <div class="modal-body p-2">
-                    <div class="row text-end mb-2">                       
-                        <div class="col-6">
-                            <button type="button" class="btn btn-sm" @click="setSaleQty" id="setSaleBtn"  data-bs-dismiss="modal">
-                                <span ><i class="fa-solid fa-hard-drive"></i> Save</span>
-                            </button>
-                        </div>
-                        <div class="col-6">
-                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button>
-                        </div>
-                    </div>
-                    <div>
-                        <table class="table table-bordered" v-if="Object.keys(editItem).length">
-                            <tbody>
-                                <tr>
-                                    <td colspan="2" class="p-2 text-center">{{editItem.item_name}}</td>
-                                </tr>
-                                <tr v-if="editItem.packing_size.largest_unit">
-                                    <td class="p-0">
-                                        <input @keyup="checkEditQty" @keypress.enter="pressSetSaleQty"  type="number" v-model="editItem.input_l_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="p-0">
-                                        <select  class="form-control-plaintext form-control-sm text-center" v-model="editItem.sale_l_unit">
-                                                <option selected>{{editItem.packing_size.largest_unit}}</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="p-0">
-                                        <input @keyup="checkEditQty" @keypress.enter="pressSetSaleQty" type="number" v-model="editItem.input_m_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="p-0">
-                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.sale_m_unit">
-                                                <option selected>{{editItem.packing_size.medium_unit}}</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="p-0">
-                                        <input @keyup="checkEditQty" @keypress.enter="pressSetSaleQty" type="number" v-model="editItem.input_s_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="p-0">
-                                        <select class="form-control-plaintext form-control-sm text-center" v-model="editItem.sale_s_unit">
-                                                <option selected>{{editItem.packing_size.smallest_unit}}</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>                
-            </div>
-            </div>
-        </div>
-    -->
+        </div>       
         <setQtyModal @setQty="setSaleQty" :ei="editItem" />
         <setDiscountModal @saveDiscount="saveDiscount" :ei="editItem" />
 
@@ -246,7 +185,7 @@
  import PageHeader from "@/views/partials/PageHeader.vue"
  import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {Timestamp, collection, addDoc, doc, increment,  updateDoc, query, where, orderBy, getDocs} from 'firebase/firestore'
+import {disableNetwork, Timestamp, collection, addDoc, doc, increment,  updateDoc, onSnapshot, query, where, orderBy, getDocs} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 //import Products from "@/views/sales/Products.vue"
 import SalesModal from "@/views/modals/sales/SalesModal.vue"
@@ -285,6 +224,7 @@ export default {
             customer: {},
             code_no:"",
             products:[],
+            isOffline: false,
             customerData: {
                 id: 123456669,
                 code: 123456669,
@@ -306,6 +246,14 @@ export default {
                 sale_date: {required}
             }
     },
+    updated(){
+        const desc=document.querySelector("#description")
+        const qty=document.querySelector("#setQty")
+        const discount=document.querySelector("#setDiscount")
+        const closeBtn=document.querySelector(".close")
+
+       
+    },
     mounted() {
         this.voucher_no=new Date().getTime();
         this.sale_date=new Date().toISOString().substr(0, 10)    
@@ -315,7 +263,11 @@ export default {
         const code_no=document.getElementById("code_no");
         code_no.focus();
        }, 300)
+      // await disableNetwork(db)
+     this.checkDatabase();
+   
     },
+  
     watch:{
         msg:{
             handler(val){
@@ -347,10 +299,7 @@ export default {
         }
     },
     methods:{
-        pressSetSaleQty(){
-            const btn=document.getElementById("setSaleBtn");
-            btn.click();
-        },
+       
         setCodeOnPaste(){
             setTimeout(()=>{                
             const item=this.products.filter((f)=>f.code_no==this.code_no);
@@ -361,10 +310,12 @@ export default {
             },200)
         },
         async fetchProducts(){
-        const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
-        const snapShot=await getDocs(query_url)
-        const products=ss.products(snapShot)       
-        this.products=products;
+            const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
+            onSnapshot(query_url, async(snapShot) =>{
+                    const isLocal=snapShot.metadata.fromCache;                  
+                    const products=ss.products(snapShot)       
+                    this.products=products;                  
+            });              
        } ,
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
@@ -421,11 +372,12 @@ export default {
                     if(f.id===e.id){
                         f.sale_qty=sale_qty,
                         f.input_l_qty =e.input_l_qty ? e.input_l_qty : 0,
-                        f.input_m_qty= e.input_m_qty ? e.input_m_qty : 0,
-                        f.input_s_qty= e.input_s_qty  ? e.input_s_qty  : 0
+                        f.input_m_qty= e.input_m_qty ? e.input_m_qty : 0
+                        f.input_s_qty= e.input_s_qty  ? e.input_s_qty  : 0;
+                        f.qty_sale_price_unit=e.input_l_qty ? e.packing_size.largest_unit : e.input_m_qty ? e.packing_size.medium_unit : e.packing_size.smallest_unit ;
                     }
                }) &&
-               e.qty_sale_price ? this.calEdit() : null;
+                this.calEdit();
         },
      
         setEdit(i){
@@ -464,33 +416,7 @@ export default {
                             amount=Math.floor(f.qty_sale_price  * f.sale_qty)
                        }    
                         f.amount=amount;
-                        f.final_amount=f.discount ? amount - f.discount : amount;
-
-                        /*
-                       let smallest_price=0;
-                       let medium_price=0;
-                       let largest_price=0; 
-                       if(sale_unit=="largest_unit"){
-                           smallest_price=Math.floor((f.qty_sale_price / (f.packing_size.medium_qty * f.packing_size.smallest_qty)))
-                           medium_price=smallest_price * f.packing_size.smallest_qty
-                           largest_price=medium_price * f.packing_size.medium_qty
-                       }else if(sale_unit=="medium_unit"){
-                            smallest_price=Math.floor((f.qty_sale_price / f.packing_size.smallest_qty))
-                            medium_price=smallest_price * f.packing_size.smallest_qty
-                            largest_price=medium_price * f.packing_size.medium_qty
-                       }else if(sale_unit=="smallest_unit"){
-                            smallest_price=Math.floor(f.qty_sale_price)
-                            medium_price=smallest_price * f.packing_size.smallest_qty
-                            largest_price=medium_price * f.packing_size.medium_qty
-                       }    
-
-                       const retail_price={
-                            largest_unit : largest_price,
-                            medium_unit: medium_price,
-                            smallest_unit: smallest_price
-                       }
-                       f.retail_price=retail_price;
-                      */
+                        f.final_amount=f.discount ? amount - f.discount : amount;                  
                    
                 }
             }) && this.calTotal();
@@ -523,7 +449,6 @@ export default {
         },
         printSale(){         
            this.print();      
-           this.clearSaleItem();
         },
         changeCustomer(){
            this.setCustomer(this.customerData)
@@ -550,45 +475,64 @@ export default {
             this.customer.name=s.customer.name;
             this.customer.phone=s.customer.phone;
         },
+        async checkDatabase(){ 
+            const query_url=query(collection(db, "sales"));           
+                onSnapshot(query_url, async(snapShot) =>{
+                    snapShot.docChanges().forEach((change) => {        
+                            if(change.type==="added"){
+                                if(change.doc.data().voucher_no==this.voucher_no){
+                                    this.updateProducts();
+                                   // this.printSale();
+                                    this.msg.type="success";
+                                    this.msg.info="The sale is complete."   
+                                    this.clearSaleItem(); 
+                                }
+                            }
+                    });                                              
+            });                              
+        } ,
         async saveSale(){                  
-        const validattion = await this.v$.$validate()
-          if(!validattion) return false;
-          if(this.saleItems.length <=0) return false;
-            this.isLoading=true;
-            this.msg.type="";
-            this.msg.info="";
+            const validattion = await this.v$.$validate()
+            if(!validattion) return false;
+            if(this.saleItems.length <=0) return false;
+            const isNotReady= this.saleItems.filter((f)=>!f.final_amount)
+            if(isNotReady.length) return false;
+            
+                this.isLoading=true;
+                this.msg.type="";
+                this.msg.info="";
+
+                 let date=new Date();
+                let sale_date=new Date(this.sale_date)
+                sale_date.setHours(date.getHours())
+                sale_date.setMinutes(date.getMinutes())
         
-            const voucher={
-                voucher_no: this.voucher_no,
-                sale_date: Timestamp.fromDate(new Date(this.sale_date)),
-                products : this.saleItems,
-                user : {uid: this.user.uid, email: this.user.email},
-                total_amount:this.total_amount,
-                extra_discount:this.extra_discount,
-                net_amount: this.net_amount,
-                paid: this.paid,
-                change:this.change,
-                sale_type:this.sale_type,
-                customer : this.customer,
-            }                  
-            const saveDocument=collection(db, "sales")
-            await addDoc(saveDocument, voucher)
+                const voucher={
+                    voucher_no: this.voucher_no,
+                    sale_date: Timestamp.fromDate(sale_date),
+                    products : this.saleItems,
+                    user : {uid: this.user.uid, email: this.user.email},
+                    total_amount:this.total_amount,
+                    extra_discount:this.extra_discount,
+                    net_amount: this.net_amount,
+                    paid: this.paid,
+                    change:this.change,
+                    sale_type:this.sale_type,
+                    customer : this.customer,
+                }                  
+                const saveDocument=collection(db, "sales")
+                await addDoc(saveDocument, voucher)     
+                        
+        },
+        updateProducts(){
             this.saleItems.map(async (p)=>{
-                const id=p.id;
-                const sale_qty=p.sale_qty;               
-                const updateDocument=doc(db, "products", id)
-                await updateDoc(updateDocument, {
-                    qty : increment(-sale_qty)
-                 })    
-            })
-            this.msg.type="success";
-            this.msg.info="Sale successful."          
-             
-            this.isLoading=false;
-           
-            this.printSale();
-            this.v$.$reset()
-            this.fetchProducts();
+                    const id=p.id;
+                    const sale_qty=p.sale_qty;               
+                    const updateDocument=doc(db, "products", id)
+                    await updateDoc(updateDocument, {
+                        qty : increment(-sale_qty)
+                    })    
+                })
         },
         clearSaleItem(){
                 this.editItem={},
@@ -603,6 +547,9 @@ export default {
                 this.voucher_no=new Date().getTime();
                 this.sale_date=new Date().toISOString().substr(0, 10)            
                 this.setCustomer(this.customerData)
+                this.isLoading=false;
+                this.v$.$reset()
+
         },
         removeSaleItem(i){
             this.saleItems.splice(i, 1)

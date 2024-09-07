@@ -84,10 +84,10 @@
     </div>
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper"
-import * as ss from "@/lib/snapshot/stocks"
+import * as ss from "@/lib/snapshot/transfers"
 export default {
     props:['fromDate', 'toDate', 'voucher_no', 'from_location', 'to_location'],
     components: {
@@ -168,10 +168,12 @@ export default {
             where("from_location", "==", this.from_location), where("to_location", "==", this.to_location), 
             orderBy("created_at", "desc"));
             }
-            const snapShot=await getDocs(query_url)
-            const stockItems=ss.stocks(snapShot);                     
-            this.reports=stockItems;
-            this.isLoading=false;
+            onSnapshot(query_url, (snapShot)=>{
+                const items=ss.transfers(snapShot);           
+                this.reports=items;
+                this.isLoading=false;
+            })
+          
         }
     }
 }

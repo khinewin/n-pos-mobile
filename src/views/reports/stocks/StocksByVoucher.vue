@@ -78,7 +78,7 @@
     </div>
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/stocks"
@@ -163,31 +163,29 @@ export default {
              query_url = query(collection(db, "openingStocks"),  
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
             }
-            const snapShot=await getDocs(query_url)
-            let stockItems=ss.stocks(snapShot);  
-           
-            if(this.code_no){            
-                stockItems=stockItems.map((st)=>{
-                    const data=st.products.filter((f)=>{
-                        return f.code_no==this.code_no
+            onSnapshot(query_url, (snapShot)=>{ //all on snapshot
+                let stockItems=ss.stocks(snapShot);                          
+                if(this.code_no){            
+                    stockItems=stockItems.map((st)=>{
+                        const data=st.products.filter((f)=>{
+                            return f.code_no==this.code_no
+                        })
+                        return {...st, products : data}
                     })
-                    return {...st, products : data}
-                })
-            }
+                }
+                stockItems=stockItems.map((i)=>{
+                    let retail_amount=0;
+                    let whole_sale_amount=0;
+                    i.products.map((rep)=>{
+                        retail_amount +=this.location=="All" ? (rep.qty + rep.main_qty) * rep.retail_price.smallest_unit : this.location=="Main" ? rep.main_qty * rep.retail_price.smallest_unit : rep.qty * rep.retail_price.smallest_unit ;
+                        whole_sale_amount += this.location=="All" ? rep.whole_sale_price.smallest_unit * (rep.qty + rep.main_qty) : this.location=="Main" ? rep.whole_sale_price.smallest_unit *rep.main_qty : rep.whole_sale_price.smallest_unit *rep.qty;
 
-            stockItems=stockItems.map((i)=>{
-                let retail_amount=0;
-                let whole_sale_amount=0;
-                i.products.map((rep)=>{
-                    retail_amount +=this.location=="All" ? (rep.qty + rep.main_qty) * rep.retail_price.smallest_unit : this.location=="Main" ? rep.main_qty * rep.retail_price.smallest_unit : rep.qty * rep.retail_price.smallest_unit ;
-                    whole_sale_amount += this.location=="All" ? rep.whole_sale_price.smallest_unit * (rep.qty + rep.main_qty) : this.location=="Main" ? rep.whole_sale_price.smallest_unit *rep.main_qty : rep.whole_sale_price.smallest_unit *rep.qty;
-
-                })
-                return {...i, retail_amount: retail_amount, whole_sale_amount: whole_sale_amount}
-            })           
-            this.reports=stockItems; 
-
-            this.isLoading=false;
+                    })
+                    return {...i, retail_amount: retail_amount, whole_sale_amount: whole_sale_amount}
+                })           
+                this.reports=stockItems; 
+                this.isLoading=false;
+            })//all on snapshot
         }
     }
 }

@@ -200,8 +200,8 @@
                                         </td>
                                         <td colspan="3" class="p-0 text-end">
                                             <button class="btn btn-sm" @click="savePrice">                     
-                                            <span v-if="!isSavingEdit"><i class="fa-solid fa-hard-drive"></i> Save</span>
-                                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSavingEdit"></span>
+                                            <span v-if="!isSavePrice"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSavePrice"></span>
                                              </button>
                                         </td>
                                     </tr>
@@ -221,7 +221,7 @@
 import PageHeader from "@/views/partials/PageHeader.vue"
 import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {Timestamp, collection, addDoc, query, where, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore'
+import {Timestamp,onSnapshot, collection, addDoc, query, where, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import Footer from '@/views/partials/Footer.vue'
 import * as ss from "@/lib/snapshot/products"
@@ -257,7 +257,7 @@ export default {
             editItem:{},
             isUpdating:false,
             isSaving:false,
-            isSavingEdit:false,
+            isSavePrice:false,
             isDeleting:false,
             selected_items:[],
             auto_cal:true,
@@ -276,6 +276,7 @@ export default {
     mounted() {
         const code_no=document.getElementById("search_by_code");
         code_no.focus();
+        this.checkDatabase();
        
     },
     computed:{
@@ -296,7 +297,7 @@ export default {
                     setTimeout(()=>{
                         this.msg.type="";
                         this.msg.info="";
-                    }, 5000)
+                    }, 3000)
                 }
             },deep:true
         }
@@ -312,6 +313,8 @@ export default {
             },300)
         },
         async saveEdit(){
+            const item=this.products.filter((f)=>f.id==this.editItem.id)
+            this.editItem=item[0]
             const updateDocument=doc(db, "products", this.editItem.id)
                 await updateDoc(updateDocument, {
                     item_name : this.editItem.item_name,
@@ -332,10 +335,7 @@ export default {
             const cf=confirm(`Are you sure ? delete the product code : ${p.item_name} `)
             if(!cf) return false;
             const document=doc(db, "products", p.id)     
-            await deleteDoc(document) //if no items delete document;
-            this.fetchProducts();  
-            this.msg.type="success";
-            this.msg.info="Product code delete successful"
+            await deleteDoc(document)      
         },
         async saveCode(){
             this.saveEdit();
@@ -344,11 +344,11 @@ export default {
             this.isSaving=true;
             const save_time=Timestamp.fromDate(new Date());
             const dataCollection=collection(db, "products", )
-            const code_no=this.code_no ? this.code_no : new Date().getTime()
+            this.code_no=this.code_no ? this.code_no : new Date().getTime()
             const data={
                 user: {uid:this.user.uid, email:this.user.email},
                 item_name: this.item_name, 
-                code_no : code_no,
+                code_no : this.code_no,
                 qty : 0,
                 retail_price: {},
                 whole_sale_price: {},
@@ -356,15 +356,9 @@ export default {
                 pur_price: {},
                 main_qty:0,
             }
-            const result=await addDoc(dataCollection, data);
-            if(result){
-                this.msg.type="success";
-                this.msg.info="Product code save successful."
-            }else{
-                this.msg.type="error";
-                this.msg.info="Product code save failed."
-            }
-            this.fetchProducts();
+            const result=await addDoc(dataCollection, data);                    
+        },
+        resetInput(){            
             this.item_name="";
             this.code_no="";
             this.v$.$reset()
@@ -375,7 +369,6 @@ export default {
             this.fetchProducts();
         },
        async savePrice(){
-        this.isSavingEdit=true;
             const updateDocument=doc(db, "products", this.editItem.id)
                 await updateDoc(updateDocument, {
                     pur_price: this.editItem.pur_price,
@@ -383,7 +376,6 @@ export default {
                     whole_sale_price: this.editItem.whole_sale_price,
                     auto_cal: this.editItem.auto_cal,
                  })  
-            this.isSavingEdit=false;
         },
 
         calRetailPrice(unit){
@@ -430,23 +422,39 @@ export default {
                 this.setEdit(0)
             }
         },
-      
+        async checkDatabase(){ 
+            const query_url=query(collection(db, "products"), orderBy("created_at", "desc"));           
+                onSnapshot(query_url, async(snapShot) =>{
+                    snapShot.docChanges().forEach((change) => {        
+                            if(change.type==="added"){
+                                if(change.doc.data().code_no==this.code_no){
+                                    this.msg.info="The medicine code has been added"
+                                    this.msg.type="success"
+                                    this.resetInput();    
+                                }
+                            }
+                            if(change.type==="modified"){
+                                this.msg.type="success";
+                                this.msg.info="The medicine code has been updated"  
+                                this.isSavePrice=false;
+                            }
+                            if(change.type==="removed"){
+                                this.msg.type="success";
+                                this.msg.info="Medicine code has been deleted"  
+                            }
+                    });                 
+            });                              
+        } ,
         async fetchProducts(){                    
             const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
-            const snapShot=await getDocs(query_url)        
-            this.products=[];   
-            if(snapShot._snapshot.docChanges.length <=0){
-                this.msg.type='error' 
-                this.msg.info='Oops..., no data found !'
+            onSnapshot(query_url, async(snapShot) =>{
+                const products=ss.products(snapShot);            
+                this.productsData=products;
+                this.searchProducts();
                 this.isLoading=false;
                 this.isUpdating=false;
-            }
-            const products=ss.products(snapShot);            
-            this.productsData=products;
-            this.searchProducts();
-            //this.products=products;
-            this.isLoading=false;
-            this.isUpdating=false;
+            })
+           
        } ,
     }
 }

@@ -5,6 +5,10 @@
             <span v-if="msgType=='success'"><i class="fa-solid fa-check"></i> </span>
            <span class="ms-2"> {{msgInfo}}</span>
         </span>
+        <span v-if="isOffline" class="position-fixed start-0 top-0  z-3 alert alert-secondary text-danger" role="alert">
+            <span><i class="fa-solid fa-triangle-exclamation"></i> </span>
+           <span class="ms-2"> {{isOffline}}</span>
+        </span>
    
     <LeftSidebar />
     <Navbar />  
@@ -31,7 +35,7 @@
     import { enableNetwork, disableNetwork } from "firebase/firestore"; 
 
 export default {
-    props: ['pageTitle', 'pageCode', 'msgType', 'msgInfo'],
+    props: ['pageTitle', 'isOffline', 'msgType', 'msgInfo',],
     components : {
         LeftMenuBtn, RightSidebar, LeftSidebar, Navbar
     },

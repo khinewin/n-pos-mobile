@@ -101,7 +101,7 @@
      <!--end modal-->
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/transfers"
@@ -195,13 +195,13 @@ export default {
      
     async fetchTransfers(){
        const query_url = query(collection(db, "transfers"),  orderBy("created_at", "desc"));
-       const snapShot=await getDocs(query_url)
-       const transfers=ss.transfers(snapShot);      
-       this.transfersData=transfers;
-     //  this.$store.dispatch("setProducts", products)
-       this.isLoading=false;
-       this.isUpdating=false;
-       this.searchTransfers();
+       onSnapshot(query_url, (snapShot)=>{
+        const transfers=ss.transfers(snapShot);      
+        this.transfersData=transfers;
+        this.isLoading=false;
+        this.isUpdating=false;
+        this.searchTransfers();
+       })      
       } ,
       showTime(t){
           return hp.showTime(t)

@@ -7,16 +7,55 @@ const groupBy = keys => array =>
 
 const showTime=(t)=>{
     const date=t.toDate()
-    const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+    const options = { year: 'numeric', month: 'numeric', day: 'numeric'};
     const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
     return formattedDate;
 };
+
+const showTimeShort=(t)=>{
+    const date=t.toDate()
+    const options = { year: '2-digit', month: 'numeric', day: 'numeric'};
+    const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
+    return formattedDate;
+};
+const showTimeHour=(t)=>{
+    const date=t.toDate()
+    const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', hourCycle: "h12", minute: '2-digit' };
+    const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
+    return formattedDate;
+};
+const showTimeHourShort=(t)=>{
+    const date=t.toDate()
+    const options = { year: '2-digit', month: 'numeric', day: 'numeric', hour: '2-digit', hourCycle: "h12", minute: '2-digit' };
+    const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
+    return formattedDate;
+};
+
+const g_code=()=>{
+        const d=new Date();
+        //return `${d.getFullYear().toString().substring(2)}${(d.getMonth()+1)}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}`
+        return (new Date().getTime());
+}
+const setAutoFocus=(id)=>{
+    const input=document.getElementById(id)
+    input.focus();
+}
+
 
 const displayPrice=(l_unit, m_unit, s_unit)=>{
     if(l_unit){
         return `${l_unit} * ${m_unit} * ${s_unit}`
     }else{
         return `${m_unit} * ${s_unit}`
+    }
+}
+const  message=(type, name)=>{
+    if(type=="added"){
+        return `New ${name} has been added`                            
+    }else if(type=="modified"){
+        return `The ${name} has been updated` 
+    }else if(type=="removed"){
+        return `The selected ${name} has been removed`
     }
 }
 
@@ -87,5 +126,10 @@ export   {
     calPackingQty,
     calPackingSize,
     displayPrice,
-    
+    showTimeHour,
+    showTimeHourShort,
+    showTimeShort,
+    g_code,
+    setAutoFocus,
+    message,
     };

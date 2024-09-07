@@ -55,7 +55,7 @@
         </div>
 </template>
 <script>
-    import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+    import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
     import db from '@/firebase/firestore'
     import * as ss from "@/lib/snapshot/purchases"
     import * as hp from "@/lib/helper"
@@ -153,10 +153,11 @@
                 const last_day_month=Timestamp.fromDate(new Date(theLast))
                 const query_url=query(collection(db, "purchases"),  
                 where("pur_date", ">=", first_day_month), where("pur_date", "<=", last_day_month), orderBy("pur_date"));            
-                const snapShot=await getDocs(query_url)
-                let saleItems=ss.purchases(snapShot);           
-                this.purchaseYearlyData=saleItems;
-                this.monthlyPurchaseReport();
+                onSnapshot(query_url,(snapShot)=>{
+                    let saleItems=ss.purchases(snapShot);           
+                    this.purchaseYearlyData=saleItems;
+                    this.monthlyPurchaseReport();
+                })
            },
            editShowTime(t){
                 const formattedDate = new Date(t).toISOString().substr(0, 10)

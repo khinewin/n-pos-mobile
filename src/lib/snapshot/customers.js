@@ -1,15 +1,16 @@
 const customers=(arr)=>{
     let customerItems=[];
-     arr.forEach((doc) => {         
+     arr.forEach((doc) => {      
+        const data=doc.data();   
         let cus = {
             id: doc.id,
-            user: doc.data().user,
-            name: doc.data().name,
-            purchase_price : doc.data().purchase_price,
-            address : doc.data().address,
-            created_at: doc.data().created_at,
-            phone : doc.data().phone,
-            code : doc.data().code,                                
+            user: data.user,
+            name: data.name,
+            address : data.address,
+            created_at: data.created_at,
+            phone : data.phone,
+            code : data.code,      
+            edit_user:  null  
         };                                
         customerItems.push(cus);                                              
     });

@@ -97,7 +97,7 @@
      <!--end modal-->
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/purchases"
@@ -184,13 +184,14 @@ export default {
      
     async fetchPurchase(){
        const query_url = query(collection(db, "purchases"),  orderBy("pur_date", "desc"));
-       const snapShot=await getDocs(query_url)
-       const purchases=ss.purchases(snapShot);      
-       this.purchasesData=purchases;
-     //  this.$store.dispatch("setProducts", products)
-       this.isLoading=false;
-       this.isUpdating=false;
-       this.searchPurchases();
+       onSnapshot(query_url, (snapShot)=>{
+            const purchases=ss.purchases(snapShot);      
+            this.purchasesData=purchases;
+            this.isLoading=false;
+            this.isUpdating=false;
+            this.searchPurchases();
+       })
+      
       } ,
       showTime(t){
           return hp.showTime(t)
