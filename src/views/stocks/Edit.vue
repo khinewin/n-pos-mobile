@@ -276,7 +276,7 @@ export default {
                                 if(change.doc.data().voucher_no==this.voucher_no){
                                    // this.printSale();
                                     this.msg.type="success";
-                                    this.msg.info="The opening stocks has been updated."   
+                                    this.msg.info=hp.message(change.type, "opening stock")    
                                     this.isLoading=false;
                                 }
                             }

@@ -293,7 +293,7 @@ export default {
                                     this.updateProducts();
                                    // this.printSale();
                                     this.msg.type="success";
-                                    this.msg.info="The new transfer items  has been saved."   
+                                    this.msg.info=hp.message(change.type, "transfer")
                                     this.resetTransfer(); 
                                 }
                             }
@@ -312,7 +312,7 @@ export default {
                 voucher_no: this.voucher_no,
                 created_at: Timestamp.fromDate(new Date(this.created_at)),           
                 products : this.storeItems,
-                user : {uid: this.user.uid, email: this.user.email},
+                user : {uid: this.user.uid, displayName: this.user.displayName},
                 from_location: this.from_location,
                 to_location: this.to_location,                     
             }      

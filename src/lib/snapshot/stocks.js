@@ -7,6 +7,7 @@ const stocks=(arr)=>{
             voucher_no: doc.data().voucher_no,
             created_at : doc.data().created_at,          
             products : doc.data().products,    
+            edit_user: null,
           /*  total_retail_amount:doc.data().total_retail_amount,
             total_whole_sale_amount: doc.data().total_whole_sale_amount,    
             total_main_retail_amount:doc.data().total_main_retail_amount,

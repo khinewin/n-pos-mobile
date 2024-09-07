@@ -15,7 +15,7 @@ const products=(snapShot)=>{
             whole_sale_price : data.whole_sale_price ? data.whole_sale_price : {},
             pur_price : data.pur_price ? data.pur_price : {},
             auto_cal: data.auto_cal ? data.auto_cal : false,
-
+            edit_user:null,
         };                                
         products.push(product);                           
     });

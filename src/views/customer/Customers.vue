@@ -77,13 +77,13 @@
                                                 {{p.code}}
                                             </td>
                                            <td :class="{'table-secondary': sort_item ==='name'}" class="p-0">
-                                                <input  @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center   m-0" v-model="p.name">
+                                                <input @keyup="setEdit(p)"  @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center   m-0" v-model="p.name">
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='phone'}" class="p-0">
-                                            <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center  m-0" v-model="p.phone">
+                                            <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center  m-0" v-model="p.phone">
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='address'}" class="p-0">
-                                            <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center m-0" v-model="p.address">
+                                            <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center m-0" v-model="p.address">
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='created_at'}" class="pt-2">{{showTime(p.created_at)}}</td>
                                        </tr>
@@ -220,14 +220,12 @@ import { required, email ,helpers} from '@vuelidate/validators'
                this.isUpdating=true;
                this.fetchCustomer();
         },
-          async saveEdit(){
-                const item=this.customers.filter((f)=>f.id==this.editItem.id)
-                this.editItem={...item[0], edit_user:  {uid:this.user.uid, type: "modified"},}
+          async saveEdit(){               
                const updateDocument=doc(db, "customers", this.editItem.id)
                 await updateDoc(updateDocument,this.editItem)  
            },
            setEdit(p){
-               this.editItem=p
+               this.editItem={...p, edit_user: {uid: this.user.uid, type: "modified"}}
            },
            clearSearch(){
                this.search_by_code="";

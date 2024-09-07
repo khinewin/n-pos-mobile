@@ -30,11 +30,11 @@
                                 </div>
                             </div> 
                              <div class="row  mt-2">
-                                    <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="searchProducts"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
-                                    <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateProducts"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
+                                    <div class="col-6 d-grid"><button class="btn btn-sm text-dark" @click="searchProducts"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
+                                    <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateProducts"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
-                                    </button></div>
-                                    <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
+                                    </button></div>-->
+                                    <div class="col-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
                              </div> 
                         </div>
                     </div>                                                                                                          
@@ -50,20 +50,20 @@
                                                 <input placeholder="Code"  type="text" v-model="code_no" class="form-control-plaintext form-control-sm  text-center">
                                             </td>
                                             <td>
-                                                <input placeholder="Description" @keypress.enter="saveCode" :class="{'border-danger' : v$.item_name.$errors.length}"  type="text" v-model="item_name" class="form-control-plaintext form-control-sm ">
+                                                <input id="item_name" placeholder="Description" @keypress.enter="saveCode" :class="{'border-danger' : v$.item_name.$errors.length}"  type="text" v-model="item_name" class="form-control-plaintext form-control-sm ">
                                             </td>                                     
                                         </tr>     
                                                                 
-                                    <tr class="text-center"  v-if="products.length > 0"  v-for="(p, i) in products" :key="p.id" @click="setEdit(i)" :class="{'table-secondary' : editItem.id === p.id}">                                    
+                                    <tr class="text-center"  v-if="products.length > 0"  v-for="(p, i) in products" :key="p.id" @click="setEdit(p)" :class="{'table-secondary' : editItem.id === p.id}">                                    
                                         <td :class="{'table-secondary': sort_item ==='code_no'}" class="p-0 col-1 position-relative">
                                             <a class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeProduct(i, p)"><i class="fa-solid fa-square-minus"></i></a>                                                                                       
                                             <span>
-                                                <input @keypress.enter="saveEdit" @paste="pasteEdit" type="text" class="form-control-plaintext form-control-sm text-center " v-model="p.code_no">
+                                                <input @keyup="setEdit(p)" @keypress.enter="saveEdit" @paste="pasteEdit" type="text" class="form-control-plaintext form-control-sm text-center " v-model="p.code_no">
                                             </span>
                                         </td>
                                         <td :class="{'table-secondary': sort_item ==='item_name'}" class="p-0 col-2">
                                             <span>
-                                                <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext form-control-sm ms-2" v-model="p.item_name">
+                                                <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext form-control-sm ms-2" v-model="p.item_name">
                                             </span>
                                         </td>                                       
                                     </tr>
@@ -139,17 +139,17 @@
                                         <td class="pt-2">Pur price</td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                            <input :disabled="!editItem.packing_size.largest_unit" @keyup="calPurPrice('largest_unit')" type="number" v-model="editItem.pur_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
+                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calPurPrice('largest_unit')" type="number" v-model="editItem.pur_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                            <input :disabled="!editItem.packing_size.medium_unit"  @keyup="calPurPrice('medium_unit')"  type="number" v-model="editItem.pur_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
+                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.medium_unit"  @keyup="calPurPrice('medium_unit')"  type="number" v-model="editItem.pur_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                                <input :disabled="!editItem.packing_size.smallest_unit" @keyup="calPurPrice('smallest_unit')" type="number" v-model="editItem.pur_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
+                                                <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.smallest_unit" @keyup="calPurPrice('smallest_unit')" type="number" v-model="editItem.pur_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>                                        
                                     </tr>
@@ -157,17 +157,17 @@
                                         <td class="pt-2">Retail price</td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                            <input :disabled="!editItem.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="editItem.retail_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
+                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="editItem.retail_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                            <input :disabled="!editItem.packing_size.medium_unit"  @keyup="calRetailPrice('medium_unit')"  type="number" v-model="editItem.retail_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
+                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.medium_unit"  @keyup="calRetailPrice('medium_unit')"  type="number" v-model="editItem.retail_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                                <input :disabled="!editItem.packing_size.smallest_unit" @keyup="calRetailPrice('smallest_unit')" type="number" v-model="editItem.retail_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
+                                                <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.smallest_unit" @keyup="calRetailPrice('smallest_unit')" type="number" v-model="editItem.retail_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>                                        
                                     </tr>
@@ -175,17 +175,17 @@
                                         <td class="pt-2">Wholesale price</td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                            <input :disabled="!editItem.packing_size.largest_unit" @keyup="calWholesalePrice('largest_unit')" type="number" v-model="editItem.whole_sale_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
+                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calWholesalePrice('largest_unit')" type="number" v-model="editItem.whole_sale_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                            <input :disabled="!editItem.packing_size.medium_unit"  @keyup="calWholesalePrice('medium_unit')"  type="number" v-model="editItem.whole_sale_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
+                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.medium_unit"  @keyup="calWholesalePrice('medium_unit')"  type="number" v-model="editItem.whole_sale_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>
                                         <td class="text-center p-0">
                                             <span v-if="Object.keys(editItem.packing_size).length > 0">
-                                                <input :disabled="!editItem.packing_size.smallest_unit" @keyup="calWholesalePrice('smallest_unit')" type="number" v-model="editItem.whole_sale_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
+                                                <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.smallest_unit" @keyup="calWholesalePrice('smallest_unit')" type="number" v-model="editItem.whole_sale_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
                                             </span>
                                         </td>                                        
                                     </tr>                                              
@@ -213,7 +213,7 @@
             </div>
         </div>
         <PackingSizeModal />
-        <SelectPackingSizeModal @setPackingSize="setPackingSize" />
+        <SelectPackingSizeModal @setPackingSize="setPackingSize" :ei="editItem" />
 </div>   
  
 </template>
@@ -268,14 +268,13 @@ export default {
         }
     },
     created() {     
-        if(this.user !==null){
-            this.isLoading=true;
-            this.fetchProducts();
-        }
+      
     },
     mounted() {
         const code_no=document.getElementById("search_by_code");
         code_no.focus();
+        this.isLoading=true;
+        this.fetchProducts();
         this.checkDatabase();
        
     },
@@ -285,12 +284,7 @@ export default {
         }
     },
     watch:{
-        user(data){
-            if(data !==null){
-                this.isLoading=true;
-                this.fetchProducts();
-            }
-        },
+       
         msg:{
             handler(val){
                 if(val.type){
@@ -312,14 +306,9 @@ export default {
                 this.saveEdit();
             },300)
         },
-        async saveEdit(){
-            const item=this.products.filter((f)=>f.id==this.editItem.id)
-            this.editItem=item[0]
+        async saveEdit(){           
             const updateDocument=doc(db, "products", this.editItem.id)
-                await updateDoc(updateDocument, {
-                    item_name : this.editItem.item_name,
-                    code_no: this.editItem.code_no,                  
-                 })  
+                await updateDoc(updateDocument, this.editItem)  
         },
         setPackingSize(p){
             this.editItem.packing_size=p;
@@ -328,17 +317,23 @@ export default {
         async savePackingSize(){
             const updateDocument=doc(db, "products", this.editItem.id)
                 await updateDoc(updateDocument, {
-                    packing_size : this.editItem.packing_size,                  
+                    packing_size : this.editItem.packing_size,        
+                    edit_user : this.editItem.edit_user          
                  })  
         },
         async removeProduct(i, p){
             const cf=confirm(`Are you sure ? delete the product code : ${p.item_name} `)
             if(!cf) return false;
+
+            const updateDocument=doc(db, "products", p.id)
+            await updateDoc(updateDocument, {edit_user: {uid: this.user.uid, type: 'removed'}})  
+
             const document=doc(db, "products", p.id)     
             await deleteDoc(document)      
         },
         async saveCode(){
-            this.saveEdit();
+            if(Object.keys(this.editItem).length) this.saveEdit();
+
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
             this.isSaving=true;
@@ -346,7 +341,7 @@ export default {
             const dataCollection=collection(db, "products", )
             this.code_no=this.code_no ? this.code_no : new Date().getTime()
             const data={
-                user: {uid:this.user.uid, email:this.user.email},
+                user: {uid:this.user.uid, displayName:this.user.displayName},
                 item_name: this.item_name, 
                 code_no : this.code_no,
                 qty : 0,
@@ -355,6 +350,8 @@ export default {
                 created_at : save_time,          
                 pur_price: {},
                 main_qty:0,
+                edit_user: {uid: this.user.uid, type: 'added'}
+
             }
             const result=await addDoc(dataCollection, data);                    
         },
@@ -375,6 +372,7 @@ export default {
                     retail_price: this.editItem.retail_price,
                     whole_sale_price: this.editItem.whole_sale_price,
                     auto_cal: this.editItem.auto_cal,
+                    edit_user : this.editItem.edit_user
                  })  
         },
 
@@ -388,9 +386,8 @@ export default {
             return cp.calPurPrice(unit, this.editItem);
         },
        
-        setEdit(i){
-            this.editItem=this.products[i];
-            this.$store.dispatch("setProduct", this.editItem)
+        setEdit(p){
+            this.editItem={...p,  edit_user:  {uid:this.user.uid, type: "modified"}};
         },
         clearSearch(){
             this.search_by_code="";
@@ -419,29 +416,38 @@ export default {
                        }) 
             }
             if(this.products.length > 0){
-                this.setEdit(0)
+                let item={}
+                if(Object.keys(this.editItem).length){
+                    const items=this.products.filter((f)=>f.id==this.editItem.id)
+                    item=items[0]
+                }else{
+                     item=this.products[0]
+                }
+                this.setEdit(item)
             }
         },
+        message(type){
+                this.msg.info=hp.message(type, "medicine code")
+                this.msg.type="success"                                                         
+        }, 
         async checkDatabase(){ 
             const query_url=query(collection(db, "products"), orderBy("created_at", "desc"));           
                 onSnapshot(query_url, async(snapShot) =>{
-                    snapShot.docChanges().forEach((change) => {        
-                            if(change.type==="added"){
-                                if(change.doc.data().code_no==this.code_no){
-                                    this.msg.info="The medicine code has been added"
-                                    this.msg.type="success"
+                    const dc=snapShot._snapshot.docChanges;
+                    const user=this.user;
+                    snapShot.docChanges().forEach((change) => {                       
+                        const res=change.doc.data();   
+                            if(change.type==="added" && res.edit_user.uid==user.uid && dc.length===1){
+                                    this.message("added")
                                     this.resetInput();    
-                                }
-                            }
-                            if(change.type==="modified"){
-                                this.msg.type="success";
-                                this.msg.info="The medicine code has been updated"  
-                                this.isSavePrice=false;
-                            }
-                            if(change.type==="removed"){
-                                this.msg.type="success";
-                                this.msg.info="Medicine code has been deleted"  
-                            }
+                                    hp.setAutoFocus("item_name")     
+                            }           
+                            if(change.type==="modified" && res.edit_user.type=="modified" && res.edit_user.uid==user.uid){
+                                    this.message("modified")
+                            }  
+                            if(change.type==="removed" && res.edit_user.type=="removed" && res.edit_user.uid==user.uid){
+                                    this.message("removed")
+                            }             
                     });                 
             });                              
         } ,

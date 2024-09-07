@@ -31,16 +31,16 @@
                                            </div>                                      
                                     </div>
                                     <div class="row mt-2">
-                                            <div class="col-4 d-grid">
+                                            <div class="col-6 d-grid">
                                                 <button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
                                             </div>
-                                            <div class="col-4 d-grid">
+                                            <!--<div class="col-4 d-grid">
                                                 <button class="btn btn-sm text-dark" @click="updateSales">
                                                     <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
                                                     <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                                 </button>
-                                            </div>
-                                            <div class="col-4 d-grid">
+                                            </div>-->
+                                            <div class="col-6 d-grid">
                                                 <button class="btn btn-sm text-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                                             </div>
                                     </div>
@@ -54,17 +54,17 @@
                                         <tbody>
                                             <tr class="table-secondary text-center">
                                                 <td>Voucher no.</td>
-                                                <td class="text-start">Name</td>
+                                                <td class="">Name</td>
                                                 <td>Phone</td>
                                                 <td>Sale date</td>
-                                                <td class="text-start">User</td>                                    
+                                                <td class="">User</td>                                    
                                             </tr>                                
                                             <tr v-if="sales.length > 0" v-for="s in sales" :key="s.id" @click="setCode(s)" data-bs-dismiss="modal" style="cursor: context-menu;">
                                                 <td class="text-center">{{s.voucher_no}}</td>
                                                 <td>{{s.customer.name}}</td>
                                                 <td class="text-center">{{s.customer.phone}}</td>
                                                 <td class="text-center">{{showTime(s.sale_date)}}</td>
-                                                <td>{{removeAfterAt(s.user.email)}}</td>
+                                                <td class="text-center">{{s.user.displayName}}</td>
                                             </tr>
                                         </tbody>
                                     </table>   

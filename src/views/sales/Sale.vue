@@ -74,9 +74,9 @@
                                                 </td>
                                             </tr>      
                                             <tr>
-                                                <td class="text-end py-1" >Phone :</td>
-                                                <td class="py-0">
-                                                    <input type="tel"   v-model="customer.phone" class="form-control-plaintext form-control-sm border-bottom" id="customer_phone" placeholder="Phone">                                                
+                                                <td class="text-end py-1" >Cashier :</td>
+                                                <td class="py-1">
+                                                    {{user.displayName}}
                                                 </td>
                                             </tr>                                               
                                         </thead>
@@ -173,7 +173,7 @@
         <SalesModal @setCode="setOldCode" />
         <CustomerModal @setCustomer="setCustomer" />
         <!--Pritn item start-->
-        <div class="d-none" id="printMe" v-if="saleItems.length > 0" >
+        <div class="" id="printMe" v-if="saleItems.length > 0" >
                 <Print :data="printData" />
         </div>       
         <setQtyModal @setQty="setSaleQty" :ei="editItem" />
@@ -246,14 +246,7 @@ export default {
                 sale_date: {required}
             }
     },
-    updated(){
-        const desc=document.querySelector("#description")
-        const qty=document.querySelector("#setQty")
-        const discount=document.querySelector("#setDiscount")
-        const closeBtn=document.querySelector(".close")
-
-       
-    },
+   
     mounted() {
         this.voucher_no=new Date().getTime();
         this.sale_date=new Date().toISOString().substr(0, 10)    
@@ -295,6 +288,7 @@ export default {
                 extra_discount: this.extra_discount,
                 paid:this.paid,
                 change:this.change,
+                user: this.user,
             }
         }
     },
@@ -484,7 +478,7 @@ export default {
                                     this.updateProducts();
                                    // this.printSale();
                                     this.msg.type="success";
-                                    this.msg.info="The sale is complete."   
+                                    this.msg.info=hp.message("added", "sale")   
                                     this.clearSaleItem(); 
                                 }
                             }
@@ -511,7 +505,7 @@ export default {
                     voucher_no: this.voucher_no,
                     sale_date: Timestamp.fromDate(sale_date),
                     products : this.saleItems,
-                    user : {uid: this.user.uid, email: this.user.email},
+                    user : {uid: this.user.uid, displayName: this.user.displayName},
                     total_amount:this.total_amount,
                     extra_discount:this.extra_discount,
                     net_amount: this.net_amount,

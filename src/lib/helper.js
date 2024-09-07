@@ -51,7 +51,7 @@ const displayPrice=(l_unit, m_unit, s_unit)=>{
 }
 const  message=(type, name)=>{
     if(type=="added"){
-        return `New ${name} has been added`                            
+        return `New ${name} has been saved`                            
     }else if(type=="modified"){
         return `The ${name} has been updated` 
     }else if(type=="removed"){

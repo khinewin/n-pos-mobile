@@ -401,7 +401,7 @@ export default {
                                     this.updateProducts();
                                    // this.printSale();
                                     this.msg.type="success";
-                                    this.msg.info="The purchase list has been saved."   
+                                    this.msg.info=hp.message(change.type, "purchase") 
                                     this.clearPurchaseItem(); 
                                 }
                             }
@@ -424,7 +424,7 @@ export default {
                 supplier: this.supplier,
                 location: this.location,
                 products : this.storePurchase,
-                user : {uid: this.user.uid, email: this.user.email},
+                user : {uid: this.user.uid, displayName: this.user.displayName},
                 total_amount:this.total_amount,
                 total_discount:this.total_discount,
                 total_price:this.total_price,

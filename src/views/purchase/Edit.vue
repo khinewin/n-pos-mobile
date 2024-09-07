@@ -452,7 +452,7 @@ export default {
                                 if(change.doc.data().voucher_no==this.voucher_no){
                                    // this.printSale();
                                     this.msg.type="success";
-                                    this.msg.info="The purchase list has been updated."   
+                                    this.msg.info=hp.message(change.type, "purchase") 
                                     this.isLoading=false;
                                 }
                             }
@@ -482,7 +482,7 @@ export default {
                 pur_date: Timestamp.fromDate(new Date(this.pur_date)),
                 supplier: this.supplier,
                 products : this.storePurchase,
-                user : {uid: this.user.uid, email: this.user.email},
+                user : {uid: this.user.uid, displayName: this.user.displayName},
                 total_amount:this.total_amount,
                 total_discount:this.total_discount,
                 total_price:this.total_price,

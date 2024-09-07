@@ -147,13 +147,8 @@ export default {
         },    
       
     },
-    watch:{
-       editItem(data){
-           
-       }
-    },
-    created() {     
-      
+  
+    mounted() {         
         this.voucher_no=new Date().getTime();
         this.created_at=new Date().toISOString().substr(0, 10)
         this.checkDatabase();
@@ -264,7 +259,7 @@ export default {
                                     this.updateProducts();
                                    // this.printSale();
                                     this.msg.type="success";
-                                    this.msg.info="The new opening stocks  has been saved."   
+                                    this.msg.info=hp.message(change.type, "opening stock")   
                                     this.resetStocks(); 
                                 }
                             }
@@ -283,7 +278,7 @@ export default {
                 voucher_no: this.voucher_no,
                 created_at: Timestamp.fromDate(new Date(this.created_at)),           
                 products : this.storeItems,
-                user : {uid: this.user.uid, email: this.user.email},              
+                user : {uid: this.user.uid, displayName: this.user.displayName},              
             }      
             const saveDocument=collection(db, "openingStocks")
             await addDoc(saveDocument, voucher)                                                  

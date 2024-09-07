@@ -38,16 +38,16 @@
                                        </div>
                                 
                                 <div class="row mt-2">
-                                        <div class="col-4 d-grid">
+                                        <div class="col-6 d-grid">
                                             <button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
                                         </div>
-                                        <div class="col-4 d-grid">
+                                        <!--<div class="col-4 d-grid">
                                             <button class="btn btn-sm text-dark" @click="updatePurchases">
                                                 <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
                                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                             </button>
-                                        </div>
-                                        <div class="col-4 d-grid">
+                                        </div>-->
+                                        <div class="col-6 d-grid">
                                             <button class="btn btn-sm text-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                                         </div>
                                 </div>
@@ -70,7 +70,7 @@
                                                 <td class="text-center">{{p.voucher_no}}</td>
                                                 <td class="text-center">{{showTime(p.pur_date)}}</td>
                                                 <td>{{p.supplier.name}} ({{p.supplier.company}})</td>
-                                                <td>{{removeAfterAt(p.user.email)}}</td>
+                                                <td class="text-center">{{p.user.displayName}}</td>
                                                 <td>{{p.location}}</td>
                                             </tr>
                                         </tbody>

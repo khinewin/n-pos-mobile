@@ -42,16 +42,16 @@
                                     </div>   
                                 
                                 <div class="row">
-                                        <div class="col-4 d-grid">
+                                        <div class="col-6 d-grid">
                                             <button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
                                         </div>
-                                        <div class="col-4 d-grid">
+                                        <!--<div class="col-4 d-grid">
                                             <button class="btn btn-sm text-dark" @click="updateTransfers">
                                                 <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
                                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                             </button>
-                                        </div>
-                                        <div class="col-4 d-grid">
+                                        </div>-->
+                                        <div class="col-6 d-grid">
                                             <button class="btn btn-sm text-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                                         </div>
                                 </div>
@@ -75,7 +75,7 @@
                                                 <td>{{p.from_location}}</td>
                                                 <td>{{p.to_location}}</td>
                                                 <td class="text-center">{{showTime(p.created_at)}}</td>
-                                                <td>{{removeAfterAt(p.user.email)}}</td>
+                                                <td class="text-center">{{p.user.displayName}}</td>
                                             </tr>
                                         </tbody>
                                     </table>   

@@ -30,9 +30,9 @@
                         </td>
                     </tr>      
                     <tr>
-                        <td class="pb-0 fw-bold">Phone <span class="float-end">:</span></td>
+                        <td class="pb-0 fw-bold">Cashier <span class="float-end">:</span></td>
                         <td class=" ps-2 pb-0" style="border-bottom: 1px dotted;">
-                            {{data.customer.phone}}
+                            {{data.user.displayName}}
                         </td>
                     </tr>                                               
                 </tbody>
@@ -127,6 +127,12 @@
                         <td class="">Name <span class="">:</span></td>
                         <td class="" style="border-bottom: 1px dotted;">
                             {{data.customer.name}}
+                        </td>
+                    </tr>   
+                    <tr>
+                        <td class="">Cashier <span class="">:</span></td>
+                        <td class="" style="border-bottom: 1px dotted;">
+                            {{data.user.displayName}}
                         </td>
                     </tr>      
                                                            

@@ -7,17 +7,17 @@
                <div class="card">
                    <div class="card-body p-2"> 
                     <div class="row justify-content-end mb-2">
-                        <div class="col-4 d-grid">
+                        <div class="col-6 d-grid">
                             <button class="btn btn-sm text-dark" data-bs-dismiss="modal" @click="setCode"><span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                             </button>
                         </div>
-                        <div class="col-4 d-grid">
+                        <!--<div class="col-4 d-grid">
                             <button class="btn btn-sm text-dark" @click="updateData"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                             </button>
-                        </div>
-                        <div class="col-4 d-grid"><button class="btn btn-sm text-dark" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button></div>
+                        </div>-->
+                        <div class="col-6 d-grid"><button class="btn btn-sm text-dark" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button></div>
                     </div> 
                    <div class="row g-2">
                     <div class="col-12">
@@ -85,6 +85,7 @@ import * as hp  from "@/lib/helper"
 import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
 export default {   
+    props:['ei'],
    data(){
        return{
            packingSizes:[],
@@ -103,11 +104,11 @@ export default {
    mounted() {
     const myModalEl = document.getElementById('selectPackingSizeModal')
        myModalEl.addEventListener('show.bs.modal', event => {     
-            this.smallest_unit=this.product.packing_size.smallest_unit
-            this.smallest_qty=this.product.packing_size.smallest_qty;
-            this.medium_qty=this.product.packing_size.medium_qty;
-            this.medium_unit=this.product.packing_size.medium_unit;
-            this.largest_unit=this.product.packing_size.largest_unit;
+            this.smallest_unit=this.ei.packing_size.smallest_unit
+            this.smallest_qty=this.ei.packing_size.smallest_qty;
+            this.medium_qty=this.ei.packing_size.medium_qty;
+            this.medium_unit=this.ei.packing_size.medium_unit;
+            this.largest_unit=this.ei.packing_size.largest_unit;
        })   
    },
    created(){

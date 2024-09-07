@@ -249,7 +249,7 @@ export default {
                                     this.updateProducts();
                                    // this.printSale();
                                     this.msg.type="success";
-                                    this.msg.info="The new adjustment items has been saved."   
+                                    this.msg.info=hp.message(change.type, "adjustment") 
                                     this.resetAdjustments(); 
                                 }
                             }
@@ -269,7 +269,7 @@ export default {
                 created_at: Timestamp.fromDate(new Date(this.created_at)),    
                 location: this.location,       
                 products : this.storeItems,
-                user : {uid: this.user.uid, email: this.user.email},              
+                user : {uid: this.user.uid, displayName: this.user.displayName},              
             }      
             const saveDocument=collection(db, "adjustments")
             await addDoc(saveDocument, voucher)                                
