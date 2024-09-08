@@ -50,7 +50,7 @@
                                                     <td class="col-1">Code</td>
                                                     <td class="col-2">Description</td>
                                                     <td class="col-1">Packing size</td>
-                                                    <td class="col-1">Pharmacy Inv</td>
+                                                    <td class="col-1">Pharmacy Inv Bal</td>
                                                     <td class="col-2" v-if="sale_type=='retail'">Retail price</td>
                                                     <td class="col-2" v-if="sale_type=='whole_sale'">Wholesale price</td>
 
@@ -64,12 +64,12 @@
                                                     <td class="text-end col-1">
                                                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                             
                                                     </td>                                                  
-                                                    <td class="text-center" v-if="sale_type=='retail'">
-                                                        <span v-if="p.retail_price.largest_unit">{{p.packing_size.largest_unit}}*{{p.retail_price.largest_unit}}, </span>
-                                                        <span v-if="p.retail_price.medium_unit">{{p.packing_size.medium_unit}}*{{p.retail_price.medium_unit}}, </span>
-                                                        <span v-if="p.retail_price.smallest_unit">{{p.packing_size.smallest_unit}}*{{p.retail_price.smallest_unit}} </span>
+                                                    <td class="text-end" v-if="sale_type=='retail'">
+                                                        <span v-if="p.retail_price.largest_unit">{{p.retail_price.largest_unit}} * </span>
+                                                        <span v-if="p.retail_price.medium_unit">{{p.retail_price.medium_unit}} * </span>
+                                                        <span v-if="p.retail_price.smallest_unit">{{p.retail_price.smallest_unit}} </span>
                                                     </td>
-                                                    <td class="text-center" v-if="sale_type=='whole_sale'">
+                                                    <td class="text-end" v-if="sale_type=='whole_sale'">
                                                         <span v-if="p.whole_sale_price.largest_unit">{{p.packing_size.largest_unit}}*{{p.whole_sale_price.largest_unit}}, </span>
                                                         <span v-if="p.whole_sale_price.medium_unit">{{p.packing_size.medium_unit}}*{{p.whole_sale_price.medium_unit}}, </span>
                                                         <span v-if="p.whole_sale_price.smallest_unit">{{p.packing_size.smallest_unit}}*{{p.whole_sale_price.smallest_unit}} </span>

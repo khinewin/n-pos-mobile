@@ -565,7 +565,7 @@ export default {
         checkQty(p){
             if(p.qty  <1 ){
                 this.msg.type="error";
-                this.msg.info="Insufficient inventory"
+                this.msg.info="Insufficient inventory balance"
                 return false;
             }          
             return true;

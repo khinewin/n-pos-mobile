@@ -122,7 +122,7 @@
                                         </td>
                                     </tr>
                                     <tr class="">
-                                        <td class="py-1">Pharmacy Inv</td>                                       
+                                        <td class="py-1">Pharmacy Inv Bal</td>                                       
                                         <td class="text-center" :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]">
                                             <div  v-if="editItem.packing_size">
                                                 {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            
@@ -130,7 +130,7 @@
                                         </td>
                                     </tr>    
                                     <tr class="">
-                                        <td class="py-1">Main Inv</td>                                      
+                                        <td class="py-1">Main Inv Bal</td>                                      
                                         <td class="text-center" :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]">
                                             <div  v-if="editItem.packing_size">
                                                 {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.main_qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            

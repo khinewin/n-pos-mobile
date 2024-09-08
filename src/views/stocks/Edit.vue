@@ -42,8 +42,8 @@
                                     <td class="col-1">Code</td>
                                     <td class="col-2" data-bs-toggle="modal" data-bs-target="#searchCode" style="cursor: context-menu;"><i class="fa-solid fa-circle-plus"></i> Description</td>
                                     <td class="col-1">Packing size</td>
-                                    <td class="col-1 table-info">Main Inv</td>     
-                                    <td class="col-1 table-info">Pharmacy Inv</td>   
+                                    <td class="col-1 table-info">Main Inv Bal</td>     
+                                    <td class="col-1 table-info">Pharmacy Inv Bal</td>   
                                     <td class="col-1 table-primary">Pur price</td>
                                     <td class="col-1 table-primary">Retail price</td>
                                     <td class="col-1 table-primary">Wholesale price</td>                                  

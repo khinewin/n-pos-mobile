@@ -53,8 +53,8 @@
                                     <td class="col-1 ">Code</td>
                                     <td class="col-1">Desc</td>
                                     <td class="col-1">Packing size</td>
-                                    <td class="col-1">Main Inv</td>     
-                                    <td class="col-1">Pharmacy Inv</td>   
+                                    <td class="col-1">Main Inv Bal</td>     
+                                    <td class="col-1">Pharmacy Inv Bal</td>   
                                     <td class="col-1">Pur price</td>
                                     <td class="col-1">Retail price</td>
                                     <td class="col-1">Wholesale price</td>      
