@@ -7,14 +7,14 @@
                 <tbody class="small">  
                     <tr>
                         <td class="col-4 pb-0 fw-bold">Voucher no. <span class="float-end">:</span></td>
-                        <td class="col-8  ps-2 pb-0" style="border-bottom: 1px dotted;">
+                        <td class="col-8  ps-2 pb-0" >
                             {{data.voucher_no}}
                         </td>
                     </tr>
                     <tr>
                         <td class="pb-0 fw-bold">Date <span class="float-end">:</span></td>
-                        <td class=" ps-2 pb-0" style="border-bottom: 1px dotted;">
-                           <span>{{showPrintTime(data.sale_date)}}</span>
+                        <td class=" ps-2 pb-0" >
+                           <span v-if="data.print_date">{{showPrintTime(data.print_date)}}</span>
                         </td>
                     </tr>       
                 </tbody>
@@ -25,13 +25,13 @@
                 <tbody class="small">                                     
                     <tr>
                         <td class="  col-4 pb-0 fw-bold">Name <span class="float-end">:</span></td>
-                        <td class=" ps-2 col-8 pb-0" style="border-bottom: 1px dotted;">
+                        <td class=" ps-2 col-8 pb-0" >
                             {{data.customer.name}}
                         </td>
                     </tr>      
                     <tr>
                         <td class="pb-0 fw-bold">Cashier <span class="float-end">:</span></td>
-                        <td class=" ps-2 pb-0" style="border-bottom: 1px dotted;">
+                        <td class=" ps-2 pb-0" >
                             {{data.user.displayName}}
                         </td>
                     </tr>                                               
@@ -112,26 +112,26 @@
                 <tbody class="">  
                     <tr>
                         <td class="">Voucher no. <span class="">:</span></td>
-                        <td class="" style="border-bottom: 1px dotted;">
+                        <td class="" >
                             {{data.voucher_no}}
                         </td>
                     </tr>
                     <tr>
                         <td class="">Date <span class="">:</span></td>
-                        <td class="" style="border-bottom: 1px dotted;">
-                           <span>{{showPrintTime(data.sale_date)}}</span>
+                        <td class="" >
+                           <span v-if="data.print_date">{{showPrintTime(data.print_date)}}</span>
                         </td>
                     </tr>       
                                                    
                     <tr>
                         <td class="">Name <span class="">:</span></td>
-                        <td class="" style="border-bottom: 1px dotted;">
+                        <td class="" >
                             {{data.customer.name}}
                         </td>
                     </tr>   
                     <tr>
                         <td class="">Cashier <span class="">:</span></td>
-                        <td class="" style="border-bottom: 1px dotted;">
+                        <td class="" >
                             {{data.user.displayName}}
                         </td>
                     </tr>      
@@ -226,11 +226,7 @@ export default {
             return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
         showPrintTime(t){
-            const newT=Timestamp.fromDate(new Date(t))
-            const date=newT.toDate()
-            const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-            const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
-            return formattedDate;
+           return hp.showTimeHour(t)
         },
     },
   

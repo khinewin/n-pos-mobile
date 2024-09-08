@@ -7,7 +7,8 @@ const packingSizes=(arr)=>{
             user: doc.data().user,
             packing_unit: doc.data().packing_unit,        
             packing_name: doc.data().packing_name,      
-            created_at: doc.data().created_at,        
+            created_at: doc.data().created_at,   
+            edit_user: null,     
         };                                       
         sizes.push(size);                                                    
     });

@@ -8,7 +8,7 @@
                    <div class="card-body p-2"> 
                     <div class="row justify-content-end mb-2">
                         <div class="col-6 d-grid">
-                            <button class="btn btn-sm text-dark" data-bs-dismiss="modal" @click="setCode"><span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                            <button id="setBtn" class="btn btn-sm text-dark" data-bs-dismiss="modal" @click="setCode"><span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                             </button>
                         </div>
@@ -36,7 +36,7 @@
                                 <tr class=" text-center">
                                     <td>Medium unit</td>
                                     <td class="col-1 p-0">
-                                        <input type="number" class="form-control-plaintext text-center" v-model="medium_qty">
+                                        <input @keypress.enter="pressSetBtn" type="number" class="form-control-plaintext text-center" v-model="medium_qty">
                                     </td>
                                     <td class="col-1 p-0">
                                         <select class="form-control-plaintext text-center" v-model="medium_unit">
@@ -47,7 +47,7 @@
                                 <tr class="text-center">
                                     <td>Smallest unit</td>
                                     <td class="col-1 p-0">
-                                        <input type="number" class="form-control-plaintext text-center" v-model="smallest_qty">
+                                        <input @keypress.enter="pressSetBtn" type="number" class="form-control-plaintext text-center" v-model="smallest_qty">
                                     </td>
                                     <td class="col-1 p-0">
                                         <select class="form-control-plaintext text-center " v-model="smallest_unit">
@@ -135,6 +135,10 @@ export default {
         
    },
    methods:{
+        pressSetBtn(){
+            const btn=document.getElementById("setBtn")
+            btn.click();
+        },
         setCode(){
             if(this.medium_unit && this.smallest_qty && this.smallest_unit){
                 const packingSize={

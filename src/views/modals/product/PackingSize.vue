@@ -17,7 +17,7 @@
                         <table class="table table-bordered mb-0 table-hover">
                             <tbody class="small">                                     
                                 <tr class="">
-                                    <td class="p-0"><input placeholder="Packing name" type="text" @keypress.enter="savePackingSize" v-model="packing_name" class="form-control-plaintext form-control-sm text-center"></td>
+                                    <td class="p-0"><input id="packing_name" placeholder="Packing name" type="text" @keypress.enter="savePackingSize" v-model="packing_name" class="form-control-plaintext form-control-sm text-center"></td>
                                     <td class="p-0"><input placeholder="Packing unit" type="text" @keypress.enter="savePackingSize" v-model="packing_unit" class="form-control-plaintext form-control-sm text-center"></td>
                                 </tr>                                                                                       
                                 <tr  class="" v-if="packingSizes.length > 0"  v-for="p in packingSizes" :key="p.id" @mouseenter="setEdit(p)"  style="cursor:context-menu">
@@ -52,7 +52,7 @@
      <!--end modal-->
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, deleteDoc, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
+import {Timestamp, collection, onSnapshot, addDoc, getDocs, doc, deleteDoc, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as ss from "@/lib/snapshot/packingSizes"
 import * as hp  from "@/lib/helper"
@@ -67,31 +67,32 @@ export default {
             packing_name:"",
            isUpdating:false,
            isLoading:false,       
-           editItem:{}
+           editItem:{},
+           msg :{
+                type: "",
+                info:"",
+           }
        }
    },   
    mounted() {
-      
+    this.isLoading=true; 
+    this.fetchpackingSizes();   
+    this.checkDatabase(); 
+    const myModalEl = document.getElementById('packingSizeModal')
+       myModalEl.addEventListener('show.bs.modal', event => {    
+            setTimeout(()=>{
+                hp.setAutoFocus("packing_name")
+            }, 300)            
+       })   
+            
    },
-   created(){
-       if(this.user !==null){         
-              this.isLoading=true; 
-              this.fetchpackingSizes();                
-       }
-   },   
+ 
    computed:{
        user(){
            return this.$store.getters.user;
        },     
    },
-   watch:{       
-       user(data){
-               if(data !==null){         
-                this.isLoading=true;          
-                this.fetchpackingSizes();           
-           }
-       },         
-   },
+  
    methods:{
         async removePackingSize(p){
             const document=doc(db, "packingSizes", p.id)     
@@ -99,7 +100,7 @@ export default {
             this.fetchpackingSizes();  
         },
         setEdit(p){
-            this.editItem=p;
+            this.editItem={...p, edit_user : {uid: this.user.uid, type: "modified"}};
         },
         async saveEdit(){
             const data=doc(db, "packingSizes", this.editItem.id)
@@ -111,16 +112,42 @@ export default {
             const created_at=Timestamp.fromDate(new Date());
             const dataCollection=collection(db, "packingSizes", )
             const data={
-                user: {uid:this.user.uid, email:this.user.email},
+                user: {uid:this.user.uid, displayName:this.user.displayName},
                 packing_unit: this.packing_unit,         
                 packing_name: this.packing_name,      
-                created_at: created_at
+                created_at: created_at,
+                edit_user: {uid:this.user.uid, type:"added"},
+
             }
             const result=await addDoc(dataCollection, data);
-            this.fetchpackingSizes();
-            this.packing_unit="";          
-            this.packing_name=""; 
+           
         },
+        message(type){
+                this.msg.info=hp.message(type, "packing size")
+                this.msg.type="success"                                                         
+        }, 
+        async checkDatabase(){ 
+            const query_url=query(collection(db, "packingSizes"), orderBy("created_at", "desc"));           
+                onSnapshot(query_url, async(snapShot) =>{
+                    const dc=snapShot._snapshot.docChanges;
+                    const user=this.user;
+                    snapShot.docChanges().forEach((change) => {                       
+                        const res=change.doc.data();   
+                            if(change.type==="added" && res.edit_user.uid==user.uid && dc.length===1){
+                                    this.message("added")
+                                    this.packing_unit="";          
+                                    this.packing_name=""; 
+                                    hp.setAutoFocus("packing_name")
+                            }           
+                            if(change.type==="modified" && res.edit_user.type=="modified" && res.edit_user.uid==user.uid){
+                                    this.message("modified")
+                            }  
+                            if(change.type==="removed" && res.edit_user.type=="removed" && res.edit_user.uid==user.uid){
+                                    this.message("removed")
+                            }             
+                    });                 
+            });                              
+        } ,
        updateData(){
                this.isUpdating=true;
                this.fetchpackingSizes();
@@ -128,11 +155,12 @@ export default {
       
        async fetchpackingSizes(){
        const query_url = query(collection(db, "packingSizes"), orderBy("created_at", "desc"));
-       const snapShot=await getDocs(query_url)
-       const pz=ss.packingSizes(snapShot)          
-       this.packingSizes=pz;
-       this.isLoading=false;
-       this.isUpdating=false;
+       onSnapshot(query_url, (snapShot)=>{
+            const pz=ss.packingSizes(snapShot)          
+            this.packingSizes=pz;
+            this.isLoading=false;
+            this.isUpdating=false;
+       })
       } ,
       showTime(t){
            return hp.showTime(t)

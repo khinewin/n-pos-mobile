@@ -65,9 +65,9 @@
                                     <td class="col-2"  data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Descrption</td>
                                     <td class="col-1">Exp. date</td>     
                                     <td class="col-1">Packing size</td>                              
-                                    <td class="col-1" colspan="1">Qty</td>
-                                    <td class="col-2" colspan="2">Unit price</td>                                    
-                                    <td class="col-1">Discount</td>                                    
+                                    <td class="col-1 table-primary" colspan="1">Qty</td>
+                                    <td class="col-2 table-info" colspan="2">Unit price</td>                                    
+                                    <td class="col-1 table-warning">Discount</td>                                    
                                     <td class="col-1">Amount</td>
                                     <td class="col-1">Discount</td>
                                     <td class="col-1">Price</td>
@@ -82,18 +82,18 @@
                                     <td class="pt-2">
                                          {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                     </td>
-                                   <td class="pt-2 text-end" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                   <td class="pt-2 text-end table-primary" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.pur_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                    </td>
-                                   <td class="p-0">
+                                   <td class="p-0 table-info">
                                         <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.qty_pur_price" class="form-control-plaintext form-control-sm  text-center" placeholder="Price">                                        
                                     </td>
-                                    <td class="p-0">
+                                    <td class="p-0 table-info">
                                         <select @change="calEdit" class="form-control-plaintext form-control-sm text-center" v-model="st.qty_pur_price_unit">
                                             <option  v-for="pu in onlyString(st.packing_size)">{{pu}}</option>
                                         </select>
                                     </td>
-                                    <td class="text-center pt-2" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
+                                    <td class="text-center pt-2 table-warning" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
                                         <span v-if="st.dis_qty">{{st.dis_qty}}{{st.dis_qty_unit}}</span>
                                             <span v-if="st.dis_amount">{{st.dis_amount}}$</span>
                                             <span v-if="st.dis_percent">{{st.dis_percent}}%</span>                                      

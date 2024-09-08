@@ -150,6 +150,11 @@ export default {
            this.searchSales();
        },
        searchSales(){        
+        this.sales=this.sales.sort((a,b)=>{
+                const date_a=new Date(a.sale_date.toDate()).getTime();
+                const date_b=new Date(b.sale_date.toDate()).getTime();
+                return date_a - date_b;
+            })
            if(this.search_by_voucher_no){
                this.sales=this.salesData.filter((f)=>{
                        return f.voucher_no===Number(this.search_by_voucher_no);

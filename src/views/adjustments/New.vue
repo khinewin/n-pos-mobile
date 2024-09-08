@@ -51,7 +51,7 @@
                                     <td class="col-1">Packing size</td>
                                     <td class="col-1">Before Adj</td>
                                     <td class="col-1">Adj type</td>
-                                    <td class="col-1">Qty</td>      
+                                    <td class="col-1 table-primary">Qty</td>      
                                     <td class="col-1">After Adj</td>   
                                     <td class="col-1">RTS/RFS</td>                          
                                     <td class="col-2">Remark</td>                                                                                       
@@ -74,7 +74,7 @@
                                             <option>Decrement</option>
                                         </select>
                                     </td>
-                                    <td class="text-center pt-2" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                    <td class="text-center pt-2 table-primary" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>     
                                     <td class="pt-2 text-center">

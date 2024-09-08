@@ -94,9 +94,9 @@
                                                 <i class="fa-solid fa-circle-plus"></i> Description
                                             </td>  
                                             <td class="col-1 pt-2 text-center">Packing size</td>                                                                                    
-                                            <td class="col-1 text-center pt-2">Qty</td>
-                                            <td class="col-2 text-center pt-2" colspan="2">Unit price</td>
-                                            <td class="col-1 text-center pt-2">Discount</td>
+                                            <td class="col-1 text-center pt-2 table-primary">Qty</td>
+                                            <td class="col-2 text-center pt-2 table-info" colspan="2">Unit price</td>
+                                            <td class="col-1 text-center pt-2 table-warning">Discount</td>
                                             <td class="col-1 text-center pt-2">Amount</td>
                                             <td class="col-1 text-center pt-2">Discount Amount</td>
                                             <td class="col-1 text-center pt-2">Final amount</td>
@@ -115,18 +115,18 @@
                                             <td class="pt-2">
                                                 {{calPackingSize(s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit, s.packing_size.medium_qty, s.packing_size.smallest_qty)}}
                                             </td>                                        
-                                            <td class="pt-2 text-end" id="setQty" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                            <td class="pt-2 text-end table-primary" id="setQty" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                                 {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
                                             </td>                                            
-                                            <td class="p-0">
+                                            <td class="p-0 table-info">
                                                 <input disabled  type="number"  v-model="s.qty_sale_price" class="form-control-plaintext form-control-sm  text-center" placeholder="Price">                                        
                                             </td>
-                                            <td class="p-0">
+                                            <td class="p-0 table-info">
                                                 <select @change="calEdit" class="form-control-plaintext form-control-sm text-center" v-model="s.qty_sale_price_unit">
                                                     <option  v-for="pu in onlyString(s.packing_size)">{{pu}}</option>
                                                 </select>
                                             </td>
-                                            <td class="pt-2 text-center" id="setDiscount" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
+                                            <td class="pt-2 text-center table-warning" id="setDiscount" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
                                                 <span v-if="s.dis_qty">{{s.dis_qty}}{{s.dis_qty_unit}}</span>
                                                 <span v-if="s.dis_amount">{{s.dis_amount}}$</span>
                                                 <span v-if="s.dis_percent">{{s.dis_percent}}%</span>      
@@ -173,8 +173,19 @@
         <SalesModal @setCode="setOldCode" />
         <CustomerModal @setCustomer="setCustomer" />
         <!--Pritn item start-->
-        <div class="" id="printMe" v-if="saleItems.length > 0" >
-                <Print :data="printData" />
+        <div class="d-none" id="printMe" v-if="saleItems.length > 0" >
+                <Print :data="{
+                    voucher_no: this.voucher_no,
+                    customer: this.customer,
+                    saleItems: this.saleItems,
+                    print_date:this.print_date,
+                    total_amount:this.total_amount,
+                    net_amount:this.net_amount,
+                    extra_discount: this.extra_discount,
+                    paid:this.paid,
+                    change:this.change,
+                    user: this.user,            
+            }  " />
         </div>       
         <setQtyModal @setQty="setSaleQty" :ei="editItem" />
         <setDiscountModal @saveDiscount="saveDiscount" :ei="editItem" />
@@ -224,6 +235,7 @@ export default {
             customer: {},
             code_no:"",
             products:[],
+            print_date:"",
             isOffline: false,
             customerData: {
                 id: 123456669,
@@ -237,7 +249,8 @@ export default {
                 type :"",
                 info :"",
             },
-            output: null,               
+            output: null,        
+             
         }
     },
     validations(){
@@ -258,7 +271,8 @@ export default {
        }, 300)
       // await disableNetwork(db)
      this.checkDatabase();
-   
+     //set print date     
+       this.setPrintDate();
     },
   
     watch:{
@@ -277,23 +291,18 @@ export default {
         user(){
             return this.$store.getters.user;
         },
-        printData(){
-            return{
-                voucher_no: this.voucher_no,
-                customer: this.customer,
-                saleItems: this.saleItems,
-                sale_date:this.sale_date,
-                total_amount:this.total_amount,
-                net_amount:this.net_amount,
-                extra_discount: this.extra_discount,
-                paid:this.paid,
-                change:this.change,
-                user: this.user,
-            }
-        }
+      
     },
     methods:{
        
+        setPrintDate(){
+            const date=new Date();
+            let print_date=new Date();
+            print_date.setHours(date.getHours())
+            print_date.setMinutes(date.getMinutes())
+          this.print_date=Timestamp.fromDate(print_date);
+        },
+
         setCodeOnPaste(){
             setTimeout(()=>{                
             const item=this.products.filter((f)=>f.code_no==this.code_no);
@@ -459,6 +468,7 @@ export default {
             this.isNewSale=false;
             this.voucher_no=s.voucher_no,
             this.sale_date=this.editShowTime(s.sale_date)
+            this.print_date=s.sale_date;
             this.saleItems=s.products;
             this.total_amount=s.total_amount;
             this.net_amount=s.net_amount;
@@ -476,7 +486,7 @@ export default {
                             if(change.type==="added"){
                                 if(change.doc.data().voucher_no==this.voucher_no){
                                     this.updateProducts();
-                                   // this.printSale();
+                                    this.printSale();
                                     this.msg.type="success";
                                     this.msg.info=hp.message("added", "sale")   
                                     this.clearSaleItem(); 
@@ -492,6 +502,8 @@ export default {
             const isNotReady= this.saleItems.filter((f)=>!f.final_amount)
             if(isNotReady.length) return false;
             
+                this.setPrintDate();
+
                 this.isLoading=true;
                 this.msg.type="";
                 this.msg.info="";
