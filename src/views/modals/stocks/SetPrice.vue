@@ -120,7 +120,10 @@ export default {
         pressClose(){
             const btn=document.getElementById("close")
             btn.click();
-        }   
+        } ,
+        saveAutoCal(){
+            this.$emit("saveAutoCal")
+        }  
     }
 }
 </script>

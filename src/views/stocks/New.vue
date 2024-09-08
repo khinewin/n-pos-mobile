@@ -88,7 +88,7 @@
        
         <ProductModal @setCode="setCode"  />
         <SetQty :ei="editItem" @saveQty="saveQty" />
-        <SetPrice :ei="editItem" />
+        <SetPrice :ei="editItem" @saveAutoCal="saveAutoCal" />
     </div>
 </template>
 <script>
