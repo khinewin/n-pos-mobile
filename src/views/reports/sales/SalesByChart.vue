@@ -2,9 +2,9 @@
   <div class="container-fluid">
     <div class="row my-2">
         <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header text-dark">Top 10 sales item</div>
+            <div class="card">
                 <div class="card-body p-0">
+                    <div class="ms-4 mt-2">Top 10 sales item</div>
                    <div class="row">
                     <div class="col-12">
                         <div v-if="isLoading">
@@ -16,7 +16,7 @@
                                 </div>
                             </div>
                         </div>   
-                        <div v-if="topSalesQty.length >1">
+                        <div v-if="topSalesQty.length >1" class="pe-5">
                             <GChart
                             :settings="{ packages: ['corechart', 'table', 'map'] }"
                             type="ColumnChart"
@@ -33,9 +33,9 @@
     </div>
         <div class="row my-2">
             <div class="col-12">
-                <div class="card shadow">
-                    <div class="card-header text-dark">Sales with purchase amount and profit by Date</div>
+                <div class="card">
                     <div class="card-body p-0">
+                    <div class="ms-4 mt-2">Sales with purchase amount and profit by Date</div>
                       <div class="row">
                         <div class="col-12">
                             <div v-if="isLoading">
@@ -47,7 +47,7 @@
                                     </div>
                                 </div>
                             </div>   
-                            <div v-if="products.length >1">
+                            <div v-if="products.length >1" class="pe-5">
                                 <GChart
                                 :settings="{ packages: ['corechart', 'table', 'map'] }"
                                 type="ColumnChart"
@@ -64,9 +64,9 @@
         </div>
         <div class="row g-2">
             <div class="col-md-6">
-                <div class="card shadow">
-                    <div class="card-header">Sales with purchase amount and profit by Month</div>
+                <div class="card">
                     <div class="card-body p-0">
+                        <div class="ms-4 mt-2">Sales with purchase amount and profit by Month</div>
                        <div class="row">
                         <div class="col-12">
                             <div v-if="isLoading">
@@ -78,7 +78,7 @@
                                     </div>
                                 </div>
                             </div>   
-                            <div v-if="monthlyProducts.length > 1">
+                            <div v-if="monthlyProducts.length > 1" class="pe-5">
                                 <GChart
                                 :settings="{ packages: ['corechart', 'table', 'map'] }"
                                 type="ColumnChart"
@@ -93,9 +93,9 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="card shadow">
-                    <div class="card-header">Sales amount by Month</div>
+                <div class="card">
                     <div class="card-body p-0">
+                    <div class="ms-4 mt-2">Sales amount by Month</div>
                       <div class="row">
                         <div class="col-12">
                             <div v-if="isLoading">
@@ -113,6 +113,7 @@
                                 type="PieChart"
                                 :data="monthlySalesProducts"
                                 :options="monthlySalesAmountOptions"
+
                             />
                             </div>
                             <div class="my-5 text-center" v-else >No data.</div>
@@ -145,8 +146,9 @@ export default {
             salesData:[],
             isLoading:false,   
             discount:0,
-            qtyOptions: {     
-                colors : ["teal"]
+            qtyOptions: {
+                colors : ["teal"],
+                width: '100%'
             },        
             chartOptions: {              
                 colors : ["orange", "blue","green", "brown"]
@@ -291,7 +293,6 @@ export default {
             gbc.map((res)=>{                
                    let data={item_name:"", sale_qty: 0}
                     res[1].map((ren)=>{
-                            console.log(ren)
                             data.item_name=ren.item_name;
                             data.sale_qty += ren.packing_size.largest_unit ?  ren.sale_qty / (ren.packing_size.medium_qty * ren.packing_size.smallest_qty) : ren.sale_qty / ren.packing_size.smallest_qty;
                     })
@@ -347,6 +348,6 @@ export default {
     
 }
 </script>
-<style lang="">
-    
+<style scoped>
+   
 </style>

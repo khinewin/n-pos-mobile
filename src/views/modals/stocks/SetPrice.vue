@@ -18,71 +18,50 @@
                                 </tr>
                                 <tr class="fw-bold">
                                     <td class="col-1"></td>
-                                    <td class="text-center col-1">
-                                        <span v-if="Object.keys(ei.packing_size).length">{{ei.packing_size.largest_unit}}</span>
-                                        <span v-else>L unit</span>
+                                    <td class="text-center col-1" v-if="ei.packing_size.largest_unit">
+                                        <span >{{ei.packing_size.largest_unit}}</span>
                                     </td>
-                                    <td class="text-center col-1">
-                                        <span v-if="Object.keys(ei.packing_size).length">{{ei.packing_size.medium_unit}}</span>
-                                        <span v-else>M unit</span>
+                                    <td class="text-center col-1" v-if="ei.packing_size.medium_unit">
+                                        <span >{{ei.packing_size.medium_unit}}</span>
                                     </td>                                        
-                                    <td class="text-center col-1" >
-                                        <span v-if="Object.keys(ei.packing_size).length">{{ei.packing_size.smallest_unit}}</span>
-                                        <span v-else>S unit</span>
+                                    <td class="text-center col-1"  v-if="ei.packing_size.smallest_unit">
+                                        <span >{{ei.packing_size.smallest_unit}}</span>
                                     </td>
                                 </tr>       
                                 <tr class="">
                                     <td class="pt-2">Pur price</td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(ei.packing_size).length > 0">
+                                    <td class="text-center p-0"  v-if="ei.packing_size.largest_unit">
                                         <input @keypress.enter="pressClose" :disabled="!ei.packing_size.largest_unit" @keyup="calPurPrice('largest_unit')" type="number" v-model="ei.pur_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
                                     </td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(ei.packing_size).length > 0">
+                                    <td class="text-center p-0"  v-if="ei.packing_size.medium_unit">
                                         <input @keypress.enter="pressClose" :disabled="!ei.packing_size.medium_unit"  @keyup="calPurPrice('medium_unit')"  type="number" v-model="ei.pur_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
                                     </td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(ei.packing_size).length > 0">
+                                    <td class="text-center p-0"  v-if="ei.packing_size.smallest_unit">
                                             <input @keypress.enter="pressClose" :disabled="!ei.packing_size.smallest_unit" @keyup="calPurPrice('smallest_unit')" type="number" v-model="ei.pur_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
                                     </td>                                        
                                 </tr>
                                 <tr class="">
                                     <td class="pt-2">Retail price</td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(ei.packing_size).length > 0">
+                                    <td class="text-center p-0"  v-if="ei.packing_size.largest_unit">
                                         <input @keypress.enter="pressClose" :disabled="!ei.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="ei.retail_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
                                     </td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(ei.packing_size).length > 0">
+                                    <td class="text-center p-0"  v-if="ei.packing_size.medium_unit">
                                         <input @keypress.enter="pressClose" :disabled="!ei.packing_size.medium_unit"  @keyup="calRetailPrice('medium_unit')"  type="number" v-model="ei.retail_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
                                     </td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(ei.packing_size).length > 0">
+                                    <td class="text-center p-0"  v-if="ei.packing_size.smallest_unit">
                                             <input @keypress.enter="pressClose" :disabled="!ei.packing_size.smallest_unit" @keyup="calRetailPrice('smallest_unit')" type="number" v-model="ei.retail_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
                                     </td>                                        
                                 </tr>
                                 <tr class="">
                                     <td class="pt-2">Wholesale price</td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(ei.packing_size).length > 0">
+                                    <td class="text-center p-0"  v-if="ei.packing_size.largest_unit">
                                         <input @keypress.enter="pressClose" :disabled="!ei.packing_size.largest_unit" @keyup="calWholesalePrice('largest_unit')" type="number" v-model="ei.whole_sale_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
                                     </td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(ei.packing_size).length > 0">
+                                    <td class="text-center p-0"  v-if="ei.packing_size.medium_unit">
                                         <input @keypress.enter="pressClose" :disabled="!ei.packing_size.medium_unit"  @keyup="calWholesalePrice('medium_unit')"  type="number" v-model="ei.whole_sale_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
                                     </td>
-                                    <td class="text-center p-0">
-                                        <span v-if="Object.keys(ei.packing_size).length > 0">
+                                    <td class="text-center p-0"  v-if="ei.packing_size.smallest_unit">
                                             <input @keypress.enter="pressClose" :disabled="!ei.packing_size.smallest_unit" @keyup="calWholesalePrice('smallest_unit')" type="number" v-model="ei.whole_sale_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
-                                        </span>
                                     </td>                                        
                                 </tr>  
                                 <tr>

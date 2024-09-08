@@ -227,7 +227,7 @@ export default {
                  main_s_qty: main_s ? main_s : 0,
                  l_qty: l ? l : 0, 
                  m_qty:m ? m :0,
-                 s_qty: s ? s :0                 
+                 s_qty: s ? s :0,     
                 };
         },       
        

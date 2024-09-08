@@ -392,9 +392,10 @@ export default {
             }else{
                 this.setEdit(this.products[0])
             }
+           
         },
-        setEdit(p){           
-             this.editItem={...p,  edit_user:  {uid:this.user.uid, type: "modified"}};
+        setEdit(p){          
+             this.editItem=p ? {...p,  edit_user:  {uid:this.user.uid, type: "modified"}} : {};
         },
         clearSearch(){
             this.search_by_code="";
@@ -434,7 +435,7 @@ export default {
                 onSnapshot(query_url, async(snapShot) =>{
                     const dc=snapShot._snapshot.docChanges;
                     const user=this.user;
-                    snapShot.docChanges().forEach((change) => {                       
+                    snapShot.docChanges().forEach((change) => {     
                         const res=change.doc.data();   
                             if(change.type==="added" && res.edit_user.uid==user.uid && dc.length===1){
                                     this.message("added")

@@ -78,7 +78,7 @@
      <!--end modal-->
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, deleteDoc, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, deleteDoc, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as ss from "@/lib/snapshot/packingSizes"
 import * as hp  from "@/lib/helper"
@@ -164,11 +164,12 @@ export default {
       
        async fetchpackingSizes(){
        const query_url = query(collection(db, "packingSizes"), orderBy("created_at", "desc"));
-       const snapShot=await getDocs(query_url)      
-       const pz=ss.packingSizes(snapShot)  
-       this.packingSizes=pz;
-       this.isLoading=false;
-       this.isUpdating=false;
+        onSnapshot(query_url, (snapShot)=>{
+            const pz=ss.packingSizes(snapShot)  
+            this.packingSizes=pz;
+            this.isLoading=false;
+            this.isUpdating=false;
+        })
       } ,
       showTime(t){
            return hp.showTime(t)
