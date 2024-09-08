@@ -23,7 +23,7 @@
                             <div class="row g-2">
                                 <div class="col-6">
                                     <div class="form-floating mb-2">
-                                        <select v-model="from_location" class="form-select form-select-sm" id="from_location">
+                                        <select v-model="from_location" class="form-select form-select-sm" id="from_location" @change="handleFromLocation(from_location)">
                                             <option>Main</option>
                                             <option>Pharmacy</option>
                                         </select>
@@ -32,7 +32,7 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="form-floating mb-2">
-                                        <select v-model="to_location" class="form-select form-select-sm" id="to_location">
+                                        <select v-model="to_location" class="form-select form-select-sm" id="to_location" @change="handleToLocation(from_location)">
                                             <option>Main</option>
                                             <option>Pharmacy</option>
                                         </select>
@@ -384,6 +384,26 @@ export default {
         setSupplier(s){
             this.supplier=s;
         },
+        handleFromLocation(location){
+           if(location=="Main"){
+                this.from_location="Main";
+                this.to_location="Pharmacy"
+            } 
+            if(location=="Pharmacy"){
+                this.from_location="Pharmacy";
+                this.to_location="Main"
+            }           
+      },
+      handleToLocation(location){
+        if(location=="Main"){
+                this.from_location="Pharmacy";
+                this.to_location="Main"
+            } 
+            if(location=="Pharmacy"){
+                this.from_location="Main";
+                this.to_location="Pharmacy"
+            }     
+      },
         reportAdjustments(r_type){                     
             this.$router.push({name: "ReportsAdjustments", params :{"reportType": r_type, "fromDate": this.from_date, "toDate": this.to_date},
             query : {voucher_no: this.voucher_no, "code_no": this.code_no ? this.code_no : null, "item_name" : this.item_name ? this.item_name : null,
