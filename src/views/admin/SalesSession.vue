@@ -108,11 +108,11 @@
                 })
                 //for totay sales
                 const today=this.showTime(Timestamp.fromDate(new Date()))
-                this.salesYearlyData.filter((f)=>{
+                this.salesYearlyData.filter((f)=>{                 
                        const sale_date=this.showTime(f.sale_date)
                         if(sale_date === today){
                                 this.sales_today += f.total_amount;
-                        }
+                        }                                
                 })
                 // for this week
                 function getCurrentWeekDates() {
@@ -129,12 +129,18 @@
                     };
                 }
                 const w=getCurrentWeekDates();
-                const first_day_week=Timestamp.fromDate(new Date(this.editShowTime(w.firstDay)))
-                const last_day_week=Timestamp.fromDate(new Date(this.editShowTime(w.lastDay)))
+           //     const first_day_week=Timestamp.fromDate(new Date(this.editShowTime(w.firstDay)))
+            //    const last_day_week=Timestamp.fromDate(new Date(this.editShowTime(w.lastDay)))
+                
                 this.salesYearlyData.filter((f)=>{
-                        if(f.sale_date >= first_day_week && f.sale_date <= last_day_week){
-                                this.sales_this_week += f.total_amount;
+                       // console.log(f.sale_date.toDate(), w.lastDay)
+                        const sd=f.sale_date.toDate();
+                        if(sd >= w.firstDay && sd <= w.lastDay){
+                            this.sales_this_week += f.total_amount;
                         }
+                      /*  if(f.sale_date >= first_day_week && f.sale_date <= last_day_week){
+                                this.sales_this_week += f.total_amount;
+                        }*/
                 })
                 //for this month
                 let date = new Date();
