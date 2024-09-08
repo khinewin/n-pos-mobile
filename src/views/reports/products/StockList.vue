@@ -145,7 +145,7 @@
             if(this.code_no){
                 query_url = query(collection(db, "products"), where("code_no", "==", Number(this.code_no)), orderBy("created_at", "desc"));
             }else{
-                 query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
+                 query_url = query(collection(db, "products"), where("is_deleted", "==", false), orderBy("created_at", "desc"));
             }
            onSnapshot(query_url, (snapShot)=>{
             const products=lib.products(snapShot)

@@ -2,7 +2,13 @@
     <div>           
            <PageHeader page-title="customers" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info"/>
            <div class="container-fluid">
-               <div class="row mb-2 justify-content-end">                            
+               <div class="row mb-2 justify-content-end">  
+                <div class="col-sm-2 d-grid">
+                    <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
+                        <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete</span>
+                        <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
+                    </button>
+                </div>                           
                 <div class="col-sm-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCustomer">
                         <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
@@ -47,6 +53,9 @@
                                <table class="table table-bordered table-hover mb-0">
                                    <tbody class="small">
                                        <tr class="text-center table-secondary" style="cursor: context-menu;">
+                                        <td>
+                                            <input type="checkbox" @click="checkAll" v-model="is_check_all">
+                                        </td>
                                            <td @click="sortCustomers('code')"><i class="fa-solid fa-sort"></i> Code</td>
                                            <td @click="sortCustomers('name')"><i class="fa-solid fa-sort"></i> Name</td>
                                            <td @click="sortCustomers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
@@ -54,6 +63,9 @@
                                            <td @click="sortCustomers('created_at')"><i class="fa-solid fa-sort"></i> Date</td>
                                        </tr>
                                        <tr>
+                                        <td class="position-relative">
+                                            <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" @click="checkAll" v-model="is_deleted">
+                                        </td>
                                             <td class="p-0">
                                                 <input @keyperss.enter="saveCustomer"  type="text" v-model="code" class="form-control-plaintext text-center" id="code" placeholder="Code">                                                                                       
                                             </td>
@@ -72,8 +84,11 @@
                                         </tr>
                                        
                                        <tr class="text-center" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id" @click="setEdit(p)" >                                            
+                                        <td class="position-relative">
+                                            <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" v-model="p.is_deleted">
+                                        </td>
                                            <td :class="{'table-secondary': sort_item ==='code'}" class="pt-2 position-relative">
-                                            <a class="text-danger position-absolute start-0 top-50 translate-middle ps-2" href="#!" @click="removeCustomer(i, p)"><i class="fa-solid fa-square-minus"></i></a>                                                                                        
+                                            <!--<a class="text-danger position-absolute start-0 top-50 translate-middle ps-2" href="#!" @click="removeCustomer(i, p)"><i class="fa-solid fa-square-minus"></i></a>-->                                                                                        
                                                 {{p.code}}
                                             </td>
                                            <td :class="{'table-secondary': sort_item ==='name'}" class="p-0">
@@ -150,7 +165,10 @@ import { required, email ,helpers} from '@vuelidate/validators'
                msg : {
                    type :"",
                    info :"",
-               }
+               },
+               is_deleted:false,
+               is_check_all: false,
+               isDeleting:false,
            }
        },
        created() {     
@@ -182,6 +200,25 @@ import { required, email ,helpers} from '@vuelidate/validators'
            }
        },
        methods:{
+
+        async deleteMultiple(){
+            const is_has=this.customers.filter((f)=>f.is_deleted)
+            if(is_has.length <=0) return false;
+            const cf=confirm(`Are you sure you want to delete the customers ?`)
+            if(!cf) return false;
+            this.isDeleting=true;
+            this.customers.filter(async (s)=>{
+                if(s.is_deleted){
+                    const updateDocument=doc(db, "customers", s.id)
+                    await updateDoc(updateDocument, {is_deleted: true, edit_user: {uid: this.user.uid, type: 'removed'}})  
+                }
+            })
+        },
+        checkAll(){
+            this.customers=this.customers.map((s)=>{
+               return {...s, is_deleted : this.is_check_all ? false : true}
+            })
+        },
       
         async removeCustomer(i, p){
             const cf=confirm(`Are you sure ? delete the customer : ${p.name} `)
@@ -210,7 +247,8 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 code :  this.code,
                 phone: this.phone,
                 address: this.address,
-                created_at : created_at,            
+                created_at : created_at,       
+                is_deleted: this.is_deleted,     
                 edit_user: {uid: this.user.uid, type: 'added'}
             }
             const result=await addDoc(dataCollection, data);         
@@ -240,7 +278,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
         }, 
          
            async checkDatabase(){ 
-            const query_url=query(collection(db, "customers"), orderBy("created_at", "desc"));           
+            const query_url=query(collection(db, "customers"),  orderBy("created_at", "desc"));           
                 onSnapshot(query_url, async(snapShot) =>{
                     const dc=snapShot._snapshot.docChanges;
                     const user=this.user;
@@ -254,15 +292,17 @@ import { required, email ,helpers} from '@vuelidate/validators'
                             if(change.type==="modified" && res.edit_user.type=="modified" && res.edit_user.uid==user.uid){
                                     this.message("modified")
                             }  
-                            if(change.type==="removed" && res.edit_user.type=="removed" && res.edit_user.uid==user.uid){
+                            if(change.type==="modified" && res.edit_user.type=="removed" && res.edit_user.uid==user.uid){
                                     this.message("removed")
+                                    this.isDeleting=false;
+                                    this.is_check_all=false;
                             }             
                     });                 
                     const isLocal=snapShot.metadata.formCache;                              
             });                              
         } ,
            async fetchCustomer(){                    
-               const query_url = query(collection(db, "customers"), orderBy("created_at", "desc"));
+               const query_url = query(collection(db, "customers"), where("is_deleted", "==", false ), orderBy("created_at", "desc"));
                onSnapshot(query_url, async(snapShot) =>{                    
                     const customers=ss.customers(snapShot);           
                     this.customersData=customers;

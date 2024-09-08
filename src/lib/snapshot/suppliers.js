@@ -9,6 +9,7 @@ const suppliers=(arr)=>{
             created_at: doc.data().created_at,
             phone : doc.data().phone,
             code : doc.data().code,     
+            is_deleted : doc.data().is_deleted,
             edit_user: null,                           
         };                                
         supplierItems.push(product);                                               

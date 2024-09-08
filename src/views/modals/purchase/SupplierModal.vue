@@ -28,12 +28,12 @@
                             </div>
                         </div>
                           <div class="row mt-2">
-                            <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
-                            <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
+                            <div class="col-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
+                            <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                 </button>
-                            </div>
-                            <div class="col-4 d-grid">
+                            </div>-->
+                            <div class="col-6 d-grid">
                                 <button class="btn btn-sm text-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                             </div>
                           </div> 
@@ -185,7 +185,7 @@
                 }
             },
             async fetchSuppliers(){ 
-            const query_url=query(collection(db, "suppliers"), orderBy("created_at", "desc"));           
+            const query_url=query(collection(db, "suppliers"), where("is_deleted","==",false ), orderBy("created_at", "desc"));           
                 onSnapshot(query_url, async(snapShot) =>{                  
                     const suppliers=ss.suppliers(snapShot);   
                     this.suppliersData=suppliers;

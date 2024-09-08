@@ -4,6 +4,12 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">   
                 <div class="col-sm-2 d-grid">
+                    <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
+                        <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete</span>
+                        <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
+                    </button>
+                </div>       
+                <div class="col-sm-2 d-grid">
                     <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn"><i class="fa-solid fa-boxes-packing"></i> Packing size</button>
                 </div>                            
                 <div class="col-sm-2 d-grid">
@@ -44,8 +50,18 @@
                         <div class="card-body p-2 table-responsive ">
                             <div>
                                 <table class="table table-bordered mb-0">
-                                    <tbody>                                                                     
+                                    <tbody> 
+                                        <tr class="text-center table-secondary" style="cursor: context-menu;">
+                                            <td class="">
+                                                <input type="checkbox" @click="checkAll" v-model="is_check_all">
+                                            </td>
+                                            <td class="">Code</td>
+                                            <td class="">Description</td>
+                                        </tr>                                                                    
                                         <tr>
+                                            <td class="position-relative">
+                                                <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" @click="checkAll" v-model="is_deleted">
+                                            </td>
                                             <td>
                                                 <input placeholder="Code"  type="text" v-model="code_no" class="form-control-plaintext form-control-sm  text-center">
                                             </td>
@@ -54,14 +70,17 @@
                                             </td>                                     
                                         </tr>     
                                                                 
-                                    <tr class="text-center"  v-if="products.length > 0"  v-for="(p, i) in products" :key="p.id"  :class="{'table-secondary' : editItem.id === p.id}">                                    
-                                        <td :class="{'table-secondary': sort_item ==='code_no'}" class="p-0 col-1 position-relative">
-                                            <a class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeProduct(i, p)"><i class="fa-solid fa-square-minus"></i></a>                                                                                       
+                                    <tr class="text-center"  v-if="products.length > 0"  v-for="(p, i) in products" :key="p.id"  :class="{'table-secondary' : editItem.id === p.id}">   
+                                        <td class="position-relative">
+                                            <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" v-model="p.is_deleted">
+                                        </td>                                 
+                                        <td :class="{'table-secondary': sort_item ==='code_no'}" class="p-0  position-relative">
+                                            <!---<a class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeProduct(i, p)"><i class="fa-solid fa-square-minus"></i></a>-->                                                                                       
                                             <span>
                                                 <input @click="setEdit(p)" @keyup="setEdit(p)" @keypress.enter="saveEdit" @paste="pasteEdit" type="text" class="form-control-plaintext form-control-sm text-center " v-model="p.code_no">
                                             </span>
                                         </td>
-                                        <td :class="{'table-secondary': sort_item ==='item_name'}" class="p-0 col-2">
+                                        <td :class="{'table-secondary': sort_item ==='item_name'}" class="p-0">
                                             <span>
                                                 <input @click="setEdit(p)" @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext form-control-sm ms-2" v-model="p.item_name">
                                             </span>
@@ -259,7 +278,10 @@ export default {
             msg : {
                 type :"",
                 info :"",
-            }
+            },
+            is_deleted:false,
+            is_check_all: false,
+            isDeleting:false,
         }
     },
     created() {     
@@ -293,6 +315,24 @@ export default {
     },
 
     methods:{   
+        async deleteMultiple(){
+            const is_has=this.products.filter((f)=>f.is_deleted)
+            if(is_has.length <=0) return false;
+            const cf=confirm(`Are you sure you want to delete the medicine code ?`)
+            if(!cf) return false;
+            this.isDeleting=true;
+            this.products.filter(async (s)=>{
+                if(s.is_deleted){
+                    const updateDocument=doc(db, "products", s.id)
+                    await updateDoc(updateDocument, {is_deleted: true, edit_user: {uid: this.user.uid, type: 'removed'}})  
+                }
+            })
+        },
+        checkAll(){
+            this.products=this.products.map((s)=>{
+               return {...s, is_deleted : this.is_check_all ? false : true}
+            })
+        },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
@@ -349,6 +389,7 @@ export default {
                 created_at : save_time,          
                 pur_price: {},
                 main_qty:0,
+                is_deleted:this.is_deleted,
                 edit_user: {uid: this.user.uid, type: 'added'}
 
             }
@@ -445,8 +486,10 @@ export default {
                             if(change.type==="modified" && res.edit_user.type=="modified" && res.edit_user.uid==user.uid){
                                     this.message("modified")
                             }  
-                            if(change.type==="removed" && res.edit_user.type=="removed" && res.edit_user.uid==user.uid){
+                            if(change.type==="modified" && res.edit_user.type=="removed" && res.edit_user.uid==user.uid){
                                     this.message("removed")    
+                                    this.isDeleting=false;
+                                    this.is_check_all=false;
                                     //this.editItem={}
                             }    
                             this.checkEdit();
@@ -455,7 +498,7 @@ export default {
             });                              
         } ,
         async fetchProducts(){                    
-            const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
+            const query_url = query(collection(db, "products"), where("is_deleted", "==", false), orderBy("created_at", "desc"));
             onSnapshot(query_url, async(snapShot) =>{
                 const products=ss.products(snapShot);   
                 this.productsData=products;

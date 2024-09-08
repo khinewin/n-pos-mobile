@@ -200,7 +200,7 @@ export default {
         },
       
         async fetchProducts(){
-        const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
+        const query_url = query(collection(db, "products"), where("is_deleted", "==", false), orderBy("created_at", "desc"));
         onSnapshot(query_url, async(snapShot) =>{                  
                     const products=lib.products(snapShot)       
                     this.productsData=products;

@@ -55,7 +55,7 @@ const  message=(type, name)=>{
     }else if(type=="modified"){
         return `The ${name} has been updated` 
     }else if(type=="removed"){
-        return `The selected ${name} has been removed`
+        return `The selected ${name} has been deleted`
     }
 }
 

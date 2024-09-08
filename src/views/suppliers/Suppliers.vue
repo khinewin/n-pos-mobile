@@ -2,7 +2,13 @@
     <div>           
            <PageHeader page-title="Suppliers" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info"/>
            <div class="container-fluid">
-               <div class="row mb-2 justify-content-end">                            
+               <div class="row mb-2 justify-content-end">   
+                <div class="col-sm-2 d-grid">
+                    <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
+                        <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete</span>
+                        <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
+                    </button>
+                </div>                           
                 <div class="col-sm-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveSupplier">
                         <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
@@ -31,11 +37,11 @@
                                  </div> 
                             </div>
                              <div class="row mt-2">
-                                    <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="searchSuppliers"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
-                                    <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
+                                    <div class="col-6 d-grid"><button class="btn btn-sm text-dark" @click="searchSuppliers"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
+                                    <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
-                                    </button></div>
-                                    <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
+                                    </button></div>-->
+                                    <div class="col-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
                              </div> 
                         </div>
                       </div>                                                                                                          
@@ -46,6 +52,9 @@
                                <table class="table table-bordered table-hover mb-0">
                                    <tbody class="">
                                        <tr class="text-center table-secondary" style="cursor: context-menu;">
+                                        <td>
+                                            <input type="checkbox" @click="checkAll" v-model="is_check_all">
+                                        </td>
                                            <td  @click="sortSuppliers('code')"><i class="fa-solid fa-sort"></i> Code</td>
                                            <td @click="sortSuppliers('name')"><i class="fa-solid fa-sort"></i> Name</td>
                                            <td @click="sortSuppliers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
@@ -53,6 +62,9 @@
                                            <td @click="sortSuppliers('created_at')"><i class="fa-solid fa-sort"></i> Date</td>
                                        </tr>
                                        <tr>
+                                        <td class="position-relative">
+                                            <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" @click="checkAll" v-model="is_deleted">
+                                        </td>
                                             <td class="">
                                                 <input @keypress.enter="saveSupplier" type="text" v-model="code" class="form-control-plaintext text-center" id="code" placeholder="Code">                                                                                       
                                             </td>
@@ -71,9 +83,12 @@
                                         </tr>
                                        
                                        <tr class="text-center" v-if="suppliers.length > 0"  v-for="(p, i) in suppliers" :key="p.id" @mouseenter="setEdit(p)" >                                           
-                                           <td :class="{'table-secondary': sort_item ==='code'}" class="pt-2 position-relative">
-                                                <a class="text-danger position-absolute start-0 top-50 translate-middle ps-2" href="#!" @click="removeSupplier(i, p)"><i class="fa-solid fa-square-minus"></i></a>                                                                                        
-                                                {{p.code}}
+                                        <td class="position-relative">
+                                            <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" v-model="p.is_deleted">
+                                        </td>
+                                           <td :class="{'table-secondary': sort_item ==='code'}" class="position-relative">
+                                                <!--<a class="text-danger position-absolute start-0 top-50 translate-middle ps-2" href="#!" @click="removeSupplier(i, p)"><i class="fa-solid fa-square-minus"></i></a>-->                                                                                        
+                                                <span class="position-absolute start-50 top-50 translate-middle">{{p.code}}</span>
                                             </td>
                                            <td :class="{'table-secondary': sort_item ==='name'}" class="p-0">
                                                 <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center m-0" v-model="p.name">
@@ -84,7 +99,9 @@
                                            <td :class="{'table-secondary': sort_item ==='company'}" class="p-0">
                                             <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center m-0" v-model="p.company">
                                            </td>
-                                           <td :class="{'table-secondary': sort_item ==='created_at'}" class="pt-2">{{showTime(p.created_at)}}</td>
+                                           <td :class="{'table-secondary': sort_item ==='created_at'}" class="position-relative">
+                                                <span class="position-absolute start-50 top-50 translate-middle">{{showTime(p.created_at)}}</span>
+                                           </td>
                                        </tr>
                                    </tbody>
                                </table>
@@ -149,7 +166,10 @@ import { required, email ,helpers} from '@vuelidate/validators'
                msg : {
                    type :"",
                    info :"",
-               }
+               },
+               is_deleted:false,
+               is_check_all: false,
+               isDeleting:false,
            }
        },
        created() {     
@@ -181,6 +201,24 @@ import { required, email ,helpers} from '@vuelidate/validators'
            }
        },
        methods:{
+        async deleteMultiple(){
+            const is_has=this.suppliers.filter((f)=>f.is_deleted)
+            if(is_has.length <=0) return false;
+            const cf=confirm(`Are you sure you want to delete the suppliers ?`)
+            if(!cf) return false;
+            this.isDeleting=true;
+            this.suppliers.filter(async (s)=>{
+                if(s.is_deleted){
+                    const updateDocument=doc(db, "suppliers", s.id)
+                    await updateDoc(updateDocument, {is_deleted: true, edit_user: {uid: this.user.uid, type: 'removed'}})  
+                }
+            })
+        },
+        checkAll(){
+            this.suppliers=this.suppliers.map((s)=>{
+               return {...s, is_deleted : this.is_check_all ? false : true}
+            })
+        },
         resetInput(){
             this.name="";
             this.phone="";
@@ -211,15 +249,17 @@ import { required, email ,helpers} from '@vuelidate/validators'
                             if(change.type==="modified" && res.edit_user.type=="modified" && res.edit_user.uid==user.uid){
                                     this.message("modified")
                             }  
-                            if(change.type==="removed" && res.edit_user.type=="removed" && res.edit_user.uid==user.uid){
+                            if(change.type==="modified" && res.edit_user.type=="removed" && res.edit_user.uid==user.uid){
                                     this.message("removed")
+                                    this.isDeleting=false;
+                                    this.is_check_all=false;
                             }             
                     });                 
                     const isLocal=snapShot.metadata.formCache;                              
             });                              
         } ,
         async fetchSuppliers(){ 
-            const query_url=query(collection(db, "suppliers"), orderBy("created_at", "desc"));           
+            const query_url=query(collection(db, "suppliers"), where("is_deleted", "==", false), orderBy("created_at", "desc"));           
                 onSnapshot(query_url, async(snapShot) =>{                  
                     const suppliers=lib.suppliers(snapShot);   
                     this.suppliersData=suppliers;
@@ -254,6 +294,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 phone: this.phone,
                 company: this.company,
                 created_at : created_at,      
+                is_deleted: this.is_deleted,
                 edit_user: {uid: this.user.uid, type: 'added'}         
             }      
             const docRef=await addDoc(dataCollection, data)                          

@@ -16,6 +16,7 @@ const products=(snapShot)=>{
             pur_price : data.pur_price ? data.pur_price : {},
             auto_cal: data.auto_cal ? data.auto_cal : false,
             edit_user:null,
+            is_deleted:data.is_deleted,
         };                                
         products.push(product);                           
     });

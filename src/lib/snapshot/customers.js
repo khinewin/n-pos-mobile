@@ -10,6 +10,7 @@ const customers=(arr)=>{
             created_at: data.created_at,
             phone : data.phone,
             code : data.code,      
+            is_deleted: data.is_deleted,
             edit_user:  null  
         };                                
         customerItems.push(cus);                                              
