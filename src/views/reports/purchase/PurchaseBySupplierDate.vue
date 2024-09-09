@@ -1,6 +1,6 @@
 <template lang="">
     <div class="">  
-        <table class="table table-bordered border-dark table-hover">
+        <table class="table table-bordered border-dark table-hover mb-0">
             <tbody class="" v-if="reports.length > 0">                                 
                 <tr v-for="r in reports" :key="r[0]">
                     <td class="col-1 text-center">
@@ -68,7 +68,7 @@
                 </tr>
                <tr>
                 <td colspan="2" class="p-0" style="border-style: hidden;">
-                    <table class="table table-bordered border-dark table-hover" >
+                    <table class="table table-bordered border-dark table-hover mb-0" >
                         <tbody class="table-group-divider">
                             <tr>
                                 <td class="text-end fw-bold col-10" >Grand total amount</td>
