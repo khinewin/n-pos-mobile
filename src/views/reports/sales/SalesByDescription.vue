@@ -195,7 +195,7 @@ export default {
                     item.pur_price=ren.pur_price;
                     item.pur_amount +=ren.pur_price.smallest_unit * ren.sale_qty;
                     item.profit += ren.final_amount - (ren.pur_price.smallest_unit * ren.sale_qty);                                
-                    item.extra_discount += ren.extra_discount;
+                    item.extra_discount += Number(ren.extra_discount);
                 })
                 return item;
            }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)
@@ -219,8 +219,13 @@ export default {
         },
        
         async fetchSales(){
-            const from_date=Timestamp.fromDate(new Date(this.fromDate))
-            const to_date=Timestamp.fromDate(new Date(this.toDate))
+            const date=new Date();         
+            let fDate=new Date(this.fromDate)
+            fDate.setHours("0", "0", "0")
+            const from_date=Timestamp.fromDate(fDate)
+            let tDate=new Date(this.toDate)
+            tDate.setHours("23", "59", "59")
+            const to_date=Timestamp.fromDate(tDate)
            let query_url="";
             if(this.customer_code){
             query_url = query(collection(db, "sales"),  

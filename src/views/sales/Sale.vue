@@ -161,6 +161,12 @@
                                                 {{change}}
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td colspan="9" class="text-end">Credit</td>
+                                            <td class="text-end">
+                                                {{credit}}
+                                            </td>
+                                        </tr>
                                     </tbody>
                               </table>
                               </div>
@@ -228,6 +234,7 @@ export default {
             total_amount:0,
             net_amount:0,
             extra_discount:0,
+            credit:0,
             charges:0,
             paid:0,
             change:0,
@@ -365,12 +372,14 @@ export default {
         },
        
         setSaleQty(){           
-            this.checkEditQty();
+            const isCheck=this.checkEditQty();
             const e=this.editItem;
                 let sale_qty=0;
                 sale_qty += e.input_l_qty ? e.input_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
                 sale_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty: 0;
-                sale_qty += e.input_s_qty ? e.input_s_qty : 0;
+                sale_qty += e.input_s_qty ? e.input_s_qty : 0;                        
+                
+
                return this.saleItems.map((f)=>{   
                     if(f.id===e.id){
                         f.sale_qty=sale_qty,
@@ -435,7 +444,7 @@ export default {
 
             this.total_amount=total_amount;
             this.net_amount=this.extra_discount ? this.total_amount - this.extra_discount : this.total_amount;
-           
+            this.credit=this.paid ? Math.abs(this.net_amount) - this.paid :  this.net_amount;
         },
         setInput(e){
            if(e.target.value==0){
@@ -508,6 +517,10 @@ export default {
                 this.msg.type="";
                 this.msg.info="";
 
+                if(this.credit > 0){
+                    this.saveCredit();
+                }
+
                  let date=new Date();
                 let sale_date=new Date(this.sale_date)
                 sale_date.setHours(date.getHours())
@@ -519,16 +532,39 @@ export default {
                     products : this.saleItems,
                     user : {uid: this.user.uid, displayName: this.user.displayName},
                     total_amount:this.total_amount,
+                    extra_discount:this.extra_discount ? this.extra_discount : 0,
+                    net_amount: this.net_amount ,
+                    paid: this.paid ? this.paid : 0,
+                    change:this.change,
+                    sale_type:this.sale_type,
+                    customer : this.customer,
+                    credit: this.credit,
+                }                  
+                const saveDocument=collection(db, "sales")
+                await addDoc(saveDocument, voucher)     
+                        
+        },
+        async saveCredit(){
+            let date=new Date();
+            let sale_date=new Date(this.sale_date)
+            sale_date.setHours(date.getHours())
+            sale_date.setMinutes(date.getMinutes())
+            const voucher={
+                    voucher_no: this.voucher_no,
+                    sale_date: Timestamp.fromDate(sale_date),
+                    products : this.saleItems,
+                    user : {uid: this.user.uid, displayName: this.user.displayName},
+                    total_amount:this.total_amount,
                     extra_discount:this.extra_discount,
                     net_amount: this.net_amount,
                     paid: this.paid,
                     change:this.change,
                     sale_type:this.sale_type,
                     customer : this.customer,
+                    credit: this.credit,
                 }                  
-                const saveDocument=collection(db, "sales")
+                const saveDocument=collection(db, "creditSales")
                 await addDoc(saveDocument, voucher)     
-                        
         },
         updateProducts(){
             this.saleItems.map(async (p)=>{
@@ -549,6 +585,7 @@ export default {
                 this.net_amount=0;
                 this.paid=0,
                 this.change=0
+                this.credit=0
                 this.isNewSale=true;                
                 this.voucher_no=new Date().getTime();
                 this.sale_date=new Date().toISOString().substr(0, 10)            
@@ -578,21 +615,20 @@ export default {
                 sale_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty: 0;
                 sale_qty += e.input_s_qty ? e.input_s_qty : 0;
 
-                let bal_qty_largest_unit=Math.floor(e.qty / (e.packing_size.medium_qty * e.packing_size.smallest_qty));
-                let bal_qty_medium_unit=Math.floor((e.qty % (e.packing_size.medium_qty * e.packing_size.smallest_qty)) / e.packing_size.smallest_qty);
+                let bal_qty_largest_unit=e.packing_size.largest_unit ? Math.floor(e.qty / (e.packing_size.medium_qty * e.packing_size.smallest_qty)) : 0;
+                let bal_qty_medium_unit=e.packing_size.medium_unit ? Math.floor((e.qty % (e.packing_size.medium_qty * e.packing_size.smallest_qty)) / e.packing_size.smallest_qty): 0;
                 let bal_qty_smallest_unit=e.qty;
-                
-            this.saleItems.filter((f, i)=>{
-                if(e.id===f.id){
+                //console.log(e.input_l_qty)//has a trouble
                     if(sale_qty > e.qty){
                         this.msg.type="error";
-                        this.msg.info="Maximum  inventory"
+                        this.msg.info="Maximum  inventory balance"
                         e.input_l_qty = bal_qty_largest_unit ? bal_qty_largest_unit : 0;
                         e.input_m_qty = bal_qty_largest_unit ? 0 : bal_qty_medium_unit ? bal_qty_medium_unit : 0;
                         e.input_s_qty = bal_qty_largest_unit || bal_qty_medium_unit ? 0 : bal_qty_smallest_unit ? bal_qty_smallest_unit : 0;
-                    }                 
-                }
-            });
+                        isSufficient=false;                        
+                    }                
+            
+            
             if(!isSufficient) return false;
             return true;
         },
@@ -639,7 +675,8 @@ export default {
             this.charges=this.total_amount - this.discount;
         },*/
         calPaid(){
-            this.change=this.paid - this.net_amount;
+            this.change=this.paid - this.net_amount > 0 ? this.paid - this.net_amount : 0;
+            this.credit=this.paid - this.net_amount < 0 ? Math.abs(this.paid - this.net_amount) : 0;
         },
        
          editShowTime(t){

@@ -170,13 +170,13 @@ export default {
                         let index = sales.findIndex((item) => item.voucher_no == res.voucher_no);
                         if(index === -1){
                             sales.push({...data, 
-                            group_customer:  `${res.customer.name}`,
-                            customer_code: res.customer.code,
+                            group_customer:  `${res.customer.code}`,
+                            customer_name: res.customer.name,
                             extra_discount : res.discount,
                              voucher_no: res.voucher_no, extra_discount: res.extra_discount})
                         }else{
-                            sales.push({...data, group_customer:  `${res.customer.name}`,
-                            customer_code: res.customer.code,
+                            sales.push({...data, group_customer:  `${res.customer.code}`,
+                            customer_name: res.customer.name,
                             extra_discount : res.discount, 
                             voucher_no: res.voucher_no, extra_discount: 0})
                         }                                 
@@ -207,7 +207,9 @@ export default {
             let total_sale_amount=0;
             let total_discount=0;
            const gbc=gbd.map((res)=>{
+            let customer_name=""
             const res1=Object.entries(hp.gb_item_name_price(res[1]))
+                customer_name=res[1][0].customer_name
                 const res2=res1.map((res)=>{
                     const item_name=res[1][0].item_name;
                 let item={
@@ -234,7 +236,7 @@ export default {
                     item.pur_price=ren.pur_price;
                     item.pur_amount +=ren.pur_price.smallest_unit * ren.sale_qty;
                     item.profit += ren.final_amount - (ren.pur_price.smallest_unit * ren.sale_qty);                                
-                    item.extra_discount += ren.extra_discount;
+                    item.extra_discount += Number(ren.extra_discount);
                 })
                 return item;
            }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)
@@ -254,7 +256,7 @@ export default {
                 total_discount += extra_discount;
                 const res4={sale_amount, pur_amount, profit_amount, extra_discount}
 
-                const newData=[res[0],  [...res2],res4]               
+                const newData=[customer_name,  [...res2],res4]               
                 return newData;                             
            })           
            this.total_pur_amount=total_pur_amount;
@@ -262,11 +264,17 @@ export default {
            this.total_sale_amount=total_sale_amount;
            this.total_discount=total_discount;
            this.reports=gbc;
-        
         },   
         async fetchSales(){
-            const from_date=Timestamp.fromDate(new Date(this.fromDate))
-            const to_date=Timestamp.fromDate(new Date(this.toDate))
+         //   const from_date=Timestamp.fromDate(new Date(this.fromDate))
+            const date=new Date();         
+            let fDate=new Date(this.fromDate)
+            fDate.setHours("0", "0", "0")
+            const from_date=Timestamp.fromDate(fDate)
+            let tDate=new Date(this.toDate)
+            tDate.setHours("23", "59", "59")
+            const to_date=Timestamp.fromDate(tDate)
+            
             let query_url=""
             if(this.customer_code){
                 query_url = query(collection(db, "sales"), 

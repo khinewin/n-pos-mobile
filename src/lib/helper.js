@@ -26,7 +26,7 @@ const showTimeHour=(t)=>{
 };
 const showTimeHourShort=(t)=>{
     const date=t.toDate()
-    const options = { year: '2-digit', month: 'numeric', day: 'numeric', hour: '2-digit', hourCycle: "h12", minute: '2-digit' };
+    const options = { year: '2-digit', month: 'numeric', day: 'numeric', hour: '2-digit', hourCycle:"h12", minute: '2-digit' };
     const formattedDate = new Intl.DateTimeFormat('en-UK', options).format(date);
     return formattedDate;
 };

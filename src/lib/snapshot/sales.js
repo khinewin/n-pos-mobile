@@ -10,11 +10,12 @@ const sales=(arr)=>{
             products : data.products,    
              net_amount: data.net_amount,
              paid:data.paid,
-             extra_discount: data.extra_discount,
+             extra_discount: data.extra_discount ? data.extra_discount : 0,
              change: data.change,
              total_amount:data.total_amount,
              sale_type: data.sale_type,
              customer : data.customer,
+             credit: data.credit,
         };                                     
         saleItems.push(sale); 
     })

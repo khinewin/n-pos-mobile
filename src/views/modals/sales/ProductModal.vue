@@ -51,8 +51,8 @@
                                                     <td class="col-2">Description</td>
                                                     <td class="col-1">Packing size</td>
                                                     <td class="col-1">Pharmacy Inv Bal</td>
-                                                    <td class="col-2" v-if="sale_type=='retail'">Retail price</td>
-                                                    <td class="col-2" v-if="sale_type=='whole_sale'">Wholesale price</td>
+                                                    <td class="col-1" v-if="sale_type=='retail'">Retail price</td>
+                                                    <td class="col-1" v-if="sale_type=='whole_sale'">Wholesale price</td>
 
                                                 </tr>                                      
                                                 <tr class="" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"   style="cursor:context-menu">
@@ -61,7 +61,7 @@
                                                     <td class="">
                                                         {{calPackingSize(p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit, p.packing_size.medium_qty, p.packing_size.smallest_qty)}}
                                                     </td>
-                                                    <td class="text-end col-1">
+                                                    <td class="text-end">
                                                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                             
                                                     </td>                                                  
                                                     <td class="text-end" v-if="sale_type=='retail'">

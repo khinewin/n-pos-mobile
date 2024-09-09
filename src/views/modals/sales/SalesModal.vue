@@ -150,18 +150,20 @@ export default {
            this.searchSales();
        },
        searchSales(){        
-        this.sales=this.sales.sort((a,b)=>{
-                const date_a=new Date(a.sale_date.toDate()).getTime();
-                const date_b=new Date(b.sale_date.toDate()).getTime();
-                return date_a - date_b;
-            })
+        
            if(this.search_by_voucher_no){
                this.sales=this.salesData.filter((f)=>{
                        return f.voucher_no===Number(this.search_by_voucher_no);
                })
            }else if(this.search_by_from_sale_date && this.search_by_to_sale_date){
-                const searchFromDate=Timestams.fromDate(new Date(this.search_by_from_sale_date));
-                const searchToDate=Timestams.fromDate(new Date(this.search_by_to_sale_date));
+                const date=new Date();         
+                let fDate=new Date(this.search_by_from_sale_date)
+                fDate.setHours("0", "0", "0")
+                const searchFromDate=Timestamp.fromDate(fDate)
+                let tDate=new Date(this.search_by_to_sale_date)
+                tDate.setHours("23", "59", "59")
+                const searchToDate=Timestamp.fromDate(tDate)
+           
                 this.sales=this.salesData.filter((f)=>{
                         return  f.sale_date >= searchFromDate && f.sale_date <= searchToDate; 
                 })   
@@ -172,6 +174,11 @@ export default {
                            }
                  })                                     
            }
+           this.sales=this.sales.sort((a,b)=>{
+                const date_a=new Date(a.sale_date.toDate()).getTime();
+                const date_b=new Date(b.sale_date.toDate()).getTime();
+                return date_a - date_b;
+            })
        },
      
     async fetchSales(){

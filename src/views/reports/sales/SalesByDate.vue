@@ -92,6 +92,7 @@ export default {
             total_profit:0,       
             total_discount:0,
             isLoading:false,
+         
             msg : {
                 type :"",
                 info :"",
@@ -140,6 +141,13 @@ export default {
       
     },
     methods:{
+        setSaleDate(){
+            const date=new Date();         
+            let to_date=new Date(this.toDate)
+            to_date.setHours(date.getHours())
+            to_date.setMinutes(date.getMinutes())
+          this.update_to_date=Timestamp.fromDate(to_date);
+        },
         displayPrice(l_unit, m_unit, s_unit){
             return hp.displayPrice(l_unit, m_unit, s_unit);
         },
@@ -197,7 +205,7 @@ export default {
                     sale_qty : 0,
                     code_no:"",
                     profit: 0,               
-                    extra_discount:0,
+                    extra_discount: 0,
                     packing_size: {},
                     retail_price:{},
                     whole_sale_price:{},
@@ -216,11 +224,10 @@ export default {
                     item.pur_price=ren.pur_price;
                     item.pur_amount +=ren.pur_price.smallest_unit * ren.sale_qty;
                     item.profit += ren.final_amount - (ren.pur_price.smallest_unit * ren.sale_qty);                                
-                    item.extra_discount += ren.extra_discount;
+                    item.extra_discount += Number(ren.extra_discount);
                 })
                 return item;
            }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)
-               
                 let sale_amount=0;
                 let pur_amount=0;
                 let profit_amount=0;
@@ -245,9 +252,15 @@ export default {
            this.total_discount =total_discount;
            this.reports=gbc;        
         },   
-        async fetchSales(){
-            const from_date=Timestamp.fromDate(new Date(this.fromDate))
-            const to_date=Timestamp.fromDate(new Date(this.toDate))
+        async fetchSales(){           
+            const date=new Date();         
+            let fDate=new Date(this.fromDate)
+            fDate.setHours("0", "0", "0")
+            const from_date=Timestamp.fromDate(fDate)
+            let tDate=new Date(this.toDate)
+            tDate.setHours("23", "59", "59")
+            const to_date=Timestamp.fromDate(tDate)
+
            let query_url=""
            if(this.customer_code){
             query_url = query(collection(db, "sales"), 

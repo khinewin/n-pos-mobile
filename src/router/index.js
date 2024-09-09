@@ -27,6 +27,7 @@ import Adjustments from '@/views/adjustments/Adjustments.vue'
 import NewAdjustment from '@/views/adjustments/New.vue'
 import EditAdjustment from '@/views/adjustments/Edit.vue'
 import ReportAdjustments from '@/views/reports/Adjustments.vue'
+import SalesOnCredit from '@/views/sales/SalesOnCredit.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),  
@@ -57,6 +58,13 @@ const router = createRouter({
       name: 'Sale',     
       component: Sale,
       meta : {title: "N-Pharmacy | Sale"}
+
+    },
+    {
+      path: '/soc',
+      name: 'Soc',     
+      component: SalesOnCredit,
+      meta : {title: "N-Pharmacy | SOC"}
 
     },
     {

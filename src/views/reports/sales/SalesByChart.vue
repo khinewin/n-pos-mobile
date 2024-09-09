@@ -312,8 +312,14 @@ export default {
             this.isLoading=false   
         },
         async fetchSalesDaily(){
-            const from_date=Timestamp.fromDate(new Date(this.fromDate))
-            const to_date=Timestamp.fromDate(new Date(this.toDate))
+            const date=new Date();         
+            let fDate=new Date(this.fromDate)
+            fDate.setHours("0", "0", "0")
+            const from_date=Timestamp.fromDate(fDate)
+            let tDate=new Date(this.toDate)
+            tDate.setHours("23", "59", "59")
+            const to_date=Timestamp.fromDate(tDate)
+            
            let query_url=""
            if(this.customer_code){
             query_url = query(collection(db, "sales"),  
