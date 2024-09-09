@@ -16,7 +16,10 @@
             </tbody>
             <tbody v-if="reports.length > 0" v-for="r in reports" :key="r[0]">
                 <tr>
-                    <td class="text-center" :rowspan="r[1].length + 4">{{r[0]}}</td>
+                    <td class="text-center" :rowspan="r[1].length + 4">
+                       <div> {{r[0].supplier_name}}</div>
+                       <div>{{r[0].company}}</div>
+                    </td>
                 </tr>                                            
                 <tr v-for="st in r[1]" :key="st.code_no">
                     <td class="text-center">{{st.code_no}}</td>
@@ -161,9 +164,9 @@ export default {
                     res.products.map((data)=>{
                         let index = purchase.findIndex((item) => item.voucher_no == res.voucher_no);
                         if(index === -1){
-                            purchase.push({...data, group_supplier : `${res.supplier.name} (${res.supplier.company})`,  voucher_no: res.voucher_no, extra_discount: res.extra_discount})
+                            purchase.push({...data, group_supplier : res.supplier.code, supplier_name: res.supplier.name, supplier_company: res.supplier.company,  voucher_no: res.voucher_no, extra_discount: res.extra_discount})
                         }else{
-                            purchase.push({...data, group_supplier : `${res.supplier.name} (${res.supplier.company})`,  voucher_no: res.voucher_no, extra_discount: 0})
+                            purchase.push({...data, group_supplier : res.supplier.code,  supplier_name: res.supplier.name, supplier_company: res.supplier.company, voucher_no: res.voucher_no, extra_discount: 0})
                         }   
                  })
             })
@@ -182,10 +185,13 @@ export default {
 
             const gbs=Object.entries(hp.gb_supplier(purchase))
            const gbc=gbs.map((res)=>{
-                const supplier=res[0]
+                let supplier_name=""
+                let company=""
                 const res1=Object.entries(hp.gb_item_name_pur_price(res[1]))
                 const res2=res1.map((res)=>{
                     const item_name=res[1][0].item_name;
+                    supplier_name=res[1][0].supplier_name;
+                    company=res[1][0].supplier_company;
                     let item={extra_discount:0,packing_size:"",
                         item_name: item_name, code_no:"", 
                         discount:0, 
@@ -222,7 +228,7 @@ export default {
                     price += ren.price;
                     discount += ren.discount;
                 })               
-                const newData=[supplier,  [...res2],res3]       
+                const newData=[{supplier_name, company},  [...res2],res3]       
                 total_amount += amount;
                 total_price += price;
                 total_discount += discount;             

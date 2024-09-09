@@ -1,9 +1,12 @@
 <template lang="">
     <div class="">  
         <table class="table table-bordered border-dark table-hover">
-            <tbody class="" v-if="reports.length > 0">                            
+            <tbody class="" v-if="reports.length > 0">                                 
                 <tr v-for="r in reports" :key="r[0]">
-                    <td class="col-1 text-center">{{r[0]}}</td>
+                    <td class="col-1 text-center">
+                        <div> {{r[0].supplier_name}}</div>
+                        <div>{{r[0].company}}</div>
+                    </td>
                     <td class="p-0 col-11">
                         <table class="table table-bordered border-dark table-hover mb-0" style="border-style: hidden;">
                             <tbody>
@@ -182,9 +185,9 @@ export default {
                     res.products.map((data)=>{
                         let index = purchase.findIndex((item) => item.voucher_no == res.voucher_no);
                         if(index === -1){
-                            purchase.push({...data, group_supplier : `${res.supplier.name} (${res.supplier.company})`, group_date :  this.showTime(res.pur_date),  voucher_no: res.voucher_no, extra_discount: res.extra_discount})
+                            purchase.push({...data, group_supplier : res.supplier.code, supplier_name: res.supplier.name, supplier_company: res.supplier.company, group_date :  this.showTime(res.pur_date),  voucher_no: res.voucher_no, extra_discount: res.extra_discount})
                         }else{
-                            purchase.push({...data, group_supplier : `${res.supplier.name} (${res.supplier.company})`, group_date :  this.showTime(res.pur_date), voucher_no: res.voucher_no, extra_discount: 0})
+                            purchase.push({...data, group_supplier : res.supplier.code, supplier_name: res.supplier.name, supplier_company: res.supplier.company, group_date :  this.showTime(res.pur_date), voucher_no: res.voucher_no, extra_discount: 0})
                         }
                      })
             })
@@ -203,13 +206,16 @@ export default {
            
             const gbs=Object.entries(hp.gb_supplier(purchase))       
             const data=gbs.map((res)=>{
-                const supplier_name=res[0]
+                let supplier_name=""
+                let company="";
                 const gbd=Object.entries(hp.gb_date(res[1])) 
                 const gbc=gbd.map((ren)=>{
                     const date=ren[0];
                     const res1=Object.entries(hp.gb_item_name_price(ren[1]))
                     const res2=res1.map((rep)=>{
                         const item_name=res[1][0].item_name;
+                        supplier_name=res[1][0].supplier_name;
+                        company=res[1][0].supplier_company;
                         let item={extra_discount:0,packing_size:"",
                             item_name: item_name, code_no:"", 
                             discount:0, 
@@ -257,7 +263,7 @@ export default {
                 this.total_amount = total_amount;
                 this.total_price =total_price;
                 this.total_discount =total_discount;
-                return [supplier_name, gbc];                     
+                return [{supplier_name, company}, gbc];                     
             })
            // console.log(data)
             this.reports=data;
