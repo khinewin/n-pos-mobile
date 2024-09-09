@@ -19,9 +19,9 @@
             </div>
            <SalesSession />
            <PurchaseSession />
-           <div class="row g-0">           
+           <div class="row g-1 my-1 n-link">           
             <div class="col-sm-2 col-lg-3 d-grid">
-                <router-link class="btn btn-sm" :to="{name : 'Sale'}" ><i class="fa-solid fa-cash-register"></i> Sale</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Sale'}" ><i class="fa-solid fa-cash-register"></i> Sale</router-link>
             </div>
             <div class="col-sm-2 col-lg-3 d-grid">
                 <router-link class="btn btn-sm" :to="{name : 'Purchase'}"><i class="fa-solid fa-cart-shopping"></i> Purchase</router-link>
@@ -74,6 +74,8 @@ import PurchaseChart from "@/views/admin/PurchaseChart.vue"
         },
 }
 </script>
-<style lang="">
-    
+<style scoped>
+    .n-link .btn:hover{
+        text-shadow: 2px 5px 5px rgba(0, 0, 0, 0.6);
+    }
 </style>
