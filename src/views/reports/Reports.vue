@@ -150,92 +150,45 @@
                 <div class="col-sm-6">
                     <div class="card shadow min-vh-80">
                         <div class="card-body p-2 small report">                                                                                      
-                            <ul class="list-group">
-                                <li class="list-group-item">
-                                          <!-- Stock dropend button -->
-                                          <div class="btn-group dropend">
-                                            <button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                                Medicine code
-                                            </button>                               
-                                            <ul class="dropdown-menu py-0">                                  
-                                                <li class="list-group-item" v-for="sl in products" :key="sl.code">                                     
-                                                    <button class="dropdown-item small" @click="reportProducts(sl.code)">{{sl.name}}</button>
-                                                </li>                                             
-                                            </ul>
-                                        </div>
-                                        <!--stock dropen button-->
-                                </li>
-                                <li class="list-group-item">
-                                    <!-- stocks dropend button -->
-                                  <div class="btn-group dropend">
-                                      <button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                          Stocks
-                                      </button>                               
-                                      <ul class="dropdown-menu py-0">                                  
-                                          <li class="list-group-item" v-for="st in stocks" :key="st.code">                                     
-                                              <button :class="{'disabled' : !st.active}" class="dropdown-item small" @click="reportStocks(st.code)">{{st.name}}</button>
-                                          </li>   
-                                      </ul>
-                                  </div>
-                                  <!--stocks dropen button-->
-                              </li>
-                                <li class="list-group-item">
-                                      <!-- Sales dropend button -->
-                                    <div class="btn-group dropend">
-                                        <button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Sales
-                                        </button>                               
-                                        <ul class="dropdown-menu py-0">                                  
-                                            <li class="list-group-item" v-for="s in sales" :key="s.code">                                     
-                                                <button :class="{'disabled' : !s.active}" class="dropdown-item small" @click="reportSales(s.code)">{{s.name}}</button>
-                                            </li>   
-                                        </ul>
-                                    </div>
-                                    <!--Sales dropen button-->
-                                </li>
-                                <li class="list-group-item">
-                                    <!-- Sales dropend button -->
-                                  <div class="btn-group dropend">
-                                      <button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                          Purchase
-                                      </button>                               
-                                      <ul class="dropdown-menu py-0">                                  
-                                          <li class="list-group-item" v-for="p in purchase" :key="p.code">                                     
-                                              <button :class="{'disabled' : !p.active}" class="dropdown-item small" @click="reportPurchase(p.code)">{{p.name}}</button>
-                                          </li>                                          
-                                      </ul>
-                                  </div>
-                                  <!--Sales dropen button-->
-                              </li>
-                              <li class="list-group-item">
-                                <!-- Sales dropend button -->
-                              <div class="btn-group dropend">
-                                  <button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                      Transfers
-                                  </button>                               
-                                  <ul class="dropdown-menu py-0">                                  
-                                      <li class="list-group-item" v-for="tf in transfers" :key="tf.code">                                     
-                                          <button :class="{'disabled' : !tf.active}" class="dropdown-item small" @click="reportTransfers(tf.code)">{{tf.name}}</button>
-                                      </li>                                          
-                                  </ul>
-                              </div>
-                              <!--Sales dropen button-->
-                          </li>
-                          <li class="list-group-item">
-                            <!-- Sales dropend button -->
-                          <div class="btn-group dropend">
-                              <button type="button" class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                  Adjustments
-                              </button>                               
-                              <ul class="dropdown-menu py-0">                                  
-                                  <li class="list-group-item" v-for="a in adjustments" :key="a.code">                                     
-                                      <button :class="{'disabled' : !a.active}" class="dropdown-item small" @click="reportAdjustments(a.code)">{{a.name}}</button>
-                                  </li>                                          
-                              </ul>
-                          </div>
-                          <!--Sales dropen button-->
-                      </li>
-                            </ul>
+                            <table class="table table-bordered table-hover">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <ReportList @report="reportProducts" title="Medicine code" :arr="products" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <ReportList @report="reportStocks" title="Opening stocks" :arr="stocks" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <ReportList @report="reportSales" title="Sales" :arr="sales" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <ReportList @report="reportPurchase" title="Purchase" :arr="purchase" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <ReportList @report="reportTransfers" title="Transfers" :arr="transfers" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <ReportList @report="reportAdjustments" title="Adjustments" :arr="adjustments" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <ReportList @report="reportSoc" title="SOC" :arr="soc" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>   
                         </div>                                          
                     </div>
                 </div>
@@ -255,10 +208,11 @@ import db from '@/firebase/firestore'
 import SupplierModal from '@/views/modals/purchase/SupplierModal.vue'
 import CustomerModal from '@/views/modals/sales/CustomerModal.vue'
 import ProductModal from "@/views/modals/reports/ProductModal.vue"
+import ReportList from "@/views/reports/ReportList.vue"
 
 export default {
     components: {
-        PageHeader, SupplierModal, CustomerModal, ProductModal
+        PageHeader, SupplierModal, CustomerModal, ProductModal, ReportList
     },
     setup () {
         return { v$: useVuelidate() }
@@ -330,6 +284,11 @@ export default {
                 {code: "by_supplier_date", name: "by supplier and date", active: true},
                 {code: "by_exp_date", name: "by expire date", active: true}
             ],
+            soc:[
+                {code : "by_customer", name: "by customer", active: true},
+                {code: "by_customer_date", name:"by customer and date", active: true},
+                {code: "by_voucher", name: "by voucher", active: true},               
+             ],
            
         }
     },
@@ -444,6 +403,13 @@ export default {
             "code_no": this.code_no ? this.code_no : null, "item_name" : this.item_name ? this.item_name : null
             }})
         },     
+        reportSoc(r_type){                     
+            this.$router.push({name: "ReportsSoc", params :{"reportType": r_type, "fromDate": this.from_date, "toDate": this.to_date},
+            query : {voucher_no: this.voucher_no,  customer_code: this.customer.code ? this.customer.code : null,
+                customer_name: this.customer.name ? this.customer.name : null, code_no: this.code_no ? this.code_no : null, item_name: this.item_name ? this.item_name : null}
+            })
+        },
+        
      
     }
 }

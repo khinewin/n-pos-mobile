@@ -92,8 +92,10 @@ export default {
             const currentDate = new Date();
             const theFirst = new Date(currentDate.getFullYear(), 0, 1);
             const theLast = new Date(currentDate.getFullYear(), 11, 31);
+            theLast.setHours("23", "59", "59")
             const from_date=Timestamp.fromDate(new Date(theFirst))
             const to_date=Timestamp.fromDate(new Date(theLast))
+
             const query_url= query(collection(db, "sales"),  
             where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date"));            
             onSnapshot(query_url,(snapShot)=>{
