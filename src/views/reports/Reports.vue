@@ -8,16 +8,22 @@
                         <div class="card-body p-2 rounded small">
                             <div class="row g-2">                              
                                 <div class="col-6">
-                                    <div class="form-floating mb-2">
-                                        <input type="date" class="form-control form-control-sm" id="from_date" v-model="from_date" placeholder="From date">
+                                   <div class="input-group mb-2">
+                                    <div class="form-floating">
+                                        <flat-pickr class="form-control form-control-sm" v-model="from_date" id="from_date" :config="config" />
                                         <label for="from_date">From date</label>
-                                    </div>  
+                                    </div>
+                                    <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                   </div>  
                                 </div>
                                 <div class="col-6">
-                                    <div class="form-floating mb-2">
-                                        <input type="date" class="form-control form-control-sm" id="to_date" v-model="to_date" placeholder="To date">
-                                        <label for="to_date">To date</label>
-                                    </div>
+                                    <div class="input-group mb-2">
+                                        <div class="form-floating">
+                                            <flat-pickr class="form-control form-control-sm" v-model="to_date" id="to_date" :config="config" />
+                                            <label for="to_date">To date</label>
+                                        </div>
+                                        <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                       </div>
                                 </div>
                             </div>                                                    
                             <div class="row g-2">
@@ -209,28 +215,37 @@ import SupplierModal from '@/views/modals/purchase/SupplierModal.vue'
 import CustomerModal from '@/views/modals/sales/CustomerModal.vue'
 import ProductModal from "@/views/modals/reports/ProductModal.vue"
 import ReportList from "@/views/reports/ReportList.vue"
+import FlatPickr from 'vue-flatpickr-component';
 
 export default {
     components: {
-        PageHeader, SupplierModal, CustomerModal, ProductModal, ReportList
+        PageHeader, SupplierModal, CustomerModal, ProductModal, ReportList, FlatPickr
     },
     setup () {
         return { v$: useVuelidate() }
     },
     data(){
-        return{         
+        return{      
+            config: {
+                dateFormat: 'd/m/Y', // Flatpickr options
+                enableTime: false,
+                wrap: true, // set wrap to true only when using 'input-group'
+               // altFormat: 'M j, Y',
+            },  
             adj_type:"",   
             rts_rfs: "",
             gt_equal:null,
             lt_equal:null,
             from_location:"Main",
             to_location:"Pharmacy",
-            from_date:"",
             item_name:"",
             location: "All",
             code_no:"",
             item_name:"",
+
             to_date:"",
+           from_date:"",
+
             voucher_no:"",
             packing_unit:"S Unit",
             supplier: {
@@ -271,6 +286,7 @@ export default {
             sales:[
                 {code : "by_date", name: "by date", active: true},
                 {code: "by_description", name:"by description", active: true},
+                {code: "by_description_date", name:"by description and date", active: true},
                 {code: "by_voucher", name: "by voucher", active: true},    
                 {code: "by_customer", name:"by customer", active: true},
                 {code: "by_customer_date", name: "by customer and date", active: true},    
@@ -295,10 +311,12 @@ export default {
   
     mounted() {
         let date = new Date();
-        let firstDay = new Date(date.getFullYear(), date.getMonth(),1+1).toISOString().substr(0, 10);
-        let lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 1).toISOString().substr(0, 10);
-        this.from_date=firstDay
-        this.to_date=lastDay
+        const firstDay = new Date(date.getFullYear(), date.getMonth(),1);
+        const lastDay = new Date(date.getFullYear(), date.getMonth() + 1,0)
+
+       this.from_date=firstDay
+       this.to_date=lastDay      
+
     },
    watch:{
     user(data){
@@ -321,8 +339,18 @@ export default {
         user(){
             return this.$store.getters.user;
         }
+        
     },
     methods:{
+     
+        parseYMD(dateStr) {
+            const [day, month, year] = dateStr.split('-');
+            return  `${year}-${month}-${day}`;
+        },
+        parseDMY(dateStr) {
+            const [day, month, year] = dateStr.split('-');
+            return  `${day}-${month}-${year}`;
+        },
         setCode(p){
             this.code_no=p.code_no;
             this.item_name=p.item_name;
@@ -336,6 +364,8 @@ export default {
             this.from_location="Main";
             this.to_location="Pharmacy";
             this.location="All";
+            this.adj_type="";
+            this.rts_rfs="";
         },
         setCustomer(c){
             this.customer=c;

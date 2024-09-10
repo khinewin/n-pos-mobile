@@ -27,24 +27,16 @@
                 </div>
             </div>            
             <div class="col-12">                   
-                    <div v-if="reportType==='by_date'">
-                        <SalesByDate  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no" />
-                    </div>
+                   
                     <div v-if="reportType==='by_voucher'">
-                        <SalesByVoucher  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :voucher_no="voucher_no" />
-                    </div>
-                    <div v-if="reportType==='by_description'">
-                        <SalesByDescription  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no"/>
-                    </div>
+                        <SocByVoucher  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :voucher_no="voucher_no" />
+                    </div>                  
                     <div v-if="reportType==='by_customer_date'">
-                        <SalesByCustomerDate :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no"/>
+                        <SocByCustomerDate :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no"/>
                     </div>
                     <div v-if="reportType==='by_customer'">
-                        <SalesByCustomer  :fromDate="fromDate"  :toDate="toDate" :customer_code="customer_code" :code_no="code_no"/>
-                    </div>
-                    <div v-if="reportType==='by_chart'">
-                        <SalesByChart  :fromDate="fromDate"  :toDate="toDate" :customer_code="customer_code" :code_no="code_no"/>
-                    </div>
+                        <SocByCustomer  :fromDate="fromDate"  :toDate="toDate" :customer_code="customer_code" :code_no="code_no"/>
+                    </div>                  
             </div>
         </div>
     </div>
@@ -52,25 +44,23 @@
 <script>
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
-import SalesByDate from "@/views/reports/sales/SalesByDate.vue"
-import SalesByVoucher from "@/views/reports/sales/SalesByVoucher.vue"
-import SalesByDescription from "@/views/reports/sales/SalesByDescription.vue"
-import SalesByCustomer from "@/views/reports/sales/SalesByCustomer.vue"
-import SalesByCustomerDate from "@/views/reports/sales/SalesByCustomerDate.vue"
-import SalesByChart from "@/views/reports/sales/SalesByChart.vue"
+
+import SocByVoucher from "@/views/reports/soc/SocByVoucher.vue"
+import SocByCustomer from "@/views/reports/soc/SocByCustomer.vue"
+import SocByCustomerDate from "@/views/reports/soc/SocByCustomerDate.vue"
 import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
 
 
 export default {
     components: {
-        SalesByDate,SalesByVoucher,SalesByDescription, SalesByCustomer, SalesByCustomerDate,SalesByChart, LargePrintHeader
+        SocByVoucher, SocByCustomer, SocByCustomerDate, LargePrintHeader
     },
   
     data(){
         return{         
             reportType:this.$route.params['reportType'],
-            fromDate:this.$route.params['fromDate'],
-            toDate:this.$route.params['toDate'],
+            fromDate:this.parseYMD(this.$route.params['fromDate']),
+            toDate:this.parseYMD(this.$route.params['toDate']),
             voucher_no: this.$route.query.voucher_no,
             customer_name: this.$route.query.customer_name,
             customer_code: this.$route.query.customer_code,
@@ -81,7 +71,7 @@ export default {
             displayReportType:"",
             reports:[],
             current_month:[],
-            salesData:[],
+            SocData:[],
             isLoading:false,
             msg : {
                 type :"",
@@ -140,6 +130,10 @@ export default {
       
     },
     methods:{
+        parseYMD(dateStr) {
+            const [day, month, year] = dateStr.split('/');
+            return  `${year}-${month}-${day}`;
+        },
         async print () {
         // Pass the element id here
          await this.$htmlToPaper('printMe');

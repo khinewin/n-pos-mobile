@@ -8,7 +8,8 @@ import "./Style.css"
 /* import the fontawesome core */
 import { library, dom } from '@fortawesome/fontawesome-svg-core'
 import store from "@/store"
-
+import 'flatpickr/dist/flatpickr.css';
+import "flatpickr/dist/themes/dark.css"
 /* import font awesome icon component */
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 

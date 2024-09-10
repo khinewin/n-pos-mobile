@@ -36,6 +36,9 @@
                     <div v-if="reportType==='by_description'">
                         <SalesByDescription  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no"/>
                     </div>
+                    <div v-if="reportType==='by_description_date'">
+                        <SalesByDescriptionDate  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no"/>
+                    </div>
                     <div v-if="reportType==='by_customer_date'">
                         <SalesByCustomerDate :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no"/>
                     </div>
@@ -58,19 +61,22 @@ import SalesByDescription from "@/views/reports/sales/SalesByDescription.vue"
 import SalesByCustomer from "@/views/reports/sales/SalesByCustomer.vue"
 import SalesByCustomerDate from "@/views/reports/sales/SalesByCustomerDate.vue"
 import SalesByChart from "@/views/reports/sales/SalesByChart.vue"
+import SalesByDescriptionDate from "@/views/reports/sales/SalesByDescriptionDate.vue"
+
 import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
 
 
 export default {
     components: {
-        SalesByDate,SalesByVoucher,SalesByDescription, SalesByCustomer, SalesByCustomerDate,SalesByChart, LargePrintHeader
+        SalesByDate,SalesByVoucher,SalesByDescription, SalesByCustomer, SalesByCustomerDate,SalesByChart, LargePrintHeader,
+        SalesByDescriptionDate
     },
   
     data(){
         return{         
             reportType:this.$route.params['reportType'],
-            fromDate:this.$route.params['fromDate'],
-            toDate:this.$route.params['toDate'],
+            fromDate:this.parseYMD(this.$route.params['fromDate']),
+            toDate:this.parseYMD(this.$route.params['toDate']),     
             voucher_no: this.$route.query.voucher_no,
             customer_name: this.$route.query.customer_name,
             customer_code: this.$route.query.customer_code,
@@ -91,10 +97,12 @@ export default {
         }
     },
    
-    mounted() {    
-      
+    mounted() { 
+
+          
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
+
             if(this.reportType==="by_date"){
                 this.displayReportType="by Date"
             }else 
@@ -103,6 +111,10 @@ export default {
             }else
             if(this.reportType==='by_description'){
                 this.displayReportType="by Description"
+            }
+            else
+            if(this.reportType==='by_description_date'){
+                this.displayReportType="by Description and Date"
             }
             else
             if(this.reportType==='by_customer'){
@@ -140,6 +152,10 @@ export default {
       
     },
     methods:{
+        parseYMD(dateStr) {
+            const [day, month, year] = dateStr.split('/');
+            return  `${year}-${month}-${day}`;
+        },
         async print () {
         // Pass the element id here
          await this.$htmlToPaper('printMe');

@@ -8,10 +8,10 @@
           </div>
           <div class="offcanvas-body ">      
             <ul class="list-group small ">
-              <li class="list-group-item bg-secondary-subtle border-0" data-bs-dismiss="offcanvas" aria-label="Close">
+              <li class="list-group-item list-group-item-a bg-secondary-subtle border-0" data-bs-dismiss="offcanvas" aria-label="Close">
                 <router-link class="nav-link" :to="{name : 'Profile'}"><i class="fa-solid fa-id-card-clip"></i> Profile</router-link>
               </li>
-              <li class="list-group-item bg-secondary-subtle border-0" >
+              <li class="list-group-item list-group-item-a  bg-secondary-subtle border-0" >
                 <a href="#!"  class="nav-link" @click="showConfirm"><i class="fa-solid fa-right-from-bracket" ></i> Logout</a>
               </li>                       
            </ul>
@@ -74,6 +74,12 @@ export default {
     
 }
 </script>
-<style lang="">
-    
+<style>
+      .list-group-item-a:hover{
+          padding-left: 30px;
+          transition: all 0.4s;
+      }
+      .router-link-active {
+          color : red !important
+      }
 </style>

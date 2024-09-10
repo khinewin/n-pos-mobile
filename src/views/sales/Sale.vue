@@ -20,7 +20,7 @@
                     <button :disabled="saleItems.length <=0 || isNewSale" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print</button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                        <button type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length <=0 || !isNewSale"><i class="fa-solid fa-hard-drive"></i> Save
+                        <button type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length <=0 || !isNewSale " ><i class="fa-solid fa-hard-drive"></i> Save
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>
@@ -190,7 +190,8 @@
                     extra_discount: this.extra_discount,
                     paid:this.paid,
                     change:this.change,
-                    user: this.user,            
+                    user: this.user,     
+                    credit: this.credit,       
             }  " />
         </div>       
         <setQtyModal @setQty="setSaleQty" :ei="editItem" />
@@ -245,8 +246,8 @@ export default {
             print_date:"",
             isOffline: false,
             customerData: {
-                id: 123456669,
-                code: 123456669,
+                id: 123456789,
+                code: 123456789,
                 name:"Default Customer",
                 phone:"09xxxxxxxxx",
                 address :"",
@@ -485,6 +486,7 @@ export default {
             this.extra_discount=s.extra_discount;
             this.paid=s.paid;
             this.sale_type=s.sale_type
+            this.credit=s.credit
             this.customer.name=s.customer.name;
             this.customer.phone=s.customer.phone;
         },
@@ -508,6 +510,7 @@ export default {
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
             if(this.saleItems.length <=0) return false;
+            if(this.customer.code==123456789 && this.credit > 0) return false;
             const isNotReady= this.saleItems.filter((f)=>!f.final_amount)
             if(isNotReady.length) return false;
             

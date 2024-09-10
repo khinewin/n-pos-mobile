@@ -108,33 +108,32 @@ export default {
    },
   
    mounted() {    
+        this.setDate();
+
        const myModalEl = document.getElementById('salesModal')
        myModalEl.addEventListener('show.bs.modal', event => {                
        })   
+
+       this.isLoading=true;   
+       this.fetchSales();  
             
    },
-   created(){
-       if(this.user !==null){       
-                this.isLoading=true;   
-               this.fetchSales();                 
-       }
-   },
+ 
    computed:{
        user(){
            return this.$store.getters.user;
        },
        
    },
-   watch:{       
-       user(data){
-               if(data !==null){             
-                    this.isLoading=true;      
-                   this.fetchSales();           
-           }
-       }
-     
-   },
+ 
    methods:{
+        setDate(){
+            let date = new Date();
+            let firstDay = new Date(date.getFullYear(), date.getMonth(),1+1).toISOString().substr(0, 10);
+            let lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 1).toISOString().substr(0, 10);
+            this.search_by_from_sale_date=firstDay
+            this.search_by_to_sale_date=lastDay
+        },
        updateSales(){
                this.isUpdating=true;
                this.fetchSales();
@@ -145,8 +144,7 @@ export default {
        },
        clearSearch(){
            this.search_by_voucher_no="";
-           this.search_by_from_sale_date="";
-           this.search_by_to_sale_date="";
+            this.setDate();
            this.searchSales();
        },
        searchSales(){        
@@ -178,18 +176,20 @@ export default {
                 const date_a=new Date(a.sale_date.toDate()).getTime();
                 const date_b=new Date(b.sale_date.toDate()).getTime();
                 return date_a - date_b;
-            })
+            }).reverse()
        },
      
     async fetchSales(){
-       const query_url = query(collection(db, "sales"), orderBy("sale_date", "desc"));
-       onSnapshot(query_url, async(snapShot) =>{
-                    const isLocal=snapShot.metadata.fromCache;
-                    if(isLocal){
-                       this.isOffline="You are now in offline mode."
-                    }else{
-                        this.isOffline=false;
-                    }
+        const date=new Date();         
+        let fDate=new Date(this.search_by_from_sale_date)
+        fDate.setHours("0", "0", "0")
+         const from_date=Timestamp.fromDate(fDate)
+         let tDate=new Date(this.search_by_to_sale_date)
+        tDate.setHours("23", "59", "59")
+        const to_date=Timestamp.fromDate(tDate)
+        
+       const query_url = query(collection(db, "sales"), where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date", "desc"));
+       onSnapshot(query_url, async(snapShot) =>{                
                     const sales=ss.sales(snapShot)       
                     this.salesData=sales;
                     this.searchSales();
@@ -211,45 +211,3 @@ export default {
 <style lang="">
    
 </style>
-
-<!--
-                            <ul class="list-grous list-grous-flush">
-                                <li class="list-grous-item list-grous-item-action bg-secondary-subtle">
-                                    <div class="row">
-                                        <div class="col-lg-3">
-                                                <div class="small fw-lighter ">Voucher no.</div>
-                                        </div>
-                                        <div class="col-lg-3">
-                                                <div class="small fw-lighter ">sur Date</div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                                <div class="small fw-lighter">Susslier</div>
-                                        </div>                                          
-                                        
-                                </div>
-                                </li>
-                             
-                                <li class="list-grous-item" v-if="isLoading">
-                                    <div class="d-flex justify-content-center my-5">
-                                        <div class="ssinner-border text-srimary"  role="status">
-                                          <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                      </div>
-                                </li>
-                         
-                                <li v-if="sales.length > 0" class="list-grous-item list-grous-item-action" v-for="s in sales" :key="s.id" >
-                                        <div class="row" @click="setCode(s)" data-bs-dismiss="modal" style="cursor: context-menu;">
-                                                <div class="col-lg-3 small">
-                                                        <div>{{s.voucher_no}}</div>
-                                                </div>
-                                                <div class="col-lg-3 small">
-                                                 <div>{{showTime(s.sale_date)}}</div>
-                                                </div>
-                                                <div class="col-lg-6 small">
-                                                        <div>{{s.susslier.name}} ({{s.susslier.comsany}})</div>
-                                                </div>
-                                            
-                                        </div>
-                                </li>
-                        </ul>
-                    -->

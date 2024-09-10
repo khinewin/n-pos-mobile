@@ -87,11 +87,17 @@
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="6"  class="text-end  pe-2 " >Change</td>
+                        <td colspan="6"  class="text-end  pe-2 " style="border-bottom-style: hidden;">Change</td>
                         <td class="text-end ">
                             {{data.change}}
                         </td>
-                    </tr>                           
+                    </tr> 
+                    <tr v-if="data.credit">
+                        <td colspan="6" class="text-end pe-2" >Credit</td>
+                        <td class="text-end">
+                            {{data.credit}}
+                        </td>
+                    </tr>                                
                 </tbody>
           </table>
           <table>
@@ -185,9 +191,15 @@
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="5" class="" >Change</td>
+                        <td colspan="5" class="" style="border-bottom-style: hidden;">Change</td>
                         <td class="">
                             {{data.change}}
+                        </td>
+                    </tr>   
+                    <tr v-if="data.credit">
+                        <td colspan="5" class="" >Credit</td>
+                        <td class="">
+                            {{data.credit}}
                         </td>
                     </tr>                           
                 </tbody>

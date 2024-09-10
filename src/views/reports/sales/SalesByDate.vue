@@ -102,15 +102,8 @@ export default {
     },
    
     mounted() {    
-            if(this.user !==null){
-                this.isLoading=true;
-                this.fetchSales();  
-            }
-            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType="by_date"){
-                this.displayReportType="by Date"
-            }
+        this.isLoading=true;
+        this.fetchSales();  
     },
    watch:{
    
@@ -141,13 +134,7 @@ export default {
       
     },
     methods:{
-        setSaleDate(){
-            const date=new Date();         
-            let to_date=new Date(this.toDate)
-            to_date.setHours(date.getHours())
-            to_date.setMinutes(date.getMinutes())
-          this.update_to_date=Timestamp.fromDate(to_date);
-        },
+      
         displayPrice(l_unit, m_unit, s_unit){
             return hp.displayPrice(l_unit, m_unit, s_unit);
         },
@@ -253,7 +240,6 @@ export default {
            this.reports=gbc;        
         },   
         async fetchSales(){           
-            const date=new Date();         
             let fDate=new Date(this.fromDate)
             fDate.setHours("0", "0", "0")
             const from_date=Timestamp.fromDate(fDate)

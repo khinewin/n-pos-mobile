@@ -58,8 +58,8 @@ export default {
             reportType:this.$route.params['reportType'],
             from_location: this.$route.params['from_location'],
             to_location: this.$route.params['to_location'],
-            fromDate:this.$route.params['fromDate'],
-            toDate:this.$route.params['toDate'],
+            fromDate:this.parseYMD(this.$route.params['fromDate']),
+            toDate:this.parseYMD(this.$route.params['toDate']),
             voucher_no: this.$route.query.voucher_no,
             code_no: this.$route.query.code_no,
             item_name: this.$route.query.item_name,
@@ -116,6 +116,10 @@ export default {
       
     },
     methods:{
+        parseYMD(dateStr) {
+            const [day, month, year] = dateStr.split('/');
+            return  `${year}-${month}-${day}`;
+        },
         async print () {
         // Pass the element id here
          await this.$htmlToPaper('printMe');

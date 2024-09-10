@@ -76,6 +76,6 @@ import PurchaseChart from "@/views/admin/PurchaseChart.vue"
 </script>
 <style scoped>
     .n-link .btn:hover{
-        text-shadow: 2px 5px 5px rgba(0, 0, 0, 0.6);
+        text-shadow: 1px 1px 10px rgba(255, 255, 0, 0.6);
     }
 </style>
