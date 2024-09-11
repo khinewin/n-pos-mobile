@@ -53,7 +53,7 @@
                                         <tr>
                                             <td class="text-end py-1">Date :</td>
                                             <td class="py-0">
-                                                <input type="date" :class="{'border-0 border-bottom border-danger' : v$.created_at.$errors.length > 0}"  v-model="created_at" class="form-control-plaintext form-control-sm border-bottom" id="created_at" placeholder="Date">                                                
+                                                <flat-pickr class="form-control-plaintext form-control-sm border-bottom" v-model="created_at"  :config="config" />
                                             </td>
                                         </tr>                                       
                                     </tbody>
@@ -122,11 +122,12 @@ import ProductModal from '@/views/modals/purchase/ProductModal.vue'
 import * as ss from "@/lib/snapshot/products"
 import * as hp from '@/lib/helper'
 import setQtyModal from "@/views/modals/setQtyModal.vue";
+import FlatPickr from 'vue-flatpickr-component';
 
 
 export default {
     components: {
-        PageHeader, ProductModal,setQtyModal
+        PageHeader, ProductModal,setQtyModal, FlatPickr
     },
     setup () {
         return { v$: useVuelidate() }
@@ -139,7 +140,13 @@ export default {
             }
     },
     data(){
-        return{       
+        return{      
+            config: {
+                dateFormat: 'd/m/Y', // Flatpickr options
+                enableTime: false,
+                wrap: true, // set wrap to true only when using 'input-group'
+               // altFormat: 'M j, Y',
+            },    
             voucher_no:"", 
             created_at:"",        
             from_location:"Main",
@@ -175,9 +182,9 @@ export default {
             },deep:true
         }
     },
-    created() {          
+    mounted() {          
         this.voucher_no=new Date().getTime();
-        this.created_at=new Date().toISOString().substr(0, 10)
+        this.created_at=hp.setToday();
         this.checkDatabase();
     },
     
@@ -307,10 +314,11 @@ export default {
             this.isSaving=true;
             this.msg.type="";
             this.msg.info="";
-        
+            const created_at=hp.insertDateNoTime(this.created_at)
+
             const voucher={
                 voucher_no: this.voucher_no,
-                created_at: Timestamp.fromDate(new Date(this.created_at)),           
+                created_at: Timestamp.fromDate(created_at),           
                 products : this.storeItems,
                 user : {uid: this.user.uid, displayName: this.user.displayName},
                 from_location: this.from_location,
@@ -323,7 +331,7 @@ export default {
             this.isLoading=false;
             this.isSaving=false;
             this.voucher_no=new Date().getTime();
-            this.created_at=new Date().toISOString().substr(0, 10)         
+            this.created_at=hp.setToday();
             this.storeItems=[]
             this.transfer_item={}         
             this.v$.$reset()

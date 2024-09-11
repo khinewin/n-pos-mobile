@@ -12,9 +12,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="pb-0 fw-bold">Date <span class="float-end">:</span></td>
+                        <td class="pb-0 fw-bold">Sale date <span class="float-end">:</span></td>
                         <td class=" ps-2 pb-0" >
-                           <span v-if="data.print_date">{{showPrintTime(data.print_date)}}</span>
+                           <span>{{sale_date}}</span>
                         </td>
                     </tr>       
                 </tbody>
@@ -24,7 +24,7 @@
             <table class="table mb-0 table-borderless">
                 <tbody class="small">                                     
                     <tr>
-                        <td class="  col-4 pb-0 fw-bold">Name <span class="float-end">:</span></td>
+                        <td class="  col-4 pb-0 fw-bold">Customer <span class="float-end">:</span></td>
                         <td class=" ps-2 col-8 pb-0" >
                             {{data.customer.name}}
                         </td>
@@ -100,9 +100,10 @@
                     </tr>                                
                 </tbody>
           </table>
-          <table>
+          <table class="table table-borderless">
                 <tbody>
                     <tr>
+                        <td>Print date : {{printDate}}</td>
                         <td></td>
                     </tr>
                 </tbody>
@@ -123,14 +124,14 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="">Date <span class="">:</span></td>
+                        <td class="">Sale date <span class="">:</span></td>
                         <td class="" >
-                           <span v-if="data.print_date">{{showPrintTime(data.print_date)}}</span>
+                           <span >{{sale_date}}</span>
                         </td>
                     </tr>       
                                                    
                     <tr>
-                        <td class="">Name <span class="">:</span></td>
+                        <td class="">Customer <span class="">:</span></td>
                         <td class="" >
                             {{data.customer.name}}
                         </td>
@@ -223,9 +224,12 @@ export default {
     data(){
         return{
             largePrinter:true,
+            printDate: "",
+            sale_date:"",
         }
     },
     mounted() {
+        this.setPrintDate();
     },
     computed:{
        
@@ -240,6 +244,22 @@ export default {
         showPrintTime(t){
            return hp.showTimeHour(t)
         },
+        setPrintDate(){
+            const date=new Date();
+            const today=Timestamp.fromDate(date)
+            const pDate=hp.showTimeHour(today)
+            this.printDate=pDate;
+
+            let sale_time="";
+            if(this.data.saleMode=='Sale / New'){                
+                const sDate=hp.insertDate(this.data.print_date)
+                const s_date=Timestamp.fromDate(sDate)
+                sale_time=hp.showTimeHour(s_date)
+            }else{
+                 sale_time=hp.showTimeHour(this.data.print_date)
+            }
+            this.sale_date=sale_time;
+       }
     },
   
 

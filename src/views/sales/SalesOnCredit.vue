@@ -29,7 +29,6 @@
                                         <tr>
                                             <td class="col-1 p-0">
                                                 <select class="form-control-plaintext text-center" v-model="display_type" @change="filterData">
-                                                    <option>All</option>
                                                     <option>Paid</option>
                                                     <option>Credit</option>
                                                 </select>
@@ -95,7 +94,10 @@
                                                     <option  v-for="si in saleItems" :key="si.id">{{si.voucher_no}}</option>
                                                 </select>
                                             </td>
-                                            <td class="p-0"><input v-model="paid_date" :disabled="!customer.id" type="date" class="form-control-plaintext text-center"></td>
+                                            <td class="p-0">
+                                                <flat-pickr :disabled="!paid_for" class="form-control-plaintext form-control-sm text-center" v-model="paid_date"  :config="config" />
+
+                                            </td>
                                             <td class="p-0"><input @keypress.enter="savePaid" v-model="paid_amount" :disabled="!customer.id" type="number" class="form-control-plaintext text-end"></td>
                                         </tr>
                                         <tr v-if="debtpayments.length" v-for="dp in debtpayments" :key="dp.id">
@@ -137,15 +139,21 @@ import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/sales"
 import * as dp from "@/lib/snapshot/debtpayments"
 import PrintSoc from "@/views/sales/PrintSoc.vue"
+import FlatPickr from 'vue-flatpickr-component';
 
 
 export default {
     components: {
-        CustomerModal,Print ,PrintSoc, PageHeader
+        CustomerModal,Print ,PrintSoc, PageHeader, FlatPickr
     },
     data(){
         return{    
-          
+            config: {
+                dateFormat: 'd/m/Y', // Flatpickr options
+                enableTime: false,
+                wrap: true, // set wrap to true only when using 'input-group'
+               // altFormat: 'M j, Y',
+            },   
             isLoading:false,
             customer:{},
             saleItems:[],
@@ -180,7 +188,8 @@ export default {
    
     mounted() {
         this.voucher_no=new Date().getTime();
-        this.paid_date=new Date().toISOString().substr(0, 10)     
+        this.paid_date=hp.setToday();
+
         this.setPrintDate();
     },
   
@@ -258,10 +267,12 @@ export default {
 
         async savePaid(){
             if(!this.paid_for || !this.paid_amount) return false;
-            let date=new Date();
-            let paid_date=new Date(this.paid_date)
-            paid_date.setHours(date.getHours())
-            paid_date.setMinutes(date.getMinutes())
+           // let date=new Date();
+           // let paid_date=new Date(this.paid_date)
+           // paid_date.setHours(date.getHours())
+           // paid_date.setMinutes(date.getMinutes())
+            const paid_date=hp.insertDate(this.paid_date)
+
             const voucher={
                     paid_date: Timestamp.fromDate(paid_date),
                     user : {uid: this.user.uid, displayName: this.user.displayName},
@@ -280,7 +291,7 @@ export default {
                 credit: cData[0].credit - this.paid_amount,
             }
             const id=cData[0].id;
-            const saveDocument=doc(db, "creditSales",id)
+            const saveDocument=doc(db, "sales",id)
             await updateDoc(saveDocument, data)     
         },
         filterData(){
@@ -321,7 +332,7 @@ export default {
             });  
         },
         fetchCreditSales(){
-            const   query_url = query(collection(db, "creditSales"), where("customer.id","==", this.customer.id), orderBy("sale_date", "asc"));          
+            const   query_url = query(collection(db, "sales"), where("customer.id","==", this.customer.id), orderBy("sale_date", "asc"));          
             onSnapshot(query_url, async(snapShot) =>{
                     const items=ss.sales(snapShot)       
                     this.saleItemsData=items;    
@@ -345,7 +356,7 @@ export default {
             this.total_credit=0;
             this.paid_amount=0;
             this.paid_for="";
-            this.paid_date="";
+            this.paid_date=hp.setToday();
             this.debtpayments=[]
             this.debtpaymentsData=[]
             this.clearPrintData();
@@ -353,7 +364,7 @@ export default {
        setCustomer(c){
             this.customer=c;
             this.fetchCreditSales();
-            this.paid_date=new Date().toISOString().substr(0, 10)   
+            this.paid_date=hp.setToday();
             this.clearPrintData();
             this.checkDatabase();
        },

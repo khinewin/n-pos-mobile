@@ -34,7 +34,7 @@
                                             </td>                                       
                                             <td class="col-2 text-end py-1">Date :</td>
                                             <td class="col-2 py-0">
-                                                <input type="date" :class="{'border-0 border-bottom border-danger' : v$.created_at.$errors.length > 0}"  v-model="created_at" class="form-control-plaintext form-control-sm border-bottom" id="created_at" placeholder="Date">                                                
+                                                <flat-pickr class="form-control-plaintext form-control-sm border-bottom" v-model="created_at"  :config="config" />
                                             </td>
                                         </tr>                                       
                                     </tbody>
@@ -112,11 +112,12 @@ import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/purchase/ProductModal.vue'
 import * as hp from "@/lib/helper"
 import setQtyModal from "@/views/modals/setQtyModal.vue";
+import FlatPickr from 'vue-flatpickr-component';
 
 
 export default {
     components: {
-        PageHeader, ProductModal,setQtyModal
+        PageHeader, ProductModal,setQtyModal,FlatPickr
     },
     setup () {
         return { v$: useVuelidate() }
@@ -130,6 +131,12 @@ export default {
     },
     data(){
         return{       
+            config: {
+                dateFormat: 'd/m/Y', // Flatpickr options
+                enableTime: false,
+                wrap: true, // set wrap to true only when using 'input-group'
+               // altFormat: 'M j, Y',
+            },   
             voucher_no:"", 
             created_at:"",         
             location: "Pharmacy",
@@ -166,7 +173,7 @@ export default {
     },
     created() {           
         this.voucher_no=new Date().getTime();
-        this.created_at=new Date().toISOString().substr(0, 10)
+        this.created_at=hp.setToday();
         this.checkDatabase();
     },
     
@@ -263,10 +270,11 @@ export default {
             this.isSaving=true;
             this.msg.type="";
             this.msg.info="";
-        
+            const created_at=hp.insertDateNoTime(this.created_at)
+
             const voucher={
                 voucher_no: this.voucher_no,
-                created_at: Timestamp.fromDate(new Date(this.created_at)),    
+                created_at: Timestamp.fromDate(created_at),    
                 location: this.location,       
                 products : this.storeItems,
                 user : {uid: this.user.uid, displayName: this.user.displayName},              
@@ -278,7 +286,7 @@ export default {
             this.isLoading=false;
             this.isSaving=false;
             this.voucher_no=new Date().getTime();
-            this.created_at=new Date().toISOString().substr(0, 10)         
+            this.created_at=hp.setToday();
             this.storeItems=[]
             this.adj_item=null
             this.editItem={}           

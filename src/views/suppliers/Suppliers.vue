@@ -78,7 +78,7 @@
                                                 <input @keypress.enter="saveSupplier" type="text" v-model="company"  :class="{'border-danger' : v$.company.$errors.length}"  class="form-control-plaintext text-center" id="company" placeholder="Company">                                              
                                             </td>
                                             <td class="">
-                                                <input @change="saveSupplier" type="date" v-model="created_at"    class="form-control-plaintext text-center" id="company" placeholder="Date">                                              
+                                                <flat-pickr @change="saveSupplier" class="form-control-plaintext form-control-sm text-center" v-model="created_at"  :config="config" />
                                             </td>
                                         </tr>
                                        
@@ -130,9 +130,11 @@ import { required, email ,helpers} from '@vuelidate/validators'
    import db from '@/firebase/firestore'
    import * as lib from '@/lib/snapshot/suppliers'
    import * as hp from '@/lib//helper'
+   import FlatPickr from 'vue-flatpickr-component';
+
    export default {
        components: {
-               PageHeader
+               PageHeader, FlatPickr
        },
        setup () {
         return { v$: useVuelidate() }
@@ -146,6 +148,12 @@ import { required, email ,helpers} from '@vuelidate/validators'
     },
        data(){
            return{
+            config: {
+                dateFormat: 'd/m/Y', // Flatpickr options
+                enableTime: false,
+                wrap: true, // set wrap to true only when using 'input-group'
+               // altFormat: 'M j, Y',
+            },   
             code :"",
             name:"",
             phone:"",
@@ -180,7 +188,8 @@ import { required, email ,helpers} from '@vuelidate/validators'
            }
        },
        async mounted() {
-     
+        this.created_at=hp.setToday();
+
        },
       
        computed:{
@@ -223,7 +232,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
             this.name="";
             this.phone="";
             this.code= "";
-            this.created_at="";
+            this.created_at=hp.setToday();
             this.company="";
             this.isSaving=false;
             this.isLoading=false;
@@ -283,7 +292,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
             this.isSaving=true;
-            const date=this.created_at ? new Date(this.created_at) : new Date();
+            const date=hp.insertDateNoTime(this.created_at)
             const created_at=Timestamp.fromDate(date);
             const dataCollection=collection(db, "suppliers")
             this.code=this.code ? this.code : hp.g_code();

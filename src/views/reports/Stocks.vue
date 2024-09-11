@@ -13,7 +13,7 @@
                 <LargePrintHeader />
             </div>
             <div class="col-12 text-center">
-                <h6>Reports stocks {{displayReportType}}</h6>
+                <h6>Reports stocks {{displayReportType(reportType)}}</h6>
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="" v-if="code_no">Code : {{item_name}}</div>
@@ -47,7 +47,7 @@ import StocksByDate from "@/views/reports/stocks/StocksByDate.vue"
 import StocksByDescription from "@/views/reports/stocks/StocksByDescription.vue"
 import StocksByVoucher from "@/views/reports/stocks/StocksByVoucher.vue"
 import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
-
+import * as rt from "@/lib/reportType"
 export default {
     components: {
         StocksByDate, StocksByDescription, StocksByVoucher,LargePrintHeader
@@ -64,7 +64,6 @@ export default {
             code_no: this.$route.query.code_no,
             displayFromDate:"",
             displayToDate:"",
-            displayReportType:"",
             reports:[],
             current_month:[],
             salesData:[],
@@ -81,15 +80,7 @@ export default {
       
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType==="by_date"){
-                this.displayReportType="by Date"
-            }else 
-            if(this.reportType==='by_voucher'){
-                this.displayReportType="by Voucher"
-            }else
-            if(this.reportType==='by_description'){
-                this.displayReportType="by Description"
-            }
+          
     },
    watch:{
    
@@ -109,12 +100,12 @@ export default {
         user(){
             return this.$store.getters.user;
         },
-        report_type(){
-            return this.$store.getters.reportType;
-        },
-      
+       
     },
     methods:{
+        displayReportType(reportType){
+            return rt.displayReportType(reportType)
+        },
         parseYMD(dateStr) {
             const [day, month, year] = dateStr.split('/');
             return  `${year}-${month}-${day}`;

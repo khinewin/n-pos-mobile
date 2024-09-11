@@ -13,7 +13,7 @@
                 <LargePrintHeader />
             </div>
             <div class="col-12 text-center">
-                <h6>Reports adjustments {{displayReportType}}</h6>
+                <h6>Reports adjustments {{displayReportType(reportType)}}</h6>
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="" v-if="code_no">Code : {{item_name}}</div>
@@ -55,6 +55,7 @@ import AdjustmentsByVoucher from "@/views/reports/adjustments/AdjustmentsByVouch
 import AdjustmentsByLocation from "@/views/reports/adjustments/AdjustmentsByLocation.vue"
 import AdjustmentsByAdjType from "@/views/reports/adjustments/AdjustmentsByAdjType.vue"
 import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
+import * as rt from '@/lib/reportType'
 
 export default {
     components: {
@@ -74,7 +75,6 @@ export default {
             location:this.$route.query.location,
             displayFromDate:"",
             displayToDate:"",
-            displayReportType:"",
             reports:[],
             current_month:[],
             salesData:[],
@@ -91,20 +91,7 @@ export default {
       
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType==="by_date"){
-                this.displayReportType="by Date"
-            }else 
-            if(this.reportType==='by_voucher'){
-                this.displayReportType="by Voucher"
-            }else
-            if(this.reportType==='by_description'){
-                this.displayReportType="by Description"
-            }else if(this.reportType==='by_location'){
-                 this.displayReportType="by Location"
-            }
-            else if(this.reportType==='by_adj_type'){
-                 this.displayReportType="by Type"
-            }
+          
     },
    watch:{
    
@@ -130,6 +117,9 @@ export default {
       
     },
     methods:{
+        displayReportType(reportType){
+            return rt.displayReportType(reportType)
+        },
         parseYMD(dateStr) {
             const [day, month, year] = dateStr.split('/');
             return  `${year}-${month}-${day}`;

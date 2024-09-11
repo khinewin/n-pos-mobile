@@ -1,9 +1,9 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="Sale" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader :page-title="saleMode" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                            
-                <div class="col-sm-4 lg-md-2 pt-1 ps-4 small">
+                <div class="col-sm-2 lg-md-2 pt-1 ps-4 small">
                     <div class="form-check form-check-inline" >
                         <input class="form-check-input border-dark" :disabled="saleItems.length > 0" type="radio" name="inlineRadioOptions" id="inlineRadio1" v-model="sale_type" value="retail">
                         <label class="form-check-label" for="inlineRadio1" :class="[sale_type==='retail' ? 'tex-primary' : 'text-dark']">Retail</label>
@@ -14,13 +14,19 @@
                       </div>
                 </div>
                 <div class="col-sm-2 d-grid">
+                    <!--<button class="btn btn-sm" @click="changeToEdit" :disabled="saleMode=='Sale / New'" ><i class="fa-solid fa-pen-to-square"></i> Edit</button>-->
+                </div>
+                <div class="col-sm-2 d-grid">
                     <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#salesModal"><i class="fa-solid fa-folder-tree"></i> Browse</button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                    <button :disabled="saleItems.length <=0 || isNewSale" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print</button>
+                    <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print</button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                        <button type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length <=0 || !isNewSale " ><i class="fa-solid fa-hard-drive"></i> Save
+                        <button v-if="saleMode=='Sale / New' || saleMode=='Sale / Old'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length <=0 || saleMode=='Sale / Old' " ><i class="fa-solid fa-hard-drive"></i> Save
+                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
+                        </button>
+                        <button v-if="saleMode =='Sale / Edit'" type="button" @click="updateSale" class="btn btn-sm" :disabled="isLoading" ><i class="fa-solid fa-hard-drive"></i> Update
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>
@@ -48,9 +54,9 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-end py-1">Date :</td>
+                                                <td class="text-end py-1">Sale date :</td>
                                                 <td class="py-0">
-                                                    <input type="date" :class="{'border-0 border-bottom border-danger' : v$.sale_date.$errors.length > 0}"  v-model="sale_date" class="form-control-plaintext form-control-sm border-bottom" id="sale_date" placeholder="Date">                                                
+                                                    <flat-pickr class="form-control-plaintext form-control-sm border-bottom" v-model="sale_date" id="sale_date" :config="config" />
                                                 </td>
                                             </tr> 
                                                                                    
@@ -61,14 +67,14 @@
                                     <table class="table mb-0 table-borderless">
                                         <thead class="small">                                           
                                             <tr>
-                                                <td class="text-end col-4 py-1">Name :</td>
+                                                <td class="text-end col-4 py-1">Customer :</td>
                                                 <td class="py-0 col-6">
-                                                    <div class="row g-0">
-                                                        <div class="col-11">
+                                                    <div class="row g-2">
+                                                        <div class="col-8">
                                                             <input type="text" @click="changeCustomer" v-model="customer.name" class="form-control-plaintext form-control-sm border-bottom" id="customer_name" placeholder="Name">                                                
                                                         </div>
-                                                        <div class="col-1 py-0" v-if="isNewSale">
-                                                            <span class="b-inline-block" data-bs-toggle="modal" data-bs-target="#customerModal"><i class="fa-solid fa-pen"></i></span>
+                                                        <div class="col-4 py-0 border-bottom text-center">
+                                                            <span class="d-block text-primary" :data-bs-toggle="[saleMode=='Sale / Old' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / Old' ? '' : '#customerModal']" ><i class="fa-solid fa-pen"></i></span>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -88,9 +94,9 @@
                                     <tbody class="small fw-bold">
                                         <tr class="table-secondary">
                                             <td class="col-1 text-center">
-                                                <input @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext form-control-sm text-center" placeholder="Scan code here">
+                                                <input :disabled="saleMode=='Sale / Old'" @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext form-control-sm text-center" placeholder="Scan code here">
                                             </td>
-                                            <td id="description" class="col-2 text-center pt-2" data-bs-toggle="modal" data-bs-target="#searchCode" style="cursor: context-menu;">
+                                            <td id="description" class="col-2 text-center pt-2" :data-bs-toggle="[saleMode=='Sale / Old' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / Old' ? '' : '#searchCode']" style="cursor: context-menu;">
                                                 <i class="fa-solid fa-circle-plus"></i> Description
                                             </td>  
                                             <td class="col-1 pt-2 text-center">Packing size</td>                                                                                    
@@ -106,7 +112,7 @@
                                     <tbody>                                   
                                         <tr class="" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(i)"  >
                                             <td class="position-relative pt-2 text-center">
-                                                <span v-if="isNewSale">
+                                                <span v-if="saleMode=='Sale / New'">
                                                     <a  class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeSaleItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                                 </span>
                                                 {{s.code_no}}
@@ -142,7 +148,7 @@
                                         <tr>
                                             <td colspan="9" class="text-end pt-2" >Extra discount</td>
                                             <td class="text-end p-0">
-                                                <input @click="setInput" @mouseleave="setInput" :disabled="!isNewSale"  type="number"  @change="calTotal" @keyup="calTotal" v-model="extra_discount" class="form-control-plaintext form-control-sm text-end m-0">
+                                                <input @click="setInput" @mouseleave="setInput" :disabled="saleMode=='Sale / Old'"  type="number"  @change="calTotal" @keyup="calTotal" v-model="extra_discount" class="form-control-plaintext form-control-sm text-end m-0">
                                             </td>
                                         </tr>
                                         <tr>
@@ -152,7 +158,7 @@
                                         <tr>
                                             <td colspan="9" class="text-end pt-2">Paid</td>
                                             <td class="text-end p-0">
-                                                <input @click="setInput" @mouseleave="setInput" :disabled="!isNewSale" @keypress.enter="saveSale" @change="calPaid" @keyup="calPaid" type="number" v-model="paid" class="form-control-plaintext form-control-sm text-end m-0">
+                                                <input @click="setInput" @mouseleave="setInput" :disabled="saleMode=='Sale / Old'" @keypress.enter="saveSale" @change="calPaid" @keyup="calPaid" type="number" v-model="paid" class="form-control-plaintext form-control-sm text-end m-0">
                                             </td>
                                         </tr>
                                         <tr>
@@ -184,14 +190,16 @@
                     voucher_no: this.voucher_no,
                     customer: this.customer,
                     saleItems: this.saleItems,
-                    print_date:this.print_date,
+                    sale_date:this.sale_date,
+                    print_date: this.print_date,
                     total_amount:this.total_amount,
                     net_amount:this.net_amount,
                     extra_discount: this.extra_discount,
                     paid:this.paid,
                     change:this.change,
                     user: this.user,     
-                    credit: this.credit,       
+                    credit: this.credit,    
+                    saleMode: this.saleMode,   
             }  " />
         </div>       
         <setQtyModal @setQty="setSaleQty" :ei="editItem" />
@@ -214,17 +222,25 @@ import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/products"
 import setQtyModal from "@/views/modals/setQtyModal.vue";
 import setDiscountModal from "@/views/modals/setDiscountModal.vue";
+import FlatPickr from 'vue-flatpickr-component';
+
 
 export default {
     components: {
-        PageHeader,SalesModal,CustomerModal,Print, ProductModal,setQtyModal,setDiscountModal,
+        PageHeader,SalesModal,CustomerModal,Print, ProductModal,setQtyModal,setDiscountModal, FlatPickr
     },
     setup () {
         return { v$: useVuelidate() }
     },
     data(){
         return{    
-            isNewSale:true,
+            config: {
+                dateFormat: 'd/m/Y', // Flatpickr options
+                enableTime: false,
+                wrap: true, // set wrap to true only when using 'input-group'
+               // altFormat: 'M j, Y',
+            },  
+            saleMode: "Sale / New",
             isLoading:false,
             sale_type: "retail",
             saleItems:[],
@@ -232,6 +248,7 @@ export default {
             store_item:{},
             voucher_no:"",
             sale_date:"",
+            print_date:"",
             total_amount:0,
             net_amount:0,
             extra_discount:0,
@@ -270,7 +287,8 @@ export default {
    
     mounted() {
         this.voucher_no=new Date().getTime();
-        this.sale_date=new Date().toISOString().substr(0, 10)    
+        this.sale_date=hp.setToday()
+        this.print_date=hp.setToday();
         this.setCustomer(this.customerData)
         this.fetchProducts();
        setTimeout(()=>{
@@ -280,7 +298,6 @@ export default {
       // await disableNetwork(db)
      this.checkDatabase();
      //set print date     
-       this.setPrintDate();
     },
   
     watch:{
@@ -303,13 +320,10 @@ export default {
     },
     methods:{
        
-        setPrintDate(){
-            const date=new Date();
-            let print_date=new Date();
-            print_date.setHours(date.getHours())
-            print_date.setMinutes(date.getMinutes())
-          this.print_date=Timestamp.fromDate(print_date);
+        changeToEdit(){
+           this.saleMode="Sale / Edit"
         },
+       
 
         setCodeOnPaste(){
             setTimeout(()=>{                
@@ -475,10 +489,10 @@ export default {
             this.customer.created_at=p.created_at
         },
         setOldCode(s){
-            this.isNewSale=false;
+            this.saleMode="Sale / Old";
             this.voucher_no=s.voucher_no,
-            this.sale_date=this.editShowTime(s.sale_date)
-            this.print_date=s.sale_date;
+            this.sale_date=hp.setOldDate(s.sale_date)
+            this.print_date=s.sale_date
             this.saleItems=s.products;
             this.total_amount=s.total_amount;
             this.net_amount=s.net_amount;
@@ -512,26 +526,22 @@ export default {
             if(this.saleItems.length <=0) return false;
             if(this.customer.code==123456789 && this.credit > 0) return false;
             const isNotReady= this.saleItems.filter((f)=>!f.final_amount)
-            if(isNotReady.length) return false;
-            
-                this.setPrintDate();
+            if(isNotReady.length) return false;            
 
-                this.isLoading=true;
+              this.isLoading=true;
                 this.msg.type="";
                 this.msg.info="";
 
-                if(this.credit > 0){
+              /*  if(this.credit > 0){
                     this.saveCredit();
                 }
+                    */
 
-                 let date=new Date();
-                let sale_date=new Date(this.sale_date)
-                sale_date.setHours(date.getHours())
-                sale_date.setMinutes(date.getMinutes())
-        
+                const sale_date=hp.insertDate(this.sale_date)
+
                 const voucher={
                     voucher_no: this.voucher_no,
-                    sale_date: Timestamp.fromDate(sale_date),
+                   sale_date: Timestamp.fromDate(sale_date),
                     products : this.saleItems,
                     user : {uid: this.user.uid, displayName: this.user.displayName},
                     total_amount:this.total_amount,
@@ -542,9 +552,9 @@ export default {
                     sale_type:this.sale_type,
                     customer : this.customer,
                     credit: this.credit,
-                }                  
+                }                           
                 const saveDocument=collection(db, "sales")
-                await addDoc(saveDocument, voucher)     
+                await addDoc(saveDocument, voucher)           
                         
         },
         async saveCredit(){
@@ -589,9 +599,10 @@ export default {
                 this.paid=0,
                 this.change=0
                 this.credit=0
-                this.isNewSale=true;                
+                this.saleMode="Sale / New";                
                 this.voucher_no=new Date().getTime();
-                this.sale_date=new Date().toISOString().substr(0, 10)            
+                this.sale_date=hp.setToday();      
+                this.print_date=hp.setToday();  
                 this.setCustomer(this.customerData)
                 this.isLoading=false;
                 this.v$.$reset()

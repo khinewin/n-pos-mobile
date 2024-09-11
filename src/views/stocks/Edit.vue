@@ -29,7 +29,7 @@
                                         <tr>
                                             <td class="text-end pt-2 fw-bold">Date :</td>
                                             <td class="py-0">
-                                                <input type="date" :class="{'border-0 border-bottom border-danger' : v$.created_at.$errors.length > 0}"  v-model="created_at" class="form-control-plaintext border-bottom" id="created_at" placeholder="Date">                                                
+                                                <flat-pickr class="form-control-plaintext form-control-sm border-bottom" v-model="created_at"  :config="config" />
                                             </td>
                                         </tr>                                       
                                     </tbody>
@@ -101,10 +101,12 @@ import SetPrice from '@/views/modals/stocks/SetPrice.vue'
 import * as ss from "@/lib/snapshot/stocks"
 import * as hp from '@/lib/helper';
 import * as cp from '@/lib/cal_price'
+import FlatPickr from 'vue-flatpickr-component';
+
 
 export default {
     components: {
-        PageHeader, ProductModal,SetQty,SetPrice
+        PageHeader, ProductModal,SetQty,SetPrice, FlatPickr
     },
     setup () {
         return { v$: useVuelidate() }
@@ -118,6 +120,12 @@ export default {
     },
     data(){
         return{       
+            config: {
+                dateFormat: 'd/m/Y', // Flatpickr options
+                enableTime: false,
+                wrap: true, // set wrap to true only when using 'input-group'
+               // altFormat: 'M j, Y',
+            },   
             id:"",
             voucher_no:"", 
             created_at:"",         
@@ -236,7 +244,7 @@ export default {
         setItem(item){
             this.id=item.id;
             this.voucher_no=item.voucher_no;
-            this.created_at=this.showEditTime(item.created_at);
+            this.created_at=hp.setOldDate(item.created_at)
             this.storeItems=item.products;         
         },
         async fetchStock(){
@@ -290,11 +298,12 @@ export default {
             
             this.updateProducts();
             
+            const created_at=hp.insertDateNoTime(this.created_at)
             const voucher={
                 voucher_no: this.voucher_no,
-                created_at: Timestamp.fromDate(new Date(this.created_at)),           
+                created_at: Timestamp.fromDate(created_at),           
                 products : this.storeItems,
-                user : {uid: this.user.uid, email:this.user.email},          
+                user : {uid: this.user.uid, displayName:this.user.displayName},          
             }     
             this.isLoading=false;
             const saveDocument=doc(db, "openingStocks", this.id)

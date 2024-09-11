@@ -209,14 +209,14 @@ export default {
 
            let query_url="";
            if(this.voucher_no){
-             query_url = query(collection(db, "creditSales"), 
+             query_url = query(collection(db, "sales"), 
             where("voucher_no", "==", Number(this.voucher_no)));
             }else 
             if(this.customer_code){
-                query_url = query(collection(db, "creditSales"), 
+                query_url = query(collection(db, "sales"), 
                 where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), where("customer.code", "==", Number(this.customer_code)), orderBy("sale_date", "desc"));
             }else{
-                query_url = query(collection(db, "creditSales"), 
+                query_url = query(collection(db, "sales"), 
                 where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date", "desc"));
             }           
             onSnapshot(query_url, (snapShot)=>{

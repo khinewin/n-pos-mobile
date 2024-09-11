@@ -44,7 +44,7 @@
                                         <tr>
                                             <td class="text-end col-6 py-1">Pur date :</td>
                                             <td class="py-0 col-6">
-                                                <input type="date" :class="{'border-0 border-bottom border-danger' : v$.pur_date.$errors.length > 0}"  v-model="pur_date" class="form-control-plaintext form-control-sm border-bottom" id="pur_date" placeholder="Date">                                                
+                                                <flat-pickr class="form-control-plaintext form-control-sm border-bottom" v-model="pur_date"  :config="config" />
                                             </td>
                                         </tr>
                                         <tr>
@@ -78,7 +78,9 @@
                                         {{st.code_no}}                                                                                         
                                     </td>                                    
                                     <td class="pt-2">{{st.item_name}}</td>
-                                    <td class="p-0"><input type="date" class="form-control-plaintext form-control-sm" v-model="st.tmp_exp_date" @change="setExpDate(st.id)"></td>
+                                    <td class="p-0">
+                                        <flat-pickr class="form-control-plaintext form-control-sm text-center" v-model="st.tmp_exp_date" @change="setExpDate(st.id)"  :config="config" />
+                                    </td>
                                     <td class="pt-2">
                                          {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                     </td>
@@ -152,10 +154,12 @@ import * as ss from "@/lib/snapshot/purchases"
 import * as hp  from "@/lib/helper"
 import setQtyModal from "@/views/modals/setQtyModal.vue";
 import setDiscountModal from "@/views/modals/setDiscountModal.vue";
+import FlatPickr from 'vue-flatpickr-component';
+
 
 export default {
     components: {
-        PageHeader, ProductModal, SupplierModal, Footer, setQtyModal,setDiscountModal,
+        PageHeader, ProductModal, SupplierModal, Footer, setQtyModal,setDiscountModal,FlatPickr
     },
     setup () {
         return { v$: useVuelidate() }
@@ -173,6 +177,12 @@ export default {
     },
     data(){
         return{    
+            config: {
+                dateFormat: 'd/m/Y', // Flatpickr options
+                enableTime: false,
+                wrap: true, // set wrap to true only when using 'input-group'
+               // altFormat: 'M j, Y',
+            },  
             id:"",
             location:"",
             old_location:"",
@@ -269,11 +279,12 @@ export default {
         setExpDate(id){
             const arr=this.storePurchase.filter((f)=>f.id==id)
            const p=arr[0]
-           this.editItem.exp_date=p.tmp_exp_date ? Timestamp.fromDate(new Date(p.tmp_exp_date))  : null;
-           p.exp_date=p.tmp_exp_date ? Timestamp.fromDate(new Date(p.tmp_exp_date))  : null;
+           const exp_date=hp.insertDateNoTime(p.tmp_exp_date)
+           this.editItem.exp_date=p.tmp_exp_date ? Timestamp.fromDate(exp_date)  : null;
+           p.exp_date=p.tmp_exp_date ? Timestamp.fromDate(exp_date)  : null;
         },
         setPurchaseItem(p){            
-                const pur_date=this.editShowTime(p.pur_date)
+                const pur_date=hp.setOldDate(p.pur_date)
                 this.voucher_no=p.voucher_no;
                 this.pur_date=pur_date//new Date(this.showTime(p.pur_date)).toISOString().substr(0, 10)
                 this.supplier=p.supplier;
@@ -477,9 +488,11 @@ export default {
             this.updateProducts();
            this.updateStoreItem();
 
+           const pur_date=hp.insertDateNoTime(this.pur_date)
+
             const voucher={
                 voucher_no: this.voucher_no,
-                pur_date: Timestamp.fromDate(new Date(this.pur_date)),
+                pur_date: Timestamp.fromDate(pur_date),
                 supplier: this.supplier,
                 products : this.storePurchase,
                 user : {uid: this.user.uid, displayName: this.user.displayName},

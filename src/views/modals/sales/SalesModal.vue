@@ -13,21 +13,33 @@
                                         <div class="row g-1">
                                            <div class="col-md-4 col-lg-12">
                                             <div class="form-floating">
-                                                <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchSales" placeholder="Voucher no." class="form-control form-control-sm">
+                                                <input type="search" id="search_by_voucher_no" @paste="searchSales" v-model="search_by_voucher_no" @keypress.enter="searchSales" placeholder="Voucher no." class="form-control form-control-sm">
                                                 <label for="search_by_voucher_no" class="small">Voucher no.</label>
                                             </div>
                                            </div>
                                            <div class="col-md-4 col-lg-12">
                                             <div class="form-floating">
-                                                <input type="date" v-model="search_by_from_sale_date" @change="searchSales" placeholder="From sur date" class="form-control form-control-sm">
-                                                <label for="search_by_from_sale_date" class="small ">From  date</label>
+                                                <input type="search" id="search_by_customer" v-model="search_by_customer" @keypress.enter="searchSales" placeholder="Customer name" class="form-control form-control-sm">
+                                                <label for="search_by_customer" class="small">Customer name</label>
                                             </div>
                                            </div>
                                            <div class="col-md-4 col-lg-12">
-                                            <div class="form-floating">
-                                                <input type="date" v-model="search_by_to_sale_date" @change="searchSales" placeholder="To sur date" class="form-control form-control-sm">
-                                                <label for="search_by_to_sale_date" class="small ">To  date</label>
-                                            </div>
+                                            <div class="input-group mb-2">
+                                                <div class="form-floating">
+                                                    <flat-pickr @change="searchSales" class="form-control form-control-sm" v-model="search_by_from_sale_date" id="from_date" :config="config" />
+                                                    <label for="from_date">From date</label>
+                                                </div>
+                                                <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                               </div>
+                                           </div>
+                                           <div class="col-md-4 col-lg-12">
+                                            <div class="input-group mb-2">
+                                                <div class="form-floating">
+                                                    <flat-pickr @change="searchSales" class="form-control form-control-sm" v-model="search_by_to_sale_date" id="from_date" :config="config" />
+                                                    <label for="from_date">From date</label>
+                                                </div>
+                                                <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                               </div>
                                            </div>                                      
                                     </div>
                                     <div class="row mt-2">
@@ -94,7 +106,12 @@ import {Timestamp, collection, addDoc, getDocs, onSnapshot, doc, setDoc, where, 
 import db from '@/firebase/firestore'
 import * as ss from "@/lib/snapshot/sales"
 import * as hp from '@/lib/helper'
+import FlatPickr from 'vue-flatpickr-component';
+
 export default {
+    components:{
+        FlatPickr
+    },
    data(){
        return{
            sales:[],
@@ -102,14 +119,20 @@ export default {
            search_by_voucher_no:"",
            search_by_from_sale_date:"",
            search_by_to_sale_date:"",
+           search_by_customer:"",
             isUpdating:false,
            isLoading:false,
+           config: {
+                dateFormat: 'd/m/Y', // Flatpickr options
+                enableTime: false,
+                wrap: true, // set wrap to true only when using 'input-group'
+               // altFormat: 'M j, Y',
+            },  
        }
    },
   
    mounted() {    
         this.setDate();
-
        const myModalEl = document.getElementById('salesModal')
        myModalEl.addEventListener('show.bs.modal', event => {                
        })   
@@ -122,17 +145,13 @@ export default {
    computed:{
        user(){
            return this.$store.getters.user;
-       },
-       
+       },       
    },
  
    methods:{
         setDate(){
-            let date = new Date();
-            let firstDay = new Date(date.getFullYear(), date.getMonth(),1+1).toISOString().substr(0, 10);
-            let lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 1).toISOString().substr(0, 10);
-            this.search_by_from_sale_date=firstDay
-            this.search_by_to_sale_date=lastDay
+            this.search_by_from_sale_date=hp.setSearchFromDate();
+            this.search_by_to_sale_date=hp.setSearchToDate();
         },
        updateSales(){
                this.isUpdating=true;
@@ -144,57 +163,42 @@ export default {
        },
        clearSearch(){
            this.search_by_voucher_no="";
+           this.search_by_customer="";
             this.setDate();
            this.searchSales();
        },
-       searchSales(){        
-        
-           if(this.search_by_voucher_no){
-               this.sales=this.salesData.filter((f)=>{
-                       return f.voucher_no===Number(this.search_by_voucher_no);
-               })
-           }else if(this.search_by_from_sale_date && this.search_by_to_sale_date){
-                const date=new Date();         
-                let fDate=new Date(this.search_by_from_sale_date)
-                fDate.setHours("0", "0", "0")
-                const searchFromDate=Timestamp.fromDate(fDate)
-                let tDate=new Date(this.search_by_to_sale_date)
-                tDate.setHours("23", "59", "59")
-                const searchToDate=Timestamp.fromDate(tDate)
-           
-                this.sales=this.salesData.filter((f)=>{
-                        return  f.sale_date >= searchFromDate && f.sale_date <= searchToDate; 
-                })   
-           }else{
-                this.sales= this.salesData.filter((s, i)=>{
-                           if(i < 20){
-                               return s;
-                           }
-                 })                                     
-           }
-           this.sales=this.sales.sort((a,b)=>{
-                const date_a=new Date(a.sale_date.toDate()).getTime();
-                const date_b=new Date(b.sale_date.toDate()).getTime();
-                return date_a - date_b;
-            }).reverse()
-       },
-     
-    async fetchSales(){
-        const date=new Date();         
-        let fDate=new Date(this.search_by_from_sale_date)
-        fDate.setHours("0", "0", "0")
-         const from_date=Timestamp.fromDate(fDate)
-         let tDate=new Date(this.search_by_to_sale_date)
-        tDate.setHours("23", "59", "59")
-        const to_date=Timestamp.fromDate(tDate)
-        
-       const query_url = query(collection(db, "sales"), where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date", "desc"));
+       searchSales(){                     
+         this.fetchSales();        
+       },    
+
+    displaySales(){
+        if(this.search_by_customer && this.search_by_voucher_no){
+            this.sales=this.salesData.filter((f)=>{
+               return f.customer.name.toLowerCase().includes(this.search_by_customer.toLowerCase()) && f.voucher_no==Number(this.search_by_voucher_no)
+            })
+       }else
+        if(this.search_by_customer){
+            this.sales=this.salesData.filter((f)=>f.customer.name.toLowerCase().includes(this.search_by_customer.toLowerCase()))
+       }else
+       if(this.search_by_voucher_no){
+            this.sales=this.salesData.filter((f)=>f.voucher_no==Number(this.search_by_voucher_no))
+       }else{
+            this.sales=this.salesData;
+       }
+    },   
+    async fetchSales(){    
+       const from_date=Timestamp.fromDate(hp.searchFromDate(this.search_by_from_sale_date))
+        const to_date=Timestamp.fromDate(hp.searchToDate(this.search_by_to_sale_date))        
+        let query_url="";         
+        if(this.search_by_from_sale_date && this.search_by_to_sale_date){
+            query_url = query(collection(db, "sales"), where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date", "desc"));
+        }
        onSnapshot(query_url, async(snapShot) =>{                
                     const sales=ss.sales(snapShot)       
                     this.salesData=sales;
-                    this.searchSales();
                     this.isLoading=false;
                     this.isUpdating=false;
+                    this.displaySales();
             });        
       } ,
       showTime(t){

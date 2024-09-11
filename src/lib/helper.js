@@ -91,8 +91,74 @@ const  message=(type, name)=>{
             return `1${m_unit} * ${s_unit_qty}${s_unit}`
         }
     }
+
+    const searchFromDate=(searchDate)=>{
+        const [day, month, year] = searchDate.split('/');
+        const s_date = `${year}-${month}-${day}`;
+        let fDate=new Date(s_date)
+        fDate.setHours("0", "0", "0")
+        return fDate;        
+    }   
     
-   
+    const searchToDate=(searchDate)=>{
+        const [day, month, year] = searchDate.split('/');
+        const s_date = `${year}-${month}-${day}`;
+        let tDate=new Date(s_date)
+        tDate.setHours("23", "59", "59")
+        return tDate;
+    }
+
+    const setSearchFromDate=()=>{
+            let date = new Date();
+            const firstDay = new Date(date.getFullYear(), date.getMonth(),1);
+            const fday=firstDay.getDate().toString().padStart(2, 0);
+            const month=String(date.getMonth()+1).padStart(2,0)
+            const year=date.getFullYear();            
+            const first_day=`${fday}/${month}/${year}`
+            return first_day
+    }
+    const setSearchToDate=()=>{
+        let date = new Date();
+        const lastDay = new Date(date.getFullYear(), date.getMonth() + 1,0)
+        const lday=lastDay.getDate().toString().padStart(2,0)
+        const month=String(date.getMonth()+1).padStart(2,0)
+        const year=date.getFullYear();        
+        const last_day=`${lday}/${month}/${year}`
+        return last_day        
+    }
+    const setToday=()=>{
+        let date = new Date();
+        const day=date.getDate().toString().padStart(2,0)
+        const month=String(date.getMonth()+1).padStart(2,0)
+        const year=date.getFullYear();        
+        const today=`${day}/${month}/${year}`
+        return today        
+    }
+    const setOldDate=(d)=>{
+        let date = new Date(d.toDate());
+        const day=date.getDate().toString().padStart(2,0)
+        const month=String(date.getMonth()+1).padStart(2,0)
+        const year=date.getFullYear();        
+        const today=`${day}/${month}/${year}`
+        return today        
+    }
+    const insertDate=(d)=>{
+        const date=new Date();
+        const [day, month, year] = d.split('/');
+        const s_date = `${year}-${month}-${day}`;
+        let tDate=new Date(s_date)
+        tDate.setHours(date.getHours())
+        tDate.setMinutes(date.getMinutes())
+        return tDate;
+    }
+    const insertDateNoTime=(d)=>{
+        const date=new Date();
+        const [day, month, year] = d.split('/');
+        const s_date = `${year}-${month}-${day}`;
+        let tDate=new Date(s_date)      
+        return tDate;
+    }
+
 
 const gb_date=groupBy(['group_date'])
 const gb_item_name=groupBy(['item_name'])
@@ -132,4 +198,12 @@ export   {
     g_code,
     setAutoFocus,
     message,
+    searchFromDate, 
+    searchToDate,
+    setSearchFromDate,
+    setSearchToDate,
+    setToday,
+    insertDate,
+    setOldDate,
+    insertDateNoTime
     };

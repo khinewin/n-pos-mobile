@@ -13,7 +13,7 @@
                 <LargePrintHeader />
             </div>
             <div class="col-12 text-center">
-                <h6>Reports purchase {{displayReportType}}</h6>
+                <h6>Reports purchase {{displayReportType(reportType)}}</h6>
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="" v-if="code_no">Code : {{item_name}}</div>
@@ -62,6 +62,7 @@ import PurchaseBySupplier from "@/views/reports/purchase/PurchaseBySupplier.vue"
 import PurchaseBySupplierDate from "@/views/reports/purchase/PurchaseBySupplierDate.vue"
 import PurchaseByExpDate from "@/views/reports/purchase/PurchaseByExpDate.vue"
 import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
+import * as rt from "@/lib/reportType"
 
 export default {
     components: {
@@ -83,7 +84,6 @@ export default {
             item_name: this.$route.query.item_name,   
             displayFromDate:"",
             displayToDate:"",
-            displayReportType:"",
             reports:[],
             current_month:[],
             salesData:[],
@@ -98,26 +98,6 @@ export default {
    
     mounted() {    
       
-            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType==="by_date"){
-                this.displayReportType="by Date"
-            }else 
-            if(this.reportType==='by_voucher'){
-                this.displayReportType="by Voucher"
-            }else
-            if(this.reportType==='by_description'){
-                this.displayReportType="by Description"
-            }else
-            if(this.reportType==='by_supplier'){
-                this.displayReportType="by Supplier"
-            }else
-            if(this.reportType==='by_supplier_date'){
-                this.displayReportType="by Supplier and Date"
-            }else
-            if(this.reportType==='by_exp_date'){
-                this.displayReportType="by Expire Date"
-            }
     },
    watch:{
    
@@ -137,12 +117,13 @@ export default {
         user(){
             return this.$store.getters.user;
         },
-        report_type(){
-            return this.$store.getters.reportType;
-        },
+      
       
     },
     methods:{
+        displayReportType(reportType){
+            return rt.displayReportType(reportType)
+        },
         parseYMD(dateStr) {
             const [day, month, year] = dateStr.split('/');
             return  `${year}-${month}-${day}`;

@@ -55,24 +55,24 @@
                                            <td @click="sortCustomers('name')" class="text-start"><i class="fa-solid fa-sort"></i> Name</td>
                                            <td @click="sortCustomers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
                                            <td @click="sortCustomers('address')"><i class="fa-solid fa-sort"></i> Address</td>
-                                           <td @click="sortCustomers('created_at')"><i class="fa-solid fa-sort"></i> Date</td>
+                                           <td @click="sortCustomers('created_at')"><i class="fa-solid fa-sort"></i> Member date</td>
                                        </tr>
                                      
                                        
                                        <tr class="" data-bs-dismiss="modal" @click="setCustomer(p)" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id" style="cursor:context-menu">                                         
-                                           <td :class="{'table-secondary': sort_item ==='code'}" >
+                                           <td :class="{'table-secondary': sort_item ==='code'}" class="text-center">
                                                 {{p.code}}
                                             </td>
                                            <td :class="{'table-secondary': sort_item ==='name'}">
                                                 {{p.name}}
                                            </td>
-                                           <td :class="{'table-secondary': sort_item ==='phone'}">
+                                           <td :class="{'table-secondary': sort_item ==='phone'}" class="text-center">
                                                 {{p.phone}}
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='address'}">
                                                 {{p.address}}
                                            </td>
-                                           <td :class="{'table-secondary': sort_item ==='created_at'}">{{showTime(p.created_at)}}</td>
+                                           <td :class="{'table-secondary': sort_item ==='created_at'}" class="text-center">{{showTime(p.created_at)}}</td>
                                        </tr>
                                    </tbody>
                                </table>

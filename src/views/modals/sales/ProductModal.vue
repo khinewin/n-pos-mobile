@@ -70,9 +70,9 @@
                                                         <span v-if="p.retail_price.smallest_unit">{{p.retail_price.smallest_unit}} </span>
                                                     </td>
                                                     <td class="text-end" v-if="sale_type=='whole_sale'">
-                                                        <span v-if="p.whole_sale_price.largest_unit">{{p.packing_size.largest_unit}}*{{p.whole_sale_price.largest_unit}}, </span>
-                                                        <span v-if="p.whole_sale_price.medium_unit">{{p.packing_size.medium_unit}}*{{p.whole_sale_price.medium_unit}}, </span>
-                                                        <span v-if="p.whole_sale_price.smallest_unit">{{p.packing_size.smallest_unit}}*{{p.whole_sale_price.smallest_unit}} </span>
+                                                        <span v-if="p.whole_sale_price.largest_unit">{{p.whole_sale_price.largest_unit}} * </span>
+                                                        <span v-if="p.whole_sale_price.medium_unit">{{p.whole_sale_price.medium_unit}} * </span>
+                                                        <span v-if="p.whole_sale_price.smallest_unit">{{p.whole_sale_price.smallest_unit}} </span>
                                                     </td>
                                                 </tr>
                                             </tbody>

@@ -13,7 +13,7 @@
                 <LargePrintHeader />
             </div>
             <div class="col-12 text-center">
-                <h6>Reports SOC {{displayReportType}}</h6>
+                <h6>Reports SOC {{displayReportType(reportType)}}</h6>
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="" v-if="code_no">Code : {{item_name}}</div>
@@ -49,7 +49,7 @@ import SocByVoucher from "@/views/reports/soc/SocByVoucher.vue"
 import SocByCustomer from "@/views/reports/soc/SocByCustomer.vue"
 import SocByCustomerDate from "@/views/reports/soc/SocByCustomerDate.vue"
 import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
-
+import * as rt from '@/lib/reportType'
 
 export default {
     components: {
@@ -68,7 +68,7 @@ export default {
             item_name: this.$route.query.item_name,
             displayFromDate:"",
             displayToDate:"",
-            displayReportType:"",
+        //    displayReportType:"",
             reports:[],
             current_month:[],
             SocData:[],
@@ -81,30 +81,9 @@ export default {
         }
     },
    
-    mounted() {    
-      
-            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType==="by_date"){
-                this.displayReportType="by Date"
-            }else 
-            if(this.reportType==='by_voucher'){
-                this.displayReportType="by Voucher"
-            }else
-            if(this.reportType==='by_description'){
-                this.displayReportType="by Description"
-            }
-            else
-            if(this.reportType==='by_customer'){
-                this.displayReportType="by Customer"
-            }
-            else
-            if(this.reportType==='by_customer_date'){
-                this.displayReportType="by Customer and Date"
-            }else
-            if(this.reportType==='by_chart'){
-                this.displayReportType="by Chart"
-            }
+    mounted() {          
+         this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
+         this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
     },
    watch:{
    
@@ -124,12 +103,12 @@ export default {
         user(){
             return this.$store.getters.user;
         },
-        report_type(){
-            return this.$store.getters.reportType;
-        },
-      
+       
     },
     methods:{
+        displayReportType(report_type){
+            return  rt.displayReportType(report_type)
+        },
         parseYMD(dateStr) {
             const [day, month, year] = dateStr.split('/');
             return  `${year}-${month}-${day}`;

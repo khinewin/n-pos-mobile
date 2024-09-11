@@ -29,7 +29,7 @@
                                         <tr>
                                             <td class="text-end py-1">Date :</td>
                                             <td class="py-0">
-                                                <input type="date" :class="{'border-0 border-bottom border-danger' : v$.created_at.$errors.length > 0}"  v-model="created_at" class="form-control-plaintext form-control-sm border-bottom" id="created_at" placeholder="Date">                                                
+                                                <flat-pickr class="form-control-plaintext form-control-sm border-bottom" v-model="created_at"  :config="config" />
                                             </td>
                                         </tr>                                       
                                     </tbody>
@@ -100,13 +100,15 @@ import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/stocks/ProductModal.vue'
 import SetQty from '@/views/modals/stocks/SetQty.vue'
 import SetPrice from '@/views/modals/stocks/SetPrice.vue'
+import FlatPickr from 'vue-flatpickr-component';
+
 
 import * as ss from "@/lib/snapshot/products"
 import * as hp from "@/lib/helper"
 import * as cp from "@/lib/cal_price"
 export default {
     components: {
-        PageHeader, ProductModal,SetQty,SetPrice
+        PageHeader, ProductModal,SetQty,SetPrice, FlatPickr
     },
     setup () {
         return { v$: useVuelidate() }
@@ -119,7 +121,13 @@ export default {
             }
     },
     data(){
-        return{       
+        return{      
+            config: {
+                dateFormat: 'd/m/Y', // Flatpickr options
+                enableTime: false,
+                wrap: true, // set wrap to true only when using 'input-group'
+               // altFormat: 'M j, Y',
+            },   
             voucher_no:"", 
             created_at:"",         
             stock_item: {},
@@ -150,7 +158,7 @@ export default {
   
     mounted() {         
         this.voucher_no=new Date().getTime();
-        this.created_at=new Date().toISOString().substr(0, 10)
+        this.created_at=hp.setToday();
         this.checkDatabase();
     },
     
@@ -274,9 +282,11 @@ export default {
             this.msg.type="";
             this.msg.info="";
         
+            const created_at=hp.insertDateNoTime(this.created_at)
+
             const voucher={
                 voucher_no: this.voucher_no,
-                created_at: Timestamp.fromDate(new Date(this.created_at)),           
+                created_at: Timestamp.fromDate(created_at),           
                 products : this.storeItems,
                 user : {uid: this.user.uid, displayName: this.user.displayName},              
             }      
