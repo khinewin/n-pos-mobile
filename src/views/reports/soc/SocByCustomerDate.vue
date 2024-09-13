@@ -30,19 +30,19 @@
                                                 <td class="text-center"  >
                                                     {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.sale_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
                                                 </td>
-                                                <td class="text-end">{{p.final_amount}}</td>                                               
+                                                <td class="text-end">{{fM(p.final_amount)}}</td>                                               
                                             </tr>
                                             <tr>
-                                                <td colspan="4" class="text-end fw-bold">Total sale amount</td>
-                                                <td class="text-end">{{res[2].sale_amount}}</td>                                               
+                                                <td colspan="4" class="text-end fw-bold border-bottom rm-b-b pe-2">Total sale amount (Ks)</td>
+                                                <td class="text-end">{{fM(res[2].sale_amount)}}</td>                                               
                                             </tr>
                                             <tr>
-                                                <td colspan="4" class="text-end fw-bold">Paid</td>
-                                                <td class="text-end">{{res[2].paid}}</td>                  
+                                                <td colspan="4" class="text-end fw-bold border-bottom rm-b-b pe-2">Paid (Ks)</td>
+                                                <td class="text-end">{{fM(res[2].paid)}}</td>                  
                                             </tr>
                                             <tr>
-                                                <td colspan="4" class="text-end fw-bold">Credit</td>
-                                                <td class="text-end">{{res[2].credit}}</td>                  
+                                                <td colspan="4" class="text-end fw-bold pe-2">Credit (Ks)</td>
+                                                <td class="text-end">{{fM(res[2].credit)}}</td>                  
                                             </tr>
                                         </tbody>
                                     </table>
@@ -57,16 +57,16 @@
                         <table class="table table-bordered border-dark mb-0 table-group-divider table-hover">
                             <tbody>
                                 <tr>
-                                    <td class="text-end fw-bold col-10">Grand total sale amount</td>
-                                    <td class="text-end col-2">{{total_sale_amount}}</td>
+                                    <td class="text-end fw-bold col-10 border-bottom rm-b-b pe-2">Net total sale amount (Ks)</td>
+                                    <td class="text-end col-2">{{fM(total_sale_amount)}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-end fw-bold">Total paid</td>
-                                    <td class="text-end">{{total_paid}}</td>
+                                    <td class="text-end fw-bold border-bottom rm-b-b pe-2">Total paid (Ks)</td>
+                                    <td class="text-end">{{fM(total_paid)}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-end fw-bold">Total credit</td>
-                                    <td class="text-end">{{total_credit}}</td>
+                                    <td class="text-end fw-bold pe-2">Total credit (Ks)</td>
+                                    <td class="text-end">{{fM(total_credit)}}</td>
                                 </tr>                             
                             </tbody>
                         </table>
@@ -113,10 +113,9 @@ export default {
     },
    
     mounted() {    
-            if(this.user !==null){
                 this.isLoading=true;
                 this.fetchSales();  
-            }
+            
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
             if(this.reportType="by_date"){
@@ -135,12 +134,7 @@ export default {
                 }
             },deep:true
         },
-        user(data){
-            if(data){
-                this.isLoading=true;
-                this.fetchSales();  
-            }
-        }   
+       
    },
     computed:{
         user(){
@@ -152,6 +146,9 @@ export default {
       
     },
     methods:{
+        fM(amount){
+            return hp.formattedAmount(amount)
+        },
         displayPrice(l_unit, m_unit, s_unit){
             return hp.displayPrice(l_unit, m_unit, s_unit);
         },

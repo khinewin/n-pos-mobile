@@ -113,8 +113,7 @@
                                         </tr>    
                                     </tbody>
                                   
-                                    <tbody> 
-                                                                        
+                                    <tbody>                                                                         
                                         <tr class="" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(i)"  >
                                             <td class="position-relative text-center">
                                                 <span v-if="saleMode=='Sale / New'">
@@ -146,8 +145,7 @@
                                             <td class=" text-end">{{s.discount}}</td>
                                             <td class="text-end">{{s.final_amount}}</td>
                                         </tr> 
-                                    </tbody>
-                                    <tbody>
+                                   
                                         <tr>
                                             <td colspan="9" class="text-end">Total amount</td>
                                             <td class="text-end">{{total_amount}}</td>
@@ -181,7 +179,7 @@
                                             </td>
                                         </tr>
                                     </tbody>
-                              </table>
+                                </table>
                               </div>
                         </div>
                     </div>
@@ -191,7 +189,7 @@
         <ProductModal @setCode="setCode" :sale_type="sale_type" :saleItems="saleItems"/>
         <SalesModal @setCode="setOldCode" />
         <CustomerModal @setCustomer="setCustomer" />
-        <!--Pritn item start-->
+        <!--Print item start-->
         <div class="d-none" id="printMe" v-if="saleItems.length > 0" >
                 <Print :data="{
                     voucher_no: this.voucher_no,
@@ -326,7 +324,7 @@ export default {
       
     },
     methods:{
-       
+    
         changeToEdit(){
            this.saleMode="Sale / Edit"
         },

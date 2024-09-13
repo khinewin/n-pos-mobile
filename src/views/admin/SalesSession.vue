@@ -8,7 +8,7 @@
                                 <div class="col-9">
                                     <div class="small fw-lighter mb-2">Sales (Today)</div>
                                     <div class="card-text">                                     
-                                        {{sales_today}} MMK
+                                       Ks {{fM(sales_today)}}
                                     </div>
                                 </div>
                             </div>
@@ -22,7 +22,7 @@
                             <div class="col-3 text-center h1"><i class="fa-solid fa-cart-plus"></i></div>
                             <div class="col-9">
                                 <div class="small fw-lighter mb-2">Sales (This week)</div>
-                                <div class="card-text">{{sales_this_week}} MMK</div>
+                                <div class="card-text">Ks {{fM(sales_this_week)}}</div>
                             </div>
                         </div>
                     </div>
@@ -35,7 +35,7 @@
                             <div class="col-3 text-center h1"><i class="fa-solid fa-cart-plus"></i></div>
                             <div class="col-9">
                                 <div class="small fw-lighter mb-2">Sales (This month)</div>
-                                <div class="card-text">{{sales_this_month}} MMK</div>
+                                <div class="card-text">Ks {{fM(sales_this_month)}}</div>
                             </div>
                         </div>
                     </div>
@@ -48,7 +48,7 @@
                             <div class="col-3 text-center h1"><i class="fa-solid fa-cart-plus"></i></div>
                             <div class="col-9">
                                 <div class="small fw-lighter mb-2">Sales (This year)</div>
-                                <div class="card-text">{{sales_this_year}} MMK</div>
+                                <div class="card-text">Ks {{fM(sales_this_year)}}</div>
                             </div>
                         </div>
                     </div>
@@ -81,23 +81,15 @@
             }
         },
         mounted() {
-        
+            this.isLoading=true;
+            this.fetchSalesYearly();
         },
-        created(){
-            if(this.user !== null){
-                this.isLoading=true;
-                this.fetchSalesYearly();
-            }
-        },
-        watch:{
-            user(data){
-                if(data){
-                    this.isLoading=true;
-                    this.fetchSalesYearly();
-                }
-            }
-        },
+     
+      
         methods:{
+            fM(amount){
+                return hp.formattedAmount(amount)
+            },
             showTime(t){
                 return hp.showTime(t)
             },

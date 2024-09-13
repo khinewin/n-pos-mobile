@@ -43,7 +43,7 @@
                 <tbody class="small">
                     <tr class="text-center fw-bold">
                         <td class="col-1">No.</td>
-                        <td class="col-6">Description</td>
+                        <td class="col-4">Description</td>
                         <td class="col-1">Qty</td>
                         <td class="col-1">Unit Price</td>
                         <td class="col-1">Discount</td>
@@ -56,46 +56,46 @@
                         <td class="text-center">
                             {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
                         </td>    
-                        <td class="text-end">{{s.qty_sale_price}}' {{s.qty_sale_price_unit}} </td>     
+                        <td class="text-end">{{fM(s.qty_sale_price)}}' {{s.qty_sale_price_unit}} </td>     
                         <td class="text-center">
                             <span v-if="s.dis_qty">{{s.dis_qty}}{{s.dis_qty_unit}}</span>
                             <span v-if="s.dis_amount">{{s.dis_amount}}$</span>
                             <span v-if="s.dis_percent">{{s.dis_percent}}%</span>     
                         </td>         
-                        <td class=" text-end">{{s.discount}}</td>
-                        <td class=" text-end">{{s.final_amount}}</td>     
+                        <td class=" text-end">{{fM(s.discount)}}</td>
+                        <td class=" text-end">{{fM(s.final_amount)}}</td>     
                     </tr>                        
               
                     <tr>
                         <td colspan="6"  class="text-end  pe-2 " style="border-bottom-style: hidden;">Total amount</td>
-                        <td class="text-end">{{data.total_amount}}</td>
+                        <td class="text-end">{{fM(data.total_amount)}}</td>
                     </tr>                     
                     <tr>
                         <td colspan="6" class="text-end pe-2 " style="border-bottom-style: hidden;">Extra discount</td>
                         <td class="text-end">
-                            {{data.extra_discount}}
+                            {{fM(data.extra_discount)}}
                         </td>
                     </tr>
                     <tr>
                         <td colspan="6" class="text-end pe-2 " style="border-bottom-style: hidden;">Net amount</td>
-                        <td class="text-end">{{data.net_amount}}</td>
+                        <td class="text-end">{{fM(data.net_amount)}}</td>
                     </tr>
                     <tr >
-                        <td colspan="6" class="text-end  pe-2 " style="border-bottom-style: hidden;">Paid</td>
+                        <td colspan="6" class="text-end  pe-2 " style="border-bottom-style: hidden;">Paid (Ks)</td>
                         <td class="text-end">
-                            {{data.paid}}
+                            {{fM(data.paid)}}
                         </td>
                     </tr>
                     <tr>
                         <td colspan="6"  class="text-end  pe-2 " style="border-bottom-style: hidden;">Change</td>
                         <td class="text-end ">
-                            {{data.change}}
+                            {{fM(data.change)}}
                         </td>
                     </tr> 
                     <tr v-if="data.credit">
                         <td colspan="6" class="text-end pe-2" >Credit</td>
                         <td class="text-end">
-                            {{data.credit}}
+                            {{fM(data.credit)}}
                         </td>
                     </tr>                                
                 </tbody>
@@ -147,13 +147,13 @@
           </table>
         </div>
         <div class="">
-            <table class="small-print-table">
+            <table class="small-print-table table-bordered">
                 <tbody class="fw-bold text-center">
                     <tr class="">
                         <td class="">No.</td>
                         <td class="">Description</td>
                         <td class="" >Qty</td>
-                        <td class="" >Unit price</td>
+                        <!--<td class="" >Unit price</td>-->
                         <td class="">Discount</td>
                         <td class="">Amount</td>
                     </tr>
@@ -165,46 +165,54 @@
                         <td>                           
                              {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
                         </td>
-                        <td class="text-center">{{s.qty_sale_price_unit}} * {{s.qty_sale_price}}</td>    
-                        <td class="text-end">{{s.discount}}</td>
-                        <td class="text-end">{{s.final_amount}}</td>
+                        <!--<td class="text-center">{{fM(s.qty_sale_price)}}' {{s.qty_sale_price_unit}}</td>    -->
+                        <td class="text-end">{{s.discount ? fM(s.discount) : 0}}</td>
+                        <td class="text-end">{{fM(s.final_amount)}}</td>
                     </tr>                        
                     </tbody>
                     <tbody class="text-end">
                     <tr>
-                        <td colspan="5" class=" " style="border-bottom-style: hidden;">Total amount</td>
-                        <td class="">{{data.total_amount}}</td>
+                        <td colspan="4" class=" " style="border-bottom-style: hidden;">Total amount</td>
+                        <td class="">{{fM(data.total_amount)}}</td>
                     </tr>                     
                     <tr>
-                        <td colspan="5" class="" style="border-bottom-style: hidden;">Extra discount</td>
+                        <td colspan="4" class="" style="border-bottom-style: hidden;">Extra discount</td>
                         <td class="">
-                            {{data.extra_discount}}
+                            {{fM(data.extra_discount)}}
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="5" class="" style="border-bottom-style: hidden;">Net amount</td>
-                        <td class="">{{data.net_amount}}</td>
+                        <td colspan="4" class="" style="border-bottom-style: hidden;">Net amount</td>
+                        <td class="">{{fM(data.net_amount)}}</td>
                     </tr>
                     <tr >
-                        <td colspan="5" class="" style="border-bottom-style: hidden;">Paid</td>
+                        <td colspan="4" class="" style="border-bottom-style: hidden;">Paid (Ks)</td>
                         <td class="">
-                            {{data.paid}}
+                            {{fM(data.paid)}}
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="5" class="" style="border-bottom-style: hidden;">Change</td>
+                        <td colspan="4" :class="{'border-bottom rm-b-b' : data.credit}">Change</td>
                         <td class="">
-                            {{data.change}}
+                            {{fM(data.change)}}
                         </td>
                     </tr>   
                     <tr v-if="data.credit">
-                        <td colspan="5" class="" >Credit</td>
+                        <td colspan="4" class="" >Credit</td>
                         <td class="">
-                            {{data.credit}}
+                            {{fM(data.credit)}}
                         </td>
                     </tr>                           
                 </tbody>
           </table>
+          <table class="small-print-table-time">
+            <tbody>
+                <tr>
+                    <td>Print date : {{printDate}}</td>
+                    <td></td>
+                </tr>
+            </tbody>
+      </table>
         
         </div>      
     </div>
@@ -235,6 +243,9 @@ export default {
        
     },
     methods:{
+        fM(amount){
+            return hp.formattedAmount(amount)
+        },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
@@ -268,7 +279,7 @@ export default {
 <style>
       .small-print-header td{
         padding: 2px;
-        font-size: 12px;
+        font-size: 11px;
     }
     .small-print-table{
         border: 1px solid;
@@ -279,5 +290,8 @@ export default {
     }
     .small-print-table tbody{
         border-bottom: 1px solid;
+    }
+    .small-print-table-time{
+        font-size: 11px;
     }
 </style>

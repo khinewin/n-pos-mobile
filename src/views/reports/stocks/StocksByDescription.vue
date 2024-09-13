@@ -37,9 +37,9 @@
                     </td>
                     </tr>
                     <tr>
-                        <td :colspan="[location=='All' ? 6 : 5]" class="text-end fw-bold">Total</td>                        
-                        <td class="text-end">{{total_retail_amount}}</td>
-                        <td class="text-end">{{total_whole_sale_amount}}</td>
+                        <td :colspan="[location=='All' ? 6 : 5]" class="text-end fw-bold pe-2">Total amount (Ks)</td>                        
+                        <td class="text-end">{{fM(total_retail_amount)}}</td>
+                        <td class="text-end">{{fM(total_whole_sale_amount)}}</td>
                     </tr>
                
             </tbody>
@@ -82,10 +82,9 @@ export default {
     },
    
     mounted() {    
-            if(this.user !==null){
                 this.isLoading=true;
                 this.fetchStocks();  
-            }
+            
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
             if(this.reportType="by_date"){
@@ -104,12 +103,7 @@ export default {
                 }
             },deep:true
         },
-        user(data){
-            if(data){
-                this.isLoading=true;
-                this.fetchStocks();  
-            }
-        }   
+      
    },
     computed:{
         user(){
@@ -120,6 +114,9 @@ export default {
         },      
     },
     methods:{
+        fM(amount){
+            return hp.formattedAmount(amount);
+        },
         displayPrice(l_unit, m_unit, s_unit){
             return hp.displayPrice(l_unit, m_unit, s_unit);
         },

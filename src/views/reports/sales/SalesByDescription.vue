@@ -22,27 +22,27 @@
                         <td class="text-end"  >
                             {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.sale_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
                         </td>
-                        <td class="text-end">{{p.final_amount}}</td>
+                        <td class="text-end">{{fM(p.final_amount)}}</td>
                         <td class="text-end" >
-                               {{p.pur_amount}}
+                               {{fM(p.pur_amount)}}
                         </td>
                         <td class="text-end">
-                                {{p.profit}}
+                                {{fM(p.profit)}}
                         </td>                        
                     </tr>
                     <tr class="text-end">
-                        <td colspan="4" class=" fw-bold">Total</td>
-                        <td>{{sale_amount}}</td>
-                        <td>{{pur_amount}}</td>
-                        <td>{{profit_amount}}</td>
+                        <td colspan="4" class=" fw-bold border-bottom rm-b-b pe-2">Total (Ks)</td>
+                        <td>{{fM(sale_amount)}}</td>
+                        <td>{{fM(pur_amount)}}</td>
+                        <td>{{fM(profit_amount)}}</td>
                     </tr>
                     <tr>
-                        <td colspan="6" class="text-end fw-bold">Extra discount</td>
-                        <td class="text-end">{{extra_discount}}</td>                  
+                        <td colspan="6" class="text-end fw-bold border-bottom rm-b-b pe-2">Extra discount (Ks)</td>
+                        <td class="text-end">{{fM(extra_discount)}}</td>                  
                     </tr>
                     <tr>
-                        <td colspan="6" class="text-end fw-bold">Net profit</td>
-                        <td class="text-end">{{profit_amount - extra_discount}}</td>                  
+                        <td colspan="6" class="text-end fw-bold  pe-2">Net profit (Ks)</td>
+                        <td class="text-end">{{fM(profit_amount - extra_discount)}}</td>                  
                     </tr>
                   
                 </tbody>
@@ -87,10 +87,9 @@ export default {
     },
    
     mounted() {    
-            if(this.user !==null){
                 this.isLoading=true;
                 this.fetchSales();  
-            }
+            
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
             if(this.reportType="by_date"){
@@ -109,12 +108,7 @@ export default {
                 }
             },deep:true
         },
-        user(data){
-            if(data){
-                this.isLoading=true;
-                this.fetchSales();  
-            }
-        }   
+       
    },
     computed:{
         user(){
@@ -126,6 +120,9 @@ export default {
       
     },
     methods:{
+        fM(amount){
+            return hp.formattedAmount(amount);
+        },
         displayPrice(l_unit, m_unit, s_unit){
             return hp.displayPrice(l_unit, m_unit, s_unit);
         },

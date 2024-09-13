@@ -44,16 +44,16 @@
                         </td>
                     </tr>
                     <tr class="text-center fw-bold">
-                        <td colspan="6"></td>
+                        <td colspan="6" class="border-bottom rm-b-b"></td>
                         <td>Pur amount</td>
                         <td>Retail amount</td>
                         <td>WS amount</td>
                     </tr>
                     <tr>
-                        <td colspan="6" class="text-end fw-bold">Total</td>
-                        <td class="text-end">{{total_retail_amount}}</td>
-                        <td class="text-end">{{total_whole_sale_amount}}</td>
-                        <td class="text-end">{{total_pur_amount}}</td>
+                        <td colspan="6" class="text-end fw-bold pe-2">Total (Ks)</td>
+                        <td class="text-end">{{fM(total_retail_amount)}}</td>
+                        <td class="text-end">{{fM(total_whole_sale_amount)}}</td>
+                        <td class="text-end">{{fM(total_pur_amount)}}</td>
                     </tr>
                
             </tbody>
@@ -94,10 +94,9 @@ export default {
     },
    
     mounted() {    
-            if(this.user !==null){
                 this.isLoading=true;
                 this.fetchAdjustments();  
-            }
+            
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
             if(this.reportType="by_date"){
@@ -116,12 +115,7 @@ export default {
                 }
             },deep:true
         },
-        user(data){
-            if(data){
-                this.isLoading=true;
-                this.fetchAdjustments();  
-            }
-        }   
+      
    },
     computed:{
         user(){
@@ -132,6 +126,9 @@ export default {
         },      
     },
     methods:{
+        fM(amount){
+            return hp.formattedAmount(amount)
+        },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },

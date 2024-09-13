@@ -18,12 +18,12 @@
                                 <tbody class="small">
                                     <tr>
                                         <td class="text-end col-2 p-0 fw-bold">Voucher no. :</td>
-                                        <td class="col-2 p-0 ps-2" style="border-bottom: 1px dotted;">
+                                        <td class="col-2 p-0 ps-2">
                                             {{adj.voucher_no}}
                                         </td>                                                             
                                 
                                         <td class="text-end col-2 p-0 fw-bold">Date :</td>
-                                        <td class="col-2 p-0  ps-2" style="border-bottom: 1px dotted;">
+                                        <td class="col-2 p-0  ps-2">
                                            <span v-if="adj.created_at"> {{showTime(adj.created_at)}}</span>
                                         </td>
                                     </tr>                               
@@ -43,7 +43,7 @@
                                     <td class="col-1">RTS/RFS</td>                          
                                     <td class="col-1">Remark</td>                                      
                                 </tr>
-                                <tr class=""v-if="adj.products.length > 0" v-for="(st, i) in adj.products" :key="st.id">
+                                <tr class=""v-if="adj.products.length > 0" v-for="(st, i) in adj.products" :key="st.id" >
                                     <td class="text-center">
                                         {{st.code_no}}                                           
                                     </td>
@@ -101,10 +101,9 @@ export default {
         }
     },   
     mounted() {    
-            if(this.user !==null){
                 this.isLoading=true;
                 this.fetchadjs();  
-            }
+            
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
             if(this.reportType="by_date"){
@@ -123,12 +122,7 @@ export default {
                 }
             },deep:true
         },
-        user(data){
-            if(data){
-                this.isLoading=true;
-                this.fetchadjs();  
-            }
-        }   
+     
    },
     computed:{
         user(){
@@ -139,7 +133,11 @@ export default {
         },
       
     },
-    methods:{
+    
+    methods:{        
+        fM(amount){
+            return hp.formattedAmount(amount)
+        },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },

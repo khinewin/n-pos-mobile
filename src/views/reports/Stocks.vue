@@ -13,7 +13,7 @@
                 <LargePrintHeader />
             </div>
             <div class="col-12 text-center">
-                <h6>Reports stocks {{displayReportType(reportType)}}</h6>
+                <h6>Reports Stocks {{displayReportType(reportType)}}</h6>
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="" v-if="code_no">Code : {{item_name}}</div>

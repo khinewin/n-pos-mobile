@@ -14,7 +14,7 @@
                 <div class="d-none d-print-block">
                     <LargePrintHeader />
                 </div>
-                <h6>Reports medicine code {{displayReportType}}</h6>
+                <h6>Reports Medicine code  {{displayReportType}}</h6>
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="" v-if="code_no">Code : {{item_name}}</div>

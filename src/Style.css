@@ -36,6 +36,13 @@
     padding-right: 2px;
 }
 
+.rm-b-b {
+    border-bottom-style: hidden !important;
+}
+.rm-b-s {
+    border-left-style: hidden !important;
+}
+
 .min-vh-80{
     min-height: 80vh !important;
 }

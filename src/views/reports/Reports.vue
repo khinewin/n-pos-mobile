@@ -10,26 +10,26 @@
                                 <div class="col-6">
                                    <div class="input-group mb-2">
                                     <div class="form-floating">
-                                        <flat-pickr class="form-control form-control-sm" v-model="from_date" id="from_date" :config="config" />
+                                        <flat-pickr class="form-control-plaintext border-bottom" v-model="from_date" id="from_date" :config="config" />
                                         <label for="from_date">From date</label>
                                     </div>
-                                    <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                    <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                    </div>  
                                 </div>
                                 <div class="col-6">
                                     <div class="input-group mb-2">
                                         <div class="form-floating">
-                                            <flat-pickr class="form-control form-control-sm" v-model="to_date" id="to_date" :config="config" />
+                                            <flat-pickr class="form-control-plaintext border-bottom" v-model="to_date" id="to_date" :config="config" />
                                             <label for="to_date">To date</label>
                                         </div>
-                                        <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                        <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                        </div>
                                 </div>
                             </div>                                                    
                             <div class="row g-2">
                                 <div class="col-6">
                                     <div class="form-floating mb-2">
-                                        <select v-model="from_location" class="form-select form-select-sm" id="from_location" @change="handleFromLocation(from_location)">
+                                        <select v-model="from_location" class="form-control-plaintext border-bottom" id="from_location" @change="handleFromLocation(from_location)">
                                             <option>Main</option>
                                             <option>Pharmacy</option>
                                         </select>
@@ -38,7 +38,7 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="form-floating mb-2">
-                                        <select v-model="to_location" class="form-select form-select-sm" id="to_location" @change="handleToLocation(from_location)">
+                                        <select v-model="to_location" class="form-control-plaintext border-bottom" id="to_location" @change="handleToLocation(from_location)">
                                             <option>Main</option>
                                             <option>Pharmacy</option>
                                         </select>
@@ -50,26 +50,24 @@
                                 <div class="col-5">
                                     <div class="mb-2 input-group">
                                         <div class="form-floating ">
-                                            <input  type="number" class="form-control form-control-sm" id="gt_equal" v-model="gt_equal" placeholder=">=">
+                                            <input  type="number" class="form-control-plaintext border-bottom" id="gt_equal" v-model="gt_equal" placeholder=">=">
                                             <label for="gt_equal">>=</label>
                                         </div> 
-                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
+                                        <span class="input-group-text bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
                                     </div>
                                 </div>
                                 <div class="col-5">
                                     <div class="mb-2 input-group">
                                         <div class="form-floating ">
-                                            <input  type="number" class="form-control form-control-sm" id="lt_equal" v-model="lt_equal" placeholder="<=">
+                                            <input  type="number" class="form-control-plaintext border-bottom" id="lt_equal" v-model="lt_equal" placeholder="<=">
                                             <label for="lt_equal"><=</label>
                                         </div> 
-                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
+                                        <span class="input-group-text bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
                                     </div>
                                 </div>
                                 <div class="col-2">
                                     <div class="form-floating">
-                                        <select v-model="packing_unit" id="packing_unit" disabled class="form-select form-select-sm text-center">
-                                            <option>L Unit </option>
-                                            <option>M Unit</option>
+                                        <select v-model="packing_unit" id="packing_unit"  class="form-control-plaintext border-bottom">                                          
                                             <option>S Unit</option>
                                         </select>
                                         <label for="packing_unit">Packing unit</label>
@@ -77,7 +75,7 @@
                                 </div>
                                </div>
                             <div class="form-floating mb-2">
-                                <select v-model="location" class="form-select form-select-sm">
+                                <select v-model="location" class="form-control-plaintext border-bottom">
                                     <option>All</option>
                                     <option>Main</option>
                                     <option>Pharmacy</option>
@@ -88,19 +86,19 @@
                                 <div class="col-6">
                                     <div class="mb-2 input-group">
                                         <div class="form-floating ">
-                                            <input data-bs-toggle="modal" data-bs-target="#searchCode"  type="text" class="form-control form-control-sm" id="item_name" v-model="item_name" placeholder="Code">
+                                            <input data-bs-toggle="modal" data-bs-target="#searchCode"  type="text" class="form-control-plaintext border-bottom" id="item_name" v-model="item_name" placeholder="Code">
                                             <label for="item_name">Code</label>
                                         </div> 
-                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
+                                        <span class="input-group-text bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="mb-2 input-group">
                                         <div class="form-floating ">
-                                            <input  type="text" class="form-control form-control-sm" id="voucher_no" v-model="voucher_no" placeholder="Voucher no.">
+                                            <input  type="text" class="form-control-plaintext border-bottom" id="voucher_no" v-model="voucher_no" placeholder="Voucher no.">
                                             <label for="voucher_no">Voucher no.</label>
                                         </div> 
-                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
+                                        <span class="input-group-text  bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
                                     </div>
                                 </div>
                            </div>
@@ -108,19 +106,19 @@
                                 <div class="col-6">
                                     <div class="input-group">
                                         <div class="form-floating">
-                                            <input data-bs-toggle="modal" data-bs-target="#searchSupplier" type="text" class="form-control form-control-sm" id="supplier" v-model="supplier.name" placeholder="Supplier">
+                                            <input data-bs-toggle="modal" data-bs-target="#searchSupplier" type="text" class="form-control-plaintext border-bottom" id="supplier" v-model="supplier.name" placeholder="Supplier">
                                             <label for="supplier">Supplier</label>
                                         </div> 
-                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>  
+                                        <span class="input-group-text  bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>  
                                     </div> 
                                 </div>
                                 <div class="col-6">
                                     <div class="input-group mb-2">
                                         <div class="form-floating">
-                                            <input data-bs-toggle="modal" data-bs-target="#customerModal" type="text" class="form-control form-control-sm" id="customer" v-model="customer.name" placeholder="Supplier">
+                                            <input data-bs-toggle="modal" data-bs-target="#customerModal" type="text" class="form-control-plaintext border-bottom" id="customer" v-model="customer.name" placeholder="Supplier">
                                             <label for="supplier">Customer</label>
                                         </div> 
-                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>  
+                                        <span class="input-group-text  bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>  
                                     </div>  
                                 </div>                             
                             </div>         
@@ -128,25 +126,25 @@
                                 <div class="col-6">
                                     <div class="mb-2 input-group">
                                         <div class="form-floating ">
-                                            <select v-model="adj_type" class="text-center form-select form-select-sm" id="adj_type">
+                                            <select v-model="adj_type" class="form-control-plaintext border-bottom" id="adj_type">
                                                 <option>Increment</option>
                                                 <option>Decrement</option>
                                             </select>
                                             <label for="adj_type">Adj type</label>
                                         </div> 
-                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
+                                        <span class="input-group-text  bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="mb-2 input-group">
                                         <div class="form-floating ">
-                                            <select v-model="rts_rfs" class="text-center form-select form-select-sm" id="rts_rfs">
+                                            <select v-model="rts_rfs" class="form-control-plaintext border-bottom" id="rts_rfs">
                                                 <option>Yes</option>
                                                 <option>No</option>
                                             </select>
                                             <label for="item_name">RTS/RFS</label>
                                         </div> 
-                                        <span class="input-group-text" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
+                                        <span class="input-group-text  bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
                                     </div>
                                 </div>
                                </div>                                                                                           
@@ -165,7 +163,7 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            <ReportList @report="reportStocks" title="Opening stocks" :arr="stocks" />
+                                            <ReportList @report="reportStocks" title="Stocks" :arr="stocks" />
                                         </td>
                                     </tr>
                                     <tr>

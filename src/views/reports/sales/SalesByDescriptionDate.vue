@@ -9,7 +9,7 @@
                                 <tr><td colspan="2" class="fw-bold ps-2  py-1 text-primary">{{r[0]}}</td></tr>
                                 <tr v-for="res in r[1]">
                                    <td class="col-11 p-0">
-                                    <table class="table table-bordered mb-0 border-dark table-hover " style="border-style: hidden;">
+                                    <table class="table table-bordered mb-0 border-dark table-hover"  style="border-style: hidden;">
                                         <tbody class="fw-bold text-center">
                                             <tr>
                                                 <td rowspan="2">Date</td>
@@ -23,7 +23,7 @@
                                                 <td class="col-1 text-center">Profit</td>
                                             </tr>
                                         </tbody>
-                                        <tbody>              
+                                        <tbody class="">              
                                             <tr>
                                                 <td class="col-1 text-center" :rowspan="res[1].length + 4"> {{res[0]}}</td>
                                             </tr>                              
@@ -35,27 +35,27 @@
                                                 <td class="text-end"  >
                                                     {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.sale_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
                                                 </td>
-                                                <td class="text-end">{{p.final_amount}}</td>
+                                                <td class="text-end">{{fM(p.final_amount)}}</td>
                                                 <td class="text-end" >
-                                                       {{p.pur_amount}}
+                                                       {{fM(p.pur_amount)}}
                                                 </td>
                                                 <td class="text-end">
-                                                        {{p.profit}}
+                                                        {{fM(p.profit)}}
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td colspan="3" class="text-end fw-bold">Total</td>
-                                                <td class="text-end">{{res[2].sale_amount}}</td>
-                                                <td class="text-end">{{res[2].pur_amount}}</td>
-                                                <td class="text-end">{{res[2].profit_amount}}</td>
+                                                <td colspan="3" class="text-end fw-bold  border-bottom rm-b-b pe-2">Total (Ks)</td>
+                                                <td class="text-end">{{fM(res[2].sale_amount)}}</td>
+                                                <td class="text-end">{{fM(res[2].pur_amount)}}</td>
+                                                <td class="text-end">{{fM(res[2].profit_amount)}}</td>
                                             </tr>
                                             <tr>
-                                                <td colspan="5" class="text-end fw-bold">Extra discount</td>
-                                                <td class="text-end">{{res[2].extra_discount}}</td>                  
+                                                <td colspan="5" class="text-end fw-bold  border-bottom rm-b-b pe-2">Extra discount (Ks)</td>
+                                                <td class="text-end">{{fM(res[2].extra_discount)}}</td>                  
                                             </tr>
                                             <tr>
-                                                <td colspan="5" class="text-end fw-bold">Total profit</td>
-                                                <td class="text-end">{{res[2].profit_amount - res[2].extra_discount}}</td>                  
+                                                <td colspan="5" class="text-end fw-bold  pe-2">Total profit (Ks)</td>
+                                                <td class="text-end">{{fM(res[2].profit_amount - res[2].extra_discount)}}</td>                  
                                             </tr>
                                         </tbody>
                                     </table>
@@ -70,20 +70,20 @@
                         <table class="table table-bordered border-dark mb-0 table-group-divider table-hover">
                             <tbody>
                                 <tr>
-                                    <td class="text-end fw-bold col-10">Grand total sale amount</td>
-                                    <td class="text-end col-2">{{total_sale_amount}}</td>
+                                    <td class="text-end fw-bold col-10  border-bottom rm-b-b pe-2">Grand total sale amount (Ks)</td>
+                                    <td class="text-end col-2">{{fM(total_sale_amount)}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-end fw-bold">Grand total pur amount</td>
-                                    <td class="text-end">{{total_pur_amount}}</td>
+                                    <td class="text-end fw-bold  border-bottom rm-b-b pe-2">Grand total pur amount (Ks)</td>
+                                    <td class="text-end">{{fM(total_pur_amount)}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-end fw-bold">Total discount</td>
-                                    <td class="text-end">{{total_discount}}</td>
+                                    <td class="text-end fw-bold  border-bottom rm-b-b pe-2">Total discount (Ks)</td>
+                                    <td class="text-end">{{fM(total_discount)}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-end fw-bold">Grand total profit</td>
-                                    <td class="text-end">{{total_profit - total_discount}}</td>
+                                    <td class="text-end fw-bold  pe-2">Grand total profit (Ks)</td>
+                                    <td class="text-end">{{fM(total_profit - total_discount)}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -147,10 +147,9 @@ export default {
     },
    
     mounted() {    
-            if(this.user !==null){
                 this.isLoading=true;
                 this.fetchSales();  
-            }
+            
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
             if(this.reportType="by_date"){
@@ -169,12 +168,7 @@ export default {
                 }
             },deep:true
         },
-        user(data){
-            if(data){
-                this.isLoading=true;
-                this.fetchSales();  
-            }
-        }   
+      
    },
     computed:{
         user(){
@@ -186,6 +180,9 @@ export default {
       
     },
     methods:{
+        fM(amount){
+            return hp.formattedAmount(amount);
+        },
         displayPrice(l_unit, m_unit, s_unit){
             return hp.displayPrice(l_unit, m_unit, s_unit);
         },

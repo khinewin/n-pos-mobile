@@ -16,12 +16,12 @@
                                 <tbody class="small">
                                     <tr>
                                         <td class="text-end col-2 p-0 fw-bold">Voucher no. :</td>
-                                        <td class="col-2 p-0 ps-2" style="border-bottom: 1px dotted;">
+                                        <td class="col-2 p-0 ps-2">
                                             {{stock.voucher_no}}
                                         </td>                                                             
                                 
                                         <td class="text-end col-2 p-0 fw-bold">Date :</td>
-                                        <td class="col-2 p-0  ps-2" style="border-bottom: 1px dotted;">
+                                        <td class="col-2 p-0  ps-2">
                                            <span v-if="stock.created_at"> {{showTime(stock.created_at)}}</span>
                                         </td>
                                     </tr>                               
@@ -65,9 +65,9 @@
                                     </td>                                   
                                 </tr>    
                                 <tr>
-                                    <td :colspan="[location=='All' ? 6 : 5]" class="text-end fw-bold">Total amount</td>
-                                    <td class="text-end ">{{stock.retail_amount}}</td>
-                                    <td class="text-end ">{{stock.whole_sale_amount}}</td>
+                                    <td :colspan="[location=='All' ? 6 : 5]" class="text-end fw-bold pe-2">Total amount (Ks)</td>
+                                    <td class="text-end ">{{fM(stock.retail_amount)}}</td>
+                                    <td class="text-end ">{{fM(stock.whole_sale_amount)}}</td>
                                 </tr>                                                                                     
                             </tbody>
                         </table>                                     
@@ -99,10 +99,9 @@ export default {
         }
     },   
     mounted() {    
-            if(this.user !==null){
                 this.isLoading=true;
                 this.fetchStocks();  
-            }
+            
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
             if(this.reportType="by_date"){
@@ -121,12 +120,7 @@ export default {
                 }
             },deep:true
         },
-        user(data){
-            if(data){
-                this.isLoading=true;
-                this.fetchStocks();  
-            }
-        }   
+       
    },
     computed:{
         user(){
@@ -138,6 +132,9 @@ export default {
       
     },
     methods:{
+        fM(amount){
+            return hp.formattedAmount(amount);
+        },
         displayPrice(l_unit, m_unit, s_unit){
             return hp.displayPrice(l_unit, m_unit, s_unit);
         },

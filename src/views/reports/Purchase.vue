@@ -13,7 +13,7 @@
                 <LargePrintHeader />
             </div>
             <div class="col-12 text-center">
-                <h6>Reports purchase {{displayReportType(reportType)}}</h6>
+                <h6>Reports Purchase {{displayReportType(reportType)}}</h6>
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="" v-if="code_no">Code : {{item_name}}</div>
@@ -97,7 +97,8 @@ export default {
     },
    
     mounted() {    
-      
+        this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
+        this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
     },
    watch:{
    

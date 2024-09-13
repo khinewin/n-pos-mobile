@@ -19,11 +19,11 @@
                             <tbody>
                                 <tr class="">
                                     <td class="text-end pb-0">Voucher no. :</td>
-                                    <td class="pb-0" style="border-bottom: 1px dotted;">
+                                    <td class="pb-0" >
                                         {{p.voucher_no}}
                                     </td>                              
                                     <td class="text-end pb-0">Location :</td>
-                                    <td class="pb-0"  style="border-bottom: 1px dotted;">
+                                    <td class="pb-0"  >
                                         {{p.location}}
                                     </td>                            
                                    
@@ -37,11 +37,11 @@
                                 <tr class="">
                                                                 
                                     <td class="text-end pb-0">Pur date :</td>
-                                    <td class="pb-0" v-if="p.pur_date" style="border-bottom: 1px dotted;">
+                                    <td class="pb-0" v-if="p.pur_date" >
                                         {{showTime(p.pur_date)}}
                                     </td>                              
                                     <td class="text-end pb-0">Supplier :</td>
-                                    <td class="pb-0" style="border-bottom: 1px dotted;">
+                                    <td class="pb-0" >
                                         {{p.supplier.name}} ({{p.supplier.company}})
                                     </td>
                                 </tr>
@@ -64,10 +64,10 @@
                             </tr>
                         </tbody>
                         <tbody>
-                            <tr class="small text-center" v-if="p.products.length > 0" v-for="st in p.products" :key="st.id">
-                                <td class="">{{st.code_no}}</td>
+                            <tr class="" v-if="p.products.length > 0" v-for="st in p.products" :key="st.id">
+                                <td class="text-center">{{st.code_no}}</td>
                                 <td class="">{{st.item_name}}</td>
-                                <td class="">                                   
+                                <td class="text-center">                                   
                                      <span v-if="st.exp_date">{{showTime(st.exp_date)}}</span>
                                 </td>
                                 <td class="col-1">
@@ -79,25 +79,25 @@
                                 <td class="text-center">
                                     {{st.qty_pur_price}}' {{st.qty_pur_price_unit}}
                                 </td>                   
-                                <td class="text-end">{{st.amount}}</td>
-                                <td class="text-end">{{st.discount}}</td>
-                                <td class="text-end">{{st.price}}</td>                               
+                                <td class="text-end">{{fM(st.amount)}}</td>
+                                <td class="text-end">{{st.discount ? fM(st.discount) : 0}}</td>
+                                <td class="text-end">{{fM(st.price)}}</td>                               
                             </tr>
                             <tr class="small">
-                                <td colspan="8" class="text-end">Total amount</td>
-                                <td class="text-end">{{p.total_amount}}</td>
+                                <td colspan="8" class="text-end fw-bold border-bottom rm-b-b pe-2">Total amount (Ks)</td>
+                                <td class="text-end">{{fM(p.total_amount)}}</td>
                             </tr>
                             <tr class="small">
-                                <td colspan="8" class="text-end">Total discount</td>
-                                <td class="text-end ">{{p.total_discount}}</td>
+                                <td colspan="8" class="text-end fw-bold border-bottom rm-b-b pe-2">Total discount (Ks)</td>
+                                <td class="text-end ">{{fM(p.total_discount)}}</td>
                             </tr>
                             <tr class="small">
-                                <td colspan="8" class="text-end">Extra discount</td>
-                                <td class="text-end">{{p.extra_discount}}</td>
+                                <td colspan="8" class="text-end fw-bold border-bottom rm-b-b pe-2">Extra discount (Ks)</td>
+                                <td class="text-end">{{fM(p.extra_discount)}}</td>
                             </tr>
                             <tr class="small">
-                                <td colspan="8" class="text-end">Total price</td>
-                                <td class="text-end">{{p.total_price}}</td>
+                                <td colspan="8" class="text-end fw-bold pe-2">Total price (Ks)</td>
+                                <td class="text-end">{{fM(p.total_price)}}</td>
                             </tr>                           
                         </tbody>
                    </table>                          
@@ -131,10 +131,9 @@ export default {
     },
    
     mounted() {    
-            if(this.user !==null){
                 this.isLoading=true;
                 this.fetchPurchase();  
-            }
+            
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
             if(this.reportType="by_date"){
@@ -153,12 +152,7 @@ export default {
                 }
             },deep:true
         },
-        user(data){
-            if(data){
-                this.isLoading=true;
-                this.fetchPurchase();  
-            }
-        }   
+      
    },
     computed:{
         user(){
@@ -170,6 +164,9 @@ export default {
       
     },
     methods:{
+        fM(amount){
+            return hp.formattedAmount(amount)
+        },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },

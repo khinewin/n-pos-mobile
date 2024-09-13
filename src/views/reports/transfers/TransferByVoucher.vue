@@ -17,22 +17,25 @@
                             <table class="table mb-0 table-borderless ">
                                 <tbody class="small">
                                     <tr>
-                                        <td class="text-end p-0 fw-bold">From location :</td>
-                                        <td class="col-2 p-0 ps-2" style="border-bottom: 1px dotted;">
+                                        <td class="text-end col-2 fw-bold">From location :</td>
+                                        <td class="col-4  ps-2">
                                             {{from_location}}
-                                        </td>                                                             
+                                        </td>                                                            
                                 
-                                        <td class="text-end p-0 fw-bold">To location :</td>
-                                        <td class="col-2 p-0  ps-2" style="border-bottom: 1px dotted;">
+                                        <td class="text-end fw-bold">Voucher no. :</td>
+                                        <td class="ps-2">
+                                            {{stock.voucher_no}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-end col-2  fw-bold">To location :</td>
+                                        <td class="ps-2 col-4">
                                            <span > {{to_location}}</span>
                                         </td>
-                                        <td class="text-end p-0 fw-bold">Voucher no. :</td>
-                                        <td class="col-2 p-0 ps-2" style="border-bottom: 1px dotted;">
-                                            {{stock.voucher_no}}
-                                        </td>                                                             
+                                                                                                    
                                 
-                                        <td class="text-end  p-0 fw-bold">Date :</td>
-                                        <td class="col-2 p-0  ps-2" style="border-bottom: 1px dotted;">
+                                        <td class="text-end   fw-bold">Date :</td>
+                                        <td class="ps-2">
                                            <span v-if="stock.created_at"> {{showTime(stock.created_at)}}</span>
                                         </td>
                                     </tr>                               

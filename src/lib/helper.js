@@ -159,6 +159,19 @@ const  message=(type, name)=>{
         return tDate;
     }
 
+    const formattedAmount =(amount)=> new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(amount);
+
+      const formattedAmountCurrency =(amount)=> {
+        const f= new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(amount);
+      return `Ks ${f}`
+    }
+
 
 const gb_date=groupBy(['group_date'])
 const gb_item_name=groupBy(['item_name'])
@@ -205,5 +218,7 @@ export   {
     setToday,
     insertDate,
     setOldDate,
-    insertDateNoTime
+    insertDateNoTime,
+    formattedAmount,
+    formattedAmountCurrency,
     };

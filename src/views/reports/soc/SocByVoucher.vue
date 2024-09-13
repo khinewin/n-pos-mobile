@@ -17,13 +17,13 @@
                                     <tbody class="small">  
                                         <tr>
                                             <td class="col-4 pb-0 fw-bold text-end">Voucher no. <span class="">:</span></td>
-                                            <td class="col-8  ps-2 pb-0" style="border-bottom: 1px dotted;">
+                                            <td class="col-8  ps-2 pb-0" >
                                                 {{sale.voucher_no}}
                                             </td>
                                         </tr>
                                         <tr>
                                             <td class="pb-0 fw-bold text-end">Date <span class="">:</span></td>
-                                            <td class=" ps-2 pb-0" style="border-bottom: 1px dotted;">
+                                            <td class=" ps-2 pb-0" >
                                                <span>{{showTime(sale.sale_date)}}</span>
                                             </td>
                                         </tr>       
@@ -35,13 +35,13 @@
                                     <tbody class="small">                                     
                                         <tr>
                                             <td class="  col-4 pb-0 fw-bold text-end">Customer <span class="">:</span></td>
-                                            <td class=" ps-2 col-8 pb-0" style="border-bottom: 1px dotted;">
+                                            <td class=" ps-2 col-8 pb-0" >
                                                 {{sale.customer.name}}
                                             </td>
                                         </tr>      
                                         <tr>
                                             <td class="pb-0 fw-bold text-end">Cashier <span class="">:</span></td>
-                                            <td class=" ps-2 pb-0" style="border-bottom: 1px dotted;">
+                                            <td class=" ps-2 pb-0" >
                                                 {{sale.user.displayName}}
                                             </td>
                                         </tr>                                               
@@ -74,43 +74,43 @@
                                                 {{s.qty_sale_price_unit}}' {{s.qty_sale_price}}
                                             </td>                                         
                                            
-                                            <td class=" text-end">{{s.amount}}</td>
-                                            <td class=" text-end">{{s.discount}}</td>
-                                            <td class=" text-end">{{s.final_amount}}</td>
+                                            <td class=" text-end">{{fM(s.amount)}}</td>
+                                            <td class=" text-end">{{s.discount ? fM(s.discount) : 0}}</td>
+                                            <td class=" text-end">{{fM(s.final_amount)}}</td>
                                            
                                         </tr>                        
                                     </tbody>
                                     <tbody>
                                         <tr>
-                                            <td colspan="7" class="text-end pe-2 " style="border-bottom-style: hidden;">Total amount</td>
-                                            <td class="text-end ">{{sale.total_amount}}</td>
+                                            <td colspan="7" class="text-end pe-2 border-bottom fw-bold rm-b-b" >Total amount (Ks)</td>
+                                            <td class="text-end ">{{fM(sale.total_amount)}}</td>
                                         </tr>                     
                                         <tr>
-                                            <td colspan="7" class="text-end  pe-2 " style="border-bottom-style: hidden;">Extra discount</td>
+                                            <td colspan="7" class="text-end  pe-2 border-bottom fw-bold rm-b-b " >Extra discount (Ks)</td>
                                             <td class="text-end ">
-                                                {{sale.extra_discount}}
+                                                {{fM(sale.extra_discount)}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="7" class="text-end   pe-2 " style="border-bottom-style: hidden;">Net amount</td>
-                                            <td class="text-end ">{{sale.net_amount}}</td>
+                                            <td colspan="7" class="text-end   pe-2 border-bottom fw-bold rm-b-b" >Net amount (Ks)</td>
+                                            <td class="text-end ">{{fM(sale.net_amount)}}</td>
                                         </tr>
                                         <tr >
-                                            <td colspan="7" class="text-end   pe-2 " style="border-bottom-style: hidden;">Paid</td>
+                                            <td colspan="7" class="text-end   pe-2 border-bottom fw-bold rm-b-b " >Paid (Ks)</td>
                                             <td class="text-end">
-                                                {{sale.paid}}
+                                                {{fM(sale.paid)}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="7" class="text-end   pe-2 " style="border-bottom-style: hidden;" >Change</td>
+                                            <td colspan="7" class="text-end   pe-2 border-bottom fw-bold rm-b-b"  >Change</td>
                                             <td class="text-end ">
-                                                {{sale.change}}
+                                                {{fM(sale.change)}}
                                             </td>
                                         </tr> 
                                         <tr>
-                                            <td colspan="7" class="text-end   pe-2 " >Credit</td>
+                                            <td colspan="7" class="text-end   pe-2 fw-bold " >Credit</td>
                                             <td class="text-end ">
-                                                {{sale.credit}}
+                                                {{fM(sale.credit)}}
                                             </td>
                                         </tr>                           
                                     </tbody>
@@ -130,9 +130,9 @@
                         <td>Total credit</td>
                     </tr>
                     <tr class="text-end">
-                        <td>{{total_amount}}</td>
-                        <td>{{total_paid}}</td>
-                        <td>{{total_credit}}</td>
+                        <td>{{fM(total_amount)}}</td>
+                        <td>{{fM(total_paid)}}</td>
+                        <td>{{fM(total_credit)}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -163,10 +163,9 @@ export default {
     },
    
     mounted() {    
-            if(this.user !==null){
                 this.isLoading=true;
                 this.fetchSales();  
-            }
+            
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
             if(this.reportType="by_date"){
@@ -185,12 +184,7 @@ export default {
                 }
             },deep:true
         },
-        user(data){
-            if(data){
-                this.isLoading=true;
-                this.fetchSales();  
-            }
-        }   
+      
    },
     computed:{
         user(){
@@ -202,6 +196,9 @@ export default {
       
     },
     methods:{
+        fM(amount){
+            return hp.formattedAmount(amount)
+        },
         displayPrice(l_unit, m_unit, s_unit){
             return hp.displayPrice(l_unit, m_unit, s_unit);
         },

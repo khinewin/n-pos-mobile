@@ -17,7 +17,7 @@
                    
                 </tr>
             </tbody>
-            <tbody  v-if="reports.length > 0" v-for="r in reports" :key="r[0]"> 
+            <tbody  v-if="reports.length > 0" v-for="r in reports" :key="r[0]" class="table-group-divider"> 
                 <tr><td :rowspan="r[1].length  + 3" class="text-center">{{r[0]}}</td></tr>                                           
                 <tr v-for="st in r[1]" :key="st.code_no">
                     <td class="text-center">{{st.group_date}}</td>
@@ -48,24 +48,24 @@
                     </td>
                 </tr>
                 <tr class="text-center fw-bold">
-                    <td colspan="7"></td>
+                    <td colspan="7" class="border-bottom rm-b-b"></td>
                     <td>Pur amount</td>
                     <td>Retail amount</td>
                     <td>WS amount</td>
                 </tr>
                 <tr>
-                    <td colspan="7" class="text-end fw-bold">Total</td>
-                    <td class="text-end">{{r[2].pur_amount}}</td>
-                  <td class="text-end">{{r[2].retail_amount}}</td>
-                    <td class="text-end">{{r[2].whole_sale_amount}}</td>
+                    <td colspan="7" class="text-end fw-bold pe-2">Total (Ks)</td>
+                    <td class="text-end">{{fM(r[2].pur_amount)}}</td>
+                  <td class="text-end">{{fM(r[2].retail_amount)}}</td>
+                    <td class="text-end">{{fM(r[2].whole_sale_amount)}}</td>
                 </tr>
             </tbody>
             <tbody class="table-group-divider" v-if="reports.length">
                 <tr>
-                    <td colspan="8" class="text-end fw-bold">Grand total</td>
-                    <td class="text-end">{{total_pur_amount}}</td>
-                    <td class="text-end">{{total_retail_amount}}</td>
-                    <td class="text-end">{{total_whole_sale_amount}}</td>
+                    <td colspan="8" class="text-end fw-bold pe-2">Grand total (Ks)</td>
+                    <td class="text-end">{{fM(total_pur_amount)}}</td>
+                    <td class="text-end">{{fM(total_retail_amount)}}</td>
+                    <td class="text-end">{{fM(total_whole_sale_amount)}}</td>
                 </tr>
             </tbody>
         </table>
@@ -107,10 +107,9 @@ export default {
     },
    
     mounted() {    
-            if(this.user !==null){
                 this.isLoading=true;
                 this.fetchAdjustments();  
-            }
+            
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
             if(this.reportType="by_date"){
@@ -129,12 +128,7 @@ export default {
                 }
             },deep:true
         },
-        user(data){
-            if(data){
-                this.isLoading=true;
-                this.fetchAdjustments();  
-            }
-        }   
+      
    },
     computed:{
         user(){
@@ -146,6 +140,9 @@ export default {
       
     },
     methods:{
+        fM(amount){
+            return hp.formattedAmount(amount)
+        },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },

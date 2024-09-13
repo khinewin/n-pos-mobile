@@ -7,7 +7,7 @@
                                 <div class="col-3 text-center h1"><i class="fa-solid fa-basket-shopping"></i></div>
                                 <div class="col-9">
                                     <div class="small fw-lighter mb-2">Purchase (Today)</div>
-                                    <div class="card-text">{{purchase_today}} MMK</div>
+                                    <div class="card-text">Ks {{fM(purchase_today)}}</div>
                                 </div>
                             </div>
                     </div>
@@ -20,7 +20,7 @@
                             <div class="col-3 text-center h1"><i class="fa-solid fa-basket-shopping"></i></div>
                             <div class="col-9">
                                 <div class="small fw-lighter mb-2">Purchase (This week)</div>
-                                <div class="card-text">{{purchase_this_week}} MMK</div>
+                                <div class="card-text">Ks {{fM(purchase_this_week)}}</div>
                             </div>
                         </div>
                     </div>
@@ -33,7 +33,7 @@
                             <div class="col-3 text-center h1"><i class="fa-solid fa-basket-shopping"></i></div>
                             <div class="col-9">
                                 <div class="small fw-lighter mb-2">Purchase (This month)</div>
-                                <div class="card-text">{{purchase_this_month}} MMK</div>
+                                <div class="card-text">Ks {{fM(purchase_this_month)}}</div>
                             </div>
                         </div>
                     </div>
@@ -46,7 +46,7 @@
                             <div class="col-3 text-center h1"><i class="fa-solid fa-basket-shopping"></i></div>
                             <div class="col-9">
                                 <div class="small fw-lighter mb-2">Purchase (This year)</div>
-                                <div class="card-text">{{purchase_this_year}} MMK</div>
+                                <div class="card-text">Ks {{fM(purchase_this_year)}}</div>
                             </div>
                         </div>
                     </div>
@@ -79,21 +79,14 @@
             }
         },
         mounted() {
-        
-        },
-        created(){
-            if(this.user !== null){
-                this.fetchPurchaseYearly();
-            }
-        },
-        watch:{
-            user(data){
-                if(data){
-                    this.fetchPurchaseYearly();
-                }
-            }
-        },
+            this.fetchPurchaseYearly();
+
+        },     
+    
         methods:{
+            fM(amount){
+                return hp.formattedAmount(amount);
+            },
             showTime(t){
                 return hp.showTime(t)
             },

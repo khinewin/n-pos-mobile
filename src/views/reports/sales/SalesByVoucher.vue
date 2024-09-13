@@ -17,13 +17,13 @@
                                     <tbody class="small">  
                                         <tr>
                                             <td class="col-4 pb-0 fw-bold text-end">Voucher no. <span class="">:</span></td>
-                                            <td class="col-8  ps-2 pb-0" style="border-bottom: 1px dotted;">
+                                            <td class="col-8  ps-2 pb-0" >
                                                 {{sale.voucher_no}}
                                             </td>
                                         </tr>
                                         <tr>
                                             <td class="pb-0 fw-bold text-end">Date <span class="">:</span></td>
-                                            <td class=" ps-2 pb-0" style="border-bottom: 1px dotted;">
+                                            <td class=" ps-2 pb-0" >
                                                <span>{{showTime(sale.sale_date)}}</span>
                                             </td>
                                         </tr>       
@@ -35,14 +35,14 @@
                                     <tbody class="small">                                     
                                         <tr>
                                             <td class="  col-4 pb-0 fw-bold text-end">Name <span class="">:</span></td>
-                                            <td class=" ps-2 col-8 pb-0" style="border-bottom: 1px dotted;">
+                                            <td class=" ps-2 col-8 pb-0" >
                                                 {{sale.customer.name}}
                                             </td>
                                         </tr>      
                                         <tr>
-                                            <td class="pb-0 fw-bold text-end">Phone <span class="">:</span></td>
-                                            <td class=" ps-2 pb-0" style="border-bottom: 1px dotted;">
-                                                {{sale.customer.phone}}
+                                            <td class="pb-0 fw-bold text-end">Cashier <span class="">:</span></td>
+                                            <td class=" ps-2 pb-0" >
+                                                {{sale.user.displayName}}
                                             </td>
                                         </tr>                                               
                                     </tbody>
@@ -71,42 +71,43 @@
                                                 {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
                                             </td>                                            
                                             <td class="text-center">
-                                                {{s.qty_sale_price_unit}}' {{s.qty_sale_price}}
+                                                {{s.qty_sale_price}}' {{s.qty_sale_price_unit}}
                                             </td>                                         
                                            
-                                            <td class=" text-end">{{s.amount}}</td>
-                                            <td class=" text-end">{{s.discount}}</td>
-                                            <td class=" text-end">{{s.final_amount}}</td>
+                                            <td class=" text-end">{{fM(s.amount)}}</td>
+                                            <td class=" text-end">{{s.discount ? fM(s.discount) : 0}}</td>
+                                            <td class=" text-end">{{fM(s.final_amount)}}</td>
                                            
                                         </tr>                        
                                     </tbody>
                                     <tbody>
                                         <tr>
-                                            <td colspan="7" class="text-end pe-2 " style="border-bottom-style: hidden;">Total amount</td>
-                                            <td class="text-end ">{{sale.total_amount}}</td>
+                                            <td colspan="7" class="text-end pe-2 rm-b-b">Total amount (Ks)</td>
+                                            <td class="text-end ">{{fM(sale.total_amount)}}</td>
                                         </tr>                     
                                         <tr>
-                                            <td colspan="7" class="text-end  pe-2 " style="border-bottom-style: hidden;">Extra discount</td>
+                                            <td colspan="7" class="text-end  pe-2 rm-b-b">Extra discount (Ks)</td>
                                             <td class="text-end ">
-                                                {{sale.extra_discount}}
+                                                {{fM(sale.extra_discount)}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="7" class="text-end   pe-2 " style="border-bottom-style: hidden;">Net amount</td>
-                                            <td class="text-end ">{{sale.net_amount}}</td>
+                                            <td colspan="7" class="text-end   pe-2 rm-b-b">Net amount (Ks)</td>
+                                            <td class="text-end ">{{fM(sale.net_amount)}}</td>
                                         </tr>
                                         <tr >
-                                            <td colspan="7" class="text-end   pe-2 " style="border-bottom-style: hidden;">Paid</td>
+                                            <td colspan="7" class="text-end   pe-2 rm-b-b">Paid (Ks)</td>
                                             <td class="text-end">
-                                                {{sale.paid}}
+                                                {{fM(sale.paid)}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="7" class="text-end   pe-2 " >Change</td>
+                                            <td colspan="7" class="text-end   pe-2 " >Change (Ks)</td>
                                             <td class="text-end ">
-                                                {{sale.change}}
+                                                {{fM(sale.change)}}
                                             </td>
-                                        </tr>                           
+                                        </tr>    
+                                                                 
                                     </tbody>
                               </table>                             
                             </div>                          
@@ -138,10 +139,9 @@ export default {
     },
    
     mounted() {    
-            if(this.user !==null){
                 this.isLoading=true;
                 this.fetchSales();  
-            }
+            
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
             if(this.reportType="by_date"){
@@ -160,12 +160,7 @@ export default {
                 }
             },deep:true
         },
-        user(data){
-            if(data){
-                this.isLoading=true;
-                this.fetchSales();  
-            }
-        }   
+      
    },
     computed:{
         user(){
@@ -177,6 +172,9 @@ export default {
       
     },
     methods:{
+        fM(amount){
+            return hp.formattedAmount(amount)
+        },
         displayPrice(l_unit, m_unit, s_unit){
             return hp.displayPrice(l_unit, m_unit, s_unit);
         },
@@ -187,7 +185,7 @@ export default {
             return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
         },
         showTime(t){
-            return hp.showTime(t);
+            return hp.showTimeHour(t);
         },
         goBack(){
             this.$router.go(-1)

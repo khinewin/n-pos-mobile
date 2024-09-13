@@ -28,15 +28,15 @@
                     <td class="text-center">
                         {{st.qty_pur_price}}' {{st.qty_pur_price_unit}}
                     </td>                   
-                    <td class="text-end">{{st.amount}}</td>
-                    <td class="text-end">{{st.discount}}</td>
-                    <td class="text-end">{{st.price}}</td>
+                    <td class="text-end">{{fM(st.amount)}}</td>
+                    <td class="text-end">{{fM(st.discount)}}</td>
+                    <td class="text-end">{{fM(st.price)}}</td>
                 </tr>
                 <tr>
-                    <td colspan="5" class="text-end fw-bold">Total</td>
-                    <td class="text-end">{{r[2].amount}}</td>
-                    <td class="text-end">{{r[2].discount}}</td>                                                
-                    <td class="text-end">{{r[2].price}}</td>
+                    <td colspan="5" class="text-end fw-bold pe-2">Total (Ks)</td>
+                    <td class="text-end">{{fM(r[2].amount)}}</td>
+                    <td class="text-end">{{fM(r[2].discount)}}</td>                                                
+                    <td class="text-end">{{fM(r[2].price)}}</td>
                 </tr>
             </tbody>
         </table>
@@ -76,10 +76,9 @@ export default {
     },
    
     mounted() {    
-            if(this.user !==null){
                 this.isLoading=true;
                 this.fetchPurchase();  
-            }
+            
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
             if(this.reportType="by_date"){
@@ -98,12 +97,7 @@ export default {
                 }
             },deep:true
         },
-        user(data){
-            if(data){
-                this.isLoading=true;
-                this.fetchPurchase();  
-            }
-        }   
+        
    },
     computed:{
         user(){
@@ -114,7 +108,11 @@ export default {
         },
       
     },
+    
     methods:{
+        fM(amount){
+            return hp.formattedAmount(amount)
+        },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
