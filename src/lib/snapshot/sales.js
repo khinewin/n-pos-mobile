@@ -16,6 +16,8 @@ const sales=(arr)=>{
              sale_type: data.sale_type,
              customer : data.customer,
              credit: data.credit,
+             payment_type: data.payment_type ? data.payment_type : "Paid",
+             debt_payments: data.debt_payments ? data.debt_payments : []
         };                                     
         saleItems.push(sale); 
     })

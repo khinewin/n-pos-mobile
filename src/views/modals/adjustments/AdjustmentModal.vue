@@ -7,18 +7,43 @@
                         <div class="col-4">                                                         
                               <div class="card shadow">
                                 <div class="card-body p-2">
-                                        <div class="form-floating mb-2">
-                                          <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchadjustments" placeholder="Voucher no." class="form-control form-control-sm">
-                                         <label for="search_by_voucher_no" class="small ">Voucher no.</label>
-                                        </div>
-                                        <div class="form-floating  mb-2">
-                                            <input type="date" v-model="search_by_from_date" @change="searchadjustments" placeholder="From pur date" class="form-control form-control-sm">
-                                            <label for="search_by_from_pur_date" class="small ">From pur date</label>
-                                        </div>
-                                        <div class="form-floating  mb-2">
-                                            <input type="date" v-model="search_by_to_date" @change="searchadjustments" placeholder="To pur date" class="form-control form-control-sm">
-                                            <label for="search_by_to_pur_date" class="small ">To pur date</label>
-                                        </div>                             
+                                        <div class="row g-1 small">
+                                            <div class="col-12">
+                                                <div class="form-floating mb-2">
+                                                    <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchAdjustments" placeholder="Voucher no." class="form-control-plaintext border-bottom">
+                                                   <label for="search_by_voucher_no" class=" ">Voucher no.</label>
+                                                  </div>
+                                            </div>                                           
+                                            <div class="col-12">
+                                                <div class="input-group mb-2">
+                                                    <div class="form-floating">
+                                                        <flat-pickr @change="searchAdjustments" class="form-control-plaintext border-bottom" v-model="search_by_from_date" id="from_date" :config="config" />
+                                                        <label for="from_date">From date</label>
+                                                    </div>
+                                                    <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
+                                                   </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="input-group mb-2">
+                                                    <div class="form-floating">
+                                                        <flat-pickr @change="searchAdjustments" class="form-control-plaintext border-bottom" v-model="search_by_to_date" id="from_date" :config="config" />
+                                                        <label for="from_date">To date</label>
+                                                    </div>
+                                                    <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
+                                                   </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="form-floating ">
+                                                    <select class="form-control-plaintext border-bottom" @change="searchAdjustments" v-model="search_by_location" aria-placeholder="Location">
+                                                        <option value="">All</option>
+                                                        <option>Main</option>
+                                                        <option>Pharmacy</option>
+                                                    </select>
+                                                    <label for="search_from_location" class="">Location</label>
+                                                </div>
+                                            </div>
+                                        </div>                                       
+                                                        
                                         <div class="row">
                                             <div class="col-6 d-grid">
                                                 <button class="btn btn-sm text-dark" @click="clearSearch"> <i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
@@ -44,24 +69,26 @@
                                             <tr class="table-secondary">
                                                 <td>Voucher no.</td>
                                                 <td>Adjustment date</td>   
+                                                <td>Location</td>
                                                 <td>User</td>                                 
-                                            </tr>
-                                            <tr v-if="isLoading">
-                                                <td colspan="3">
-                                                    <div class="d-flex justify-content-center my-5">
-                                                        <div class="spinner-border text-primary"  role="status">
-                                                          <span class="visually-hidden">Loading...</span>
-                                                        </div>
-                                                      </div>
-                                                </td>
-                                            </tr>
+                                            </tr>                                           
                                             <tr v-if="adjustments.length > 0" v-for="p in adjustments" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal" style="cursor: context-menu;">
                                                 <td>{{p.voucher_no}}</td>
                                                 <td>{{showTime(p.created_at)}}</td>
+                                                <td>{{p.location}}</td>
                                                 <td>{{p.user.displayName}}</td>
                                             </tr>
                                         </tbody>
                                     </table>
+                                    <div v-if="isLoading">
+                                        <div colspan="5">
+                                            <div class="d-flex justify-content-center my-5">
+                                                <div class="spinner-border text-primary"  role="status">
+                                                  <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> 
                                 </div>
                             </div>                          
                         </div>
@@ -75,7 +102,13 @@
 import {Timestamp, collection, onSnapshot, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as ss from "@/lib/snapshot/adjustments"
+import FlatPickr from 'vue-flatpickr-component';
+import * as hp from '@/lib/helper'
+
 export default {
+    components:{
+        FlatPickr,
+    },
    data(){
        return{
            adjustments:[],
@@ -83,39 +116,40 @@ export default {
            search_by_voucher_no:"",
            search_by_from_date:"",
            search_by_to_date:"",
+           search_by_location: "",
            isLoading:false,
            isUpdating:false,
+           config: {
+                dateFormat: 'd/m/Y', // Flatpickr options
+                enableTime: false,
+                wrap: true, // set wrap to true only when using 'input-group'
+               // altFormat: 'M j, Y',
+            },  
        }
    },
   
    mounted() {    
+    this.setDate();
        const myModalEl = document.getElementById('adjustmentModal')
        myModalEl.addEventListener('show.bs.modal', event => {
                 
-       })               
+       })       
+       this.fetchAdjustments();                 
+        
    },
-   created(){
-       if(this.user !==null){     
-                this.isLoading=true;     
-               this.fetchadjustments();                 
-       }
-   },
+  
    computed:{
        user(){
            return this.$store.getters.user;
        },
        
    },
-   watch:{       
-       user(data){
-               if(data !==null){   
-                    this.isLoading=true;                
-                   this.fetchadjustments();           
-           }
-       }
-     
-   },
+  
    methods:{
+    setDate(){
+            this.search_by_from_date=hp.setSearchFromDate();
+            this.search_by_to_date=hp.setSearchToDate();
+        },
     removeAfterAt(email) {
         const parts = email.split('@');
         return parts[0];
@@ -130,22 +164,26 @@ export default {
        },
        clearSearch(){
            this.search_by_voucher_no="";
-           this.search_by_from_date="";
-           this.search_by_to_date="";
-           this.searchadjustments();
+           this.search_by_location="";
+            this.setDate();
+           this.searchAdjustments();
        },
-       searchadjustments(){
-           if(this.search_by_voucher_no){
+       searchAdjustments(){
+            this.fetchAdjustments();
+       },
+       displayAdjustments(){
+        if(this.search_by_voucher_no && this.search_by_location){
                this.adjustments=this.adjustmentsData.filter((f)=>{
-                       return f.voucher_no===Number(this.search_by_voucher_no);
+                       return f.location== this.search_by_location && f.voucher_no== this.search_by_voucher_no;
                })
-           }else
-            if(this.search_by_from_date && this.search_by_to_date){
-                const searchFromDate=Timestamp.fromDate(new Date(this.search_by_from_date));
-                const searchToDate=Timestamp.fromDate(new Date(this.search_by_to_date));
-                this.adjustments=this.adjustmentsData.filter((f)=>{
-                        return  f.created_at >= searchFromDate && f.created_at <= searchToDate; 
-                })   
+        }else  if(this.search_by_location){
+               this.adjustments=this.adjustmentsData.filter((f)=>{
+                       return f.location== this.search_by_location;
+               })
+        }else  if(this.search_by_voucher_no){
+               this.adjustments=this.adjustmentsData.filter((f)=>{
+                       return f.voucher_no== this.search_by_voucher_no;
+               })
            }else{
                    this.adjustments= this.adjustmentsData.filter((p, i)=>{
                            if(i < 20){
@@ -155,14 +193,19 @@ export default {
            }
        },
      
-    async fetchadjustments(){
-       const query_url = query(collection(db, "adjustments"), orderBy("created_at", "desc"));
+    async fetchAdjustments(){
+        const from_date=Timestamp.fromDate(hp.searchFromDate(this.search_by_from_date))
+        const to_date=Timestamp.fromDate(hp.searchToDate(this.search_by_to_date))        
+        let query_url="";         
+        if(this.search_by_from_date && this.search_by_to_date){
+            query_url = query(collection(db, "adjustments"), where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
+        }
        onSnapshot(query_url, (snapShot)=>{
         const adjustments=ss.adjustments(snapShot);      
         this.adjustmentsData=adjustments;
         this.isLoading=false;
         this.isUpdating=false;
-        this.searchadjustments();
+        this.displayAdjustments();
        })
        
       } ,

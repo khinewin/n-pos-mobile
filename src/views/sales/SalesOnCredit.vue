@@ -23,23 +23,26 @@
             <div class="card shadow">
                 <div class="card-body p-2">
                     <div class="row justify-content-end">
-                        <div class="col-8">
+                        <div class="col-10 mb-2">
                                 <table class="table  table-borderless mb-0">
-                                    <tbody>
+                                    <tbody>                                        
                                         <tr>
-                                            <td class="col-1 p-0">
-                                                <select class="form-control-plaintext text-center" v-model="display_type" @change="filterData">
+                                            <td class="col-1">
+                                                <input @change="filterData" @keyup="filterData" type="number" class="form-control-plaintext py-0 text-center" v-model="display_item">
+                                            </td>
+                                            <td class="col-1">
+                                                <select class="form-control-plaintext py-0 text-center" v-model="display_type" @change="filterData">
                                                     <option>Paid</option>
                                                     <option>Credit</option>
                                                 </select>
                                             </td>                                          
 
-                                            <td class="text-end col-1">Customer :</td>
-                                            <td class="col-1">{{customer.name}}</td>
-                                            <td class="text-end col-1">Phone :</td>
-                                            <td class="col-1">{{customer.phone}}</td>
-                                            <td class="text-end col-1">Code :</td>
-                                            <td class="col-1">{{customer.code}}</td>
+                                            <td class="text-end col-1 position-relative"><span class="position-absolute top-50 start-50 translate-middle">Customer :</span></td>
+                                            <td class="col-1 position-relative"><span class="position-absolute top-50 start-0 translate-middle">{{customer.name}}</span></td>
+                                            <td class="text-end col-1 position-relative"><span class="position-absolute top-50 start-50 translate-middle">Phone :</span></td>
+                                            <td class="col-1 position-relative"><span class="position-absolute top-50 start-0 translate-middle">{{customer.phone}}</span></td>
+                                            <td class="text-end col-1 position-relative"><span class="position-absolute top-50 start-50 translate-middle">Code :</span></td>
+                                            <td class="col-1 position-relative"><span class="position-absolute top-50 start-0 translate-middle">{{customer.code}}</span></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -56,19 +59,45 @@
                                                 <td class="col-2">Voucher No.</td>
                                                 <td  class="col-2">Date</td>
                                                 <td  class="col-2">Amount</td>
-                                                <td  class="col-2">Paid</td>
                                                 <td  class="col-2">Credit</td>
                                             </tr>
-                                            <tr v-for="s in saleItems" :key="s.id">
-                                                <td class="text-center"><input type="checkbox" v-model="s.is_check" @click="addToPrint(s)"></td>
-                                                <td class="text-center">{{s.voucher_no}}</td>
+                                        </tbody>
+                                        <tbody v-for="s in saleItems" :key="s.id" class="table-group-divider">
+                                            <tr>
+                                                <td class="text-center" style="border-bottom: 2px solid;"><input type="checkbox" v-model="s.is_check" @click="addToPrint(s)"></td>
+                                                <td class="text-center" style="border-bottom: 2px solid;">{{s.voucher_no}}</td>
+                                                <td class="text-center" style="border-bottom: 2px solid;">{{showTimeHour(s.sale_date)}}</td>
+                                                <td class="text-end" style="border-bottom: 2px solid;">{{s.net_amount}}</td>
+                                                <td class="text-end" style="border-bottom: 2px solid;">{{s.credit}}</td>
+                                             </tr>
+                                             <tr v-if="s.paid">
+                                                <td colspan="2"></td>
                                                 <td class="text-center">{{showTimeHour(s.sale_date)}}</td>
-                                                <td class="text-end">{{s.net_amount}}</td>
+                                                <td class="text-end fw-bold">Paid</td>
                                                 <td class="text-end">{{s.paid}}</td>
-                                                <td class="text-end">{{s.credit}}</td>
+                                             </tr>
+                                            <tr v-for="dp in s.debt_payments" :key="dp.paid_date">
+                                                    <td colspan="2"></td>
+                                                    <td class="text-center">{{showTimeHour(dp.paid_date)}}</td>
+                                                    <td class="text-end fw-bold">Paid</td>
+                                                    <td class="text-end">{{dp.paid}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="3"></td>
+                                                    <td class="text-end fw-bold">Total paid</td>
+                                                    <td class="text-end">{{s.total_paid}}</td>
+                                                 </tr>
+                                           
+                                        </tbody>
+                                        <tbody class="table-group-divider">
+                                            <tr class="text-center fw-bold">
+                                                <td colspan="2"></td>
+                                                <td>Total amount</td>
+                                                <td>Total paid</td>
+                                                <td>Total credit</td>
                                             </tr>
                                             <tr class="text-end">
-                                                <td colspan="3">Total</td>
+                                                <td colspan="2"></td>
                                                 <td>{{total_amount}}</td>
                                                 <td>{{total_paid}}</td>
                                                 <td>{{total_credit}}</td>
@@ -89,26 +118,18 @@
                                             <td class="col-1">Paid amount</td>
                                         </tr>
                                         <tr>
-                                            <td class="p0">
-                                                <select class="form-control-plaintext text-center" v-model="paid_for" v-if="saleItems.length" @change="calAmount">
+                                            <td class="">
+                                                <select class="form-control-plaintext py-0 text-center" v-model="paid_for" v-if="saleItems.length" @change="calAmount">
                                                     <option  v-for="si in saleItems" :key="si.id">{{si.voucher_no}}</option>
                                                 </select>
                                             </td>
-                                            <td class="p-0">
-                                                <flat-pickr :disabled="!paid_for" class="form-control-plaintext form-control-sm text-center" v-model="paid_date"  :config="config" />
+                                            <td class="">
+                                                <flat-pickr :disabled="!paid_for" class="form-control-plaintext py-0 text-center" v-model="paid_date"  :config="config" />
 
                                             </td>
-                                            <td class="p-0"><input @keypress.enter="savePaid" v-model="paid_amount" :disabled="!customer.id" type="number" class="form-control-plaintext text-end"></td>
+                                            <td class=""><input @keypress.enter="savePaid" v-model="paid_amount" :disabled="!customer.id" type="number" class="form-control-plaintext py-0 text-end"></td>
                                         </tr>
-                                        <tr v-if="debtpayments.length" v-for="dp in debtpayments" :key="dp.id">
-                                            <td class="text-center">{{dp.paid_for}}</td>
-                                            <td class="text-center">{{showTimeHour(dp.paid_date)}}</td>
-                                            <td class="text-end">{{dp.paid_amount}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2" class="text-end">Total</td>
-                                            <td class="text-end">{{total_debtpayment_amount}}</td>
-                                        </tr>
+                                      
                                     </tbody>
                                 </table>
                             </div>
@@ -123,7 +144,7 @@
     
         <CustomerModal @setCustomer="setCustomer" />      
         <div class="container-fluid d-none" id="printMe">
-            <PrintSoc :printData="printData" :customer="customer" />
+            <PrintSoc :customer="customer" :saleItems="saleItems" :total_amount="total_amount" :total_paid="total_paid" :total_credit="total_credit" />
         </div>     
     </div>
 </template>
@@ -137,7 +158,6 @@ import CustomerModal from "@/views/modals/sales/CustomerModal.vue"
 import Print from "@/views/sales/Print.vue"
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/sales"
-import * as dp from "@/lib/snapshot/debtpayments"
 import PrintSoc from "@/views/sales/PrintSoc.vue"
 import FlatPickr from 'vue-flatpickr-component';
 
@@ -154,22 +174,17 @@ export default {
                 wrap: true, // set wrap to true only when using 'input-group'
                // altFormat: 'M j, Y',
             },   
+            display_item: 1,
             isLoading:false,
             customer:{},
             saleItems:[],
             saleItemsData:[],
             total_amount:0,
             total_paid:0,
-            total_credit:0,
-            debtpayments:[],
-            debtpaymentsData:[],
-            total_debtpayment_amount:0,
+            total_credit:0,          
             display_type: "Credit",
             check_all: true,
-            printData:{
-                saleItems:[],
-                debtpayments:[],
-                total_credit:0,
+            printData:{              
                 print_date:"",
 
             },
@@ -190,7 +205,6 @@ export default {
         this.voucher_no=new Date().getTime();
         this.paid_date=hp.setToday();
 
-        this.setPrintDate();
     },
   
     watch:{
@@ -214,11 +228,11 @@ export default {
     },
     methods:{
         async checkDatabase(){ 
-            const query_url=query(collection(db, "debtPayment"), where("customer.id", "==", this.customer.id));           
+            const query_url=query(collection(db, "sales"), where("customer.id", "==", this.customer.id));           
                 onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {        
-                            if(change.type==="added"){
-                                if(change.doc.data().paid_for==this.paid_for){
+                            if(change.type==="modified"){
+                                if(change.doc.data().voucher_no==Number(this.paid_for)){
                                         this.msg.info="Making debt payment has been saved"
                                         this.msg.type="success"                                        
                                         this.paid_amount=0;
@@ -230,7 +244,6 @@ export default {
         } ,
         clearPrintData(){
             this.printData.saleItems=[]
-            this.printData.debtpayments=[];
             this.printData.total_credit=0;
         },
         handleCheckAll(){
@@ -249,96 +262,78 @@ export default {
                     items.map((item)=>{
                         this.printData.total_credit += item.credit
                     })
-
-                   let dbs=[]
-                    this.debtpaymentsData.filter((f)=>{
-                            items.map((i)=>{
-                                if(i.voucher_no==f.paid_for){
-                                    dbs.push(f)
-                                }
-                            })
-                    })
-                    this.printData.debtpayments=dbs;
-                    this.debtpayments=[]
-                    this.debtpayments=dbs;
-                    this.calTotal();
+                 
                 }, 50)            
         },
 
         async savePaid(){
-            if(!this.paid_for || !this.paid_amount) return false;
-           // let date=new Date();
-           // let paid_date=new Date(this.paid_date)
-           // paid_date.setHours(date.getHours())
-           // paid_date.setMinutes(date.getMinutes())
+            if(!this.paid_for || !this.paid_amount) return false;       
             const paid_date=hp.insertDate(this.paid_date)
 
             const voucher={
                     paid_date: Timestamp.fromDate(paid_date),
                     user : {uid: this.user.uid, displayName: this.user.displayName},
-                    paid_amount:this.paid_amount,
-                    paid_for: this.paid_for,
-                    customer: this.customer,
+                    paid:this.paid_amount,                 
                 }        
-                this.modifyCreditSales();          
-                const saveDocument=collection(db, "debtPayment")
-                await addDoc(saveDocument, voucher)     
-        },
-        async modifyCreditSales(){
+
             const cData=this.saleItems.filter((f)=>f.voucher_no == this.paid_for)
             const data={
-                paid: cData[0].paid + this.paid_amount,
                 credit: cData[0].credit - this.paid_amount,
+                debt_payments: [...cData[0].debt_payments, voucher]
             }
             const id=cData[0].id;
             const saveDocument=doc(db, "sales",id)
-            await updateDoc(saveDocument, data)     
+            await updateDoc(saveDocument, data)                   
         },
+       
         filterData(){
-            if(this.display_type=="All"){
-                this.saleItems=this.saleItemsData
-            } else if(this.display_type=="Paid"){
-                this.saleItems=this.saleItemsData.filter((f)=>f.credit <= 0)
+            if(this.display_type=="Paid"){
+                let saleItems=this.saleItemsData.filter((f)=>f.credit <= 0).reverse()
+                saleItems=saleItems.filter((s,i)=>{
+                    if(i < this.display_item){
+                        return s;
+                    }
+                })
+                this.saleItems=saleItems;
             }  else if(this.display_type=="Credit"){
-                this.saleItems=this.saleItemsData.filter((f)=>f.credit > 0)
+                let saleItems=this.saleItemsData.filter((f)=>f.credit > 0).reverse()
+                saleItems=saleItems.filter((s,i)=>{
+                    if(i < this.display_item){
+                        return s;
+                    }
+                })
+                this.saleItems=saleItems;
             }
             this.saleItems=this.saleItems.map((s)=>{
                 return {...s, is_check: true}
             })
-            this.debtpayments=[]
             this.handleCheckAll();
+            this.calTotal();
+
         },
         calTotal(){
-                    this.total_amount=0;
-                    this.total_credit=0;
-                    this.total_paid=0;
-                    this.saleItems.map((s)=>{                       
-                        this.total_amount += s.net_amount;
-                        this.total_paid += s.paid;
-                        this.total_credit += s.credit;
-                    })   
-
-                    this.total_debtpayment_amount=0;
-                    this.debtpayments.map((p)=>{
-                        this.total_debtpayment_amount += p.paid_amount;
-                    })
-        },
-        fetchDebtPayment(){
-            const query_url = query(collection(db, "debtPayment"), where("customer.id","==", this.customer.id), orderBy("paid_date", "asc"));
-            onSnapshot(query_url, async(snapShot) =>{
-                    const items=dp.payments(snapShot)       
-                    this.debtpaymentsData=items;     
-                    this.filterData();                                                                                   
-            });  
-        },
+            let total_amount=0;
+            let total_paid=0;
+            let total_credit=0;
+            this.saleItems=this.saleItems.map((s)=>{
+                    const dp=s.debt_payments.reduce((accu, cur)=>accu + cur.paid, 0)
+                    total_amount += s.net_amount;
+                    total_paid += (dp + s.paid);
+                    total_credit += s.credit;
+                    return {...s, "total_paid": dp+ s.paid}
+            })
+            this.total_amount=total_amount
+            this.total_paid=total_paid
+            this.total_credit=total_credit
+       },
+    
         fetchCreditSales(){
-            const   query_url = query(collection(db, "sales"), where("customer.id","==", this.customer.id), orderBy("sale_date", "asc"));          
+            const   query_url = query(collection(db, "sales"), where("customer.id","==", this.customer.id), where("payment_type", "==", "Credit"), orderBy("sale_date", "asc"));          
             onSnapshot(query_url, async(snapShot) =>{
                     const items=ss.sales(snapShot)       
                     this.saleItemsData=items;    
+                    this.filterData();
             });  
-            this.fetchDebtPayment();
-
         },
         calAmount(){
             this.saleItems.filter((f)=>{
@@ -357,8 +352,7 @@ export default {
             this.paid_amount=0;
             this.paid_for="";
             this.paid_date=hp.setToday();
-            this.debtpayments=[]
-            this.debtpaymentsData=[]
+          
             this.clearPrintData();
         },
        setCustomer(c){
@@ -367,15 +361,7 @@ export default {
             this.paid_date=hp.setToday();
             this.clearPrintData();
             this.checkDatabase();
-       },
-        setPrintDate(){
-            const date=new Date();
-            let print_date=new Date();
-            print_date.setHours(date.getHours())
-            print_date.setMinutes(date.getMinutes())
-          this.printData.print_date=Timestamp.fromDate(print_date);
-        },
-
+       },   
        
    
         async print () {

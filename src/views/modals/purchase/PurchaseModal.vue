@@ -10,29 +10,45 @@
                         <div class="col-lg-3">                                                         
                                 <div class="card shadow">
                                     <div class="card-body p-2">
-                                       <div class="row g-1">
+                                       <div class="row g-1 small">
                                         <div class="col-md-6 col-lg-12">
                                             <div class="form-floating ">
-                                                <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchPurchases" placeholder="Voucher no." class="form-control form-control-sm">
-                                                <label for="search_by_voucher_no" class="small">Voucher no.</label>
+                                                <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchPurchase" placeholder="Voucher no." class="form-control-plaintext border-bottom">
+                                                <label for="search_by_voucher_no" class="">Voucher no.</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-lg-12">
+                                            <div class="input-group">
+                                                <div class="form-floating">
+                                                    <flat-pickr @change="searchPurchase" class="form-control-plaintext border-bottom" v-model="search_by_from_pur_date" id="from_date" :config="config" />
+                                                    <label for="from_date">From date</label>
+                                                </div>
+                                                <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-lg-12">
+                                            <div class="input-group">
+                                                <div class="form-floating">
+                                                    <flat-pickr @change="searchPurchase" class="form-control-plaintext border-bottom" v-model="search_by_to_pur_date" id="to_date" :config="config" />
+                                                    <label for="to_date">To date</label>
+                                                </div>
+                                                <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-lg-12">
                                             <div class="form-floating ">
-                                                <input type="date" v-model="search_by_from_pur_date" @change="searchPurchases" placeholder="From pur date" class="form-control form-control-sm">
-                                                <label for="search_by_from_pur_date" class="small">From pur date</label>
+                                                <input type="search" v-model="search_by_supplier" @keyup="searchPurchase" placeholder="Supplier" class="form-control-plaintext border-bottom">
+                                                <label for="search_by_supplier" class="">Supplier</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-lg-12">
                                             <div class="form-floating ">
-                                                <input type="date" v-model="search_by_to_pur_date" @change="searchPurchases" placeholder="To pur date" class="form-control form-control-sm">
-                                                <label for="search_by_to_pur_date" class="small">To pur date</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-lg-12">
-                                            <div class="form-floating ">
-                                                <input type="search" v-model="search_by_supplier" @keyup="searchPurchases" placeholder="Supplier" class="form-control form-control-sm">
-                                                <label for="search_by_supplier" class="small">Supplier</label>
+                                                <select @change="searchPurchase" class="form-control-plaintext border-bottom" v-model="search_by_location">
+                                                    <option value="">All</option>
+                                                    <option>Main</option>
+                                                    <option>Pharmacy</option>
+                                                </select>
+                                                <label for="search_by_supplier" class="">Location</label>
                                             </div>
                                         </div>
                                        </div>
@@ -63,15 +79,17 @@
                                                 <td>Voucher no.</td>
                                                 <td>Pur date</td>                                    
                                                 <td>Supplier</td>
-                                                <td>User</td>
                                                 <td>Location</td>
+                                                <td>User</td>
+
                                             </tr>                                
                                             <tr v-if="purchases.length > 0" v-for="p in purchases" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal" aria-label="Close" style="cursor: context-menu;">
                                                 <td class="text-center">{{p.voucher_no}}</td>
                                                 <td class="text-center">{{showTime(p.pur_date)}}</td>
                                                 <td>{{p.supplier.name}} ({{p.supplier.company}})</td>
+                                                <td class="text-center">{{p.location}}</td>
                                                 <td class="text-center">{{p.user.displayName}}</td>
-                                                <td>{{p.location}}</td>
+
                                             </tr>
                                         </tbody>
                                     </table>   
@@ -101,8 +119,13 @@ import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, 
 import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/purchases"
+import FlatPickr from 'vue-flatpickr-component';
+
 export default {
    props:['storePurchase'],
+   components:{
+    FlatPickr,
+   },
    data(){
        return{
            purchases:[],
@@ -112,8 +135,15 @@ export default {
            search_by_from_pur_date:"",
            search_by_to_pur_date:"",
            search_by_supplier:"",
+           search_by_location:"",
             isUpdating:false,
            isLoading:false,
+           config: {
+                dateFormat: 'd/m/Y', // Flatpickr options
+                enableTime: false,
+                wrap: true, // set wrap to true only when using 'input-group'
+               // altFormat: 'M j, Y',
+            },  
        }
    },
   
@@ -121,28 +151,22 @@ export default {
        const myModalEl = document.getElementById('purchaseModal')
        myModalEl.addEventListener('show.bs.modal', event => {                
        })   
-            
+       this.setDate();
    },
-   created(){
-       if(this.user !==null){          
-               this.fetchPurchase();                 
-       }
+   created(){           
+        this.fetchPurchase();                       
    },
    computed:{
        user(){
            return this.$store.getters.user;
-       },
-       
+       },       
    },
-   watch:{       
-       user(data){
-               if(data !==null){             
-                    this.isLoading=true;      
-                   this.fetchPurchase();           
-           }
-       }     
-   },
+ 
    methods:{
+    setDate(){
+        this.search_by_from_pur_date=hp.setSearchFromDate();
+        this.search_by_to_pur_date=hp.setSearchToDate();
+    },
        updatePurchases(){
                this.isUpdating=true;
                this.fetchPurchase();
@@ -154,12 +178,25 @@ export default {
        clearSearch(){
            this.search_by_voucher_no="";
            this.search_by_supplier="";
-           this.search_by_from_pur_date="";
-           this.search_by_to_pur_date="";
-           this.searchPurchases();
+           this.search_by_from_pur_date=hp.setSearchFromDate();
+           this.search_by_to_pur_date=hp.setSearchToDate();
+           this.search_by_location="";
+           this.searchPurchase();
        },
-       searchPurchases(){
-           if(this.search_by_voucher_no){
+       searchPurchase(){
+            this.fetchPurchase();
+       },
+       displayPurchase(){   
+             if(this.search_by_supplier && this.search_by_location){
+               this.purchases=this.purchasesData.filter((f)=>{
+                       return f.location==this.search_by_location && (f.supplier.name.toLowerCase().includes(this.search_by_supplier.toLowerCase()) || f.supplier.company.toLowerCase().includes(this.search_by_supplier.toLowerCase()))
+               })
+           }else 
+            if(this.search_by_voucher_no && this.search_by_location){
+               this.purchases=this.purchasesData.filter((f)=>{
+                       return f.location==this.search_by_location && f.voucher_no===Number(this.search_by_voucher_no);
+               })
+           }else  if(this.search_by_voucher_no){
                this.purchases=this.purchasesData.filter((f)=>{
                        return f.voucher_no===Number(this.search_by_voucher_no);
                })
@@ -167,29 +204,32 @@ export default {
                this.purchases=this.purchasesData.filter((f)=>{
                        return f.supplier.name.toLowerCase().includes(this.search_by_supplier.toLowerCase()) || f.supplier.company.toLowerCase().includes(this.search_by_supplier.toLowerCase())
                })
-           }else if(this.search_by_from_pur_date && this.search_by_to_pur_date){
-                const searchFromDate=Timestamp.fromDate(new Date(this.search_by_from_pur_date));
-                const searchToDate=Timestamp.fromDate(new Date(this.search_by_to_pur_date));
-                this.purchases=this.purchasesData.filter((f)=>{
-                        return  f.pur_date >= searchFromDate && f.pur_date <= searchToDate; 
-                })   
+           }else if(this.search_by_location){
+               this.purchases=this.purchasesData.filter((f)=>{
+                       return f.location == this.search_by_location;
+               })
            }else{
                    this.purchases= this.purchasesData.filter((p, i)=>{
                            if(i < 20){
                                return p;
                            }
-                       })                                     
+                 })                                     
            }
        },
      
     async fetchPurchase(){
-       const query_url = query(collection(db, "purchases"),  orderBy("pur_date", "desc"));
+        let query_url="";
+        if(this.search_by_from_pur_date && this.search_by_to_pur_date){
+            const from_date=Timestamp.fromDate(hp.searchFromDate(this.search_by_from_pur_date))
+            const to_date=Timestamp.fromDate(hp.searchToDate(this.search_by_to_pur_date))       
+            query_url = query(collection(db, "purchases"), where("pur_date", ">=", from_date), where("pur_date", "<=", to_date),  orderBy("pur_date", "desc"));
+        }
        onSnapshot(query_url, (snapShot)=>{
             const purchases=ss.purchases(snapShot);      
             this.purchasesData=purchases;
             this.isLoading=false;
             this.isUpdating=false;
-            this.searchPurchases();
+            this.displayPurchase();
        })
       
       } ,

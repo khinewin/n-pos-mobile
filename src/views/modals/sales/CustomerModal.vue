@@ -13,20 +13,20 @@
                             <div class="row g-1">
                                 <div class="col-md-4 col-lg-12">
                                     <div class="form-floating">
-                                        <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchCustomer" placeholder="Code" class="form-control form-control-sm">
-                                        <label for="search_by_code" class="small">Code</label>
+                                        <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchCustomer" placeholder="Code" class="form-control-plaintext border-bottom">
+                                        <label for="search_by_code" class="">Code</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-lg-12">
                                     <div class="form-floating">
-                                        <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchCustomer" placeholder="Description" class="form-control form-control-sm">
-                                        <label for="search_by_name" class="small">Name</label>
+                                        <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchCustomer" placeholder="Description" class="form-control-plaintext border-bottom">
+                                        <label for="search_by_name" class="">Name</label>
                                     </div> 
                                 </div>
                                 <div class="col-md-4 col-lg-12">
                                     <div class="form-floating">
-                                        <input type="search" id="search_by_address" v-model="search_by_address" @keyup="searchCustomer" placeholder="Address" class="form-control form-control-sm">
-                                         <label for="search_by_address" class="small">Address</label>
+                                        <input type="search" id="search_by_address" v-model="search_by_address" @keyup="searchCustomer" placeholder="Address" class="form-control-plaintext border-bottom">
+                                         <label for="search_by_address" class="">Address</label>
                                 </div>
                                 </div> 
                             </div>

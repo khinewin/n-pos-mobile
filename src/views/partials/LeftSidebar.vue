@@ -25,7 +25,7 @@
                             <router-link class="nav-link" :to="{name : 'OpeningStocks'}"><i class="fa-solid fa-money-bill-trend-up"></i> Stocks</router-link>
                           </li>               
                           <li class="list-group-item list-group-item-action bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
-                            <router-link class="nav-link" :to="{name : 'Products'}"><i class="fa-solid fa-list-check"></i> Products code</router-link>
+                            <router-link class="nav-link" :to="{name : 'Products'}"><i class="fa-solid fa-list-check"></i> Medicine code</router-link>
                           </li>
                           <li class="list-group-item list-group-item-action bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
                             <router-link class="nav-link" :to="{name : 'Suppliers'}"><i class="fa-solid fa-person-walking-luggage"></i> Suppliers</router-link>

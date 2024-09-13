@@ -1,6 +1,6 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="Adjustments" page-code="adjustments" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader page-title="Adjustments / History" page-code="adjustments" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">
                 <div class="col-sm-2 d-grid">
@@ -8,13 +8,13 @@
                 </div>                
                 <!--<div class="col-sm-2 d-grid">
                         <button @click="goEdit" class="btn btn-sm" :class="{'disabled': !voucher_no || stock_user.uid !== user.uid}"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                </div>-->
-                <div class="col-sm-2 d-grid">
-                        <router-link :to="{name : 'NewAdjustment'}" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New</router-link>
-                </div>
+                </div>-->              
                 <div class="col-sm-2 d-grid">
                     <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#adjustmentModal"><i class="fa-solid fa-folder-tree"></i> Browse</button>
                 </div>
+                <div class="col-sm-2 d-grid">
+                    <router-link :to="{name : 'NewAdjustment'}" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New</router-link>
+            </div>
                 <div class="col-sm-2 d-grid">
                         <button @click="closeAdjustment" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                 </div>
@@ -30,18 +30,18 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end py-1 col-2">Location :</td>
-                                            <td class="col-2 py-1">
+                                            <td class="text-end col-2">Location :</td>
+                                            <td class="col-2">
                                                     {{location}}
                                             </td>
 
-                                            <td class="text-end col-2 py-1">Voucher no. :</td>
-                                            <td class="col-2 py-1">
+                                            <td class="text-end col-2">Voucher no. :</td>
+                                            <td class="col-2">
                                                 {{voucher_no}}
                                             </td>
                                      
-                                            <td class="text-end col-2 py-1">Date :</td>
-                                            <td class="py-1 col-2">
+                                            <td class="text-end col-2">Date :</td>
+                                            <td class="col-2">
                                                <span v-if="created_at"> {{showTime(created_at)}}</span>
                                             </td>
                                         </tr>

@@ -2,6 +2,9 @@
     <div class="card">
         <div class="card-body p-2">
             <LargePrintHeader />
+            <div class="row">
+                <div class="col-12 h5 text-center">SOC</div>
+            </div>
             <div class="row mb-2">
                 <div class="col-6">
                     <table class="table table-borderless mb-0">
@@ -26,42 +29,60 @@
                             </tr>
                             <tr>    
                                 <td class="text-end fw-bold">Print date :</td>
-                                <td class="">{{printData.print_date ? showTimeHour(printData.print_date) : ""}}</td>
+                                <td class="">{{print_date}}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
             
-            <table class="table table-bordered border-dark mb-0">
+            <table class="table table-hover table-bordered mb-0">
                 <tbody>
-                    <tr class="text-center fw-bold">
+                    <tr class="text-center table-secondary fw-bold">
                         <td class="col-2">Voucher No.</td>
                         <td  class="col-2">Date</td>
                         <td  class="col-2">Amount</td>
-                        <td  class="col-2">Paid</td>
                         <td  class="col-2">Credit</td>
                     </tr>
-                    </tbody>
-                    <tbody class="table-group-divider" v-if="printData.saleItems.length" v-for="ps in printData.saleItems" :key="ps.id">
-                    <tr>
-                        <td class="text-center">{{ps.voucher_no}}</td>
-                        <td class="text-center">{{showTimeHour(ps.sale_date)}}</td>
-                        <td class="text-end">{{ps.net_amount}}</td>
-                        <td class="text-end">{{ps.paid}}</td>
-                        <td class="text-end">{{ps.credit}}</td>
-                    </tr>
-                    <tr v-for="dp in printData.debtpayments" :key="dp.id">
-                        <td class="text-end fw-bold" colspan="2" v-if="dp.paid_for==ps.voucher_no">Payment date</td>
-                        <td class="text-center"  v-if="dp.paid_for==ps.voucher_no">{{showTimeHour(dp.paid_date)}}</td>
-                        <td class="text-end fw-bold"   v-if="dp.paid_for==ps.voucher_no">Paid amount</td>
-                        <td class="text-end"  v-if="dp.paid_for==ps.voucher_no">{{dp.paid_amount}}</td>
-                    </tr>
                 </tbody>
-                <tbody>
-                    <tr class="fw-bold">
-                        <td colspan="4" class="text-end">Total credit balance</td>
-                        <td class="text-end">{{printData.total_credit}}</td>
+                <tbody v-for="s in saleItems" :key="s.id" class="table-group-divider">
+                    <tr>
+                        <td class="text-center" style="border-bottom: 2px solid;">{{s.voucher_no}}</td>
+                        <td class="text-center" style="border-bottom: 2px solid;">{{showTimeHour(s.sale_date)}}</td>
+                        <td class="text-end" style="border-bottom: 2px solid;">{{s.net_amount}}</td>
+                        <td class="text-end" style="border-bottom: 2px solid;">{{s.credit}}</td>
+                     </tr>
+                     <tr v-if="s.paid">
+                        <td colspan=""></td>
+                        <td class="text-center">{{showTimeHour(s.sale_date)}}</td>
+                        <td class="text-end fw-bold">Paid</td>
+                        <td class="text-end">{{s.paid}}</td>
+                     </tr>
+                    <tr v-for="dp in s.debt_payments" :key="dp.paid_date">
+                            <td colspan=""></td>
+                            <td class="text-center">{{showTimeHour(dp.paid_date)}}</td>
+                            <td class="text-end fw-bold">Paid</td>
+                            <td class="text-end">{{dp.paid}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"></td>
+                            <td class="text-end fw-bold">Total paid</td>
+                            <td class="text-end">{{s.total_paid}}</td>
+                         </tr>
+                   
+                </tbody>
+                <tbody class="table-group-divider">
+                    <tr class="text-center fw-bold">
+                        <td colspan=""></td>
+                        <td>Total amount</td>
+                        <td>Total paid</td>
+                        <td>Total credit</td>
+                    </tr>
+                    <tr class="text-end">
+                        <td colspan=""></td>
+                        <td>{{total_amount}}</td>
+                        <td>{{total_paid}}</td>
+                        <td>{{total_credit}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -71,10 +92,20 @@
 <script>
     import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
     import * as hp from "@/lib/helper"
+    import {disableNetwork, Timestamp, collection, addDoc, doc, increment,  updateDoc, onSnapshot, query, where, orderBy, getDocs} from 'firebase/firestore'
+
 export default {
-    props:['printData', 'customer'],
+    props:['customer', 'saleItems', 'total_amount', 'total_paid', 'total_credit'],
     components:{
         LargePrintHeader
+    },
+    data(){
+        return {
+            print_date:"",
+        }
+    },
+    mounted() {
+        this.setPrintDate();
     },
     computed:{
         user(){
@@ -84,7 +115,15 @@ export default {
     methods:{
         showTimeHour(t){
             return hp.showTimeHour(t);
-        }
+        },
+        setPrintDate(){
+            const date=new Date();
+            let print_date=new Date();
+            print_date.setHours(date.getHours())
+            print_date.setMinutes(date.getMinutes())
+            this.print_date=hp.showTimeHour(Timestamp.fromDate(print_date))
+        },
+
     }
 }
 </script>

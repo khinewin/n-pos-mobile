@@ -24,10 +24,8 @@ export default {
        // await disableNetwork(db)
      //  await enableNetwork(db)
     },
-    updated() {
-        //setInterval(()=>{
-           // this.updateOnlineStatus();
-       // }, 5000)
+    mounted() {
+        this.setCusrot();
     },
     
     watch:{        
@@ -37,6 +35,10 @@ export default {
         
     },
     methods:{       
+
+        setCusrot(){
+          
+         },
        
         checkLogin() {
             const auth = getAuth();

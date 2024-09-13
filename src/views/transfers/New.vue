@@ -1,6 +1,6 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="New transfer" page-code="addTransfer" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader page-title="Transfers / New" page-code="addTransfer" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                
                 <div class="col-sm-2 d-grid">
@@ -17,22 +17,22 @@
                 <div class="card-body p-2">
                     <form @submit.prevent="saveTransfers">
                         <div class="row justify-content-end mb-2">
-                            <div class="col-sm-6 col-lg-4">
+                            <div class="col-sm-6">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-6 py-1 ">From location :</td>
-                                            <td class="col-6 py-0">
-                                                <select :disabled="storeItems.length > 0" class="form-control-plaintext form-control-sm border-bottom" v-model="from_location" @change="handleFromLocation(from_location)">
+                                            <td class="text-end col-4">From location :</td>
+                                            <td class="col-8">
+                                                <select :disabled="storeItems.length > 0" class="form-control-plaintext py-0 border-bottom" v-model="from_location" @change="handleFromLocation(from_location)">
                                                     <option value="Main">Main</option>
                                                     <option value="Pharmacy">Pharmacy</option>
                                                 </select>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end py-1">To location :</td>
-                                            <td class="py-0">
-                                                <select :disabled="storeItems.length > 0" class="form-control-plaintext form-control-sm border-bottom" v-model="to_location" @change="handleToLocation(to_location)">
+                                            <td class="text-end">To location :</td>
+                                            <td class="">
+                                                <select :disabled="storeItems.length > 0" class="form-control-plaintext py-0 border-bottom" v-model="to_location" @change="handleToLocation(to_location)">
                                                     <option value="Main">Main</option>
                                                     <option value="Pharmacy">Pharmacy</option>
                                                 </select>
@@ -41,19 +41,19 @@
                                     </tbody>
                               </table>
                             </div>
-                            <div class="col-sm-6 col-lg-4">
+                            <div class="col-sm-6">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-6 py-1">Voucher no. :</td>
-                                            <td class="col-6 py-0">
-                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext form-control-sm  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
+                                            <td class="text-end col-4">Voucher no. :</td>
+                                            <td class="col-8">
+                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext py-0  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end py-1">Date :</td>
-                                            <td class="py-0">
-                                                <flat-pickr class="form-control-plaintext form-control-sm border-bottom" v-model="created_at"  :config="config" />
+                                            <td class="text-end">Date :</td>
+                                            <td class="">
+                                                <flat-pickr class="form-control-plaintext py-0 border-bottom" v-model="created_at"  :config="config" />
                                             </td>
                                         </tr>                                       
                                     </tbody>

@@ -1,7 +1,7 @@
 <template lang="">
     <!-- packingSizes Modal -->
     <div class="modal fade" id="selectPackingSizeModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-       <div class="modal-dialog">
+       <div class="modal-dialog modal-sm">
          <div class="modal-content">               
            <div>
                <div class="card">
@@ -23,34 +23,30 @@
                     <div class="col-12">
                         <table class="table table-bordered mb-0">
                             <tbody class="small">
-                                <tr class="text-center">
-                                    <td class="col-1">Largest unit</td>
-                                    
-                                    <td class="col-1 p-0" colspan="2">
-                                        <select class="form-control-plaintext text-center" v-model="largest_unit">
+                                <tr class="text-center">                                    
+                                    <td class="col-1" colspan="2">
+                                        <select class="form-control-plaintext py-0 text-center" v-model="largest_unit">
                                             <option value=""></option>
                                             <option v-for="s in packingSizes" :key="s.id">{{s.packing_unit}}</option>
                                         </select>
                                     </td>
                                 </tr> 
                                 <tr class=" text-center">
-                                    <td>Medium unit</td>
-                                    <td class="col-1 p-0">
-                                        <input @keypress.enter="pressSetBtn" type="number" class="form-control-plaintext text-center" v-model="medium_qty">
+                                    <td class="col-">
+                                        <input @keypress.enter="pressSetBtn" type="number" class="form-control-plaintext py-0 text-center" v-model="medium_qty">
                                     </td>
-                                    <td class="col-1 p-0">
-                                        <select class="form-control-plaintext text-center" v-model="medium_unit">
+                                    <td class="col-1">
+                                        <select class="form-control-plaintext py-0 text-center" v-model="medium_unit">
                                             <option v-for="s in packingSizes" :key="s.id">{{s.packing_unit}}</option>
                                         </select>
                                     </td>
                                 </tr>      
                                 <tr class="text-center">
-                                    <td>Smallest unit</td>
-                                    <td class="col-1 p-0">
-                                        <input @keypress.enter="pressSetBtn" type="number" class="form-control-plaintext text-center" v-model="smallest_qty">
+                                    <td class="col-1">
+                                        <input @keypress.enter="pressSetBtn" type="number" class="form-control-plaintext py-0 text-center" v-model="smallest_qty">
                                     </td>
-                                    <td class="col-1 p-0">
-                                        <select class="form-control-plaintext text-center " v-model="smallest_unit">
+                                    <td class="col-1">
+                                        <select class="form-control-plaintext py-0 text-center " v-model="smallest_unit">
                                             <option v-for="s in packingSizes" :key="s.id">{{s.packing_unit}}</option>
                                         </select>
                                     </td>

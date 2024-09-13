@@ -178,12 +178,16 @@ export default {
                             group_customer:  res.customer.code,
                             customer_name: res.customer.name,
                             group_date :  this.showTime(res.sale_date),
-                             voucher_no: res.voucher_no, credit: res.credit, paid: res.paid})
+                             voucher_no: res.voucher_no, credit: res.credit, paid: res.paid,
+                             debt_paid: res.debt_payments.reduce((accu, cur)=>accu + cur.paid,0)
+                            })
                         }else{
                             sales.push({...data, group_customer: res.customer.code,
                             customer_name: res.customer.name,
                             group_date :  this.showTime(res.sale_date),
-                            voucher_no: res.voucher_no, credit: 0, paid:0})
+                            voucher_no: res.voucher_no, credit: 0, paid:0,
+                            debt_paid: 0
+                        })
                         }
                     })
             })
@@ -231,7 +235,7 @@ export default {
                                 item.final_amount +=ren.final_amount;
                                 item.sale_qty += ren.sale_qty;
                                 item.code_no=ren.code_no;                  
-                                item.paid += ren.paid;               
+                                item.paid += ren.paid + ren.debt_paid;               
                                 item.credit += Number(ren.credit);
                             })
                         return item;

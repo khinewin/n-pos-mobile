@@ -10,19 +10,19 @@
                         <div class="row g-1">
                             <div class="col-md-4 col-lg-12">
                                 <div class="form-floating">
-                                    <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchSuppliers" placeholder="Code" class="form-control form-control-sm">
+                                    <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchSuppliers" placeholder="Code" class="form-control-plaintext border-bottom">
                                     <label for="search_by_code" class="small">Code</label>
                                 </div>
                             </div>
                             <div class="col-md-4 col-lg-12">
                                 <div class="form-floating ">
-                                    <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchSuppliers" placeholder="Description" class="form-control form-control-sm">
+                                    <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchSuppliers" placeholder="Description" class="form-control-plaintext border-bottom">
                                     <label for="search_by_name" class="small ">Name</label>
                                 </div> 
                             </div>
                             <div class="col-md-4 col-lg-12">
                                 <div class="form-floating ">
-                                    <input type="search" id="search_by_company" v-model="search_by_company" @keyup="searchSuppliers" placeholder="Company" class="form-control form-control-sm">
+                                    <input type="search" id="search_by_company" v-model="search_by_company" @keyup="searchSuppliers" placeholder="Company" class="form-control-plaintext border-bottom">
                                     <label for="search_by_company" class="small">Company</label>
                                 </div> 
                             </div>

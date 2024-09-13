@@ -1,6 +1,6 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="Edit purchase" page-code="editPurchase" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader page-title="Purchase  / Edit" page-code="editPurchase" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                
                 <div class="col-sm-2 d-grid">
@@ -21,15 +21,15 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-6 py-1">Voucher no. :</td>
-                                            <td class="col-6 py-0">
-                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext form-control-sm  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
+                                            <td class="text-end col-4">Voucher no. :</td>
+                                            <td class="col-8">
+                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext p-0  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end  py-1">Location :</td>
+                                            <td class="text-end ">Location :</td>
                                             <td class="">
-                                                <select class="form-control-plaintext form-control-sm border-bottom" v-model="location" disabled>
+                                                <select class="form-control-plaintext p-0 border-bottom" v-model="location" disabled>
                                                     <option value="Main">Main</option>
                                                     <option value="Pharmacy">Pharmacy</option>
                                                 </select>
@@ -42,15 +42,15 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>                                      
                                         <tr>
-                                            <td class="text-end col-6 py-1">Pur date :</td>
-                                            <td class="py-0 col-6">
-                                                <flat-pickr class="form-control-plaintext form-control-sm border-bottom" v-model="pur_date"  :config="config" />
+                                            <td class="text-end col-4">Pur date :</td>
+                                            <td class="col-8">
+                                                <flat-pickr class="form-control-plaintext p-0  border-bottom" v-model="pur_date"  :config="config" />
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end py-1">Supplier :</td>
-                                            <td class="py-0">
-                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.supplier.name.$errors.length > 0}"  v-model="supplier.name" data-bs-toggle="modal" data-bs-target="#searchSupplier"  class="form-control-plaintext form-control-sm border-bottom">                                                
+                                            <td class="text-end">Supplier :</td>
+                                            <td class="">
+                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.supplier.name.$errors.length > 0}"  v-model="supplier.name" data-bs-toggle="modal" data-bs-target="#searchSupplier"  class="form-control-plaintext p-0 border-bottom">                                                
                                             </td>
                                         </tr>
                                     </tbody>
@@ -79,7 +79,7 @@
                                     </td>                                    
                                     <td class="pt-2">{{st.item_name}}</td>
                                     <td class="p-0">
-                                        <flat-pickr class="form-control-plaintext form-control-sm text-center" v-model="st.tmp_exp_date" @change="setExpDate(st.id)"  :config="config" />
+                                        <flat-pickr class="form-control-plaintext  text-center" v-model="st.tmp_exp_date" @change="setExpDate(st.id)"  :config="config" />
                                     </td>
                                     <td class="pt-2">
                                          {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
@@ -88,10 +88,10 @@
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.pur_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                    </td>
                                    <td class="p-0 table-info">
-                                        <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.qty_pur_price" class="form-control-plaintext form-control-sm  text-center" placeholder="Price">                                        
+                                        <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.qty_pur_price" class="form-control-plaintext   text-center" placeholder="Price">                                        
                                     </td>
                                     <td class="p-0 table-info">
-                                        <select @change="calEdit" class="form-control-plaintext form-control-sm text-center" v-model="st.qty_pur_price_unit">
+                                        <select @change="calEdit" class="form-control-plaintext  text-center" v-model="st.qty_pur_price_unit">
                                             <option  v-for="pu in onlyString(st.packing_size)">{{pu}}</option>
                                         </select>
                                     </td>
@@ -117,9 +117,9 @@
                                     <td class="text-end">{{total_price}}</td>
                                 </tr>
                                 <tr class="small">
-                                    <td colspan="10" class="text-end pt-2">Extra discount</td>
+                                    <td colspan="10" class="text-end ">Extra discount</td>
                                     <td class="text-end">
-                                        <input   type="number" @keyup="calTotal"  @change="calTotal"  v-model="extra_discount" class="form-control-plaintext form-control-sm  text-end" placeholder="0">
+                                        <input @click="setInput" @mouseleave="setInput" @keypress.enter="savePurchase"  type="number" @keyup="calTotal"  @change="calTotal"  v-model="extra_discount" class="form-control-plaintext  p-0 text-end" placeholder="0">
                                     </td>
                                 </tr>
                                 <tr class="small">
@@ -544,6 +544,15 @@ export default {
             //const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
             const formattedDate = new Date(date).toISOString().substr(0, 10)
             return formattedDate;
+        },
+        setInput(e){
+            console.log(e.target.value)
+           if(e.target.value==0){
+                e.target.value=""
+           }
+           if(e.target.value==""){
+                e.target.value=0;
+           }
         },
                     
     }

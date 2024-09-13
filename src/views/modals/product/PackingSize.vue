@@ -17,16 +17,16 @@
                         <table class="table table-bordered mb-0 table-hover">
                             <tbody class="small">                                     
                                 <tr class="">
-                                    <td class="p-0"><input id="packing_name" placeholder="Packing name" type="text" @keypress.enter="savePackingSize" v-model="packing_name" class="form-control-plaintext form-control-sm text-center"></td>
-                                    <td class="p-0"><input placeholder="Packing unit" type="text" @keypress.enter="savePackingSize" v-model="packing_unit" class="form-control-plaintext form-control-sm text-center"></td>
+                                    <td class=""><input id="packing_name" placeholder="Packing name" type="text" @keypress.enter="savePackingSize" v-model="packing_name" class="form-control-plaintext py-0 text-center"></td>
+                                    <td class=""><input placeholder="Packing unit" type="text" @keypress.enter="savePackingSize" v-model="packing_unit" class="form-control-plaintext py-0 text-center"></td>
                                 </tr>                                                                                       
                                 <tr  class="" v-if="packingSizes.length > 0"  v-for="p in packingSizes" :key="p.id" @mouseenter="setEdit(p)"  style="cursor:context-menu">
-                                    <td class="p-0 position-relative">
+                                    <td class=" position-relative">
                                         <a href="#!" class='text-danger position-absolute start-0 top-50 translate-middle ps-2' @click="removePackingSize(p)"><i class="fa-solid fa-square-minus"></i></a>
-                                        <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext form-control-sm text-center" v-model="p.packing_name">
+                                        <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext py-0 text-center" v-model="p.packing_name">
                                         </td>
-                                    <td class="text-center p-0">
-                                        <input @keypress.enter="saveEdit" type="text" class="form-control-plaintext form-control-sm text-center" v-model="p.packing_unit">
+                                    <td class="text-center ">
+                                        <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext py-0 text-center" v-model="p.packing_unit">
                                     </td>
                                 </tr>
                             </tbody>

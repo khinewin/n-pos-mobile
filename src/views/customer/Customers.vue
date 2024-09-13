@@ -2,7 +2,7 @@
     <div>           
            <PageHeader page-title="customers" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info"/>
            <div class="container-fluid">
-               <div class="row mb-2 justify-content-end">  
+               <div class="row  justify-content-end">  
                 <div class="col-sm-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete</span>
@@ -24,15 +24,15 @@
                             <div class="card-body p-2">
                                 <div class="row g-2">
                                     <div class="form-floating col-sm-4 col-lg-12 ">
-                                        <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchCustomer" placeholder="Code" class="form-control form-control-sm">
+                                        <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchCustomer" placeholder="Code" class="form-control-plaintext border-bottom ">
                                         <label for="search_by_code" class="small ">Code</label>
                                     </div>
                                     <div class="form-floating col-sm-4 col-lg-12 ">
-                                        <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchCustomer" placeholder="Description" class="form-control form-control-sm">
+                                        <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchCustomer" placeholder="Description" class="form-control-plaintext border-bottom ">
                                         <label for="search_by_name" class="small ">Name</label>
                                     </div> 
                                     <div class="form-floating col-sm-4 col-lg-12 ">
-                                        <input type="search" id="search_by_address" v-model="search_by_address" @keyup="searchCustomer" placeholder="Address" class="form-control form-control-sm">
+                                        <input type="search" id="search_by_address" v-model="search_by_address" @keyup="searchCustomer" placeholder="Address" class="form-control-plaintext border-bottom ">
                                         <label for="search_by_address" class="small ">Address</label>
                                     </div> 
                                 </div>
@@ -53,33 +53,33 @@
                                <table class="table table-bordered table-hover mb-0">
                                    <tbody class="small">
                                        <tr class="text-center table-secondary" style="cursor: context-menu;">
-                                        <td>
+                                        <td class="col-0">
                                             <input type="checkbox" @click="checkAll" v-model="is_check_all">
                                         </td>
-                                           <td @click="sortCustomers('code')"><i class="fa-solid fa-sort"></i> Code</td>
-                                           <td @click="sortCustomers('name')"><i class="fa-solid fa-sort"></i> Name</td>
-                                           <td @click="sortCustomers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
-                                           <td @click="sortCustomers('address')"><i class="fa-solid fa-sort"></i> Address</td>
-                                           <td @click="sortCustomers('created_at')"><i class="fa-solid fa-sort"></i> Date</td>
+                                           <td @click="sortCustomers('code')" class="col-2"><i class="fa-solid fa-sort"></i> Code</td>
+                                           <td @click="sortCustomers('name')" class="col-2"><i class="fa-solid fa-sort"></i> Name</td>
+                                           <td @click="sortCustomers('phone')" class="col-2"><i class="fa-solid fa-sort"></i> Phone</td>
+                                           <td @click="sortCustomers('address')" class="col-4"><i class="fa-solid fa-sort"></i> Address</td>
+                                           <td @click="sortCustomers('created_at')" class="col-2"><i class="fa-solid fa-sort"></i> Member date</td>
                                        </tr>
                                        <tr>
                                         <td class="position-relative">
                                             <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" @click="checkAll" v-model="is_deleted">
                                         </td>
-                                            <td class="p-0">
-                                                <input @keyperss.enter="saveCustomer"  type="text" v-model="code" class="form-control-plaintext text-center" id="code" placeholder="Code">                                                                                       
+                                            <td class="">
+                                                <input @keyperss.enter="saveCustomer"  type="text" v-model="code" class="form-control-plaintext py-0 text-center" id="code" placeholder="Code">                                                                                       
                                             </td>
-                                            <td class="p-0">
-                                                <input  @keyperss.enter="saveCustomer" type="text" v-model="name" :class="{'border-danger' : v$.name.$errors.length}" class="form-control-plaintext text-center" id="name" placeholder="Name">                                               
+                                            <td class="">
+                                                <input  @keyperss.enter="saveCustomer" type="text" v-model="name"  class="form-control-plaintext py-0 " id="name" placeholder="Name">                                               
                                             </td>
-                                            <td class="p-0">
-                                                <input @keypress.enter="saveCustomer" type="tel" v-model="phone"  :class="{'border-danger' : v$.phone.$errors.length}"  class="form-control-plaintext text-center" id="phone" placeholder="Phone">                                            
+                                            <td class="">
+                                                <input @keypress.enter="saveCustomer" type="tel" v-model="phone"    class="form-control-plaintext py-0 text-center" id="phone" placeholder="Phone">                                            
                                             </td>
-                                            <td class="p-0">
-                                                <input @keypress.enter="saveCustomer" type="text" v-model="address"  :class="{'border-danger' : v$.address.$errors.length}"  class="form-control-plaintext text-center" id="address" placeholder="Address">                                              
+                                            <td class="">
+                                                <input @keypress.enter="saveCustomer" type="text" v-model="address"   class="form-control-plaintext py-0" id="address" placeholder="Address">                                              
                                             </td>
-                                            <td class="p-0">
-                                                <flat-pickr @change="saveCustomer" class="form-control-plaintext form-control-sm text-center" v-model="created_at"  :config="config" />
+                                            <td class="">
+                                                <flat-pickr @change="saveCustomer" class="form-control-plaintext py-0  text-center" v-model="created_at"  :config="config" />
                                             </td>
                                         </tr>
                                        
@@ -87,20 +87,20 @@
                                         <td class="position-relative">
                                             <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" v-model="p.is_deleted">
                                         </td>
-                                           <td :class="{'table-secondary': sort_item ==='code'}" class="pt-2 position-relative">
+                                           <td :class="{'table-secondary': sort_item ==='code'}" class=" position-relative">
                                             <!--<a class="text-danger position-absolute start-0 top-50 translate-middle ps-2" href="#!" @click="removeCustomer(i, p)"><i class="fa-solid fa-square-minus"></i></a>-->                                                                                        
                                                 {{p.code}}
                                             </td>
-                                           <td :class="{'table-secondary': sort_item ==='name'}" class="p-0">
-                                                <input @keyup="setEdit(p)"  @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center   m-0" v-model="p.name">
+                                           <td :class="{'table-secondary': sort_item ==='name'}" class="">
+                                                <input @keyup="setEdit(p)"  @keypress.enter="saveEdit" type="text" class="form-control-plaintext  py-0 " v-model="p.name">
                                            </td>
-                                           <td :class="{'table-secondary': sort_item ==='phone'}" class="p-0">
-                                            <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center  m-0" v-model="p.phone">
+                                           <td :class="{'table-secondary': sort_item ==='phone'}" class="">
+                                            <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center py-0" v-model="p.phone">
                                            </td>
-                                           <td :class="{'table-secondary': sort_item ==='address'}" class="p-0">
-                                            <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center m-0" v-model="p.address">
+                                           <td :class="{'table-secondary': sort_item ==='address'}" class="">
+                                            <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext py-0" v-model="p.address">
                                            </td>
-                                           <td :class="{'table-secondary': sort_item ==='created_at'}" class="pt-2">{{showTime(p.created_at)}}</td>
+                                           <td :class="{'table-secondary': sort_item ==='created_at'}" >{{showTime(p.created_at)}}</td>
                                        </tr>
                                    </tbody>
                                </table>
@@ -224,9 +224,11 @@ import { required, email ,helpers} from '@vuelidate/validators'
             })
         },
         checkAll(){
+           setTimeout(()=>{
             this.customers=this.customers.map((s)=>{
-               return {...s, is_deleted : this.is_check_all ? false : true}
+               return {...s, is_deleted : this.is_check_all ? true : false}
             })
+           },100)
         },
       
         async removeCustomer(i, p){

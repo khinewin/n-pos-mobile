@@ -2,7 +2,7 @@
  <div>           
         <PageHeader page-title="Medicine code" page-code="medicineCode" :msg-type="msg.type" :msg-info="msg.info"/>
         <div class="container-fluid">
-            <div class="row mb-2 justify-content-end">   
+            <div class="row  justify-content-end">   
                 <div class="col-sm-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete</span>
@@ -27,11 +27,11 @@
                         <div class="card-body p-2">
                             <div class="row g-2">
                                 <div class="form-floating col-sm-6 col-lg-12">
-                                    <input type="search" id="search_by_code" v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control form-control-sm">
+                                    <input type="search" id="search_by_code" v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
                                     <label for="search_by_code" class="small">Code</label>
                                 </div>
                                 <div class="form-floating col-sm-6 col-lg-12">
-                                    <input type="search" id="search_by_description" v-model="search_by_description" @keyup="searchProducts" placeholder="Description" class="form-control form-control-sm">
+                                    <input type="search" id="search_by_description" v-model="search_by_description" @keyup="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
                                     <label for="search_by_description" class="small">Description</label>
                                 </div>
                             </div> 
@@ -52,21 +52,21 @@
                                 <table class="table table-bordered mb-0">
                                     <tbody> 
                                         <tr class="text-center table-secondary" style="cursor: context-menu;">
-                                            <td class="">
+                                            <td class="co-1">
                                                 <input type="checkbox" @click="checkAll" v-model="is_check_all">
                                             </td>
-                                            <td class="">Code</td>
-                                            <td class="">Description</td>
+                                            <td class="col-3">Code</td>
+                                            <td class="col-8">Description</td>
                                         </tr>                                                                    
                                         <tr>
                                             <td class="position-relative">
                                                 <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" @click="checkAll" v-model="is_deleted">
                                             </td>
                                             <td>
-                                                <input placeholder="Code"  type="text" v-model="code_no" class="form-control-plaintext form-control-sm  text-center">
+                                                <input placeholder="Code"  type="text" v-model="code_no" class="form-control-plaintext py-0  text-center">
                                             </td>
                                             <td>
-                                                <input id="item_name" placeholder="Description" @keypress.enter="saveCode" :class="{'border-danger' : v$.item_name.$errors.length}"  type="text" v-model="item_name" class="form-control-plaintext form-control-sm ">
+                                                <input id="item_name" placeholder="Description" @keypress.enter="saveCode"   type="text" v-model="item_name" class="form-control-plaintext py-0 mx-2">
                                             </td>                                     
                                         </tr>     
                                                                 
@@ -77,12 +77,12 @@
                                         <td :class="{'table-secondary': sort_item ==='code_no'}" class="p-0  position-relative">
                                             <!---<a class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeProduct(i, p)"><i class="fa-solid fa-square-minus"></i></a>-->                                                                                       
                                             <span>
-                                                <input @click="setEdit(p)" @keyup="setEdit(p)" @keypress.enter="saveEdit" @paste="pasteEdit" type="text" class="form-control-plaintext form-control-sm text-center " v-model="p.code_no">
+                                                <input @click="setEdit(p)" @keyup="setEdit(p)" @keypress.enter="saveEdit" @paste="pasteEdit" type="text" class="form-control-plaintext py-0 text-center " v-model="p.code_no">
                                             </span>
                                         </td>
                                         <td :class="{'table-secondary': sort_item ==='item_name'}" class="p-0">
                                             <span>
-                                                <input @click="setEdit(p)" @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext form-control-sm ms-2" v-model="p.item_name">
+                                                <input @click="setEdit(p)" @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext py-0 mx-2" v-model="p.item_name">
                                             </span>
                                         </td>                                       
                                     </tr>
@@ -114,7 +114,7 @@
                                         </td>
                                     </tr>
                                     <tr class="table-primary"  data-bs-toggle="modal" data-bs-target="#selectPackingSizeModal">
-                                        <td class="col-1 py-1">Packing size <span class="float-end"><i class="fa-solid fa-caret-right"></i></span></td>
+                                        <td class="col-1">Packing size <span class="float-end"><i class="fa-solid fa-caret-right"></i></span></td>
                                         <td :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]" class="text-center col-3">
                                             <div v-if="editItem.packing_size.smallest_unit && editItem.packing_size.medium_unit">
                                                     {{calPackingSize(editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit, editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty)}}
@@ -122,7 +122,7 @@
                                         </td>
                                     </tr>
                                     <tr class="">
-                                        <td class="py-1">Pharmacy Inv Bal</td>                                       
+                                        <td class="">Pharmacy Inv Bal</td>                                       
                                         <td class="text-center" :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]">
                                             <div  v-if="editItem.packing_size">
                                                 {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            
@@ -130,7 +130,7 @@
                                         </td>
                                     </tr>    
                                     <tr class="">
-                                        <td class="py-1">Main Inv Bal</td>                                      
+                                        <td class="">Main Inv Bal</td>                                      
                                         <td class="text-center" :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]">
                                             <div  v-if="editItem.packing_size">
                                                 {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.main_qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            
@@ -150,56 +150,56 @@
                                         </td>
                                     </tr>                        
                                     <tr class="">
-                                        <td class="pt-2">Pur price</td>
-                                        <td class="text-center p-0" v-if="editItem.packing_size.largest_unit !=null">
+                                        <td class="">Pur price</td>
+                                        <td class="text-center" v-if="editItem.packing_size.largest_unit !=null">
                                             <span >
-                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calPurPrice('largest_unit')" type="number" v-model="editItem.pur_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
+                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calPurPrice('largest_unit')" type="number" v-model="editItem.pur_price.largest_unit" class="form-control-plaintext p-0 text-center">
                                             </span>
                                         </td>
-                                        <td class="text-center p-0">
+                                        <td class="text-center">
                                             <span v-if="editItem.packing_size.medium_unit !=null">
-                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.medium_unit"  @keyup="calPurPrice('medium_unit')"  type="number" v-model="editItem.pur_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
+                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.medium_unit"  @keyup="calPurPrice('medium_unit')"  type="number" v-model="editItem.pur_price.medium_unit" class="form-control-plaintext p-0 text-center">
                                             </span>
                                         </td>
-                                        <td class="text-center p-0">
+                                        <td class="text-center">
                                             <span v-if="editItem.packing_size.smallest_unit !=null">
-                                                <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.smallest_unit" @keyup="calPurPrice('smallest_unit')" type="number" v-model="editItem.pur_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
+                                                <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.smallest_unit" @keyup="calPurPrice('smallest_unit')" type="number" v-model="editItem.pur_price.smallest_unit" class="form-control-plaintext p-0 text-center">
                                             </span>
                                         </td>                                        
                                     </tr>
                                     <tr class="">
-                                        <td class="pt-2">Retail price</td>
-                                        <td class="text-center p-0" v-if="editItem.packing_size.largest_unit !=null">
+                                        <td class="">Retail price</td>
+                                        <td class="text-center" v-if="editItem.packing_size.largest_unit !=null">
                                             <span >
-                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="editItem.retail_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
+                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="editItem.retail_price.largest_unit" class="form-control-plaintext p-0 text-center">
                                             </span>
                                         </td>
-                                        <td class="text-center p-0">
+                                        <td class="text-center">
                                             <span v-if="editItem.packing_size.medium_unit !=null">
-                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.medium_unit"  @keyup="calRetailPrice('medium_unit')"  type="number" v-model="editItem.retail_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
+                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.medium_unit"  @keyup="calRetailPrice('medium_unit')"  type="number" v-model="editItem.retail_price.medium_unit" class="form-control-plaintext p-0 text-center">
                                             </span>
                                         </td>
-                                        <td class="text-center p-0">
+                                        <td class="text-center">
                                             <span v-if="editItem.packing_size.smallest_unit !=null">
-                                                <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.smallest_unit" @keyup="calRetailPrice('smallest_unit')" type="number" v-model="editItem.retail_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
+                                                <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.smallest_unit" @keyup="calRetailPrice('smallest_unit')" type="number" v-model="editItem.retail_price.smallest_unit" class="form-control-plaintext p-0 text-center">
                                             </span>
                                         </td>                                        
                                     </tr>
                                     <tr class="">
-                                        <td class="pt-2">Wholesale price</td>
-                                        <td class="text-center p-0" v-if="editItem.packing_size.largest_unit != null">
+                                        <td class="">Wholesale price</td>
+                                        <td class="text-center" v-if="editItem.packing_size.largest_unit != null">
                                             <span >
-                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calWholesalePrice('largest_unit')" type="number" v-model="editItem.whole_sale_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
+                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calWholesalePrice('largest_unit')" type="number" v-model="editItem.whole_sale_price.largest_unit" class="form-control-plaintext p-0 text-center">
                                             </span>
                                         </td>
-                                        <td class="text-center p-0">
+                                        <td class="text-center">
                                             <span v-if="editItem.packing_size.medium_unit !=null">
-                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.medium_unit"  @keyup="calWholesalePrice('medium_unit')"  type="number" v-model="editItem.whole_sale_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
+                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.medium_unit"  @keyup="calWholesalePrice('medium_unit')"  type="number" v-model="editItem.whole_sale_price.medium_unit" class="form-control-plaintext p-0 text-center">
                                             </span>
                                         </td>
-                                        <td class="text-center p-0">
+                                        <td class="text-center">
                                             <span v-if="editItem.packing_size.smallest_unit !=null">
-                                                <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.smallest_unit" @keyup="calWholesalePrice('smallest_unit')" type="number" v-model="editItem.whole_sale_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
+                                                <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.smallest_unit" @keyup="calWholesalePrice('smallest_unit')" type="number" v-model="editItem.whole_sale_price.smallest_unit" class="form-control-plaintext p-0 text-center">
                                             </span>
                                         </td>                                        
                                     </tr>                                              
@@ -329,9 +329,11 @@ export default {
             })
         },
         checkAll(){
-            this.products=this.products.map((s)=>{
-               return {...s, is_deleted : this.is_check_all ? false : true}
-            })
+            setTimeout(()=>{
+                this.products=this.products.map((s)=>{
+                    return {...s, is_deleted : this.is_check_all ? true : false}
+                })
+            }, 100)
         },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);

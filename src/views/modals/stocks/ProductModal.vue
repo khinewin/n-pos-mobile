@@ -9,18 +9,18 @@
                         <div class="row g-1">
                             <div class="col-lg-3">
                                 <div class="card  shadow">
-                                    <div class="card-body p-2 small">
-                                        <div class="row g-1">
+                                    <div class="card-body p-2 ">
+                                        <div class="row g-1 small">
                                             <div class="col-md-6 col-lg-12">
                                                 <div class="form-floating">
-                                                    <input type="number" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control form-control-sm">
-                                                    <label for="search_by_code" class="small">Code</label>
+                                                    <input type="text" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
+                                                    <label for="search_by_code" class="">Code</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-lg-12">
                                                 <div class="form-floating">
-                                                    <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Description" class="form-control form-control-sm">
-                                                    <label for="search_by_item_name" class="small">Description</label>
+                                                    <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
+                                                    <label for="search_by_item_name" class="">Description</label>
                                                 </div> 
                                             </div>
                                         </div>

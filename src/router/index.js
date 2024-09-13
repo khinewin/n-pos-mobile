@@ -82,41 +82,41 @@ const router = createRouter({
 
     },
     {
-      path: '/opening-stocks',
+      path: '/stocks',
       name: 'OpeningStocks',     
       component: OpeningStocks,
-      meta : {title: "N-Pharmacy | Opening stocks"}
+      meta : {title: "N-Pharmacy |  Stocks / History"}
 
     },
     {
-      path: '/opening-stocks/new',
+      path: '/stocks/new',
       name: 'NewOpeningStocks',     
       component: NewOpeningStocks,
-      meta : {title: "N-Pharmacy | New opening stock"}
+      meta : {title: "N-Pharmacy | Stocks / New"}
     },
     {
-      path: '/opening-stocks/:id/edit',
+      path: '/stocks/:id/edit',
       name: 'EditOpeningStocks',     
       component: EditOpeningStocks,
-      meta : {title: "N-Pharmacy | Edit opening stock"}
+      meta : {title: "N-Pharmacy | Stocks / Edit"}
     },
     {
       path: '/purchase',
       name: 'Purchase',     
       component: Purchase,
-      meta : {title: "N-Pharmacy | Purchase"}
+      meta : {title: "N-Pharmacy | Purchase / History"}
     },
     {
       path: '/purchase/:id/edit',
       name: 'EditPurchase',     
       component: EditPurchase,
-      meta : {title: "N-Pharmacy | Edit purchase"}
+      meta : {title: "N-Pharmacy | Purchase / Edit"}
     },
     {
       path: '/purchase/add',
       name: 'AddPurchase',     
       component: AddPurchase,
-      meta : {title: "N-Pharmacy | Add purchase"}    },
+      meta : {title: "N-Pharmacy | Purchase / New"}    },
    
     {
       path: '/suppliers',

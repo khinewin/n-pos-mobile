@@ -19,12 +19,21 @@
     font-style: normal;
   }
 
-.table tbody td {
+  .table tbody td {
     font-size: 13px;
-    padding-top: 1px;
-    padding-bottom: 1px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     padding-left: 2px;
-    padding-right: 2px;;
+    padding-right: 2px;
+   
+}
+
+.table-report tbody td {
+    font-size: 13px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
 .min-vh-80{
@@ -57,3 +66,22 @@ min-height: 60vh !important;
 .vh-60{
     height: 60vh !important;
 }
+
+
+input[type="number"] {
+    direction: rtl; /* Switch text direction to right-to-left */
+  }
+
+  /* Style for the increment and decrement buttons in WebKit browsers (Chrome, Safari, Edge) */
+  input[type="number"]::-webkit-inner-spin-button {
+    position: relative;
+    left: -30px; /* Move the buttons to the left */
+  }
+
+  /* Prevent additional spin buttons in Firefox */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+

@@ -121,6 +121,22 @@
                 </div>
             </div>
          </div>
+         <div>
+            <table class="table table-bordered border-dark table-hover">
+                <tbody>
+                    <tr class="text-center fw-bold">
+                        <td>Total amount</td>
+                        <td>total paid</td>
+                        <td>Total credit</td>
+                    </tr>
+                    <tr class="text-end">
+                        <td>{{total_amount}}</td>
+                        <td>{{total_paid}}</td>
+                        <td>{{total_credit}}</td>
+                    </tr>
+                </tbody>
+            </table>
+         </div>
     </div>
 </template>
 <script>
@@ -135,6 +151,9 @@ export default {
             reports:[],
             salesData:[],          
             isLoading:false,
+            total_amount:0,
+            total_paid:0,
+            total_credit:0,
             msg : {
                 type :"",
                 info :"",
@@ -221,7 +240,16 @@ export default {
             }           
             onSnapshot(query_url, (snapShot)=>{
                 let saleItems=ss.sales(snapShot);    
-                saleItems=saleItems.filter((f)=>f.credit > 0)            
+                saleItems=saleItems.filter((f)=>f.credit > 0)      
+                saleItems=saleItems.map((s)=>{
+                    const debt_paid=s.debt_payments.reduce((accu, cur)=>accu + cur.paid,0)
+
+                    this.total_amount+= s.net_amount;
+                    this.total_paid += s.paid + debt_paid;
+                    this.total_credit +=s.credit;
+
+                    return {...s, "paid": s.paid + debt_paid}
+                })      
                 this.reports=saleItems;
                 this.isLoading=false;
             })

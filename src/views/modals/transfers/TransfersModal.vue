@@ -10,33 +10,39 @@
                         <div class="col-lg-3">                                                         
                                 <div class="card shadow">
                                     <div class="card-body p-2">
-                                       <div class="row g-1">
+                                       <div class="row g-1 small">
                                         <div class="col-md-6 col-lg-12">
                                             <div class="form-floating ">
-                                                <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchTransfers" placeholder="Voucher no." class="form-control form-control-sm">
-                                                <label for="search_by_voucher_no" class="small">Voucher no.</label>
+                                                <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchTransfers" placeholder="Voucher no." class="form-control-plaintext border-bottom">
+                                                <label for="search_by_voucher_no" class="">Voucher no.</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-lg-12">
-                                            <div class="form-floating ">
-                                                <input type="date" v-model="search_from_date" @change="searchTransfers" placeholder="From pur date" class="form-control form-control-sm">
-                                                <label for="search_from_date" class="small">From date</label>
+                                            <div class="input-group mb-2">
+                                            <div class="form-floating">
+                                                <flat-pickr @change="searchTransfers" class="form-control-plaintext border-bottom" v-model="search_from_date" id="from_date" :config="config" />
+                                                <label for="from_date">From date</label>
                                             </div>
+                                            <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
+                                           </div>
+                                        </div>
+                                        <div class="col-md-6 col-lg-12">
+                                            <div class="input-group mb-2">
+                                            <div class="form-floating">
+                                                <flat-pickr @change="searchTransfers" class="form-control-plaintext border-bottom" v-model="search_to_date" id="from_date" :config="config" />
+                                                <label for="from_date">To date</label>
+                                            </div>
+                                            <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
+                                           </div>
                                         </div>
                                         <div class="col-md-6 col-lg-12">
                                             <div class="form-floating ">
-                                                <input type="date" v-model="search_to_date" @change="searchTransfers" placeholder="To pur date" class="form-control form-control-sm">
-                                                <label for="search_to_date" class="small">To date</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-lg-12">
-                                            <div class="form-floating ">
-                                                <select class="form-select form-select-sm" @change="searchTransfers" v-model="search_from_location" aria-placeholder="From location">
-                                                    <option value="">From location</option>
-                                                    <option>Store</option>
-                                                    <option>Shop</option>
+                                                <select class="form-control-plaintext border-bottom" @change="searchTransfers" v-model="search_from_location" aria-placeholder="From location">
+                                                    <option value="">All</option>
+                                                    <option>Main</option>
+                                                    <option>Pharmacy</option>
                                                 </select>
-                                                <label for="search_from_location" class="small">From location</label>
+                                                <label for="search_from_location" class="">From location</label>
                                             </div>
                                         </div>
                                     </div>   
@@ -105,7 +111,12 @@ import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, 
 import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/transfers"
+import FlatPickr from 'vue-flatpickr-component';
+
 export default {
+    components:{
+        FlatPickr,
+    },
    props:['storePurchase'],
    data(){
        return{
@@ -117,37 +128,40 @@ export default {
            search_to_date:"",
            search_from_location:"",
 
+           from_location:"All",
+
             isUpdating:false,
            isLoading:false,
+           config: {
+                dateFormat: 'd/m/Y', // Flatpickr options
+                enableTime: false,
+                wrap: true, // set wrap to true only when using 'input-group'
+               // altFormat: 'M j, Y',
+            },  
        }
    },
   
    mounted() {    
+    this.setDate();
        const myModalEl = document.getElementById('transfersModal')
        myModalEl.addEventListener('show.bs.modal', event => {                
        })   
+       this.fetchTransfers();   
             
    },
-   created(){
-       if(this.user !==null){          
-               this.fetchTransfers();                 
-       }
-   },
+ 
    computed:{
        user(){
            return this.$store.getters.user;
        },
        
    },
-   watch:{       
-       user(data){
-               if(data !==null){             
-                    this.isLoading=true;      
-                   this.fetchTransfers();           
-           }
-       }     
-   },
+ 
    methods:{
+    setDate(){
+            this.search_from_date=hp.setSearchFromDate();
+            this.search_to_date=hp.setSearchToDate();
+        },
        updateTransfers(){
                this.isUpdating=true;
                this.fetchTransfers();
@@ -158,32 +172,26 @@ export default {
        },
        clearSearch(){
            this.search_by_voucher_no="";
-           this.search_by_supplier="";
-           this.search_from_date="";
-           this.search_to_date="";
+           this.search_from_location="";
+           this.setDate();
            this.searchTransfers();
        },
        searchTransfers(){
-           if(this.search_by_voucher_no){
+            this.fetchTransfers();
+       },
+       displayTransfers(){
+        if(this.search_by_voucher_no && this.search_from_location){
+               this.transfers=this.transfersData.filter((f)=>{
+                       return f.from_location===this.search_from_location && f.voucher_no== this.search_by_voucher_no;
+               })
+        }else   if(this.search_by_voucher_no){
                this.transfers=this.transfersData.filter((f)=>{
                        return f.voucher_no===Number(this.search_by_voucher_no);
                })
-           }else if(this.search_from_date && this.search_to_date && this.search_from_location){
-                const searchFromDate=Timestamp.fromDate(new Date(this.search_from_date));
-                const searchToDate=Timestamp.fromDate(new Date(this.search_to_date));
-                this.transfers=this.transfersData.filter((f)=>{
-                        return  f.created_at >= searchFromDate && f.created_at <= searchToDate && f.from_location===this.search_from_location; 
-                })   
            }else if(this.search_from_location){
                 this.transfers=this.transfersData.filter((f)=>{
                         return f.from_location===this.search_from_location;
                 })
-           }else if(this.search_from_date && this.search_to_date){
-                const searchFromDate=Timestamp.fromDate(new Date(this.search_from_date));
-                const searchToDate=Timestamp.fromDate(new Date(this.search_to_date));
-                this.transfers=this.transfersData.filter((f)=>{
-                        return  f.created_at >= searchFromDate && f.created_at <= searchToDate; 
-                })   
            }else{
                    this.transfers= this.transfersData.filter((p, i)=>{
                            if(i < 20){
@@ -194,13 +202,18 @@ export default {
        },
      
     async fetchTransfers(){
-       const query_url = query(collection(db, "transfers"),  orderBy("created_at", "desc"));
+        const from_date=Timestamp.fromDate(hp.searchFromDate(this.search_from_date))
+        const to_date=Timestamp.fromDate(hp.searchToDate(this.search_to_date))        
+        let query_url="";         
+        if(this.search_from_date && this.search_to_date){
+            query_url = query(collection(db, "transfers"), where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
+        }
        onSnapshot(query_url, (snapShot)=>{
         const transfers=ss.transfers(snapShot);      
         this.transfersData=transfers;
         this.isLoading=false;
         this.isUpdating=false;
-        this.searchTransfers();
+        this.displayTransfers();
        })      
       } ,
       showTime(t){

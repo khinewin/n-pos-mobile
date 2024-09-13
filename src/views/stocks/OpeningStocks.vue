@@ -1,6 +1,6 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="Stocks" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader page-title="Stocks / History" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">
                 <div class="col-sm-2 d-grid">
@@ -8,13 +8,13 @@
                 </div>                
                 <div class="col-sm-2 d-grid">
                         <button @click="goEdit" class="btn btn-sm" :class="{'disabled': !voucher_no || stock_user.uid !== user.uid}"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                </div>
-                <div class="col-sm-2 d-grid">
-                        <router-link :to="{name : 'NewOpeningStocks'}" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New</router-link>
-                </div>
+                </div>                
                 <div class="col-sm-2 d-grid">
                     <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#stocksModal"><i class="fa-solid fa-folder-tree"></i> Browse</button>
                 </div>
+                <div class="col-sm-2 d-grid">
+                    <router-link :to="{name : 'NewOpeningStocks'}" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New</router-link>
+            </div>
                 <div class="col-sm-2 d-grid">
                         <button @click="closeOpeningStock" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                 </div>
@@ -22,27 +22,26 @@
             <div class="card shadow min-vh-75" id="printMe">
                 <div class="d-none d-print-block">
                     <LargePrintHeader />
-                    <div>Opening stocks</div>
+                    <div>Stocks</div>
                 </div>
                 <div class="card-body p-2">
                     <form @submit.prevent="saveStocks">
                         <div class="row justify-content-end mb-2">
-                            <div class="col-sm-6 col-lg-4">
+                            <div class="col-sm-6">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-6 py-1">Voucher no. :</td>
-                                            <td class="col-6 py-1">
+                                            <td class="text-end col-4 ">Voucher no. :</td>
+                                            <td class="col-8">
                                                 {{voucher_no}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end py-1">Date :</td>
-                                            <td class="py-1">
+                                            <td class="text-end">Date :</td>
+                                            <td class="">
                                                <span v-if="created_at"> {{showTime(created_at)}}</span>
                                             </td>
-                                        </tr>
-                                       
+                                        </tr>                                       
                                     </tbody>
                               </table>
                             </div>
@@ -51,7 +50,7 @@
                             <tbody>
                                 <tr class=" fw-bold table-secondary text-center">
                                     <td class="col-1 ">Code</td>
-                                    <td class="col-1">Desc</td>
+                                    <td class="col-2">Description</td>
                                     <td class="col-1">Packing size</td>
                                     <td class="col-1">Main Inv Bal</td>     
                                     <td class="col-1">Pharmacy Inv Bal</td>   

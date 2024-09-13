@@ -1,6 +1,6 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="New adjustment" page-code="addAdjustment" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader page-title="Adjustments / New" page-code="addAdjustment" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                
                 <div class="col-sm-2 d-grid">
@@ -21,20 +21,20 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-2 py-1">Location :</td>
-                                            <td class="col-2 py-0">
-                                                <select v-model="location" class="form-control-plaintext form-control-sm  border-bottom" :disabled="storeItems.length > 0">
+                                            <td class="text-end col-2 ">Location :</td>
+                                            <td class="col-2">
+                                                <select v-model="location" class="form-control-plaintext py-0  border-bottom" :disabled="storeItems.length > 0">
                                                     <option>Main</option>
                                                     <option>Pharmacy</option>
                                                 </select>
                                             </td>
-                                            <td class="text-end col-2 py-1">Voucher no. :</td>
-                                            <td class="col-2 py-0">
-                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext form-control-sm  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
+                                            <td class="text-end col-2 ">Voucher no. :</td>
+                                            <td class="col-2">
+                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext py-0  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
                                             </td>                                       
-                                            <td class="col-2 text-end py-1">Date :</td>
-                                            <td class="col-2 py-0">
-                                                <flat-pickr class="form-control-plaintext form-control-sm border-bottom" v-model="created_at"  :config="config" />
+                                            <td class="col-2 text-end ">Date :</td>
+                                            <td class="col-2">
+                                                <flat-pickr class="form-control-plaintext py-0 border-bottom" v-model="created_at"  :config="config" />
                                             </td>
                                         </tr>                                       
                                     </tbody>
@@ -69,7 +69,7 @@
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.before_adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>
                                     <td>
-                                        <select v-model="st.adj_type" class="text-center form-control-plaintext form-control-sm" @change="setAdjQty">
+                                        <select v-model="st.adj_type" class="text-center form-control-plaintext py-0" @change="setAdjQty">
                                             <option>Increment</option>
                                             <option>Decrement</option>
                                         </select>
@@ -81,13 +81,13 @@
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.after_adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>      
                                     <td class="p-0">
-                                        <select class="form-control-plaintext form-control-sm text-center" v-model="st.rts_rfs">
+                                        <select class="form-control-plaintext py-0 text-center" v-model="st.rts_rfs">
                                             <option>Yes</option>
                                             <option>No</option>
                                         </select>
                                     </td>                                                         
                                     <td class="p-0">
-                                        <input  type="text" v-model="st.remark" class="form-control-plaintext form-control-sm form-control-sm text-center" placeholder="Remark">                                       
+                                        <input  type="text" v-model="st.remark" class="form-control-plaintext py-0 text-center" placeholder="Remark">                                       
                                     </td>              
                                                                                             
                                 </tr>         

@@ -10,35 +10,35 @@
                         <div class="col-lg-3">                                                         
                                 <div class="card shadow">
                                     <div class="card-body p-2">
-                                        <div class="row g-1">
+                                        <div class="row g-1 small">
                                            <div class="col-md-4 col-lg-12">
                                             <div class="form-floating">
-                                                <input type="search" id="search_by_voucher_no" @paste="searchSales" v-model="search_by_voucher_no" @keypress.enter="searchSales" placeholder="Voucher no." class="form-control form-control-sm">
-                                                <label for="search_by_voucher_no" class="small">Voucher no.</label>
+                                                <input type="search" id="search_by_voucher_no" @paste="searchSales" v-model="search_by_voucher_no" @keypress.enter="searchSales" placeholder="Voucher no." class="form-control-plaintext border-bottom">
+                                                <label for="search_by_voucher_no" class="">Voucher no.</label>
                                             </div>
                                            </div>
                                            <div class="col-md-4 col-lg-12">
                                             <div class="form-floating">
-                                                <input type="search" id="search_by_customer" v-model="search_by_customer" @keypress.enter="searchSales" placeholder="Customer name" class="form-control form-control-sm">
-                                                <label for="search_by_customer" class="small">Customer name</label>
+                                                <input type="search" id="search_by_customer" v-model="search_by_customer" @keypress.enter="searchSales" placeholder="Customer name" class="form-control-plaintext border-bottom">
+                                                <label for="search_by_customer" class="">Customer name</label>
                                             </div>
                                            </div>
                                            <div class="col-md-4 col-lg-12">
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
-                                                    <flat-pickr @change="searchSales" class="form-control form-control-sm" v-model="search_by_from_sale_date" id="from_date" :config="config" />
+                                                    <flat-pickr @change="searchSales" class="form-control-plaintext border-bottom" v-model="search_by_from_sale_date" id="from_date" :config="config" />
                                                     <label for="from_date">From date</label>
                                                 </div>
-                                                <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                                <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                                </div>
                                            </div>
                                            <div class="col-md-4 col-lg-12">
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
-                                                    <flat-pickr @change="searchSales" class="form-control form-control-sm" v-model="search_by_to_sale_date" id="from_date" :config="config" />
-                                                    <label for="from_date">From date</label>
+                                                    <flat-pickr @change="searchSales" class="form-control-plaintext border-bottom" v-model="search_by_to_sale_date" id="to_date" :config="config" />
+                                                    <label for="to_date">To date</label>
                                                 </div>
-                                                <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                                <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                                </div>
                                            </div>                                      
                                     </div>
@@ -171,12 +171,7 @@ export default {
          this.fetchSales();        
        },    
 
-    displaySales(){
-        if(this.search_by_customer && this.search_by_voucher_no){
-            this.sales=this.salesData.filter((f)=>{
-               return f.customer.name.toLowerCase().includes(this.search_by_customer.toLowerCase()) && f.voucher_no==Number(this.search_by_voucher_no)
-            })
-       }else
+    displaySales(){     
         if(this.search_by_customer){
             this.sales=this.salesData.filter((f)=>f.customer.name.toLowerCase().includes(this.search_by_customer.toLowerCase()))
        }else

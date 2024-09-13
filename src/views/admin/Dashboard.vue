@@ -30,7 +30,7 @@
                 <router-link class="btn btn-sm" :to="{name : 'OpeningStocks'}"><i class="fa-solid fa-money-bill-trend-up"></i> Stocks</router-link>
             </div>
             <div class="col-sm-2 col-lg-3 d-grid">
-                <router-link class="btn btn-sm" :to="{name : 'Products'}"><i class="fa-solid fa-list-check"></i> Products code</router-link>
+                <router-link class="btn btn-sm" :to="{name : 'Products'}"><i class="fa-solid fa-list-check"></i> Medicine code</router-link>
             </div>
             <div class="col-sm-2 col-lg-3 d-grid">
                 <router-link class="btn btn-sm" :to="{name : 'Suppliers'}"><i class="fa-solid fa-person-walking-luggage"></i> Suppliers</router-link>

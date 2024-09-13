@@ -75,12 +75,13 @@ export default {
             btn.click();
         },
         saveDiscount(){
+            if(this.ei.discount== undefined) return false;
             this.$emit("saveDiscount", this.ei)
         },
         clearDiscount(){
-            this.ei.dis_amount=0;
-            this.ei.dis_qty=0;
-            this.ei.dis_percent=0;
+            this.ei.dis_amount="";
+            this.ei.dis_qty="";
+            this.ei.dis_percent="";
             this.ei.dis_qty_unit="";
             const e=this.ei;
             e.discount=0;           

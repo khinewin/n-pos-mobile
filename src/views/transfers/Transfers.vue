@@ -1,6 +1,6 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="Transfers" page-code="transfers" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader page-title="Transfers / History" page-code="transfers" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                
                 <div class="col-sm-2 d-grid">
@@ -8,13 +8,13 @@
                 </div>                
                 <!--<div class="col-sm-2 d-grid">
                         <button @click="goEdit" class="btn btn-sm" :class="{'disabled': !voucher_no || transfer_user.uid !== user.uid}"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                </div>-->
-                <div class="col-sm-2 d-grid">
-                        <router-link :to="{name : 'AddTransfer'}" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New</router-link>
-                </div>
+                </div>-->               
                 <div class="col-sm-2 d-grid">
                     <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#transfersModal"><i class="fa-solid fa-folder-tree"></i> Browse</button>
                 </div>
+                <div class="col-sm-2 d-grid">
+                    <router-link :to="{name : 'AddTransfer'}" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New</router-link>
+            </div>
                 <div class="col-sm-2 d-grid">
                         <button @click="closeTransfer" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                 </div>
@@ -27,36 +27,36 @@
                 <div class="card-body p-2">
                     <form @submit.prevent="saveTransfers">
                         <div class="row justify-content-end">
-                            <div class="col-sm-6 col-lg-4">
+                            <div class="col-sm-6">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4 pt-2 fw-bold">From location :</td>
-                                            <td class="col-8 pt-2">
+                                            <td class="text-end col-4">From location :</td>
+                                            <td class="col-8">
                                                 {{from_location}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end pt-2 fw-bold">To location :</td>
-                                            <td class="pt-2">
+                                            <td class="text-end">To location :</td>
+                                            <td class="">
                                                 {{to_location}}
                                             </td>
                                         </tr>                                       
                                     </tbody>
                               </table>
                             </div>
-                            <div class="col-sm-6 col-lg-4">
+                            <div class="col-sm-6">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4 pt-2 fw-bold">Voucher no. :</td>
-                                            <td class="col-8 pt-2">
+                                            <td class="text-end col-4">Voucher no. :</td>
+                                            <td class="col-8">
                                                 {{voucher_no}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end pt-2 fw-bold">Date :</td>
-                                            <td class="pt-2">
+                                            <td class="text-end">Date :</td>
+                                            <td class="">
                                                 <span v-if="created_at">{{showTime(created_at)}}</span>
                                             </td>
                                         </tr>                                       

@@ -5,20 +5,35 @@
          <div class="modal-content p-2">                         
                     <div class="row g-2">
                         <div class="col-4">                                                         
-                              <div class="card shadow">
+                              <div class="card shadow ">
                                 <div class="card-body p-2">
-                                        <div class="form-floating mb-2">
-                                          <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchStocks" placeholder="Voucher no." class="form-control form-control-sm">
-                                         <label for="search_by_voucher_no" class="small ">Voucher no.</label>
-                                        </div>
-                                        <div class="form-floating  mb-2">
-                                            <input type="date" v-model="search_by_from_date" @change="searchStocks" placeholder="From pur date" class="form-control form-control-sm">
-                                            <label for="search_by_from_pur_date" class="small ">From pur date</label>
-                                        </div>
-                                        <div class="form-floating  mb-2">
-                                            <input type="date" v-model="search_by_to_date" @change="searchStocks" placeholder="To pur date" class="form-control form-control-sm">
-                                            <label for="search_by_to_pur_date" class="small ">To pur date</label>
-                                        </div>                             
+                                        <div class="row small">
+                                            <div class="col-12">
+                                                <div class="form-floating mb-2">
+                                                    <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchStocks" placeholder="Voucher no." class="form-control-plaintext border-bottom">
+                                                   <label for="search_by_voucher_no" class=" ">Voucher no.</label>
+                                                  </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="input-group mb-2">
+                                                    <div class="form-floating">
+                                                        <flat-pickr @change="searchStocks" class="form-control-plaintext border-bottom" v-model="search_by_from_date" id="from_date" :config="config" />
+                                                        <label for="from_date">From date</label>
+                                                    </div>
+                                                    <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
+                                                   </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="input-group mb-2">
+                                                    <div class="form-floating">
+                                                        <flat-pickr @change="searchStocks" class="form-control-plaintext border-bottom" v-model="search_by_to_date" id="to_date" :config="config" />
+                                                        <label for="to_date">From date</label>
+                                                    </div>
+                                                    <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
+                                                   </div>
+                                            </div>
+                                        </div>                                        
+                                            
                                         <div class="row mt-2">
                                             <div class="col-6 d-grid">
                                                 <button class="btn btn-sm text-dark" @click="clearSearch"> <i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
@@ -43,7 +58,7 @@
                                         <tbody class="small text-center">
                                             <tr class="table-secondary">
                                                 <td>Voucher no.</td>
-                                                <td>Opening date</td>   
+                                                <td>Date</td>   
                                                 <td>User</td>                                 
                                             </tr>
                                             <tr v-if="isLoading">
@@ -75,8 +90,13 @@
 import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as ss from "@/lib/snapshot/stocks"
+import FlatPickr from 'vue-flatpickr-component';
+import * as hp from '@/lib/helper'
 export default {
    props:['storestock'],
+   components:{
+    FlatPickr
+   },
    data(){
        return{
            stocks:[],
@@ -86,37 +106,36 @@ export default {
            search_by_to_date:"",
            isLoading:false,
            isUpdating:false,
+           config: {
+                dateFormat: 'd/m/Y', // Flatpickr options
+                enableTime: false,
+                wrap: true, // set wrap to true only when using 'input-group'
+               // altFormat: 'M j, Y',
+            },  
        }
    },
   
    mounted() {    
+    this.setDate();
        const myModalEl = document.getElementById('stocksModal')
        myModalEl.addEventListener('show.bs.modal', event => {
                 
        })               
+       this.fetchStocks();                     
+
    },
-   created(){
-       if(this.user !==null){     
-                this.isLoading=true;     
-               this.fetchStocks();                 
-       }
-   },
+ 
    computed:{
        user(){
            return this.$store.getters.user;
-       },
-       
+       },       
    },
-   watch:{       
-       user(data){
-               if(data !==null){   
-                    this.isLoading=true;                
-                   this.fetchStocks();           
-           }
-       }
-     
-   },
+  
    methods:{
+    setDate(){
+            this.search_by_from_date=hp.setSearchFromDate();
+            this.search_by_to_date=hp.setSearchToDate();
+        },
     removeAfterAt(email) {
         const parts = email.split('@');
         return parts[0];
@@ -131,22 +150,18 @@ export default {
        },
        clearSearch(){
            this.search_by_voucher_no="";
-           this.search_by_from_date="";
-           this.search_by_to_date="";
+           this.search_by_from_date=hp.setSearchFromDate();
+           this.search_by_to_date=hp.setSearchToDate();
            this.searchStocks();
        },
        searchStocks(){
+            this.fetchStocks();
+       },
+       displayStocks(){
            if(this.search_by_voucher_no){
                this.stocks=this.stocksData.filter((f)=>{
                        return f.voucher_no===Number(this.search_by_voucher_no);
                })
-           }else
-            if(this.search_by_from_date && this.search_by_to_date){
-                const searchFromDate=Timestamp.fromDate(new Date(this.search_by_from_date));
-                const searchToDate=Timestamp.fromDate(new Date(this.search_by_to_date));
-                this.stocks=this.stocksData.filter((f)=>{
-                        return  f.created_at >= searchFromDate && f.created_at <= searchToDate; 
-                })   
            }else{
                    this.stocks= this.stocksData.filter((p, i)=>{
                            if(i < 20){
@@ -157,14 +172,19 @@ export default {
        },
      
     async fetchStocks(){
-       const query_url = query(collection(db, "openingStocks"), orderBy("created_at", "desc"));
+        const from_date=Timestamp.fromDate(hp.searchFromDate(this.search_by_from_date))
+        const to_date=Timestamp.fromDate(hp.searchToDate(this.search_by_to_date))   
+        let query_url="";
+        if(this.search_by_from_date && this.search_by_to_date){
+            query_url = query(collection(db, "openingStocks"), where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
+        } 
        onSnapshot(query_url, (snapShot)=>{
         const stocks=ss.stocks(snapShot);      
         this.stocksData=[];
         this.stocksData=stocks;
         this.isLoading=false;
         this.isUpdating=false;
-        this.searchStocks();
+        this.displayStocks();
        })
        
       } ,

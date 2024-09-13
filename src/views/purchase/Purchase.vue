@@ -1,6 +1,6 @@
 <template lang="">
     <div>
-        <PageHeader page-title="Purchases" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader page-title="Purchase / History" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
         <PurchaseModal @setCode="setCode"/>           
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">
@@ -31,14 +31,14 @@
                         <table class="table mb-0 table-borderless">
                             <tbody>
                                 <tr>
-                                    <td class=" col-6 text-end">Voucher no. <span class="">:</span></td>
-                                    <td class="col-6" style="border-bottom: 1px dotted;">
+                                    <td class=" col-4 text-end">Voucher no. <span class="">:</span></td>
+                                    <td class="col-8" >
                                         {{voucher_no}}
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class=" text-end">Location <span class="">:</span></td>
-                                    <td class=""  style="border-bottom: 1px dotted;">
+                                    <td class=""  >
                                         {{location}}
                                     </td>
                                 </tr>
@@ -50,8 +50,8 @@
                         <table class="table mb-0 table-borderless">
                             <tbody>                              
                                 <tr>
-                                    <td class="col-6 text-end">Pur date <span class="">:</span></td>
-                                    <td class="col-6"  style="border-bottom: 1px dotted;">
+                                    <td class="col-4 text-end">Pur date <span class="">:</span></td>
+                                    <td class="col-8"  >
                                         <div  v-if="pur_date">
                                             {{showTime(pur_date)}}
                                         </div>
@@ -59,7 +59,7 @@
                                 </tr>
                                 <tr>
                                     <td class="text-end">Supplier <span class="">:</span></td>
-                                    <td class=""  style="border-bottom: 1px dotted;">
+                                    <td class=""  >
                                         {{supplier_name}}
                                     </td>
                                 </tr>
@@ -75,7 +75,7 @@
                                 <td class="col-1">Exp. date</td>     
                                 <td class="col-1">Packing size</td>                              
                                 <td class="col-1" colspan="1">Qty</td>
-                                <td class="col-2">Unit price</td>                                    
+                                <td class="col-1">Unit price</td>                                    
                                 <td class="col-1">Discount</td>                                    
                                 <td class="col-1">Amount</td>
                                 <td class="col-1">Discount</td>

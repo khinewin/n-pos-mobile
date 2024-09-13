@@ -24,8 +24,7 @@
                     <td class="text-center">
                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.sale_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
                     </td>
-                    <td class="text-end">{{p.final_amount}}</td>
-               
+                    <td class="text-end">{{p.final_amount}}</td>               
                 </tr>
                 <tr>
                     <td colspan="4" class="text-end fw-bold">Total sale amount</td>
@@ -38,8 +37,7 @@
                 <tr>
                     <td colspan="4" class="text-end fw-bold">Credit</td>
                     <td class="text-end">{{r[2].credit}}</td>               
-                </tr>
-           
+                </tr>           
             </tbody>
 
             <tbody v-if="reports.length" class="table-group-divider">
@@ -159,11 +157,15 @@ export default {
                             sales.push({...data, 
                             group_customer:  res.customer.code,
                             customer_name: res.customer.name,
-                             voucher_no: res.voucher_no, credit: res.credit, paid: res.paid})
+                             voucher_no: res.voucher_no, credit: res.credit, paid: res.paid,
+                             debt_paid: res.debt_payments.reduce((accu, cur)=>accu + cur.paid,0)
+                            })
                         }else{
                             sales.push({...data, group_customer:  res.customer.code,
                             customer_name: res.customer.name,
-                            voucher_no: res.voucher_no, credit: 0, paid: 0})
+                            voucher_no: res.voucher_no, credit: 0, paid: 0,
+                            debt_paid: 0
+                         })
                         }                                 
                     })
             })
@@ -220,7 +222,7 @@ export default {
                     item.code_no=ren.code_no;                  
                     item.pur_price=ren.pur_price;                                           
                     item.credit += Number(ren.credit);
-                    item.paid += ren.paid;
+                    item.paid += ren.paid + ren.debt_paid;
                 })
                 return item;
            }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)
