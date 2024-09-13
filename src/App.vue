@@ -25,7 +25,7 @@ export default {
      //  await enableNetwork(db)
     },
     mounted() {
-        this.setCusrot();
+        
     },
     
     watch:{        

@@ -75,20 +75,21 @@ min-height: 60vh !important;
 }
 
 
+
 input[type="number"] {
-    direction: rtl; /* Switch text direction to right-to-left */
+    direction: rtl; 
   }
 
-  /* Style for the increment and decrement buttons in WebKit browsers (Chrome, Safari, Edge) */
+  /*
   input[type="number"]::-webkit-inner-spin-button {
     position: relative;
-    left: -30px; /* Move the buttons to the left */
+    left: -30px; 
   }
 
-  /* Prevent additional spin buttons in Firefox */
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
-
+    
+*/

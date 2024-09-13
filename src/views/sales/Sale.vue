@@ -153,7 +153,7 @@
                                         <tr>
                                             <td colspan="9" class="text-end " >Extra discount</td>
                                             <td class="text-end ">
-                                                <input @click="setInput" @mouseleave="setInput" :disabled="saleMode=='Sale / History'"  type="number"  @change="calTotal" @keyup="calTotal" v-model="extra_discount" class="form-control-plaintext py-0  text-end m-0">
+                                                <input @click="setInput" @mouseleave="setInput" :disabled="saleMode=='Sale / History'"  type="number"   @change="calTotal" @keyup="calTotal" v-model="extra_discount" class="form-control-plaintext py-0  text-end m-0">
                                             </td>
                                         </tr>
                                         <tr>
