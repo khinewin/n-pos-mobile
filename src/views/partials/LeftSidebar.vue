@@ -45,6 +45,9 @@
                           <li class="list-group-item list-group-item-action bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
                             <router-link class="nav-link" :to="{name : 'Reports'}"><i class="fa-solid fa-chart-pie"></i> Reports</router-link>
                           </li>
+                          <li class="list-group-item list-group-item-action bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
+                            <router-link class="nav-link" :to="{name : 'BackupRestore'}"><i class="fa-solid fa-file-export"></i> Backup / Restore</router-link>
+                          </li>
                       </ul>
                 </li>
               </ul>

@@ -1,0 +1,442 @@
+<template lang="">
+    <div>
+        <PageHeader page-title="Backup / Restore" page-code="reports" :msg-type="msg.type" :msg-info="msg.info" />        
+        <div class="container-fluid">
+        <div class="card">
+        <div class="card-body">               
+        <div class="row mb-4">
+            <div class="col-12 col-sm-12 col-md-6">
+                <div class="h5 mb-2">Restore</div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="input-group">
+                            <input :disabled="isLoading" type="file" id="importTmp" @change="tmpFile" accept=".json" class="form-control form-control-sm">
+                            <span class="input-group-text p-0 bg-white">
+                                <button class="btn btn-primary btn-sm" @click="importTmp">
+                                    <span v-if="!isLoading">Upload</span>
+                                    <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
+                                </button>
+                            </span>
+                          </div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="h5  mb-2">Backup</div>
+                <div class="min-vh-60">
+                    <div class=" p-2 rounded small">
+                        <div class="row g-2">                              
+                            <div class="col-6 col-sm-4">
+                               <div class="input-group mb-2">
+                                <div class="form-floating">
+                                    <flat-pickr @change="changeBackupDate" class="form-control-plaintext border-bottom" v-model="from_date" id="from_date" :config="config" />
+                                    <label for="from_date">From date</label>
+                                </div>
+                                <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
+                               </div>  
+                            </div>
+                            <div class="col-6 col-sm-4">
+                                <div class="input-group mb-2">
+                                    <div class="form-floating">
+                                        <flat-pickr @change="changeBackupDate" class="form-control-plaintext border-bottom" v-model="to_date" id="to_date" :config="config" />
+                                        <label for="to_date">To date</label>
+                                    </div>
+                                    <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
+                                   </div>
+                            </div>
+                            <div class="col-12 col-md-4 d-grid">
+                                <button  @click="exportAll" class="btn btn-outline-dark">Export All</button>
+                            </div>
+                        </div>
+                        <div class="row mt-2 justify-content-center">
+                            <div class="col-12">
+                                <div class="row g-2">                                   
+                                        <div class="col-6 col-sm-4 d-grid">
+                                            <button :disabled="products.length <=0" @click="exportProducts" class="btn py-4 btn-outline-primary">Medicines Code ({{products.length}})</button>
+                                        </div>
+                                        <div class="col-6 col-sm-4 d-grid">
+                                            <button :disabled="sales.length <=0" @click="exportSales" class="btn py-4 btn-outline-success">Sales ({{sales.length}})</button>
+                                        </div>
+                                        <div class="col-6 col-sm-4 d-grid">
+                                            <button :disabled="purchases.length <=0" @click="exportPurchases" class="btn py-4 btn-outline-dark">Purchases ({{purchases.length}})</button>
+                                        </div>
+                                        <div class="col-6 col-sm-4 d-grid">
+                                            <button :disabled="stocks.length <=0" @click="exportStocks" class="btn py-4 btn-outline-secondary">Stocks ({{stocks.length}})</button>
+                                        </div>
+                                        <div class="col-6 col-sm-4 d-grid">
+                                            <button :disabled="transfers.length <=0" @click="exportTransfers" class="btn py-4 btn-outline-primary">Transfers ({{transfers.length}})</button>
+                                        </div>
+                                        <div class="col-6 col-sm-4 d-grid">
+                                            <button :disabled="adjustments.length <=0" @click="exportAdjustments" class="btn py-4 btn-outline-success">Adjustments ({{adjustments.length}})</button>
+                                        </div>
+                                        <div class="col-6 col-sm-4 d-grid">
+                                            <button :disabled="suppliers.length <=0" @click="exportSuppliers" class="btn py-4 btn-outline-success">Suppliers ({{suppliers.length}})</button>
+                                        </div>
+                                        <div class="col-6 col-sm-4 d-grid">
+                                            <button :disabled="customers.length <=0" @click="exportCustomers" class="btn py-4 btn-outline-secondary">Customers ({{customers.length}})</button>
+                                        </div>
+                                        <div class="col-6 col-sm-4 d-grid">
+                                            <button :disabled="packingSizes.length <=0" @click="exportPackingSizes" class="btn py-4 btn-outline-primary">Packing Size ({{packingSizes.length}})</button>
+                                        </div>
+                                </div>
+                            </div>                                                     
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</template>
+<script>
+import {Timestamp, collection, addDoc, getDocs, doc, onSnapshot, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
+import db from '@/firebase/firestore'
+import * as hp_sales from "@/lib/snapshot/sales"
+import * as hp_purchases from "@/lib/snapshot/purchases"
+import * as hp_products from "@/lib/snapshot/products"
+import * as hp_stocks from "@/lib/snapshot/stocks"
+import * as hp_transfers from "@/lib/snapshot/transfers"
+import * as hp_adjustments from "@/lib/snapshot/adjustments"
+import * as hp_suppliers from "@/lib/snapshot/suppliers"
+import * as hp_customers from "@/lib/snapshot/customers"
+import * as hp_packingSizes from "@/lib/snapshot/packingSizes"
+
+
+import * as hp  from "@/lib/helper"
+import * as ie from "@/lib/import_export"
+import FlatPickr from 'vue-flatpickr-component';
+import PageHeader from "@/views/partials/PageHeader.vue"
+
+export default {
+
+    components:{
+        FlatPickr, PageHeader
+    },
+    data(){
+        return {
+                isLoading:false,
+                sales:[],     
+                purchases:[], 
+                products:[],  
+                stocks:[],
+                transfers:[],
+                adjustments:[],
+                suppliers:[],
+                customers:[],
+                packingSizes:[],
+
+                from_date:"",
+                to_date:"",
+
+                restore_sales:"",
+                restore_purchases:"",
+                restore_products:"",
+                restore_stocks:"",
+
+                restore_file:"",
+                restore_name:"",
+
+                msg:{
+                    info:"",
+                    type:"",
+                },
+                config: {
+                dateFormat: 'd/m/Y', // Flatpickr options
+                enableTime: false,
+                wrap: true, // set wrap to true only when using 'input-group'
+               // altFormat: 'M j, Y',
+            },  
+            timer: 200,
+        }
+    },
+    watch:{
+        msg:{
+            handler(val){
+                if(val.type){
+                    setTimeout(()=>{
+                        this.msg.type="";
+                        this.msg.info="";
+                    }, 3000)
+                }
+            },deep:true
+        }
+    },
+    mounted(){
+        this.from_date=hp.setSearchFromDate();
+        this.to_date=hp.setToday();
+        this.fetchSales();
+        this.fetchPurchase();
+        this.fetchProducts();
+        this.fetchStocks();
+        this.fetchTransfers();
+        this.fetchAdjustments();
+        this.fetchSuppliers();
+        this.fetchCustomers();
+        this.fetchPackingSizes();
+    },
+    
+    methods:{
+        changeBackupDate(){
+            this.fetchSales();
+            this.fetchPurchase();
+            this.fetchStocks();
+            this.fetchTransfers();
+            this.fetchAdjustments();
+        },
+        finishProcess(name){
+            this.msg.info=`${name} data has ben restore on the server`
+            this.msg.type="success"
+            const input=document.querySelector("#importTmp")
+            input.value="";
+            this.isLoading=false;
+        },
+        tmpFile(event){
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                        const file_name=file.name.substring(0, file.name.indexOf("_"));
+                        this.restore_file=e.target.result;
+                        this.restore_name=file_name;
+                };
+                reader.readAsText(file);
+            }
+        },
+
+        importTmp(){         
+            if(!this.restore_file) return false;
+            try {
+                this.isLoading=true;
+                const data = JSON.parse(this.restore_file);
+                data.map(async (d,i)=>{
+                    setTimeout(async ()=>{      
+                        if(this.restore_name=="ProductsCode"){
+                            ie.restoreProducts(d)
+                        }else if(this.restore_name=="Stocks"){
+                            ie.restoreStocks(d)
+                        }else if(this.restore_name=="Sales"){
+                            ie.restoreSales(d)
+                        }else if(this.restore_name=="Purchases"){
+                            ie.restorePurchases(d);
+                        }else if(this.restore_name=="Transfers"){
+                            ie.restoreTransfers(d);
+                        }else if(this.restore_name=="Adjustments"){
+                            ie.restoreAdjustments(d);
+                        }else if(this.restore_name=="Suppliers"){
+                            ie.restoreSuppliers(d);
+                        }else if(this.restore_name=="Customers"){
+                            ie.restoreCustomers(d);
+                        }else if(this.restore_name=="PackingSize"){
+                            ie.restorePackingSizes(d);
+                        }
+                        if(i+1 == data.length){
+                            this.finishProcess(this.restore_name)
+                            this.restore_file="";
+                            this.restore_name="";
+                        }
+                    }, this.timer * i)
+                })
+            }catch(err){
+                 this.msg.info="Restoring in error."
+                this.msg.type="error"
+                this.isLoading=false;
+            }  
+        },       
+      
+    exportAll(){
+        this.exportSales();
+        this.exportPurchases()
+        this.exportProducts();
+        this.exportStocks();
+        this.exportTransfers();
+        this.exportAdjustments();
+        this.exportSuppliers();
+        this.exportCustomers();
+        this.exportPackingSizes();
+    }, 
+    exportSales(){
+    if(this.sales.length<=0) return false;
+       const result= ie.exportToJson(this.sales, `Sales_${this.from_date}_${this.to_date}`)
+       if (result){
+           this.msg.info="Sales data has been backup to local"
+           this.msg.type="success"
+       }
+    },
+    exportPurchases(){
+        if(this.purchases.length<=0) return false;
+       const result= ie.exportToJson(this.purchases, `Purchases_${this.from_date}_${this.to_date}`)
+       if (result){
+           this.msg.info="Purchase data has been backup to local"
+           this.msg.type="success"
+       }
+    },
+    exportProducts(){
+        if(this.products.length<=0) return false;
+       const result= ie.exportToJson(this.products, `ProductsCode_${this.from_date}_${this.to_date}`)
+       if (result){
+           this.msg.info="Medicines code data has been backup to local"
+           this.msg.type="success"
+       }
+    },
+    exportStocks(){
+        if(this.stocks.length <0) return false
+       const result= ie.exportToJson(this.stocks, `Stocks_${this.from_date}_${this.to_date}`)
+       if (result){
+           this.msg.info="Stocks data has been backup to local"
+           this.msg.type="success"
+       }
+    },
+    exportTransfers(){
+        if(this.transfers.length<=0) return false;
+       const result= ie.exportToJson(this.transfers, `Transfers_${this.from_date}_${this.to_date}`)
+       if (result){
+           this.msg.info="Transfers data has been backup to local"
+           this.msg.type="success"
+       }
+    },
+    exportAdjustments(){
+        if(this.adjustments.length<=0) return false;
+       const result= ie.exportToJson(this.adjustments, `Adjustments_${this.from_date}_${this.to_date}`)
+       if (result){
+           this.msg.info="Adjustments data has been backup to local"
+           this.msg.type="success"
+       }
+    },
+    exportSuppliers(){
+        if(this.suppliers.length<=0) return false;
+       const result= ie.exportToJson(this.suppliers, `Suppliers_${this.from_date}_${this.to_date}`)
+       if (result){
+           this.msg.info="Suppliers data has been backup to local"
+           this.msg.type="success"
+       }
+    },
+    exportCustomers(){
+        if(this.customers.length<=0) return false;
+       const result= ie.exportToJson(this.customers, `Customers_${this.from_date}_${this.to_date}`)
+       if (result){
+           this.msg.info="Customers data has been backup to local"
+           this.msg.type="success"
+       }
+    },
+    exportPackingSizes(){
+        if(this.packingSizes.length<=0) return false;
+       const result= ie.exportToJson(this.packingSizes, `PackingSize_${this.from_date}_${this.to_date}`)
+       if (result){
+           this.msg.info="Packing size data has been backup to local"
+           this.msg.type="success"
+       }
+    },
+    
+    fetchSales(){
+            const from_date=Timestamp.fromDate(hp.searchFromDate(this.from_date))
+             const to_date=Timestamp.fromDate(hp.searchToDate(this.to_date))     
+            const query_url = query(collection(db, "sales"), where("sale_date", ">=", from_date), where("sale_date", "<=", to_date));
+            onSnapshot(query_url, async(snapShot) =>{                                 
+                        let sales=hp_sales.sales(snapShot)  
+                        sales=sales.map((p)=>{
+                            return {...p, sale_date: new Date(p.sale_date.toDate())}
+                        })
+                       this.sales=sales;
+                });              
+     },
+    
+    fetchPurchase(){
+            const from_date=Timestamp.fromDate(hp.searchFromDate(this.from_date))
+             const to_date=Timestamp.fromDate(hp.searchToDate(this.to_date))     
+            const query_url = query(collection(db, "purchases"), where("pur_date", ">=", from_date), where("pur_date", "<=", to_date));
+            onSnapshot(query_url, async(snapShot) =>{                  
+                        let purchases=hp_purchases.purchases(snapShot)  
+                        purchases=purchases.map((p)=>{
+                            return {...p, pur_date: new Date(p.pur_date.toDate())}
+                        })
+                       this.purchases=purchases;
+                });              
+        },
+
+        fetchProducts(){       
+            const query_url = query(collection(db, "products"), where("is_deleted", "==", false));
+            onSnapshot(query_url, async(snapShot) =>{                  
+                        let products=hp_products.products(snapShot)  
+                        products=products.map((p)=>{
+                            return {...p, created_at: new Date(p.created_at.toDate())}
+                        })
+                       this.products=products;
+                });              
+        },
+        fetchStocks(){
+            const from_date=Timestamp.fromDate(hp.searchFromDate(this.from_date))
+             const to_date=Timestamp.fromDate(hp.searchToDate(this.to_date))     
+            const query_url = query(collection(db, "openingStocks"), where("created_at", ">=", from_date), where("created_at", "<=", to_date));
+            onSnapshot(query_url, async(snapShot) =>{                  
+                        let stocks=hp_stocks.stocks(snapShot)  
+                        stocks=stocks.map((p)=>{
+                            return {...p, created_at: new Date(p.created_at.toDate())}
+                        })
+                       this.stocks=stocks;
+                });              
+        },
+        fetchTransfers(){
+            const from_date=Timestamp.fromDate(hp.searchFromDate(this.from_date))
+             const to_date=Timestamp.fromDate(hp.searchToDate(this.to_date))     
+            const query_url = query(collection(db, "transfers"), where("created_at", ">=", from_date), where("created_at", "<=", to_date));
+            onSnapshot(query_url, async(snapShot) =>{                  
+                        let transfers=hp_transfers.transfers(snapShot)  
+                        transfers=transfers.map((p)=>{
+                            return {...p, created_at: new Date(p.created_at.toDate())}
+                        })
+                       this.transfers=transfers;
+                });              
+        },
+        fetchAdjustments(){
+            const from_date=Timestamp.fromDate(hp.searchFromDate(this.from_date))
+             const to_date=Timestamp.fromDate(hp.searchToDate(this.to_date))     
+            const query_url = query(collection(db, "adjustments"), where("created_at", ">=", from_date), where("created_at", "<=", to_date));
+            onSnapshot(query_url, async(snapShot) =>{                  
+                        let adjustments=hp_adjustments.adjustments(snapShot)  
+                        adjustments=adjustments.map((p)=>{
+                            return {...p, created_at: new Date(p.created_at.toDate())}
+                        })
+                       this.adjustments=adjustments;
+                });              
+        },
+        fetchSuppliers(){           
+            const query_url = query(collection(db, "suppliers"));
+            onSnapshot(query_url, async(snapShot) =>{                  
+                        let suppliers=hp_suppliers.suppliers(snapShot)  
+                        suppliers=suppliers.map((p)=>{
+                            return {...p, created_at: new Date(p.created_at.toDate())}
+                        })
+                       this.suppliers=suppliers;
+                });              
+        },
+        fetchCustomers(){           
+            const query_url = query(collection(db, "customers"));
+            onSnapshot(query_url, async(snapShot) =>{                  
+                        let customers=hp_customers.customers(snapShot)  
+                        customers=customers.map((p)=>{
+                            return {...p, created_at: new Date(p.created_at.toDate())}
+                        })
+                       this.customers=customers;
+                });              
+        },
+        fetchPackingSizes(){           
+            const query_url = query(collection(db, "packingSizes"));
+            onSnapshot(query_url, async(snapShot) =>{                  
+                        let packingSizes=hp_packingSizes.packingSizes(snapShot)  
+                        packingSizes=packingSizes.map((p)=>{
+                            return {...p, created_at: new Date(p.created_at.toDate())}
+                        })
+                       this.packingSizes=packingSizes;
+                });              
+        },
+},        
+
+}
+</script>
+<style lang="">
+    
+</style>

@@ -29,6 +29,7 @@ import EditAdjustment from '@/views/adjustments/Edit.vue'
 import ReportAdjustments from '@/views/reports/Adjustments.vue'
 import SalesOnCredit from '@/views/sales/SalesOnCredit.vue'
 import ReportsSoc from '@/views/reports/Soc.vue'
+import BackupRestore from '@/views/backup/BackupRestore.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),  
@@ -219,6 +220,12 @@ const router = createRouter({
       name: 'Profile',     
       component: Profile,    
       meta: { title: 'N-Pharmacy | User profile' },
+    },
+    {
+      path: '/backup-restore',
+      name:'BackupRestore',
+      component: BackupRestore,
+      meta: { title: 'N-Pharmacy | Backup / Restore' },
     }
   ], 
 })
