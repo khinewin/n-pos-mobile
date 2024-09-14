@@ -1,59 +1,54 @@
 <template lang="">
-        <div class="row g-2 mb-2">           
-            <div class="col-sm-6 col-md-4 col-lg-3">
-                <div class="card shadow border-0 border-bottom border-3 border-danger">
-                    <div class="card-body">
+        <div class="row g-2">           
+            <div class=" col-sm-12 col-lg-6">
+                <div class="card shadow border-0 border-start border-5 border-primary">
+                    <div class="card-body p-2">
+                            <div class="small">Sales</div>
                             <div class="row">
-                                <div class="col-3 text-center h1"><i class="fa-solid fa-cart-plus"></i></div>
-                                <div class="col-9">
-                                    <div class="small fw-lighter mb-2">Sales (Today)</div>
-                                    <div class="card-text">                                     
-                                       Ks {{fM(sales_today)}}
+                                <div class="col-2 text-center h1">
+                                    <i class="fa-solid fa-cart-plus"></i>
+                                </div>
+                                <div class="col-5">
+                                    <div class="small fw-lighter mb-1 text-center">Today</div>
+                                    <div class="card-text text-center small">                                     
+                                        {{fM(sales_today)}}
+                                    </div>
+                                </div>
+                                <div class="col-5">
+                                    <div class="small fw-lighter mb-1 text-center">This week</div>
+                                    <div class="card-text text-center small">     
+                                        {{fM(sales_this_week)}}                                
                                     </div>
                                 </div>
                             </div>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-md-4 col-lg-3">
-                <div class="card shadow border-0 border-bottom border-3 border-warning">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-3 text-center h1"><i class="fa-solid fa-cart-plus"></i></div>
-                            <div class="col-9">
-                                <div class="small fw-lighter mb-2">Sales (This week)</div>
-                                <div class="card-text">Ks {{fM(sales_this_week)}}</div>
+            <div class="col-sm-12 col-lg-6">
+                <div class="card shadow border-0 border-start border-5 border-success">
+                    <div class="card-body p-2">
+                            <div class="small">Sales</div>
+                            <div class="row">
+                                <div class="col-2 text-center h1">
+                                    <i class="fa-solid fa-cart-plus"></i>
+                                </div>
+                                <div class="col-5">
+                                    <div class="small fw-lighter mb-1 text-center">This month</div>
+                                    <div class="card-text text-center small">                                     
+                                        {{fM(sales_this_month)}}
+                                    </div>
+                                </div>
+                                <div class="col-5">
+                                    <div class="small fw-lighter mb-1 text-center">This year</div>
+                                    <div class="card-text text-center small">     
+                                        {{fM(sales_this_year)}}                                
+                                    </div>
+                                </div>
                             </div>
-                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-md-4 col-lg-3">
-                <div class="card shadow border-0 border-bottom border-3 border-info">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-3 text-center h1"><i class="fa-solid fa-cart-plus"></i></div>
-                            <div class="col-9">
-                                <div class="small fw-lighter mb-2">Sales (This month)</div>
-                                <div class="card-text">Ks {{fM(sales_this_month)}}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-md-12 col-lg-3">
-                <div class="card shadow border-0 border-bottom border-3 border-success">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-3 text-center h1"><i class="fa-solid fa-cart-plus"></i></div>
-                            <div class="col-9">
-                                <div class="small fw-lighter mb-2">Sales (This year)</div>
-                                <div class="card-text">Ks {{fM(sales_this_year)}}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+         
         </div>
 </template>
 <script>
@@ -88,7 +83,7 @@
       
         methods:{
             fM(amount){
-                return hp.formattedAmount(amount)
+                return hp.formattedAmountCurrency(amount)
             },
             showTime(t){
                 return hp.showTime(t)

@@ -10,7 +10,7 @@
                         </button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                        <router-link :to="{name : 'OpeningStocks'}" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> Close</router-link>
+                        <router-link :to="{name : 'Stocks'}" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> Close</router-link>
                 </div>
             </div>
             <div class="card shadow min-vh-75">
@@ -259,7 +259,7 @@ export default {
             }           
         },
         async checkDatabase(){ 
-            const query_url=query(collection(db, "openingStocks"));           
+            const query_url=query(collection(db, "stocks"));           
                 onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {    
                             if(change.type==="added"){
@@ -267,7 +267,7 @@ export default {
                                     this.updateProducts();
                                    // this.printSale();
                                     this.msg.type="success";
-                                    this.msg.info=hp.message(change.type, "opening stock")   
+                                    this.msg.info=hp.message(change.type, "stocks")   
                                     this.resetStocks(); 
                                 }
                             }
@@ -290,7 +290,7 @@ export default {
                 products : this.storeItems,
                 user : {uid: this.user.uid, displayName: this.user.displayName},              
             }      
-            const saveDocument=collection(db, "openingStocks")
+            const saveDocument=collection(db, "stocks")
             await addDoc(saveDocument, voucher)                                                  
         },
         updateProducts(){

@@ -155,9 +155,9 @@ export default {
             const to_date=Timestamp.fromDate(new Date(this.toDate))
             let query_url="";
             if(this.voucher_no){
-                query_url = query(collection(db, "openingStocks"),  where("voucher_no", "==", Number(this.voucher_no)))
+                query_url = query(collection(db, "stocks"),  where("voucher_no", "==", Number(this.voucher_no)))
             }else{
-             query_url = query(collection(db, "openingStocks"),  
+             query_url = query(collection(db, "stocks"),  
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
             }
             onSnapshot(query_url, (snapShot)=>{ //all on snapshot

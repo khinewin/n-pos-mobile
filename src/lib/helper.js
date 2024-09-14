@@ -70,7 +70,7 @@ const  message=(type, name)=>{
             const mm=`${m ? m : ''}${m ? m_unit : ''}`
             const ss=`${s ? s : ''}${s ? s_unit : ''}`
 
-            return `${ll}${l && m ? ", ": ""}${mm}${m && s ? ", ":""}${ss}`
+            return `${ll}${l && m ? ", ": ""}${mm}${m && s ? ", ":""}${l&&s && !m ? ", " :""}${ss}`
         }
         if(!l_unit){
             const m=Math.floor((qty / s_unit_qty))

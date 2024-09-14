@@ -1,7 +1,6 @@
 <template lang="">
     <div>
         <PageHeader page-title="Purchase / History" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
-        <PurchaseModal @setCode="setCode"/>           
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">
                 <div class="col-sm-2 d-grid">
@@ -132,6 +131,8 @@
                 </div>
             </div>
         </div>
+        <PurchaseModal @setCode="setCode"/>           
+
     </div>
 </template>
 <script>

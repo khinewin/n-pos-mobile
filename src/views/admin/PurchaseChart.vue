@@ -14,7 +14,7 @@
                                 </div>
                             </div>
                         </div>   
-                        <div v-if="monthlyPurchase.length > 1">
+                        <div v-if="monthlyPurchase.length > 1" id="chart">
                             <GChart
                             :settings="{ packages: ['corechart', 'table', 'map'] }"
                             type="PieChart"
@@ -45,7 +45,8 @@ export default {
             purchaseMonthlyData:[],
             monthlyPurchase:[],
             monthlyChartOptions: {              
-                colors : ["purple", "brown","green", "orange","gray", "blue","orange",]
+                colors : ["teal","blue", "brown","green", "orange","gray", "blue","orange",],
+                is3D: true,
             }
         }
     },
@@ -111,6 +112,8 @@ export default {
     }
 }
 </script>
-<style lang="">
-    
+<style>
+    #chart {
+  width: 100%; /* Make sure the chart container takes full width */
+}
 </style>

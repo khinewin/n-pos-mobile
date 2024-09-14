@@ -187,7 +187,7 @@ export default {
         async fetchStocks(){
             const from_date=Timestamp.fromDate(new Date(this.fromDate))
             const to_date=Timestamp.fromDate(new Date(this.toDate))
-            const query_url = query(collection(db, "openingStocks"),
+            const query_url = query(collection(db, "stocks"),
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
             onSnapshot(query_url, (snapShot)=>{
                 const stockItems=ss.stocks(snapShot);           

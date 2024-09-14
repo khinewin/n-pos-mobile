@@ -28,7 +28,7 @@
                 <div class="min-vh-60">
                     <div class=" p-2 rounded small">
                         <div class="row g-2">                              
-                            <div class="col-6 col-sm-4">
+                            <div class="col-6 col-sm-6 col-md-4">
                                <div class="input-group mb-2">
                                 <div class="form-floating">
                                     <flat-pickr @change="changeBackupDate" class="form-control-plaintext border-bottom" v-model="from_date" id="from_date" :config="config" />
@@ -37,7 +37,7 @@
                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                </div>  
                             </div>
-                            <div class="col-6 col-sm-4">
+                            <div class="col-6 col-sm-6 col-md-4">
                                 <div class="input-group mb-2">
                                     <div class="form-floating">
                                         <flat-pickr @change="changeBackupDate" class="form-control-plaintext border-bottom" v-model="to_date" id="to_date" :config="config" />

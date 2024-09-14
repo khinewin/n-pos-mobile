@@ -13,10 +13,10 @@
                     <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#stocksModal"><i class="fa-solid fa-folder-tree"></i> Browse</button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                    <router-link :to="{name : 'NewOpeningStocks'}" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New</router-link>
+                    <router-link :to="{name : 'NewStocks'}" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New</router-link>
             </div>
                 <div class="col-sm-2 d-grid">
-                        <button @click="closeOpeningStock" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                        <button @click="closeStocks" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                 </div>
             </div>
             <div class="card shadow min-vh-75" id="printMe">
@@ -168,9 +168,9 @@ export default {
          await this.$htmlToPaper('printMe');
         }, 
         goEdit(){           
-            this.$router.push({name: 'EditOpeningStocks', params: {id: this.voucher_no}})
+            this.$router.push({name: 'EditStocks', params: {id: this.voucher_no}})
         },
-        closeOpeningStock(){
+        closeStocks(){
           this.id="";
             this.voucher_no="";
             this.created_at="";

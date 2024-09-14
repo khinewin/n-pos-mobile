@@ -45,7 +45,7 @@ export default {
             salesMonthlyData:[],
             monthlySales:[],
             monthlyChartOptions: {              
-                colors : ["green"]
+                colors : ["blue"]
             }
         }
     },

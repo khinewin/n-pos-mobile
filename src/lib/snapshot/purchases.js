@@ -14,7 +14,6 @@ const purchases=(arr)=>{
             extra_discount: data.extra_discount,
             total_price:data.total_price,     
             grand_total_price: data.grand_total_price,
-            exp_date: data.exp_date,         
             location:data.location,     
             edit_user:null                         
         };                                       

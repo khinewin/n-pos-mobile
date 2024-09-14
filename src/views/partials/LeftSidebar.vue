@@ -22,7 +22,7 @@
                             <router-link class="nav-link" :to="{name : 'Purchase'}"><i class="fa-solid fa-cart-shopping"></i> Purchase</router-link>
                           </li>     
                           <li class="list-group-item list-group-item-action bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
-                            <router-link class="nav-link" :to="{name : 'OpeningStocks'}"><i class="fa-solid fa-money-bill-trend-up"></i> Stocks</router-link>
+                            <router-link class="nav-link" :to="{name : 'Stocks'}"><i class="fa-solid fa-money-bill-trend-up"></i> Stocks</router-link>
                           </li>               
                           <li class="list-group-item list-group-item-action bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
                             <router-link class="nav-link" :to="{name : 'Products'}"><i class="fa-solid fa-list-check"></i> Medicine code</router-link>
@@ -68,6 +68,6 @@ export default {
           background-color: rgba(128, 128, 128, 0.5) !important;
       }
       .router-link-active {
-          color : red !important
+          color : #0d6efd !important
       }
 </style>

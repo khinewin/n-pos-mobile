@@ -10,7 +10,7 @@
                         </button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                        <router-link :to="{name : 'OpeningStocks'}" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> Close</router-link>
+                        <router-link :to="{name : 'Stocks'}" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> Close</router-link>
                 </div>
             </div>
             <div class="card shadow min-vh-75">
@@ -248,7 +248,7 @@ export default {
             this.storeItems=item.products;         
         },
         async fetchStock(){
-            const query_url = query(collection(db, "openingStocks"), where("voucher_no", "==", Number(this.voucher_no)));
+            const query_url = query(collection(db, "stocks"), where("voucher_no", "==", Number(this.voucher_no)));
             onSnapshot(query_url, (snapShot)=>{
                 const stocks=ss.stocks(snapShot);
                 this.setItem(stocks[0])
@@ -277,14 +277,14 @@ export default {
            
         },
         async checkDatabase(){ 
-            const query_url=query(collection(db, "openingStocks"));           
+            const query_url=query(collection(db, "stocks"));           
                 onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {    
                             if(change.type==="modified"){
                                 if(change.doc.data().voucher_no==this.voucher_no){
                                    // this.printSale();
                                     this.msg.type="success";
-                                    this.msg.info=hp.message(change.type, "opening stock")    
+                                    this.msg.info=hp.message(change.type, "stocks")    
                                     this.isLoading=false;
                                 }
                             }
@@ -306,7 +306,7 @@ export default {
                 user : {uid: this.user.uid, displayName:this.user.displayName},          
             }     
             this.isLoading=false;
-            const saveDocument=doc(db, "openingStocks", this.id)
+            const saveDocument=doc(db, "stocks", this.id)
             await updateDoc(saveDocument, voucher)                     
         },
         updateProducts(){

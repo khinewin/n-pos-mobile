@@ -62,7 +62,7 @@
                             <span v-if="s.dis_amount">{{s.dis_amount}}$</span>
                             <span v-if="s.dis_percent">{{s.dis_percent}}%</span>     
                         </td>         
-                        <td class=" text-end">{{fM(s.discount)}}</td>
+                        <td class=" text-end">{{s.discount ? fM(s.discount) : 0}}</td>
                         <td class=" text-end">{{fM(s.final_amount)}}</td>     
                     </tr>                        
               

@@ -122,7 +122,6 @@ import * as ss from "@/lib/snapshot/purchases"
 import FlatPickr from 'vue-flatpickr-component';
 
 export default {
-   props:['storePurchase'],
    components:{
     FlatPickr,
    },
@@ -152,10 +151,9 @@ export default {
        myModalEl.addEventListener('show.bs.modal', event => {                
        })   
        this.setDate();
+       this.fetchPurchase();         
    },
-   created(){           
-        this.fetchPurchase();                       
-   },
+ 
    computed:{
        user(){
            return this.$store.getters.user;
@@ -224,13 +222,13 @@ export default {
             const to_date=Timestamp.fromDate(hp.searchToDate(this.search_by_to_pur_date))       
             query_url = query(collection(db, "purchases"), where("pur_date", ">=", from_date), where("pur_date", "<=", to_date),  orderBy("pur_date", "desc"));
         }
-       onSnapshot(query_url, (snapShot)=>{
-            const purchases=ss.purchases(snapShot);      
-            this.purchasesData=purchases;
+        onSnapshot(query_url, (snapShot)=>{                 
+            const pur=ss.purchases(snapShot);      
+            this.purchasesData=pur;
             this.isLoading=false;
-            this.isUpdating=false;
-            this.displayPurchase();
-       })
+            this.displayPurchase(); 
+            
+        })
       
       } ,
       showTime(t){
@@ -247,45 +245,3 @@ export default {
 <style lang="">
    
 </style>
-
-<!--
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item list-group-item-action bg-secondary-subtle">
-                                    <div class="row">
-                                        <div class="col-lg-3">
-                                                <div class="small fw-lighter ">Voucher no.</div>
-                                        </div>
-                                        <div class="col-lg-3">
-                                                <div class="small fw-lighter ">Pur Date</div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                                <div class="small fw-lighter">Supplier</div>
-                                        </div>                                          
-                                        
-                                </div>
-                                </li>
-                             
-                                <li class="list-group-item" v-if="isLoading">
-                                    <div class="d-flex justify-content-center my-5">
-                                        <div class="spinner-border text-primary"  role="status">
-                                          <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                      </div>
-                                </li>
-                         
-                                <li v-if="purchases.length > 0" class="list-group-item list-group-item-action" v-for="p in purchases" :key="p.id" >
-                                        <div class="row" @click="setCode(p)" data-bs-dismiss="modal" style="cursor: context-menu;">
-                                                <div class="col-lg-3 small">
-                                                        <div>{{p.voucher_no}}</div>
-                                                </div>
-                                                <div class="col-lg-3 small">
-                                                 <div>{{showTime(p.pur_date)}}</div>
-                                                </div>
-                                                <div class="col-lg-6 small">
-                                                        <div>{{p.supplier.name}} ({{p.supplier.company}})</div>
-                                                </div>
-                                            
-                                        </div>
-                                </li>
-                        </ul>
-                    -->

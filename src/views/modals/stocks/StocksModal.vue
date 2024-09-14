@@ -176,7 +176,7 @@ export default {
         const to_date=Timestamp.fromDate(hp.searchToDate(this.search_by_to_date))   
         let query_url="";
         if(this.search_by_from_date && this.search_by_to_date){
-            query_url = query(collection(db, "openingStocks"), where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
+            query_url = query(collection(db, "stocks"), where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
         } 
        onSnapshot(query_url, (snapShot)=>{
         const stocks=ss.stocks(snapShot);      

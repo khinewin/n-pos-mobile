@@ -6,9 +6,9 @@ import Profile from "@/views/admin/Profile.vue"
 import AddPurchase from '@/views/purchase/Add.vue'
 import Purchase from '@/views/purchase/Purchase.vue'
 import EditPurchase from '@/views/purchase/Edit.vue'
-import OpeningStocks from '@/views/stocks/OpeningStocks.vue'
-import NewOpeningStocks from '@/views/stocks/New.vue'
-import EditOpeningStocks from '@/views/stocks/Edit.vue'
+import Stocks from '@/views/stocks/Stocks.vue'
+import NewStocks from '@/views/stocks/New.vue'
+import EditStocks from '@/views/stocks/Edit.vue'
 import Sale from '@/views/sales/Sale.vue'
 import Suppliers from '@/views/suppliers/Suppliers.vue'
 import PrintSale from '@/views/sales/Print.vue'
@@ -84,21 +84,21 @@ const router = createRouter({
     },
     {
       path: '/stocks',
-      name: 'OpeningStocks',     
-      component: OpeningStocks,
+      name: 'Stocks',     
+      component: Stocks,
       meta : {title: "N-Pharmacy |  Stocks / History"}
 
     },
     {
       path: '/stocks/new',
-      name: 'NewOpeningStocks',     
-      component: NewOpeningStocks,
+      name: 'NewStocks',     
+      component: NewStocks,
       meta : {title: "N-Pharmacy | Stocks / New"}
     },
     {
       path: '/stocks/:id/edit',
-      name: 'EditOpeningStocks',     
-      component: EditOpeningStocks,
+      name: 'EditStocks',     
+      component: EditStocks,
       meta : {title: "N-Pharmacy | Stocks / Edit"}
     },
     {
@@ -141,37 +141,37 @@ const router = createRouter({
       path: "/reports/products/:reportType/:location",
       name: "ReportsProduct",
       component: ReportProduct,
-      meta : {title: "N-Pharmacy | Report product code"}
+      meta : {title: "N-Pharmacy | Report Medicine Code"}
     },
     {
       path: "/reports/transfers/:reportType/:fromDate/:toDate/:from_location/:to_location",
       name: "ReportsTransfer",
       component: ReportsTransfers,
-      meta : {title: "N-Pharmacy | Report transfer location"}
+      meta : {title: "N-Pharmacy | Report Transfers"}
     },
     {
       path: "/reports/stocks/:reportType/:fromDate/:toDate/:location",
       name: "ReportsStocks",
       component: ReportStocks,
-      meta : {title: "N-Pharmacy | Report opening stock"}
+      meta : {title: "N-Pharmacy | Report Stocks"}
     },
     {
       path: "/reports/sales/:reportType/:fromDate/:toDate",
       name: "ReportsSales",
       component: ReportSales,
-      meta : {title: "N-Pharmacy | Report sales"}
+      meta : {title: "N-Pharmacy | Report Sales"}
     },
     {
       path: "/reports/purchase/:reportType/:fromDate/:toDate/:location",
       name: "ReportsPurchase",
       component: ReportPurchase,
-      meta : {title: "N-Pharmacy | Report purchase"}
+      meta : {title: "N-Pharmacy | Report Purchase"}
     },
     {
       path: "/reports/adjustments/:reportType/:fromDate/:toDate",
       name: "ReportsAdjustments",
       component: ReportAdjustments,
-      meta : {title: "N-Pharmacy | Report adjustments"}
+      meta : {title: "N-Pharmacy | Report Adjustments"}
     },
     {
       path: "/reports/soc/:reportType/:fromDate/:toDate",
@@ -183,13 +183,13 @@ const router = createRouter({
       path: '/transfers/:id/edit',
       name: 'EditTransfer',     
       component: EditTransfer,    
-      meta: { title: 'N-Pharmacy | Edit transfer' },
+      meta: { title: 'N-Pharmacy | Transfers / Edit' },
     },
     {
       path: '/transfers/new',
       name: 'AddTransfer',     
       component: NewTransfer,    
-      meta: { title: 'N-Pharmacy | New transfer' },
+      meta: { title: 'N-Pharmacy | Transfers / New' },
     },
     {
       path: '/transfers',
@@ -207,13 +207,13 @@ const router = createRouter({
       path: '/adjustments/add',
       name: 'NewAdjustment',     
       component: NewAdjustment,
-      meta : {title: "N-Pharmacy | New adjustment"}
+      meta : {title: "N-Pharmacy | Adjustments / New"}
     },
     {
       path: '/adjustments/:id/edit',
       name: 'EditAdjustment',     
       component: EditAdjustment,
-      meta : {title: "N-Pharmacy | Edit adjustments"}
+      meta : {title: "N-Pharmacy | Adjustments / Edit"}
     },
     {
       path: '/user/profile',
