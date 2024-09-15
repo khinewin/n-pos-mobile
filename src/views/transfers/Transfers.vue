@@ -1,6 +1,6 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="Transfers / History" page-code="transfers" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader page-title="Transfer / History" page-code="transfers" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                
                 <div class="col-sm-2 d-grid">

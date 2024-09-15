@@ -45,7 +45,7 @@
                 <router-link class="btn btn-sm" :to="{name : 'Customers'}"><i class="fa-solid fa-users"></i> Customers</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm" :to="{name : 'Transfers'}"><i class="fa-solid fa-right-left"></i> Transfers</router-link>
+                <router-link class="btn btn-sm" :to="{name : 'Transfers'}"><i class="fa-solid fa-right-left"></i> Transfer</router-link>
             </div>  
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
                 <router-link class="btn btn-sm" :to="{name : 'Adjustments'}"><i class="fa-solid fa-sliders"></i> Adjustment</router-link>

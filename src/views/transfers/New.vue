@@ -1,6 +1,6 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="Transfers / New" page-code="addTransfer" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader page-title="Transfer / New" page-code="addTransfer" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                
                 <div class="col-sm-2 d-grid">
@@ -64,7 +64,7 @@
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary" >
                                     <td class="col-1">Code</td>
-                                    <td class="col-2" data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Description</td>
+                                    <td class="col-2 change-cursor" data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Description</td>
                                     <td class="col-1">Packing size</td>
                                     <td class="col-1">From Loc Bal</td> 
                                     <td class="col-1">To Loc Bal</td> 
@@ -89,7 +89,7 @@
                                     <td class="text-end">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.to_loc_bal, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>
-                                    <td class="text-center table-primary" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                    <td class="text-center table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.transfer_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>
                                     <td class="text-end">
@@ -202,7 +202,6 @@ export default {
             let isSufficient=true;
             const e=this.editItem
             const org_qty=this.from_location=="Main" ? e.main_qty : e.qty;
-
                 let trans_qty=0;
                 trans_qty += e.input_l_qty ? e.input_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
                 trans_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty: 0;
@@ -249,7 +248,6 @@ export default {
                         f.after_to_loc_bal=e.after_to_loc_bal;
                     }
                }) 
-
         },
      
         setEdit(i){

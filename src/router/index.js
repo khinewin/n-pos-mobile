@@ -30,6 +30,7 @@ import ReportAdjustments from '@/views/reports/Adjustments.vue'
 import SalesOnCredit from '@/views/sales/SalesOnCredit.vue'
 import ReportsSoc from '@/views/reports/Soc.vue'
 import BackupRestore from '@/views/backup/BackupRestore.vue'
+import EditSale from '@/views/sales/Edit.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),  
@@ -60,6 +61,13 @@ const router = createRouter({
       name: 'Sale',     
       component: Sale,
       meta : {title: "N-Pharmacy | Sale"}
+
+    },
+    {
+      path: '/sale/:id/edit',
+      name: 'EditSale',     
+      component: EditSale,
+      meta : {title: "N-Pharmacy | Sale / Edit"}
 
     },
     {
@@ -183,19 +191,19 @@ const router = createRouter({
       path: '/transfers/:id/edit',
       name: 'EditTransfer',     
       component: EditTransfer,    
-      meta: { title: 'N-Pharmacy | Transfers / Edit' },
+      meta: { title: 'N-Pharmacy | Transfer / Edit' },
     },
     {
       path: '/transfers/new',
       name: 'AddTransfer',     
       component: NewTransfer,    
-      meta: { title: 'N-Pharmacy | Transfers / New' },
+      meta: { title: 'N-Pharmacy | Transfer / New' },
     },
     {
-      path: '/transfers',
+      path: '/transfer',
       name: 'Transfers',     
       component: Transfers,    
-      meta: { title: 'N-Pharmacy | Transfers' },
+      meta: { title: 'N-Pharmacy | Transfer' },
     },
     {
       path: '/adjustments',

@@ -73,8 +73,19 @@ min-height: 60vh !important;
 .vh-60{
     height: 60vh !important;
 }
+.vh-30{
+    height: 30vh !important;
+}
+.vh-40{
+    height: 40vh !important;
+}
+.vh-50{
+    height: 50vh !important;
+}
 
-
+.change-cursor{
+    cursor: context-menu  !important;
+}
 
 input[type="number"] {
     direction: rtl; 

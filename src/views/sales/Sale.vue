@@ -18,8 +18,11 @@
                         <option value="retail">Retail</option>
                         <option value="whole_sale">Wholesale</option>
                     </select>
-                    <!--<button class="btn btn-sm" @click="changeToEdit" :disabled="saleMode=='Sale / New'" ><i class="fa-solid fa-pen-to-square"></i> Edit</button>-->
+                </div>    
+                <div class="col-sm-2 d-grid">    
+                    <button class="btn btn-sm" @click="goEdit" :disabled="!id || user.uid != sale_user.uid"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
                 </div>
+                
                 <div class="col-sm-2 d-grid">
                     <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#salesModal"><i class="fa-solid fa-folder-tree"></i> Browse</button>
                 </div>
@@ -86,16 +89,16 @@
                                             <tr>
                                                 <td class="text-end" >Cashier :</td>
                                                 <td class="">
-                                                    {{user.displayName}}
+                                                    {{sale_user.uid ? sale_user.displayName : user.displayName}}
                                                 </td>
                                             </tr>                                               
                                         </tbody>
                                   </table>
                                 </div>
                             </div>                               
-                              <div class="vh-65 overflow-y-auto">
+                              <div class="vh-50 overflow-y-auto">
                                 <table class="table table-bordered table-hover mb-0">
-                                    <tbody class="small fw-bold">
+                                    <tbody class="small fw-bold table-group-divider">
                                         <tr class="table-secondary">
                                             <td class="col-1 text-center">
                                                 <input :disabled="saleMode=='Sale / History'" @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext p-0  text-center" placeholder="Scan code here">
@@ -110,8 +113,7 @@
                                             <td class="col-2 text-center  table-warning" colspan="2">Discount</td>
                                             <td class="col-1 text-center ">Total Amt</td>
                                         </tr>    
-                                    </tbody>
-                                  
+                                    </tbody>                                  
                                     <tbody>                                                                         
                                         <tr class="" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(i)"  >
                                             <td class="position-relative text-center">
@@ -144,42 +146,40 @@
                                             <td class=" text-end table-warning" data-bs-toggle="modal" data-bs-target="#setDiscountModal">{{s.discount}}</td>
                                             <td class="text-end">{{s.final_amount}}</td>
                                         </tr> 
-                                   
+                                    </tbody>
+                                </table>
+                                </div>
+                                <table class="table table-bordered">
+                                    <tbody class="table-group-divider">
                                         <tr>
-                                            <td colspan="9" class="text-end">Total amount</td>
-                                            <td class="text-end">{{total_amount}}</td>
-                                        </tr>                     
+                                            <td  class="text-end pe-2 fw-bold col-3">Total amount</td>
+                                            <td class="text-end col-3">{{total_amount}}</td>                                        
+                                            <td  class="text-end col-3 pe-2 fw-bold">Net amount</td>
+                                            <td class="text-end col-3">{{net_amount}}</td>
+                                        </tr>                 
                                         <tr>
-                                            <td colspan="9" class="text-end " >Extra discount</td>
+                                            <td  class="text-end pe-2 fw-bold " >Extra discount</td>
                                             <td class="text-end ">
                                                 <input @click="setInput" @mouseleave="setInput" :disabled="saleMode=='Sale / History'"  type="number"   @change="calTotal" @keyup="calTotal" v-model="extra_discount" class="form-control-plaintext py-0  text-end m-0">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="9" class="text-end">Net amount</td>
-                                            <td class="text-end">{{net_amount}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="9" class="text-end">Paid</td>
-                                            <td class="text-end">
-                                                <input @click="setInput" @mouseleave="setInput" :disabled="saleMode=='Sale / History'" @keypress.enter="saveSale" @change="calPaid" @keyup="calPaid" type="number" v-model="paid" class="form-control-plaintext py-0 text-end m-0">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="9" class="text-end">Change</td>
+                                            </td>    
+                                            <td  class="text-end pe-2 fw-bold">Change</td>
                                             <td class="text-end">
                                                 {{change}}
-                                            </td>
+                                            </td>                                    
+                                          
                                         </tr>
                                         <tr>
-                                            <td colspan="9" class="text-end">Credit</td>
+                                            <td  class="text-end pe-2 fw-bold">Paid</td>
+                                            <td class="text-end">
+                                                <input @click="setInput" @mouseleave="setInput" :disabled="saleMode=='Sale / History'" @keypress.enter="saveSale" @change="calPaid" @keyup="calPaid" type="number" v-model="paid" class="form-control-plaintext py-0 text-end m-0">
+                                            </td>                               
+                                            <td  class="text-end pe-2 fw-bold">Credit</td>
                                             <td class="text-end">
                                                 {{credit}}
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
-                              </div>
                         </div>
                     </div>
                 </div>
@@ -189,7 +189,7 @@
         <SalesModal @setCode="setOldCode" />
         <CustomerModal @setCustomer="setCustomer" />
         <!--Print item start-->
-        <div class="" id="printMe" v-if="saleItems.length > 0" >
+        <div class="d-none" id="printMe" v-if="saleItems.length > 0" >
                 <Print :data="{
                     voucher_no: this.voucher_no,
                     customer: this.customer,
@@ -244,6 +244,7 @@ export default {
                 wrap: true, // set wrap to true only when using 'input-group'
                // altFormat: 'M j, Y',
             },  
+            id:"",
             saleMode: "Sale / New",
             isLoading:false,
             sale_type: "retail",
@@ -266,6 +267,7 @@ export default {
             products:[],
             print_date:"",
             isOffline: false,
+            sale_user:{},
             customerData: {
                 id: 123456789,
                 code: 123456789,
@@ -324,10 +326,9 @@ export default {
     },
     methods:{
     
-        changeToEdit(){
-           this.saleMode="Sale / Edit"
-        },
-       
+        goEdit(){           
+            this.$router.push({name: "EditSale", params: {id:this.voucher_no}})
+        },      
 
         setCodeOnPaste(){
             setTimeout(()=>{                
@@ -466,7 +467,6 @@ export default {
             this.credit=this.paid ? Math.abs(this.net_amount) - this.paid :  this.net_amount;
         },
         setInput(e){
-            console.log(e.target.value)
            if(e.target.value==0){
                 e.target.value=""
            }
@@ -494,6 +494,7 @@ export default {
             this.customer.created_at=p.created_at
         },
         setOldCode(s){
+            this.id=s.id;
             this.saleMode="Sale / History";
             this.voucher_no=s.voucher_no,
             this.sale_date=hp.setOldDate(s.sale_date)
@@ -506,6 +507,7 @@ export default {
             this.paid=s.paid;
             this.sale_type=s.sale_type
             this.credit=s.credit
+            this.sale_user=s.user;
             this.customer.name=s.customer.name;
             this.customer.phone=s.customer.phone;
         },
@@ -596,6 +598,7 @@ export default {
                 })
         },
         clearSaleItem(){
+                this.sale_user={}
                 this.editItem={},
                 this.saleItems=[],
                 this.store_item={},
@@ -646,9 +649,7 @@ export default {
                         e.input_m_qty = bal_qty_largest_unit ? 0 : bal_qty_medium_unit ? bal_qty_medium_unit : 0;
                         e.input_s_qty = bal_qty_largest_unit || bal_qty_medium_unit ? 0 : bal_qty_smallest_unit ? bal_qty_smallest_unit : 0;
                         isSufficient=false;                        
-                    }                
-            
-            
+                    }                                       
             if(!isSufficient) return false;
             return true;
         },
