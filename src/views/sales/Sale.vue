@@ -14,7 +14,7 @@
                       </div>
                 </div>-->
                 <div class="col-sm-2 d-grid">
-                    <select class="form-control-plaintext text-center" :disabled="saleItems.length > 0" v-model="sale_type">
+                    <select class="form-control-plaintext text-center" @change="changeSaleType" :disabled="saleMode=='Sale / History'" v-model="sale_type">
                         <option value="retail">Retail</option>
                         <option value="whole_sale">Wholesale</option>
                     </select>
@@ -115,7 +115,7 @@
                                         </tr>    
                                     </tbody>                                  
                                     <tbody>                                                                         
-                                        <tr class="" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(i)"  >
+                                        <tr class="" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(s)"  >
                                             <td class="position-relative text-center">
                                                 <span v-if="saleMode=='Sale / New'">
                                                     <a  class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeSaleItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
@@ -325,7 +325,29 @@ export default {
       
     },
     methods:{
-    
+        changeSaleType(){
+          this.saleItems= this.saleItems.map((s)=>{
+                const arr=Object.entries(s.packing_size)
+                 const unit=arr.filter((ft)=>{
+                            return ft[1]==s.qty_sale_price_unit;
+                     }) 
+                const sale_unit=unit[0][0] 
+                let qty_sale_price=0;
+                if(sale_unit=="largest_unit"){
+                    qty_sale_price=this.sale_type=="Retail" ? s.retail_price.largest_unit : s.whole_sale_price.largest_unit
+                }else if(sale_unit=="medium_unit"){
+                    qty_sale_price=this.sale_type=="Retail" ? s.retail_price.medium_unit : s.whole_sale_price.medium_unit
+                }else if(sale_unit){
+                    qty_sale_price=this.sale_type=="Retail" ? s.retail_price.smallest_unit : s.whole_sale_price.smallest_unit
+                }
+               return {...s, qty_sale_price: qty_sale_price}
+            })
+            this.saleItems.map((s)=>{
+                this.setEdit(s)
+                this.calEdit();
+            })
+            this.calTotal();
+        },
         goEdit(){           
             this.$router.push({name: "EditSale", params: {id:this.voucher_no}})
         },      
@@ -412,8 +434,7 @@ export default {
                 this.calEdit();
         },
      
-        setEdit(i){
-            const item=this.saleItems[i];
+        setEdit(item){
             this.editItem={...item,               
                 input_l_qty: item.input_l_qty ? item.input_l_qty : "",
                 input_m_qty: item.input_m_qty ? item.input_m_qty : "",

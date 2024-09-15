@@ -294,8 +294,8 @@ export default {
      //   this.setCustomer(this.customerData)
         this.fetchSale();
        setTimeout(()=>{
-        const code_no=document.getElementById("code_no");
-        code_no.focus();
+       // const code_no=document.getElementById("code_no");
+        //code_no.focus();
        }, 300)
       // await disableNetwork(db)
      this.checkDatabase();
