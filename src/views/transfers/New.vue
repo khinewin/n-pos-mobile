@@ -189,9 +189,43 @@ export default {
     },
     
     methods:{
-        setTransferQty(){
-            const e=this.editItem;
+        checkQty(p){
+            const org_qty=this.from_location=="Main" ? p.main_qty : p.qty;
+            if(org_qty  <1 ){
+                this.msg.type="error";
+                this.msg.info=`Insufficient ${this.from_location} inventory balance`
+                return false;
+            }          
+            return true;
+        },
+        checkEditQty(){    
+            let isSufficient=true;
+            const e=this.editItem
+            const org_qty=this.from_location=="Main" ? e.main_qty : e.qty;
 
+                let trans_qty=0;
+                trans_qty += e.input_l_qty ? e.input_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
+                trans_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty: 0;
+                trans_qty += e.input_s_qty ? e.input_s_qty : 0;
+
+                let bal_qty_largest_unit=e.packing_size.largest_unit ? Math.floor(org_qty / (e.packing_size.medium_qty * e.packing_size.smallest_qty)) : 0;
+                let bal_qty_medium_unit=e.packing_size.medium_unit ? Math.floor((org_qty % (e.packing_size.medium_qty * e.packing_size.smallest_qty)) / e.packing_size.smallest_qty): 0;
+                let bal_qty_smallest_unit=org_qty;
+                //console.log(e.input_l_qty)//has a trouble
+                    if(trans_qty > org_qty){
+                        this.msg.type="error";
+                        this.msg.info="Maximum  inventory balance"
+                        e.input_l_qty = bal_qty_largest_unit ? bal_qty_largest_unit : 0;
+                        e.input_m_qty = bal_qty_largest_unit ? 0 : bal_qty_medium_unit ? bal_qty_medium_unit : 0;
+                        e.input_s_qty = bal_qty_largest_unit || bal_qty_medium_unit ? 0 : bal_qty_smallest_unit ? bal_qty_smallest_unit : 0;
+                        isSufficient=false;                        
+                    }                                       
+            if(!isSufficient) return false;
+            return true;
+        },
+        setTransferQty(){
+            const isCheck=this.checkEditQty();
+            const e=this.editItem;           
                 let transfer_qty=0;
                 let after_from_loc_bal=0;
                 let after_to_loc_bal=0;
@@ -274,7 +308,9 @@ export default {
         storingItem(){           
             this.storeItems.push(this.transfer_item)   
          },
-        setCode(p){           
+        setCode(p){        
+            const checkQty=this.checkQty(p);
+            if(!checkQty) return false;   
             this.transfer_item={...p,
                  transfer_qty:0, 
                  from_loc_bal: this.from_location=="Main" ? p.main_qty : p.qty,

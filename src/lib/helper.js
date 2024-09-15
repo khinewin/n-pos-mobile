@@ -85,10 +85,10 @@ const  message=(type, name)=>{
 
   const  calPackingSize=(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty)=>{
         if(l_unit){
-            return `1${l_unit} * ${m_unit_qty}${m_unit} * ${s_unit_qty}${s_unit}`
+            return `1${l_unit}*${m_unit_qty}${m_unit}*${s_unit_qty}${s_unit}`
         }
         if(!l_unit){
-            return `1${m_unit} * ${s_unit_qty}${s_unit}`
+            return `1${m_unit}*${s_unit_qty}${s_unit}`
         }
     }
 
@@ -172,6 +172,7 @@ const  message=(type, name)=>{
       return `Ks ${f}`
     }
 
+  
 
 const gb_date=groupBy(['group_date'])
 const gb_item_name=groupBy(['item_name'])

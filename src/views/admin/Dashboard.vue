@@ -46,6 +46,9 @@
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
                 <router-link class="btn btn-sm" :to="{name : 'Transfers'}"><i class="fa-solid fa-right-left"></i> Transfers</router-link>
+            </div>  
+            <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
+                <router-link class="btn btn-sm" :to="{name : 'Adjustments'}"><i class="fa-solid fa-sliders"></i> Adjustment</router-link>
             </div>           
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
                 <router-link class="btn btn-sm" :to="{name : 'Soc'}"><i class="fa-solid fa-file-invoice-dollar"></i> SOC</router-link>

@@ -38,62 +38,60 @@
                 </tbody>
           </table>
         </div>
-        <div class="col-12">
-            <table class="table table-bordered table-hover border-dark mt-2 mb-0">
-                <tbody class="small">
+        <div class="col-12 mt-1">
+            <table class="table table-borderless  mb-0">
+                <tbody class="table-group-divider">
                     <tr class="text-center fw-bold">
-                        <td class="col-1">No.</td>
-                        <td class="col-4">Description</td>
-                        <td class="col-1">Qty</td>
-                        <td class="col-1">Unit Price</td>
-                        <td class="col-1">Discount</td>
-                        <td class="col-1">Discount Amt</td>
-                        <td class="col-1">Amount</td>
+                        <td class="col-0 border-0 border-bottom border-2 border-dark">No.</td>
+                        <td class="col-5 border-0  border-bottom border-2 border-dark">Description</td>
+                        <td class="col-1 border-0  border-bottom border-2 border-dark">Qty</td>
+                        <td class="col-2 border-0  border-bottom border-2 border-dark">Unit Price</td>
+                        <td class="col-2 border-0  border-bottom border-2 border-dark">Discount</td>
+                        <td class="col-2 border-0  border-bottom border-2 border-dark">Amount</td>
                     </tr>
-                    <tr class="" v-if="data.saleItems.length > 0" v-for="(s, i) in data.saleItems" :key="s.id" >   
+                </tbody>
+                <tbody class="table-group-divider">
+                    <tr cv-if="data.saleItems.length > 0" v-for="(s, i) in data.saleItems" :key="s.id" >   
                         <td class="text-center">{{i+1}}</td>                     
                         <td class="">{{s.item_name}}</td> 
                         <td class="text-center">
                             {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
                         </td>    
                         <td class="text-end">{{fM(s.qty_sale_price)}}' {{s.qty_sale_price_unit}} </td>     
-                        <td class="text-center">
+                        <!--<td class="text-center">
                             <span v-if="s.dis_qty">{{s.dis_qty}}{{s.dis_qty_unit}}</span>
                             <span v-if="s.dis_amount">{{s.dis_amount}}$</span>
                             <span v-if="s.dis_percent">{{s.dis_percent}}%</span>     
-                        </td>         
+                        </td>-->         
                         <td class=" text-end">{{s.discount ? fM(s.discount) : 0}}</td>
                         <td class=" text-end">{{fM(s.final_amount)}}</td>     
                     </tr>                        
-              
+                </tbody>
+            </table>
+            <table class="table table-borderless mb-0">
+                <tbody class="table-group-divider">
                     <tr>
-                        <td colspan="6"  class="text-end  pe-2 " style="border-bottom-style: hidden;">Total amount</td>
-                        <td class="text-end">{{fM(data.total_amount)}}</td>
-                    </tr>                     
-                    <tr>
-                        <td colspan="6" class="text-end pe-2 " style="border-bottom-style: hidden;">Extra discount</td>
-                        <td class="text-end">
-                            {{fM(data.extra_discount)}}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="6" class="text-end pe-2 " style="border-bottom-style: hidden;">Net amount</td>
+                        <td colspan=""  class="ps-2">Total amount :</td>
+                        <td class="text-end">{{fM(data.total_amount)}}</td>                   
+                        <td colspan="" class="ps-2 ">Net amount :</td>
                         <td class="text-end">{{fM(data.net_amount)}}</td>
                     </tr>
-                    <tr >
-                        <td colspan="6" class="text-end  pe-2 " style="border-bottom-style: hidden;">Paid (Ks)</td>
+                    <tr>
+                        <td colspan="" class="ps-2">Extra discount :</td>
+                        <td class="text-end">
+                            {{fM(data.extra_discount)}}
+                        </td>                                        
+                        <td colspan="" class="ps-2">Paid (Ks) :</td>
                         <td class="text-end">
                             {{fM(data.paid)}}
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="6"  class="text-end  pe-2 " style="border-bottom-style: hidden;">Change</td>
+                        <td colspan=""  class=" ps-2">Change :</td>
                         <td class="text-end ">
                             {{fM(data.change)}}
-                        </td>
-                    </tr> 
-                    <tr v-if="data.credit">
-                        <td colspan="6" class="text-end pe-2" >Credit</td>
+                        </td>                   
+                        <td colspan="" class="ps-2" >Credit :</td>
                         <td class="text-end">
                             {{fM(data.credit)}}
                         </td>
@@ -101,9 +99,9 @@
                 </tbody>
           </table>
           <table class="table table-borderless">
-                <tbody>
+                <tbody class="table-group-divider">
                     <tr>
-                        <td>Print date : {{printDate}}</td>
+                        <td>Printed on : {{printDate}}</td>
                         <td></td>
                     </tr>
                 </tbody>
@@ -172,21 +170,21 @@
                     </tbody>
                     <tbody class="text-end">
                     <tr>
-                        <td colspan="4" class=" " style="border-bottom-style: hidden;">Total amount</td>
+                        <td colspan="4" class=" ">Total amount</td>
                         <td class="">{{fM(data.total_amount)}}</td>
                     </tr>                     
                     <tr>
-                        <td colspan="4" class="" style="border-bottom-style: hidden;">Extra discount</td>
+                        <td colspan="4" class="">Extra discount</td>
                         <td class="">
                             {{fM(data.extra_discount)}}
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="4" class="" style="border-bottom-style: hidden;">Net amount</td>
+                        <td colspan="4" class="">Net amount</td>
                         <td class="">{{fM(data.net_amount)}}</td>
                     </tr>
                     <tr >
-                        <td colspan="4" class="" style="border-bottom-style: hidden;">Paid (Ks)</td>
+                        <td colspan="4" class="">Paid (Ks)</td>
                         <td class="">
                             {{fM(data.paid)}}
                         </td>

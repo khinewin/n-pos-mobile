@@ -16,12 +16,13 @@
                                 </div>
                             </div>
                         </div>   
-                        <div v-if="topSalesQty.length >1" class="pe-5">
+                        <div v-if="topSalesQty.length >1" class="pe-5 chart">
                             <GChart
                             :settings="{ packages: ['corechart', 'table', 'map'] }"
                             type="ColumnChart"
                             :data="topSalesQty"
                             :options="qtyOptions"
+                          
                         />
                         </div>
                         <div class="my-5 text-center" v-else >No data.</div>
@@ -47,7 +48,7 @@
                                     </div>
                                 </div>
                             </div>   
-                            <div v-if="products.length >1" class="pe-5">
+                            <div v-if="products.length >1" class="pe-5 chart">
                                 <GChart
                                 :settings="{ packages: ['corechart', 'table', 'map'] }"
                                 type="ColumnChart"
@@ -78,7 +79,7 @@
                                     </div>
                                 </div>
                             </div>   
-                            <div v-if="monthlyProducts.length > 1" class="pe-5">
+                            <div v-if="monthlyProducts.length > 1" class="pe-5 chart">
                                 <GChart
                                 :settings="{ packages: ['corechart', 'table', 'map'] }"
                                 type="ColumnChart"
@@ -100,7 +101,7 @@
                         <div class="col-12">
                             <div v-if="isLoading">
                                 <div colspan="5">
-                                    <div class="d-flex justify-content-center my-5">
+                                    <div class="d-flex justify-content-center my-5 chart">
                                         <div class="spinner-border text-primary"  role="status">
                                           <span class="visually-hidden">Loading...</span>
                                         </div>
@@ -148,7 +149,8 @@ export default {
             discount:0,
             qtyOptions: {
                 colors : ["teal"],
-                width: '100%'
+                width: '100%',
+                responsive: true,
             },        
             chartOptions: {              
                 colors : ["orange", "blue","green", "brown"]
@@ -157,17 +159,18 @@ export default {
                 colors : ["orange", "blue","green"]
             },
             monthlySalesAmountOptions: {              
-                colors : ["red", "orange","yellow", "green","teal","blue"]
+                colors : ["red", "orange","yellow", "green","teal","blue"],
+                is3D:true,
             }
         }
     },
     mounted() {
-        if(this.user !==null){
                 this.isLoading=true;
                 this.fetchSalesDaily();  
                 this.fetchSalesMonthly();
-            }
+            
     },
+   
     watch:{
    
    msg:{
@@ -180,13 +183,7 @@ export default {
                }
            },deep:true
        },
-       user(data){
-           if(data){
-               this.isLoading=true;
-               this.fetchSalesDaily();  
-               this.fetchSalesMonthly();
-           }
-       }   
+    
   },
     computed:{
         user(){
@@ -194,6 +191,7 @@ export default {
         },
     },
     methods:{
+     
         monthlyReports(){
             let sales=[]
             this.salesMonthlyData.map((res)=>{                  
@@ -354,6 +352,8 @@ export default {
     
 }
 </script>
-<style scoped>
-   
+<style>
+   .chart{
+    width: 100%
+   }
 </style>

@@ -45,7 +45,8 @@ export default {
             salesMonthlyData:[],
             monthlySales:[],
             monthlyChartOptions: {              
-                colors : ["blue"]
+                colors : ["blue"],
+                responsive:true,
             }
         }
     },

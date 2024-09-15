@@ -100,16 +100,15 @@
                                             <td class="col-1 text-center">
                                                 <input :disabled="saleMode=='Sale / History'" @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext p-0  text-center" placeholder="Scan code here">
                                             </td>
-                                            <td id="description" class="col-2 text-center" :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#searchCode']" style="cursor: context-menu;">
+                                            <td id="description" class="col-3 text-center" :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#searchCode']" style="cursor: context-menu;">
                                                 <i class="fa-solid fa-circle-plus"></i> Description
                                             </td>  
                                             <td class="col-1  text-center">Packing size</td>                                                                                    
                                             <td class="col-1 text-center  table-primary">Qty</td>
                                             <td class="col-2 text-center  table-info" colspan="2">Unit price</td>
-                                            <td class="col-1 text-center  table-warning">Discount</td>
                                             <td class="col-1 text-center ">Amount</td>
-                                            <td class="col-1 text-center ">Discount Amt</td>
-                                            <td class="col-1 text-center ">Final Amt</td>
+                                            <td class="col-2 text-center  table-warning" colspan="2">Discount</td>
+                                            <td class="col-1 text-center ">Total Amt</td>
                                         </tr>    
                                     </tbody>
                                   
@@ -128,21 +127,21 @@
                                             <td class=" text-end table-primary" id="setQty" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                                 {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
                                             </td>                                            
-                                            <td class=" table-info">
+                                            <td class=" table-info col-1">
                                                 <input disabled  type="number"  v-model="s.qty_sale_price" class="form-control-plaintext py-0  text-center" placeholder="Price">                                        
                                             </td>
-                                            <td class=" table-info">
+                                            <td class=" table-info col-0">
                                                 <select @change="calEdit" class="form-control-plaintext p-0 text-center" v-model="s.qty_sale_price_unit">
-                                                    <option  v-for="pu in onlyString(s.packing_size)">{{pu}}</option>
+                                                    <option   v-for="pu in onlyString(s.packing_size)">{{pu}}</option>
                                                 </select>
                                             </td>
+                                            <td class=" text-end">{{s.amount}}</td>
                                             <td class=" text-center table-warning" id="setDiscount" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
                                                 <span v-if="s.dis_qty">{{s.dis_qty}}{{s.dis_qty_unit}}</span>
                                                 <span v-if="s.dis_amount">{{s.dis_amount}}$</span>
                                                 <span v-if="s.dis_percent">{{s.dis_percent}}%</span>      
                                             </td>
-                                            <td class=" text-end">{{s.amount}}</td>
-                                            <td class=" text-end">{{s.discount}}</td>
+                                            <td class=" text-end table-warning" data-bs-toggle="modal" data-bs-target="#setDiscountModal">{{s.discount}}</td>
                                             <td class="text-end">{{s.final_amount}}</td>
                                         </tr> 
                                    
@@ -190,7 +189,7 @@
         <SalesModal @setCode="setOldCode" />
         <CustomerModal @setCustomer="setCustomer" />
         <!--Print item start-->
-        <div class="d-none" id="printMe" v-if="saleItems.length > 0" >
+        <div class="" id="printMe" v-if="saleItems.length > 0" >
                 <Print :data="{
                     voucher_no: this.voucher_no,
                     customer: this.customer,

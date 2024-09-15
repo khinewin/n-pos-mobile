@@ -6,7 +6,7 @@
                 <div class="row">
                     <div class="col-12">
                         <div v-if="isLoading">
-                            <div colspan="5">
+                            <div>
                                 <div class="d-flex justify-content-center my-5">
                                     <div class="spinner-border text-primary"  role="status">
                                       <span class="visually-hidden">Loading...</span>
@@ -47,6 +47,7 @@ export default {
             monthlyChartOptions: {              
                 colors : ["teal","blue", "brown","green", "orange","gray", "blue","orange",],
                 is3D: true,
+                responsive:true,
             }
         }
     },

@@ -2,7 +2,7 @@
     <div class="">
         <table class="table table-bordered mb-0 border-dark table-hover ">
             <tbody class="fw-bold text-center">
-                <tr><td rowspan="2">Customer</td></tr>
+                <tr><td rowspan="2" class="col-1">Customer</td></tr>
                 <tr >
                     <td class="col-1">Code</td>
                     <td class="col-2">Description</td>
