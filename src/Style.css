@@ -82,6 +82,45 @@ min-height: 60vh !important;
 .vh-50{
     height: 50vh !important;
 }
+.vh-55{
+    height: 55vh !important;
+}
+.w-5{
+    width: 5% !important;
+}
+.w-6{
+    width: 6% !important;
+}
+.w-7{
+    width: 7% !important;
+}
+.w-8{
+    width: 8% !important;
+}
+.w-9{
+    width: 9% !important;
+}
+.w-10{
+    width: 10% !important;
+}
+.w-11{
+    width: 11% !important;
+}
+.w-12{
+    width: 12% !important;
+}
+.w-13{
+    width: 13% !important;
+}
+.w-14{
+    width: 14% !important;
+}
+.w-15{
+    width: 15% !important;
+}
+.w-20{
+    width: 20% !important;
+}
 
 .change-cursor{
     cursor: context-menu  !important;

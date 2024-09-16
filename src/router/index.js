@@ -31,6 +31,8 @@ import SalesOnCredit from '@/views/sales/SalesOnCredit.vue'
 import ReportsSoc from '@/views/reports/Soc.vue'
 import BackupRestore from '@/views/backup/BackupRestore.vue'
 import EditSale from '@/views/sales/Edit.vue'
+import ReturnIn from '@/views/returnin/ReturnIn.vue'
+import EditReturnIn from '@/views/returnin/Edit.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),  
@@ -55,7 +57,20 @@ const router = createRouter({
       component: Dashboard,
       meta : {title: "N-Pharmacy | Admin dashboard"}
     },
-    
+    {
+      path: '/return-in',
+      name: 'ReturnIn',     
+      component: ReturnIn,
+      meta : {title: "N-Pharmacy | Return In"}
+
+    },
+    {
+      path: '/return-in/:id/edit',
+      name: 'EditReturnIn',     
+      component: EditReturnIn,
+      meta : {title: "N-Pharmacy | Return In / Edit"}
+
+    },
     {
       path: '/sale',
       name: 'Sale',     

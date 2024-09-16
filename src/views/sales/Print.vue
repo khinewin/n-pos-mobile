@@ -101,8 +101,7 @@
           <table class="table table-borderless">
                 <tbody class="table-group-divider">
                     <tr>
-                        <td>Printed on : {{printDate}}</td>
-                        <td></td>
+                        <td class="text-end">Printed on : {{printDate}}</td>
                     </tr>
                 </tbody>
           </table>

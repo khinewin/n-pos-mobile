@@ -2,48 +2,30 @@
     <div>           
         <PageHeader :page-title="saleMode" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
-            <div class="row mb-2 justify-content-end">                            
-             <!--<div class="col-sm-2 lg-md-2 pt-1 ps-4 small">
-                    <div class="form-check form-check-inline" >
-                        <input class="form-check-input border-dark" :disabled="saleItems.length > 0" type="radio" name="inlineRadioOptions" id="inlineRadio1" v-model="sale_type" value="retail">
-                        <label class="form-check-label" for="inlineRadio1" :class="[sale_type==='retail' ? 'tex-primary' : 'text-dark']">Retail</label>
-                      </div>
-                      <div class="form-check form-check-inline" >
-                        <input class="form-check-input border-dark" :disabled="saleItems.length > 0" type="radio" name="inlineRadioOptions" id="inlineRadio2" v-model="sale_type" value="whole_sale">
-                        <label class="form-check-label" for="inlineRadio2" :class="[sale_type==='whole_sale' ? 'tex-primary' : 'text-dark']">Wholesale</label>
-                      </div>
-                </div>-->
+            <div class="row mb-2 justify-content-end">                           
+       
                 <div class="col-sm-2 d-grid">
                     <select class="form-control-plaintext text-center" @change="changeSaleType" v-model="sale_type">
                         <option value="retail">Retail</option>
                         <option value="whole_sale">Wholesale</option>
                     </select>
-                    <!--<button class="btn btn-sm" @click="changeToEdit" :disabled="saleMode=='Sale / New'" ><i class="fa-solid fa-pen-to-square"></i> Edit</button>-->
                 </div>
-                <!--<div class="col-sm-2 d-grid">
-                    <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#salesModal"><i class="fa-solid fa-folder-tree"></i> Browse</button>
-                </div>-->
+            
                 <div class="col-sm-2 d-grid">
-                    <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print</button>
+                    <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print (cltr+p)</button>
                 </div>
-                <div class="col-sm-2 d-grid">
-                        <button v-if="saleMode=='Sale / New' || saleMode=='Sale / History'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length <=0 || saleMode=='Sale / History' " ><i class="fa-solid fa-hard-drive"></i> Save
-                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
-                        </button>
-                        <button v-if="saleMode =='Sale / Edit'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading" ><i class="fa-solid fa-hard-drive"></i> Update
+                <div class="col-sm-2 d-grid">                     
+                        <button v-if="saleMode =='Sale / Edit'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length<=0" ><i class="fa-solid fa-hard-drive"></i> Save (cltr+s)
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                    <router-link :to="{name: 'Sale'}" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> Close</router-link>
+                    <router-link :to="{name: 'Sale'}" id="close" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> Close (cltr+q)</router-link>
                 </div>
             </div>
         </div>     
         <div class="container-fluid my-2">
-            <div class="row g-1">
-                <!--<div class="col-lg-4">
-                        <Products @setCode="setCode" :saleItems="saleItems" />
-                </div>-->
+            <div class="row g-1">             
                 <div class="col-12">
                     <div class="card shadow">
                         <div class="card-body p-2">
@@ -100,8 +82,8 @@
                                             <td class="col-1 text-center">
                                                 <input :disabled="saleMode=='Sale / History'" @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext p-0  text-center" placeholder="Scan code here">
                                             </td>
-                                            <td id="description" class="col-3 text-center" :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#searchCode']" style="cursor: context-menu;">
-                                                <i class="fa-solid fa-circle-plus"></i> Description
+                                            <td id="description" class="col-3 text-center" style="cursor: context-menu;">
+                                                 Description
                                             </td>  
                                             <td class="col-1  text-center">Packing size</td>                                                                                    
                                             <td class="col-1 text-center  table-primary">Qty</td>
@@ -111,12 +93,9 @@
                                             <td class="col-1 text-center ">Total Amt</td>
                                         </tr>    
                                     </tbody>                                  
-                                    <tbody>                                                                         
-                                        <tr class="" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" >
-                                            <td class="position-relative text-center">
-                                                <span v-if="saleMode=='Sale / New'">
-                                                    <a  class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeSaleItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
-                                                </span>
+                                    <tbody class="text-nowrap text-break">                                                                         
+                                        <tr class="" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @click="setEdit(s)">
+                                            <td class="position-relative text-center">                                             
                                                 {{s.code_no}}
                                             </td>
                                             <td class="">{{s.item_name}}</td>   
@@ -212,7 +191,7 @@
  import PageHeader from "@/views/partials/PageHeader.vue"
  import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {disableNetwork, Timestamp, collection, addDoc, doc, increment, setDoc,  updateDoc, onSnapshot, query, where, orderBy, getDocs} from 'firebase/firestore'
+import {disableNetwork, Timestamp, collection, addDoc, doc, increment, setDoc, deleteDoc, updateDoc, onSnapshot, query, where, orderBy, getDocs} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 //import Products from "@/views/sales/Products.vue"
 import SalesModal from "@/views/modals/sales/SalesModal.vue"
@@ -300,7 +279,12 @@ export default {
       // await disableNetwork(db)
      this.checkDatabase();
      //set print date     
+     window.addEventListener('keydown', this.handleCtrl);
+
     },
+    beforeUnmount() {
+         window.removeEventListener('keydown', this.handleCtrl);
+     },
   
     watch:{
         msg:{
@@ -321,6 +305,35 @@ export default {
       
     },
     methods:{   
+        handleCtrl(event) {
+            if (event.ctrlKey && event.key === 's') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.saveSale(); // Call your custom function
+            }
+            if (event.ctrlKey && event.key === 'q') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const close=document.getElementById("close")
+                close.click();
+            }
+            if (event.ctrlKey && event.key === 'p') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.printSale(); // Call your custom function
+            }
+            if (event.ctrlKey && event.key === 'b') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const browse=document.getElementById("browse")
+                browse.click();
+            }
+            if (event.ctrlKey && event.key === 'e') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                 this.goEdit();
+            }
+            if (event.ctrlKey && event.key === 'i') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const des=document.getElementById("description")
+                des.click();
+            }
+        },
         changeSaleType(){
           this.saleItems= this.saleItems.map((s)=>{
                 const arr=Object.entries(s.packing_size)
@@ -357,6 +370,7 @@ export default {
             const query_url = query(collection(db, "sales"), where("voucher_no", "==", Number(this.voucher_no)));
             onSnapshot(query_url, async(snapShot) =>{
                     const sales=ss.sales(snapShot)   
+                    if(sales.length<=0) return false;
                    this.setOldCode(sales[0])  
             });              
        } ,
@@ -436,6 +450,7 @@ export default {
             const oei=this.editItem;
             this.saleItems.map((f)=>{
                 if(f.id===oei.id){
+                      
                        const arr=Object.entries(f.packing_size)
                         const units=arr.filter((ft)=>{
                             return ft[1]==f.qty_sale_price_unit;
@@ -450,7 +465,7 @@ export default {
                         }else if(sale_unit=="smallest_unit"){
                             qty_sale_price=this.sale_type=='retail' ? f.retail_price.smallest_unit : f.whole_sale_price.smallest_unit
                         }
-                       f.qty_sale_price=qty_sale_price;
+                       f.qty_sale_price=f.sale_qty <=0 ? 0 :qty_sale_price;
 
                        if(sale_unit=="largest_unit"){
                            amount=Math.floor((f.qty_sale_price / (f.packing_size.medium_qty * f.packing_size.smallest_qty)) * f.sale_qty)
@@ -511,7 +526,9 @@ export default {
             this.id=s.id;
             this.sale_date=hp.setOldDate(s.sale_date)
             this.print_date=s.sale_date
-            this.saleItems=s.products;
+            this.saleItems=s.products.map((p)=>{
+                return {...p, old_sale_qty: p.sale_qty}
+            });
             this.total_amount=s.total_amount;
             this.net_amount=s.net_amount;
             this.change=s.change;
@@ -536,27 +553,32 @@ export default {
                                    // this.clearSaleItem(); 
                                 }
                             }
+                            if(change.type==="removed"){
+                                this.msg.type="success";
+                                this.msg.info="The voucher has been cancelled." 
+                                this.isLoading=false;
+                                this.clearSaleItem();
+                            }
                     });                                              
             });                              
         } ,
         async saveSale(){                  
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
-            if(this.saleItems.length <=0) return false;
+          
             if(this.customer.code==123456789 && this.credit > 0) return false;
-            const isNotReady= this.saleItems.filter((f)=>!f.final_amount)
+
+            const isNotReady= this.saleItems.filter((f)=>f.sale_qty && !f.final_amount)
             if(isNotReady.length) return false;            
 
               this.isLoading=true;
                 this.msg.type="";
                 this.msg.info="";
 
-              /*  if(this.credit > 0){
-                    this.saveCredit();
-                }
-                    */
+                this.updateProducts();
+                this.updateStoreItem();
+                
                 const sale_date=hp.insertDate(this.sale_date)
-
                 const voucher={
                     voucher_no: Number(this.voucher_no),
                    sale_date: Timestamp.fromDate(sale_date),
@@ -573,40 +595,31 @@ export default {
                     payment_type: this.credit > 0 ? "Credit" : "Paid"
                 }                           
                 const saveDocument=doc(db, "sales", this.id)
-                await setDoc(saveDocument, voucher)           
-                this.isLoading=false;
+                if(this.saleItems.length<=0){
+                    await deleteDoc(saveDocument) 
+                }else{
+                    await setDoc(saveDocument, voucher)           
+                    this.isLoading=false;
+                }                
         },
-        async saveCredit(){
-            let date=new Date();
-            let sale_date=new Date(this.sale_date)
-            sale_date.setHours(date.getHours())
-            sale_date.setMinutes(date.getMinutes())
-            const voucher={
-                    voucher_no: this.voucher_no,
-                    sale_date: Timestamp.fromDate(sale_date),
-                    products : this.saleItems,
-                    user : {uid: this.user.uid, displayName: this.user.displayName},
-                    total_amount:this.total_amount,
-                    extra_discount:this.extra_discount,
-                    net_amount: this.net_amount,
-                    paid: this.paid,
-                    change:this.change,
-                    sale_type:this.sale_type,
-                    customer : this.customer,
-                    credit: this.credit,
-                }                  
-                const saveDocument=collection(db, "creditSales")
-                await addDoc(saveDocument, voucher)     
+      
+      
+        updateStoreItem(){
+            const updateStore=this.saleItems.filter((f)=>f.sale_qty != 0)
+            this.saleItems=updateStore;
         },
         updateProducts(){
-            this.saleItems.map(async (p)=>{
+            if(this.saleItems.length > 0){ //update products qty increase or decrease
+                    this.saleItems.map(async (p)=>{
                     const id=p.id;
-                    const sale_qty=p.sale_qty;               
+                    const sale_qty=p.sale_qty;     
+                    const old_sale_qty=p.old_sale_qty;          
                     const updateDocument=doc(db, "products", id)
-                    await updateDoc(updateDocument, {
-                        qty : increment(-sale_qty)
-                    })    
-                })
+                        await updateDoc(updateDocument, {                      
+                        qty : sale_qty < old_sale_qty ? increment(old_sale_qty - sale_qty) : increment(- (sale_qty - old_sale_qty)),
+                    })                                      
+                })               
+            }            
         },
         clearSaleItem(){
                 this.editItem={},
@@ -618,7 +631,6 @@ export default {
                 this.paid=0,
                 this.change=0
                 this.credit=0
-                this.saleMode="Sale / New";                
                 this.voucher_no=new Date().getTime();
                 this.sale_date=hp.setToday();      
                 this.print_date=hp.setToday();  

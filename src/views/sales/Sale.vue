@@ -20,25 +20,23 @@
                     </select>
                 </div>    
                 <div class="col-sm-2 d-grid">    
-                    <button class="btn btn-sm" @click="goEdit" :disabled="!id || user.uid != sale_user.uid"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                    <button class="btn btn-sm" @click="goEdit" :disabled="!id || user.uid != sale_user.uid"><i class="fa-solid fa-pen-to-square"></i> Edit (ctrl+e)</button>
                 </div>
                 
                 <div class="col-sm-2 d-grid">
-                    <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#salesModal"><i class="fa-solid fa-folder-tree"></i> Browse</button>
+                    <button class="btn btn-sm" id="browse" data-bs-toggle="modal" data-bs-target="#salesModal"><i class="fa-solid fa-folder-tree"></i> Browse (ctrl+b)</button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                    <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print</button>
+                    <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print (ctrl+p)</button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                        <button v-if="saleMode=='Sale / New' || saleMode=='Sale / History'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length <=0 || saleMode=='Sale / History' " ><i class="fa-solid fa-hard-drive"></i> Save
+                        <button v-if="saleMode=='Sale / New' || saleMode=='Sale / History'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length <=0 || saleMode=='Sale / History' " >
+                            <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
-                        </button>
-                        <button v-if="saleMode =='Sale / Edit'" type="button" @click="updateSale" class="btn btn-sm" :disabled="isLoading" ><i class="fa-solid fa-hard-drive"></i> Update
-                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
-                        </button>
+                        </button>                      
                 </div>
                 <div class="col-sm-2 d-grid">
-                        <button @click="clearSaleItem" class="btn btn-sm" :disabled="saleItems.length <=0"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                        <button @click="clearSaleItem" class="btn btn-sm" :disabled="saleItems.length <=0"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
                 </div>
             </div>
         </div>     
@@ -104,7 +102,7 @@
                                                 <input :disabled="saleMode=='Sale / History'" @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext p-0  text-center" placeholder="Scan code here">
                                             </td>
                                             <td id="description" class="col-3 text-center" :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#searchCode']" style="cursor: context-menu;">
-                                                <i class="fa-solid fa-circle-plus"></i> Description
+                                                <span v-if="saleMode=='Sale / New'"><i class="fa-solid fa-circle-plus"></i></span> Description <span v-if="saleMode=='Sale / New'">(cltr+i)</span>
                                             </td>  
                                             <td class="col-1  text-center">Packing size</td>                                                                                    
                                             <td class="col-1 text-center  table-primary">Qty</td>
@@ -114,7 +112,7 @@
                                             <td class="col-1 text-center ">Total Amt</td>
                                         </tr>    
                                     </tbody>                                  
-                                    <tbody>                                                                         
+                                    <tbody class="text-nowrap text-break">                                                                         
                                         <tr class="" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(s)"  >
                                             <td class="position-relative text-center">
                                                 <span v-if="saleMode=='Sale / New'">
@@ -123,10 +121,10 @@
                                                 {{s.code_no}}
                                             </td>
                                             <td class="">{{s.item_name}}</td>   
-                                            <td class="">
+                                            <td class=" ">
                                                 {{calPackingSize(s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit, s.packing_size.medium_qty, s.packing_size.smallest_qty)}}
                                             </td>                                        
-                                            <td class=" text-end table-primary" id="setQty" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                            <td class=" text-end table-primary" id="setQty"  :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#setQtyModal']">
                                                 {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
                                             </td>                                            
                                             <td class=" table-info col-1">
@@ -304,7 +302,11 @@ export default {
       // await disableNetwork(db)
      this.checkDatabase();
      //set print date     
+         window.addEventListener('keydown', this.handleCtrl);
     },
+    beforeUnmount() {
+         window.removeEventListener('keydown', this.handleCtrl);
+     },
   
     watch:{
         msg:{
@@ -325,6 +327,34 @@ export default {
       
     },
     methods:{
+        handleCtrl(event) {
+            if (event.ctrlKey && event.key === 's') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.saveSale(); // Call your custom function
+            }
+            if (event.ctrlKey && event.key === 'q') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.clearSaleItem(); // Call your custom function
+            }
+            if (event.ctrlKey && event.key === 'p') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.printSale(); // Call your custom function
+            }
+            if (event.ctrlKey && event.key === 'b') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const browse=document.getElementById("browse")
+                browse.click();
+            }
+            if (event.ctrlKey && event.key === 'e') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                 this.goEdit();
+            }
+            if (event.ctrlKey && event.key === 'i') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const des=document.getElementById("description")
+                des.click();
+            }
+        },
         changeSaleType(){
           this.saleItems= this.saleItems.map((s)=>{
                 const arr=Object.entries(s.packing_size)
@@ -349,6 +379,7 @@ export default {
             this.calTotal();
         },
         goEdit(){           
+            if(this.saleMode=="Sale / New") return false;
             this.$router.push({name: "EditSale", params: {id:this.voucher_no}})
         },      
 
@@ -552,7 +583,11 @@ export default {
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
             if(this.saleItems.length <=0) return false;
-            if(this.customer.code==123456789 && this.credit > 0) return false;
+            if(this.customer.code==123456789 && this.credit > 0){
+                this.msg.info="Cannot sale with credit for default customer"
+                this.msg.type="error"
+                return false
+            }
             const isNotReady= this.saleItems.filter((f)=>!f.final_amount)
             if(isNotReady.length) return false;            
 

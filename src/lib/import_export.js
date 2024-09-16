@@ -1,4 +1,4 @@
-import {Timestamp, collection, addDoc, getDocs, doc, onSnapshot, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
+import {Timestamp, collection, addDoc, getDocs, doc, deleteDoc, onSnapshot, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 
 const exportToJson=(arr, file_name)=>{
@@ -143,6 +143,15 @@ const saveDocument=doc(db, "packingSizes", d.id)
 await setDoc(saveDocument, voucher)   
 }
 
+const deleteData=(data, collection)=>{
+  data.map((d, i)=>{
+      setTimeout(async ()=>{
+          const document=doc(db, collection, d.id)     
+          await deleteDoc(document)      
+      }, 200 * i)
+  })
+}
+
   export {
     exportToJson,
     restoreSales,
@@ -154,5 +163,6 @@ await setDoc(saveDocument, voucher)
     restoreSuppliers,
     restoreCustomers,
     restorePackingSizes,
+    deleteData,
   }
   

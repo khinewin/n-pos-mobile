@@ -19,7 +19,7 @@
                                            </div>
                                            <div class="col-md-4 col-lg-12">
                                             <div class="form-floating">
-                                                <input type="search" id="search_by_customer" v-model="search_by_customer" @keypress.enter="searchSales" placeholder="Customer name" class="form-control-plaintext border-bottom">
+                                                <input type="search" id="search_by_customer" v-model="search_by_customer" @keyup="searchSales" placeholder="Customer name" class="form-control-plaintext border-bottom">
                                                 <label for="search_by_customer" class="">Customer name</label>
                                             </div>
                                            </div>

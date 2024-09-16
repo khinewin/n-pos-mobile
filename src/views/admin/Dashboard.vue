@@ -27,37 +27,37 @@
             </div>
            <div class="row g-1 my-1 n-link">           
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Sale'}" ><i class="fa-solid fa-cash-register"></i> Sale</router-link>
+                <router-link class="btn btn-sm  " :to="{name : 'Sale'}" ><i class="fa-solid fa-cash-register text-success"></i> Sale</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm" :to="{name : 'Purchase'}"><i class="fa-solid fa-cart-shopping"></i> Purchase</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Purchase'}"><i class="fa-solid fa-cart-shopping text-danger"></i> Purchase</router-link>
             </div>
             <div class=" col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm" :to="{name : 'Stocks'}"><i class="fa-solid fa-money-bill-trend-up"></i> Stocks</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Stocks'}"><i class="fa-solid fa-money-bill-trend-up text-primary"></i> Stocks</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm" :to="{name : 'Products'}"><i class="fa-solid fa-list-check"></i> Medicine code</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Products'}"><i class="fa-solid fa-list-check text-warning"></i> Medicine code</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm" :to="{name : 'Suppliers'}"><i class="fa-solid fa-person-walking-luggage"></i> Suppliers</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Suppliers'}"><i class="fa-solid fa-person-walking-luggage text-info"></i> Suppliers</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm" :to="{name : 'Customers'}"><i class="fa-solid fa-users"></i> Customers</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Customers'}"><i class="fa-solid fa-users text-success"></i> Customers</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm" :to="{name : 'Transfers'}"><i class="fa-solid fa-right-left"></i> Transfer</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Transfers'}"><i class="fa-solid fa-right-left text-danger"></i> Transfer</router-link>
             </div>  
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm" :to="{name : 'Adjustments'}"><i class="fa-solid fa-sliders"></i> Adjustment</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Adjustments'}"><i class="fa-solid fa-sliders text-primary"></i> Adjustment</router-link>
             </div>           
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm" :to="{name : 'Soc'}"><i class="fa-solid fa-file-invoice-dollar"></i> SOC</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Soc'}"><i class="fa-solid fa-file-invoice-dollar text-warning"></i> SOC</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2   d-grid">
-                <router-link :to="{name: 'Reports'}" class="btn btn-sm"><i class="fa-solid fa-chart-pie"></i> Reports</router-link>
+                <router-link :to="{name: 'Reports'}" class="btn btn-sm "><i class="fa-solid fa-chart-pie text-info"></i> Reports</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2   d-grid">
-                <router-link class="btn btn-sm" :to="{name : 'BackupRestore'}"><i class="fa-solid fa-file-export"></i> Backup / Restore</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'BackupRestore'}"><i class="fa-solid fa-download"></i> Backup / Restore</router-link>
             </div>
            </div>
            <div class="row g-2">

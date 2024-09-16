@@ -45,7 +45,7 @@
                                 <div class="card shadow vh-80 overflow-y-auto">
                                     <div class="card-body p-2">
                                         <table class="table table-bordered mb-0 table-hover">
-                                            <tbody class="small">
+                                            <tbody class="small text-nowrap text-break ">
                                                 <tr class="table-secondary text-center">
                                                     <td class="col-1">Code</td>
                                                     <td class="col-2">Description</td>
@@ -57,19 +57,19 @@
                                                 </tr>                                      
                                                 <tr class="" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"   style="cursor:context-menu">
                                                     <td class="text-center">{{p.code_no}}</td>
-                                                    <td>{{p.item_name}}</td>
-                                                    <td class="">
+                                                    <td class="text-nowrap text-break">{{p.item_name}}</td>
+                                                    <td class="text-nowrap text-break">
                                                         {{calPackingSize(p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit, p.packing_size.medium_qty, p.packing_size.smallest_qty)}}
                                                     </td>
-                                                    <td class="text-end">
+                                                    <td class="text-end ">
                                                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                             
                                                     </td>                                                  
-                                                    <td class="text-end" v-if="sale_type=='retail'">
+                                                    <td class="text-end " v-if="sale_type=='retail'">
                                                         <span v-if="p.retail_price.largest_unit">{{p.retail_price.largest_unit}} * </span>
                                                         <span v-if="p.retail_price.medium_unit">{{p.retail_price.medium_unit}} * </span>
                                                         <span v-if="p.retail_price.smallest_unit">{{p.retail_price.smallest_unit}} </span>
                                                     </td>
-                                                    <td class="text-end" v-if="sale_type=='whole_sale'">
+                                                    <td class="text-end " v-if="sale_type=='whole_sale'">
                                                         <span v-if="p.whole_sale_price.largest_unit">{{p.whole_sale_price.largest_unit}} * </span>
                                                         <span v-if="p.whole_sale_price.medium_unit">{{p.whole_sale_price.medium_unit}} * </span>
                                                         <span v-if="p.whole_sale_price.smallest_unit">{{p.whole_sale_price.smallest_unit}} </span>

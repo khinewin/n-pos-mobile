@@ -50,7 +50,7 @@
                                 <button  @click="exportAll" class="btn btn-outline-dark">Export All</button>
                             </div>
                         </div>
-                        <div class="row mt-2 justify-content-center">
+                        <div class="row mt-2 justify-content-center mb-4">
                             <div class="col-12">
                                 <div class="row g-2">                                   
                                         <div class="col-6 col-sm-4 d-grid">
@@ -83,9 +83,42 @@
                                 </div>
                             </div>                                                     
                         </div>
+                        <div class="col-12">
+                            <div class="h5  mb-2">Delete</div>
+                            <div class="row g-2">                                   
+                                <div class="col-6 col-sm-4 d-grid">
+                                    <button :disabled="products.length <=0" @click="deleteProducts" class="btn py-4 btn-outline-danger">Medicines Code ({{products.length}})</button>
+                                </div>
+                                <div class="col-6 col-sm-4 d-grid">
+                                    <button :disabled="sales.length <=0" @click="deleteSales" class="btn py-4 btn-outline-danger">Sales ({{sales.length}})</button>
+                                </div>
+                                <div class="col-6 col-sm-4 d-grid">
+                                    <button :disabled="purchases.length <=0" @click="deletePurchases" class="btn py-4 btn-outline-danger">Purchases ({{purchases.length}})</button>
+                                </div>
+                                <div class="col-6 col-sm-4 d-grid">
+                                    <button :disabled="stocks.length <=0" @click="deleteStocks" class="btn py-4 btn-outline-danger">Stocks ({{stocks.length}})</button>
+                                </div>
+                                <div class="col-6 col-sm-4 d-grid">
+                                    <button :disabled="transfers.length <=0" @click="deleteTransfers" class="btn py-4 btn-outline-danger">Transfers ({{transfers.length}})</button>
+                                </div>
+                                <div class="col-6 col-sm-4 d-grid">
+                                    <button :disabled="adjustments.length <=0" @click="deleteAdjustments" class="btn py-4 btn-outline-danger">Adjustments ({{adjustments.length}})</button>
+                                </div>
+                                <div class="col-6 col-sm-4 d-grid">
+                                    <button :disabled="suppliers.length <=0" @click="deleteSuppliers" class="btn py-4 btn-outline-danger">Suppliers ({{suppliers.length}})</button>
+                                </div>
+                                <div class="col-6 col-sm-4 d-grid">
+                                    <button :disabled="customers.length <=0" @click="deleteCustomers" class="btn py-4 btn-outline-danger">Customers ({{customers.length}})</button>
+                                </div>
+                                <div class="col-6 col-sm-4 d-grid">
+                                    <button :disabled="packingSizes.length <=0" @click="deletePackingSizes" class="btn py-4 btn-outline-danger">Packing Size ({{packingSizes.length}})</button>
+                                </div>
+                        </div>
+                        </div>
                     </div>
+                    
                     </div>
-                </div>
+                </div>               
             </div>
         </div>
     </div>
@@ -93,7 +126,7 @@
     </div>
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, onSnapshot, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
+import {Timestamp, collection, addDoc, getDocs, doc, deleteDoc, onSnapshot, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as hp_sales from "@/lib/snapshot/sales"
 import * as hp_purchases from "@/lib/snapshot/purchases"
@@ -180,6 +213,36 @@ export default {
     },
     
     methods:{
+
+        deleteProducts(){
+            ie.deleteData(this.products, "products")
+        },
+        deleteSales(){
+            ie.deleteData(this.sales, "sales")
+        },
+        deletePurchases(){
+            ie.deleteData(this.purchases, "purchases")
+        },
+        deleteStocks(){
+            ie.deleteData(this.stocks, "stocks")
+        },
+        deleteTransfers(){
+            ie.deleteData(this.transfers, "transfers")
+        },
+        deleteAdjustments(){
+            ie.deleteData(this.adjustments, "adjustments")
+        },
+        deletePackingSizes(){
+            ie.deleteData(this.packingSizes, "packingSizes")
+        },
+        deleteSuppliers(){
+            ie.deleteData(this.suppliers, "suppliers")
+        },
+        deleteCustomers(){
+            ie.deleteData(this.customers, "customers")
+        },
+        
+
         changeBackupDate(){
             this.fetchSales();
             this.fetchPurchase();
@@ -370,7 +433,7 @@ export default {
         fetchStocks(){
             const from_date=Timestamp.fromDate(hp.searchFromDate(this.from_date))
              const to_date=Timestamp.fromDate(hp.searchToDate(this.to_date))     
-            const query_url = query(collection(db, "openingStocks"), where("created_at", ">=", from_date), where("created_at", "<=", to_date));
+            const query_url = query(collection(db, "stocks"), where("created_at", ">=", from_date), where("created_at", "<=", to_date));
             onSnapshot(query_url, async(snapShot) =>{                  
                         let stocks=hp_stocks.stocks(snapShot)  
                         stocks=stocks.map((p)=>{
