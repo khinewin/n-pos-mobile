@@ -35,7 +35,7 @@
                                                 </button>
                                             </div>-->
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                                                <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (cltr+h)</button>
                                             </div>
                                         </div>   
                                     </div>
@@ -44,7 +44,7 @@
                             <div class="col-lg-9">
                                 <div class="card shadow vh-80 overflow-y-auto">
                                     <div class="card-body p-2">
-                                        <table class="table table-bordered mb-0 table-hover">
+                                        <table class="table table-bordered mb-0 table-hover text-nowrap text-break">
                                             <tbody class="small">
                                                 <tr class="table-secondary text-center">
                                                     <td class="col-1">Code</td>

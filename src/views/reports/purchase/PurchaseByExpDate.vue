@@ -6,12 +6,12 @@
                 <tr>
                     <td class="col-1">Code</td>
                     <td class="col-2">Description</td>
-                    <td class="col-1">Packing size</td>
+                    <td class="col-1">Packing Size</td>
                     <td class="col-1">Qty</td>
-                    <td class="col-1">Unit price</td>
+                    <td class="col-1">Unit Price</td>
                     <td class="col-1">Amount</td>
                     <td class="col-1">Discount</td>                                              
-                    <td class="col-1">Price</td>
+                    <td class="col-1">Unit Cost</td>
                 </tr>
             </tbody>
             <tbody v-if="reports.length >0" v-for="r in reports" :key="r[0]">   
@@ -30,13 +30,13 @@
                     </td>                   
                     <td class="text-end">{{fM(st.amount)}}</td>
                     <td class="text-end">{{fM(st.discount)}}</td>
-                    <td class="text-end">{{fM(st.price)}}</td>
+                    <td class="text-end">{{fM(st.unit_cost)}}</td>
                 </tr>
                 <tr>
                     <td colspan="5" class="text-end fw-bold pe-2">Total (Ks)</td>
                     <td class="text-end">{{fM(r[2].amount)}}</td>
                     <td class="text-end">{{fM(r[2].discount)}}</td>                                                
-                    <td class="text-end">{{fM(r[2].price)}}</td>
+                    <td class="text-end">{{fM(r[2].unit_cost)}}</td>
                 </tr>
             </tbody>
         </table>
@@ -161,7 +161,7 @@ export default {
                         qty_pur_price:0, 
                         qty_pur_price_unit: "",
                         amount:0,
-                        price:0,
+                        unit_cost:0,
                       }
                     res[1].map((ren)=>{
                         item.code_no=ren.code_no;
@@ -170,17 +170,17 @@ export default {
                         item.qty_pur_price = ren.qty_pur_price;
                         item.qty_pur_price_unit=ren.qty_pur_price_unit;
                         item.packing_size=ren.packing_size;
-                        item.price += ren.price;                        
+                        item.unit_cost += ren.unit_cost;                        
                         item.discount += ren.discount ? ren.discount : 0;
                         item.extra_discount += ren.extra_discount;
                     })
                     return item;
                 })
-                const res3={amount: 0, price:0, discount:0}
+                const res3={amount: 0, unit_cost:0, discount:0}
                 res2.map((ren)=>{
                     res3.amount += ren.amount;
                     res3.discount += ren.discount;
-                    res3.price += ren.price;
+                    res3.unit_cost += ren.unit_cost;
                 })                   
                 const newData=[res[0],  [...res2],res3]                    
                 return newData;                             

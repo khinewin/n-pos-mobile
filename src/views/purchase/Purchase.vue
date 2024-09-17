@@ -4,22 +4,22 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">
                 <div class="col-sm-2 d-grid">
-                    <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print</button>
+                    <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print (ctrl+p)</button>
                 </div>   
                 <div class="col-sm-2 d-grid">
-                    <button @click="goEdit" class='btn btn-sm' :disabled="!voucher_no || pur_user.uid !==  user.uid"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                    <button @click="goEdit" class='btn btn-sm' :disabled="!voucher_no || pur_user.uid !==  user.uid"><i class="fa-solid fa-pen-to-square"></i> Edit (ctrl+e)</button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                    <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#purchaseModal"><i class="fa-solid fa-folder-tree"></i> Browse</button>
+                    <button class="btn btn-sm" id="open" data-bs-toggle="modal" data-bs-target="#purchaseModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                        <router-link :to="{name : 'AddPurchase'}" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New</router-link>
+                        <router-link :to="{name : 'AddPurchase'}" id="add" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New (shift+n)</router-link>
                 </div>
                 <div class="col-sm-2 d-grid">
-                        <button class="btn btn-sm" :disabled="!voucher_no" @click="closeVoucher"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                        <button class="btn btn-sm" :disabled="!voucher_no" @click="closeVoucher"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
                 </div>
             </div>
-            <div class="card shadow min-vh-75" id="printMe">
+            <div class="card shadow" id="printMe">
                 <div class="d-none d-print-block">
                     <LargePrintHeader />
                     <div>Purchase</div>
@@ -65,21 +65,23 @@
                             </tbody>
                       </table>
                     </div>
-                </div>                 
+                </div>  
+                <div class="vh-50">               
                    <table class="table table-bordered mb-0 table-hover">
-                        <tbody>
+                        <tbody class="table-group-divider">
                             <tr class="text-center fw-bold table-secondary">
                                 <td class="col-1">Code</td>
                                 <td class="col-2">Descrption</td>
-                                <td class="col-1">Exp. date</td>     
-                                <td class="col-1">Packing size</td>                              
+                                <td class="col-1">Exp. Date</td>     
+                                <td class="col-1">Packing Size</td>                              
                                 <td class="col-1" colspan="1">Qty</td>
-                                <td class="col-1">Unit price</td>                                    
-                                <td class="col-1">Discount</td>                                    
-                                <td class="col-1">Amount</td>
-                                <td class="col-1">Discount</td>
-                                <td class="col-1">Price</td>
+                                <td class="col-1">Unit Price</td> 
+                                <td class="col-1">Amount</td>                                   
+                                <td class="col-1" colspan="2">Discount</td>                                    
+                                <td class="col-1">Unit Cost</td>
                             </tr>
+                            </tbody>
+                            <tbody class="table-group-divider">
                             <tr class="" v-if="products.length > 0" v-for="st in products" :key="st.id">
                                 <td class="">{{st.code_no}}</td>
                                 <td class="">{{st.item_name}}</td>
@@ -95,38 +97,41 @@
                                 <td class="text-center">
                                     {{st.qty_pur_price}} * {{st.qty_pur_price_unit}}
                                 </td>
-                                <td class="text-center">
+                                <td class="text-end">{{fM(st.amount)}}</td>
+                                <td class="text-center w-5">
                                     <span v-if="st.dis_qty">{{st.dis_qty}}{{st.dis_qty_unit}}</span>
                                     <span v-if="st.dis_amount">{{st.dis_amount}}$</span>
                                     <span v-if="st.dis_percent">{{st.dis_percent}}%</span> 
                                 </td>
-                                <td class="text-end">{{st.amount}}</td>
-                                <td class="text-end">{{st.discount}}</td>
-                                <td class="text-end">{{st.price}}</td>
-                            </tr>
-                            <tr class="small">
-                                <td colspan="9" class="text-end">Total amount</td>
-                                <td class="text-end">{{total_amount}}</td>
-                            </tr>
-                            <tr class="small">
-                                <td colspan="9" class="text-end">Total discount</td>
-                                <td class="text-end ">{{total_discount}}</td>
-                            </tr>
-                            <tr class="small">
-                                <td colspan="9" class="text-end">Total price</td>
-                                <td class="text-end">{{total_price}}</td>
-                            </tr>  
-                            <tr class="small">
-                                <td colspan="9" class="text-end">Extra discount</td>
-                                <td class="text-end">{{extra_discount}}</td>
-                            </tr>
-                            <tr class="small">
-                                <td colspan="9" class="text-end">Grand total price</td>
-                                <td class="text-end">{{grand_total_price}}</td>
-                            </tr>                           
+                                <td class="text-end w-5">{{st.discount ? fM(st.discount) : 0}}</td>
+                                <td class="text-end">{{fM(st.unit_cost)}}</td>
+                            </tr>                                                
                         </tbody>
                    </table>     
-                 
+                 </div>
+                 <table class="table table-bordered table-hover">
+                    <tbody class="table-group-divider">
+                      
+                        <tr class="small">
+                            <td  class="text-end col-3 pe-2 fw-bold">Total</td>
+                            <td class="text-end col-3">{{fM(total)}}</td>
+                            <td  class="text-end pe-2 fw-bold">Extra discount</td>
+                            <td class="text-end">
+                                {{fM(extra_discount)}}
+                            </td>
+                        </tr>                            
+                        <tr class="small">
+                            <td  class="text-end pe-2 fw-bold">Paid</td>
+                            <td class="text-end">{{fM(paid)}}</td>
+                            <td  class="text-end pe-2 fw-bold">Banalce</td>
+                            <td class="text-end">{{fM(balance)}}</td>
+                        </tr>
+                        <tr>
+                            <td  class="text-end pe-2 fw-bold">Remark</td>
+                            <td colspan="3">{{remark}}</td>
+                        </tr>
+                    </tbody>
+                 </table>
       
                 </div>
             </div>
@@ -164,8 +169,11 @@ export default {
             total_amount:0,
             total_discount:0,
             extra_discount:0,
-            grand_total_price:0,
-            total_price:0,
+            grand_total:0,
+            paid:0,
+            balance:0,
+            total:0,
+            remark:"",
             isLoading:false,
             msg : {
                 type :"",
@@ -181,8 +189,49 @@ export default {
         },    
       
     },
+    mounted() {
+        window.addEventListener('keydown', this.handlectrl);
+    },
+    beforeUnmount() {
+         window.removeEventListener('keydown', this.handlectrl);
+     },
  
     methods:{     
+        fM(amount){
+            return hp.formattedAmount(amount)
+        },
+        handlectrl(event) {
+         
+            if (event.ctrlKey && event.key === 'h') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const modal=document.getElementById("closeModal");
+                modal.click();
+            }
+            if (event.ctrlKey && event.key === 'q') {
+                event.preventDefault(); // Prevent the default browser save dialog             
+                this.closeVoucher(); // Call your custom function
+            }
+            if (event.ctrlKey && event.key === 'p') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                //this.printSale(); // Call your custom function
+                this.print();
+            }
+            if (event.ctrlKey && event.key === 'o') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const browse=document.getElementById("open")
+                browse.click();
+            }
+            if (event.ctrlKey && event.key === 'e') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                 this.goEdit();
+            }
+            if(event.shiftKey && event.key.toLowerCase()=== 'n') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const add=document.getElementById("add")
+                add.click();
+            }
+         
+        },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
@@ -203,10 +252,14 @@ export default {
             this.total_amount=0
             this.total_discount=0
             this.extra_discount=0
-            this.total_price=0,
+            this.total=0,
             this.location="";
+            this.paid=0;
+            this.balance=0;
+            this.remark="";
         },
         goEdit(){           
+            if(this.pur_user.uid!=this.user.uid) return false;
             this.$router.push({name: "EditPurchase", params: {id:this.voucher_no}})
         },
         setCode(p){
@@ -219,14 +272,17 @@ export default {
             this.location=p.location;
            // this.products=p.products;
            this.products=p.products;
+           this.remark=p.remark;
             this.calAmount(p);
         },
         calAmount(p){
             this.total_amount=p.total_amount;
             this.total_discount=p.total_discount;
             this.extra_discount=p.extra_discount;
-            this.total_price=p.total_price;
-            this.grand_total_price=p.grand_total_price;
+            this.total=p.total;
+            this.paid=p.paid;
+            this.balance=p.balance;
+            this.grand_total=p.grand_total;
         },
         
        showTime(t){
@@ -239,115 +295,3 @@ export default {
 <style lang="">
     
 </style>
-
-   <!--
-                   <ul class="list-gorup list-group-flush">
-                        <li class="list-group-item">
-                            <div class="row justify-content-end">
-                                <div class="col-lg-3">
-                                    <div class="text-end mt-2">Voucher no. :</div>
-                                </div>
-                                <div class="col-lg-3">                                 
-                                    <input type="text"  data-bs-toggle="modal" data-bs-target="#purchaseModal"  v-model="voucher_no" class="form-control-plaintext border-bottom" id="voucher_no" placeholder="Voucher no">                                        
-                                </div>
-                            </div>     
-                        </li>                       
-                        <li class="list-group-item">
-                            <div class="row justify-content-end">
-                                <div class="col-lg-3">
-                                    <div class="text-end mt-2">Date :</div>
-                                </div>
-                                <div class="col-lg-3">                                
-                                    <input type="date" v-model="pur_date" data-bs-toggle="modal" data-bs-target="#purchaseModal"  class="form-control-plaintext border-bottom" id="pur_date" placeholder="Date">                                        
-                                </div>
-                            </div>     
-                        </li>
-                        <li class="list-group-item">
-                            <div class="row justify-content-end">
-                                <div class="col-lg-3">                                
-                                    <div class="text-end mt-2">Supplier :</div>
-                                </div>
-                                <div class="col-lg-3">                                
-                                    <input type="text"  data-bs-toggle="modal" data-bs-target="#purchaseModal"  v-model="supplier" class="form-control-plaintext border-bottom" id="voucher_no" placeholder="Name (Company)">                                        
-                                   
-                                </div>
-                            </div>     
-                        </li>
-                   </ul>        
-                --> 
-                <!--
-                <ul class="list-group d-lg-none">
-                    <li class="list-group-item list-group-item-action">
-                        <div class="row g-0 small fw-bold">
-                            <div class="col-lg-1" >Code</div>
-                            <div class="col-lg-2">Desc</div>
-                            <div class="col-lg-1 text-center">Qty</div>
-                            <div class="col-lg-2 text-center">Item price</div>
-                            <div class="col-lg-2 text-center">
-                                <div class="row g-0">
-                                    <div class="col-4">Dis qty</div>
-                                    <div class="col-4">Dis %</div>
-                                    <div class="col-4">Dis $</div>
-                                </div>
-                            </div>                           
-                            <div class="col-lg-1 text-center">Amout</div>
-                            <div class="col-lg-1 text-center">Dis</div>
-                            <div class="col-lg-2 text-center">Price</div>
-                        </div> 
-                    </li>
-                    <li class="list-group-item list-group-item-action" v-if="products.length > 0" v-for="(st, i) in products" :key="st.id">
-                        <div class="row g-0 small"  >
-                            <div class="col-lg-1" >{{st.code_no}}</div>
-                            <div class="col-lg-2">{{st.item_name}}</div>
-                            <div class="col-lg-1 text-center">           
-                                <span>{{st.pur_qty}}</span>
-                            </div>
-                            <div class="col-lg-2 text-center">                               
-                                 <span>{{st.pur_price}}</span>
-                            </div>
-                            <div class="col-lg-2 text-center">
-                                <div class="row g-0">
-                                    <div class="col-4"><span v-if="st.dis_qty">{{st.dis_qty}}</span><span v-else>0</span></div>
-                                    <div class="col-4"><span v-if="st.dis_percent">{{st.dis_percent}}</span><span v-else>0</span></div>
-                                    <div class="col-4"><span v-if="st.dis_amount">{{st.dis_amount}}</span><span v-else>0</span></div>
-                                </div>
-                            </div>   
-                            <div class="col-lg-1 text-end">                               
-                                <span>{{st.amount}}</span>
-                           </div>
-                           <div class="col-lg-1 text-end">                               
-                                <span>{{st.discount}}</span>
-                            </div>
-                            <div class="col-lg-2 text-end">                               
-                                <span>{{st.price}}</span>
-                            </div>
-                        </div> 
-                    </li>
-                    <li class="list-group-item list-group-item-action">
-                        <div class="row g-0 small fw-bold justify-content-end">                            
-                            <div class="col-lg-1 text-end">Amount</div>
-                            <div class="col-lg-2 text-end">{{this.total_amount}}</div>
-                        </div> 
-                    </li>
-                    <li class="list-group-item list-group-item-action">
-                        <div class="row g-0 small fw-bold justify-content-end">                            
-                            <div class="col-lg-1 text-end">Discount</div>
-                            <div class="col-lg-2 text-end">{{this.total_discount}}</div>
-                        </div> 
-                    </li>
-                    <li class="list-group-item list-group-item-action">
-                        <div class="row g-0 small fw-bold justify-content-end">                            
-                            <div class="col-lg-1 text-end">Extra discount</div>                      
-                                <div class="col-lg-2 text-end">{{this.extra_discount}}</div>                      
-                        </div> 
-                    </li>
-                    
-                    <li class="list-group-item list-group-item-action">
-                        <div class="row g-0 small fw-bold justify-content-end">                            
-                            <div class="col-lg-1 text-end">Total price</div>
-                            <div class="col-lg-2 text-end">{{this.total_price}}</div>
-                        </div> 
-                    </li>
-                
-                </ul>        
-            -->          

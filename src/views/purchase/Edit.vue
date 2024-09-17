@@ -5,15 +5,15 @@
             <div class="row mb-2 justify-content-end">                
                 <div class="col-sm-2 d-grid">
                         <button type="button" @click="savePurchase" class="btn btn-sm" :disabled="isLoading || !voucher_no">
-                            <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                            <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>             
                 <div class="col-sm-2 d-grid">
-                        <router-link :to="{name : 'Purchase'}" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> Close</router-link>
+                        <router-link :to="{name : 'Purchase'}" class="btn btn-sm" id="close"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</router-link>
                 </div>
             </div>
-            <div class="card shadow min-vh-75">
+            <div class="card shadow">
                 <div class="card-body p-2">
                     <form @submit.prevent="savePurchase">
                         <div class="row justify-content-end mb-2">
@@ -44,7 +44,7 @@
                                         <tr>
                                             <td class="text-end col-4">Pur date :</td>
                                             <td class="col-8">
-                                                <flat-pickr class="form-control-plaintext p-0  border-bottom" v-model="pur_date"  :config="config" />
+                                                <flat-pickr class="form-control-plaintext  p-0 border-bottom" v-model="pur_date" :config="config" />
                                             </td>
                                         </tr>
                                         <tr>
@@ -57,78 +57,86 @@
                               </table>
                             </div>
                         </div>
-                       <div class="table-responsive">
+                       <div class="vh-50 overflow-y-auto">
                         <table class="table table-bordered mb-0  table-hover">
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
-                                    <td class="col-2"  data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Descrption</td>
-                                    <td class="col-1">Exp. date</td>     
-                                    <td class="col-1">Packing size</td>                              
+                                    <td class="col-2" > Descrption</td>
+                                    <td class="col-1">Exp. Date</td>     
+                                    <td class="col-1">Packing Size</td>                              
                                     <td class="col-1 table-primary" colspan="1">Qty</td>
-                                    <td class="col-2 table-info" colspan="2">Unit price</td>                                    
-                                    <td class="col-1 table-warning">Discount</td>                                    
-                                    <td class="col-1">Amount</td>
-                                    <td class="col-1">Discount</td>
-                                    <td class="col-1">Price</td>
+                                    <td class="col-2 table-info" colspan="2">Unit Price</td>     
+                                    <td class="col-1">Amount</td>                               
+                                    <td class="col-1 table-warning" colspan="2">Discount</td>                                    
+                                    <td class="col-1">Unit Cost</td>
                                 </tr>
                                 <tr class="small"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase" :key="st.id" @mouseenter="setEdit(i)"  >
-                                    <td class="pt-2 position-relative text-center">
+                                    <td class=" position-relative text-center">
                                         <!--<a class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeStoreItem(i, st)"><i class="fa-solid fa-square-minus"></i></a>-->
                                         {{st.code_no}}                                                                                         
                                     </td>                                    
-                                    <td class="pt-2">{{st.item_name}}</td>
-                                    <td class="p-0">
-                                        <flat-pickr class="form-control-plaintext  text-center" v-model="st.tmp_exp_date" @change="setExpDate(st.id)"  :config="config" />
+                                    <td class="">{{st.item_name}}</td>
+                                    <td class=" position-relative" >
+                                        <a v-if="st.tmp_exp_date" class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeExpDate(st)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
+                                        <flat-pickr class="form-control-plaintext py-0 text-center" v-model="st.tmp_exp_date" @change="setExpDate(st.id)"  :config="config" />
                                     </td>
-                                    <td class="pt-2">
+                                    <td class="">
                                          {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                     </td>
-                                   <td class="pt-2 text-end table-primary" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                   <td class=" text-end table-primary" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.pur_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                    </td>
-                                   <td class="p-0 table-info">
-                                        <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.qty_pur_price" class="form-control-plaintext   text-center" placeholder="Price">                                        
+                                   <td class=" table-info w-10">
+                                        <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.qty_pur_price" class="form-control-plaintext py-0  text-center" placeholder="Price">                                        
                                     </td>
-                                    <td class="p-0 table-info">
-                                        <select @change="calEdit" class="form-control-plaintext  text-center" v-model="st.qty_pur_price_unit">
+                                    <td class=" table-info w-5">
+                                        <select @change="calEdit" class="form-control-plaintext py-0  text-center" v-model="st.qty_pur_price_unit">
                                             <option  v-for="pu in onlyString(st.packing_size)">{{pu}}</option>
                                         </select>
                                     </td>
-                                    <td class="text-center pt-2 table-warning" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
+                                    <td class="text-end ">{{st.amount}}</td>
+
+                                    <td class="text-center  table-warning" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
                                         <span v-if="st.dis_qty">{{st.dis_qty}}{{st.dis_qty_unit}}</span>
                                             <span v-if="st.dis_amount">{{st.dis_amount}}$</span>
                                             <span v-if="st.dis_percent">{{st.dis_percent}}%</span>                                      
                                     </td>  
-                                    <td class="text-end pt-2">{{st.amount}}</td>
-                                    <td class="text-end pt-2">{{st.discount}}</td>
-                                    <td class="text-end pt-2">{{st.price}}</td>
+                                    <td class="text-end  table-warning" data-bs-toggle="modal" data-bs-target="#setDiscountModal">{{st.discount}}</td>
+                                    <td class="text-end ">{{st.unit_cost}}</td>
                                 </tr>
-                                <tr class="small">
-                                    <td colspan="10" class="text-end">Total amount</td>
-                                    <td class="text-end">{{total_amount}}</td>
-                                </tr>
-                                <tr class="small">
-                                    <td colspan="10" class="text-end">Total discount</td>
-                                    <td class="text-end ">{{total_discount}}</td>
-                                </tr>
-                                <tr class="small">
-                                    <td colspan="10" class="text-end">Total price</td>
-                                    <td class="text-end">{{total_price}}</td>
-                                </tr>
-                                <tr class="small">
-                                    <td colspan="10" class="text-end ">Extra discount</td>
-                                    <td class="text-end">
-                                        <input @click="setInput" @mouseleave="setInput" @keypress.enter="savePurchase"  type="number" @keyup="calTotal"  @change="calTotal"  v-model="extra_discount" class="form-control-plaintext  p-0 text-end" placeholder="0">
-                                    </td>
-                                </tr>
-                                <tr class="small">
-                                    <td colspan="10" class="text-end">Grand total price</td>
-                                    <td class="text-end">{{grand_total_price}}</td>
-                                </tr>
+
+                                
                             </tbody>
                         </table>
-                        </div>                                                                                            
+                        </div>    
+                        <table class="table table-bordered table-hover">
+                            <tbody>
+                                <tr class="small">
+                                    <td  class="text-end col-3 pe-2">Total</td>
+                                    <td class="text-end col-3">{{total}}</td>
+                                  
+                                    <td  class="text-end pe-2 col-3">Extra discount</td>
+                                    <td class="text-end col-3">
+                                        <input @click="setInput" @mouseleave="setInput"  type="number" @keyup="calTotal"  v-model="extra_discount" class="form-control-plaintext p-0  text-end" placeholder="0">
+                                    </td>
+                                </tr>                            
+                                <tr class="small">
+                                    <td  class="text-end pe-2">Paid</td>
+                                    <td class="text-end">
+                                        <input @click="setInput" @mouseleave="setInput" @keypress.enter="savePurchase"  type="number" @keyup="calTotal"  v-model="paid" class="form-control-plaintext p-0  text-end" placeholder="0">
+                                    </td>
+                                    <td  class="text-end pe-2">Balance</td>
+                                    <td class="text-end">{{balance}}</td>
+                                </tr>
+                                <tr class="small">
+                                    <td  class="text-end pe-2">Remark</td>
+                                    <td class="text-end" colspan="3">
+                                        <input @keypress.enter="savePurchase"  type="text"   v-model="remark" class="form-control-plaintext p-0 " placeholder="Remark">
+                                    </td>                                   
+                                </tr>
+                            </tbody>
+                        </table>                                                                                        
                 </form>
        
           
@@ -168,7 +176,6 @@ export default {
             return {
                 voucher_no: {required},             
                 pur_date: {required},
-                totalAmount:0,
                 supplier : {
                     name : {required}
                 },
@@ -198,10 +205,14 @@ export default {
             extra_discount: 0,
             total_amount:0,
             total_discount:0,
-            grand_total_price:0,
-            total_price:0,
+            grand_total:0,
+            total:0,
+            paid:0,
+            balance:0,
+            remark:"",
             tmpStorePurchase:[],
             removeItems:[],
+            
         
             isLoading:false,
             isDeleteing: false,
@@ -219,11 +230,16 @@ export default {
         },       
       
     },
-   created() {
+   mounted() {
     this.voucher_no=this.$route.params.id;
      this.fetchPurchase();
      this.checkDatabase();
+     window.addEventListener('keydown', this.handleCtrl);
+
    },
+   beforeUnmount() {
+         window.removeEventListener('keydown', this.handleCtrl);
+     },
    watch:{
     msg:{
             handler(val){
@@ -238,6 +254,20 @@ export default {
    },
     
     methods:{
+        handleCtrl(event) {
+          
+            if (event.ctrlKey && event.key === 's') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.savePurchase(); // Call your custom function
+            }
+            if (event.ctrlKey && event.key === 'q') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const des=document.getElementById("close")
+                des.click();
+            }
+          
+        },
+        
         onlyString(p){
            if(p.largest_unit){
             return {
@@ -271,10 +301,20 @@ export default {
             this.extra_discount= ""
             this.total_amount=0
             this.total_discount=0
-            this.total_price=0;
+            this.total=0;
+            this.paid=0;
+            this.balance=0;
+            this.remark="";
             this.tmpStorePurchase=[];
             this.removeItems=[];
             this.location="";
+        },
+        removeExpDate(p){
+            return this.storePurchase.filter((f)=>{
+                if(p.id==f.id){
+                    f.tmp_exp_date="";
+                }
+            })
         },
         setExpDate(id){
             const arr=this.storePurchase.filter((f)=>f.id==id)
@@ -291,16 +331,22 @@ export default {
                 this.total_amount=p.total_amount;
                 this.total_discount=p.total_discount;
                 this.extra_discount=p.extra_discount;
-                this.total_price=p.total_price;
-                this.grand_total_price=p.grand_total_price;
+                this.total=p.total;
+                this.grand_total=p.grand_total;
                 this.storePurchase=p.products;
                 this.tmpStorePurchase=p.products;// store for original item;
                 this.supplier=p.supplier;
                 this.id=p.id;
                 this.location=p.location;
                 this.old_location=p.location;
+                this.paid=p.paid;
+                this.remark=p.remark;
+                this.balance=p.balance;
                 this.storePurchase.map((s)=>{
                     return s.old_pur_qty=s.pur_qty;
+                })
+                this.storePurchase.map((s)=>{
+                    return s.tmp_exp_date=s.tmp_exp_date ? s.tmp_exp_date : "";
                 })
         },
         async fetchPurchase(){
@@ -330,7 +376,7 @@ export default {
                     f.dis_amount=e.dis_amount ? e.dis_amount : null;
                     f.dis_percent=e.dis_percent ? e.dis_percent :null;
                     f.discount=e.discount;
-                    f.price =f.amount - e.discount;
+                    f.unit_cost =f.amount - e.discount;
                 }
             }) && this.calTotal();
         },
@@ -379,7 +425,7 @@ export default {
                             amount=Math.floor(f.qty_pur_price  * f.pur_qty)
                        }    
                         f.amount=amount;
-                        f.price=f.discount ? amount - f.discount : amount;
+                        f.unit_cost=f.discount ? amount - f.discount : amount;
 
                        let smallest_price=0;
                        let medium_price=0;
@@ -407,7 +453,7 @@ export default {
                       
                     }else{
                         f.amount=0
-                        f.price=0
+                        f.unit_cost=0
                     }
                 }
             }) && this.calTotal();
@@ -416,20 +462,21 @@ export default {
         
         calTotal(){
             let total_amount=0;
-            let total_price=0;
+            let total=0;
             let total_discount=0;
             
             this.storePurchase.map((m)=>{
                 total_amount += m.amount ? m.amount : 0;
-                total_price += m.price ? m.price : 0;
+                total += m.unit_cost ? m.unit_cost : 0;
                 total_discount += m.discount ? m.discount : 0;
             })
 
             this.total_amount=total_amount;
             this.total_discount=total_discount;
-            this.total_price=total_price;
-            this.grand_total_price=this.extra_discount ? this.total_price - this.extra_discount : this.total_price;
-           
+            this.total=total;
+            this.grand_total=this.extra_discount ? this.total - this.extra_discount : this.total;
+            this.balance=(this.total - this.extra_discount) - this.paid;
+
         },
       
 
@@ -478,7 +525,7 @@ export default {
         } ,
    
         async savePurchase(){         
-            const isNotReady= this.storePurchase.filter((f)=>!f.price)
+            const isNotReady= this.storePurchase.filter((f)=>!f.unit_cost)
             if(isNotReady.length) return false;
              
             this.isLoading=true;
@@ -498,10 +545,12 @@ export default {
                 user : {uid: this.user.uid, displayName: this.user.displayName},
                 total_amount:this.total_amount,
                 total_discount:this.total_discount,
-                total_price:this.total_price,
+                total:this.total,
                 extra_discount: this.extra_discount,
-                grand_total_price: this.grand_total_price,
-                location: this.location
+                location: this.location,
+                paid:this.paid,
+                balance: this.balance,
+                remark: this.remark,
             }                        
 
             const saveDocument=doc(db, "purchases", this.id)
@@ -546,7 +595,6 @@ export default {
             return formattedDate;
         },
         setInput(e){
-            console.log(e.target.value)
            if(e.target.value==0){
                 e.target.value=""
            }

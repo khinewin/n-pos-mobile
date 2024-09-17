@@ -12,9 +12,12 @@ const purchases=(arr)=>{
             total_amount:data.total_amount,
             total_discount: data.total_discount,
             extra_discount: data.extra_discount,
-            total_price:data.total_price,     
+            total:data.total,     
             grand_total_price: data.grand_total_price,
-            location:data.location,     
+            paid: data.paid,
+            balance: data.balance,
+            location:data.location,   
+            remark:data.remark,  
             edit_user:null                         
         };                                       
         purchaseItems.push(purchase);                          

@@ -18,12 +18,12 @@
                                                     <tr class="fw-bold text-center">
                                                         <td class="col-1">Code</td>
                                                         <td class="col-2">Description</td>
-                                                        <td class="col-1">Packing size</td>
+                                                        <td class="col-1">Packing Size</td>
                                                         <td class="col-1">Qty</td>
-                                                        <td class="col-1">Unit price</td>
+                                                        <td class="col-1">Unit Price</td>
                                                         <td class="col-1">Amount</td>
                                                         <td class="col-1">Discount</td>                                              
-                                                        <td class="col-1">Price</td>
+                                                        <td class="col-1">Unit Cost</td>
                                                     </tr>
                                                 </tbody>
                                                 <tbody>                                            
@@ -41,21 +41,25 @@
                                                         </td>                   
                                                         <td class="text-end">{{fM(st.amount)}}</td>
                                                         <td class="text-end">{{fM(st.discount)}}</td>
-                                                        <td class="text-end">{{fM(st.price)}}</td>
+                                                        <td class="text-end">{{fM(st.unit_cost)}}</td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="5" class="text-end fw-bold border-bottom rm-b-b pe-2">Total (Ks)</td>
                                                         <td class="text-end">{{fM(res[2].amount)}}</td>
                                                         <td class="text-end">{{fM(res[2].discount)}}</td>                                                
-                                                        <td class="text-end">{{fM(res[2].price)}}</td>
+                                                        <td class="text-end">{{fM(res[2].unit_cost)}}</td>
                                                     </tr>
-                                                    <tr>
-                                                        <td colspan="7" class="text-end fw-bold border-bottom rm-b-b pe-2">Extra discount (Ks)</td>
-                                                        <td class="text-end">{{fM(res[2].extra_discount)}}</td>                                                        
+                                                    <tr class="text-end">
+                                                        <td colspan="7" class="text-end fw-bold  border-0 border-bottom rm-b-b  pe-2">Extra discount (Ks)</td>
+                                                        <td>{{fM(res[2].extra_discount)}}</td>                  
                                                     </tr>
-                                                    <tr>
-                                                        <td colspan="7" class="text-end fw-bold pe-2">Total price (Ks)</td>
-                                                        <td class="text-end">{{fM(res[2].price - res[2].extra_discount)}}</td>                                                        
+                                                    <tr class="text-end">
+                                                        <td colspan="7" class="text-end fw-bold  border-0 border-bottom rm-b-b pe-2">Paid (Ks)</td>
+                                                        <td>{{fM(res[2].paid)}}</td>                  
+                                                    </tr>
+                                                    <tr class="text-end">
+                                                        <td colspan="7" class="text-end fw-bold  border-0  pe-2">Balance (Ks)</td>
+                                                        <td>{{fM(res[2].balance)}}</td>                  
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -70,21 +74,22 @@
                 <td colspan="2" class="p-0" style="border-style: hidden;">
                     <table class="table table-bordered border-dark table-hover mb-0" >
                         <tbody class="table-group-divider">
+                            <tr >
+                                <td class="text-end fw-bold  border-bottom rm-b-b  pe-2" colspan="8">Total amount (Ks)</td>
+                                <td class="text-end">{{fM(total_amount)}}</td>                                
+                            </tr>                        
+                        
                             <tr>
-                                <td class="text-end fw-bold col-10 border-bottom rm-b-b pe-2" >Grand total amount(Ks)</td>
-                                <td class="text-end col-2">{{fM(total_amount)}}</td>                                
-                            </tr>                         
-                            <tr>
-                                <td class="text-end fw-bold border-bottom rm-b-b pe-2">Grand total discount (Ks)</td>
-                                <td class="text-end">{{fM(total_discount)}}</td>
+                                <td class="text-end fw-bold border-bottom   rm-b-b  pe-2" colspan="8">Total extra discount (Ks)</td>
+                                <td class="text-end">{{fM(total_extra_discount)}}</td>
                             </tr>
                             <tr>
-                                <td class="text-end fw-bold border-bottom rm-b-b pe-2">Extra discount (Ks)</td>
-                                <td class="text-end">{{fM(extra_discount)}}</td>
+                                <td class="text-end fw-bold  border-bottom   rm-b-b  pe-2" colspan="8">Total paid (Ks)</td>
+                                <td class="text-end">{{fM(total_paid)}}</td>
                             </tr>
                             <tr>
-                                <td class="text-end fw-bold pe-2">Grand total price (Ks)</td>
-                                <td class="text-end">{{fM(total_price - extra_discount)}}</td>
+                                <td class="text-end fw-bold    pe-2" colspan="8">Total Balance (Ks)</td>
+                                <td class="text-end">{{fM(total_balance)}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -116,9 +121,9 @@ export default {
             reports:[],
             purchaseData:[],
             total_amount:0,
-            total_price:0,
-            total_discount:0,
-            extra_discount:0,
+            total_extra_discount:0,
+            total_paid:0,
+            total_balance:0,
             isLoading:false,
             msg : {
                 type :"",
@@ -177,14 +182,17 @@ export default {
             let purchase=[]             
             this.purchaseData.map((res)=>{
                 if(!this.code_no){
-                    this.extra_discount += Number(res.extra_discount);
+                    this.total_extra_discount += Number(res.extra_discount);
+                    this.total_amount += res.total;
+                    this.total_paid += res.paid;
+                    this.total_balance += res.balance;
                  }  
                     res.products.map((data)=>{
                         let index = purchase.findIndex((item) => item.voucher_no == res.voucher_no);
                         if(index === -1){
-                            purchase.push({...data, group_supplier : res.supplier.code, supplier_name: res.supplier.name, supplier_company: res.supplier.company, group_date :  this.showTime(res.pur_date),  voucher_no: res.voucher_no, extra_discount: res.extra_discount})
+                            purchase.push({...data, group_supplier : res.supplier.code, supplier_name: res.supplier.name, supplier_company: res.supplier.company, group_date :  this.showTime(res.pur_date),  voucher_no: res.voucher_no, extra_discount: res.extra_discount, paid: res.paid, balance: res.balance})
                         }else{
-                            purchase.push({...data, group_supplier : res.supplier.code, supplier_name: res.supplier.name, supplier_company: res.supplier.company, group_date :  this.showTime(res.pur_date), voucher_no: res.voucher_no, extra_discount: 0})
+                            purchase.push({...data, group_supplier : res.supplier.code, supplier_name: res.supplier.name, supplier_company: res.supplier.company, group_date :  this.showTime(res.pur_date), voucher_no: res.voucher_no, extra_discount: 0, paid:0, balance:0})
                         }
                      })
             })
@@ -220,7 +228,9 @@ export default {
                             qty_pur_price:0, 
                             qty_pur_price_unit: "",
                             amount:0,
-                            price:0,
+                            unit_cost:0,
+                            paid:0,
+                            balance:0
                         }
                         rep[1].map((r)=>{
                             item.code_no=r.code_no;
@@ -229,37 +239,29 @@ export default {
                             item.qty_pur_price = r.qty_pur_price;
                             item.qty_pur_price_unit=r.qty_pur_price_unit;
                             item.packing_size=r.packing_size;
-                            item.price += r.price;                        
+                            item.unit_cost += r.unit_cost;                        
                             item.discount += r.discount ? r.discount : 0;
                             item.extra_discount += r.extra_discount;
+                            item.paid+= r.paid;
+                            item.balance += r.balance;
                         })
                         return item;                    
 
                     }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)
 
-                    let amount=0;
-                    let price=0;
-                    let discount=0;
 
-                    const res3={amount: 0, price:0, discount:0, extra_discount: 0}
+                    const res3={amount: 0, unit_cost:0, discount:0, extra_discount: 0, paid: 0, balance:0}
                     res2.map((ren)=>{
                         res3.amount += ren.amount;
                         res3.discount += ren.discount;
-                        res3.price += ren.price;
-                        res3.extra_discount += ren.extra_discount;
-
-                        amount += ren.amount;
-                        price += ren.price;
-                        discount += ren.discount;
-                    })    
-                    total_amount += amount;
-                    total_price += price;
-                    total_discount += discount;
+                        res3.unit_cost += ren.unit_cost;
+                        res3.extra_discount += this.code_no ? 0 : ren.extra_discount;     
+                        res3.paid += this.code_no ? 0 : ren.paid;
+                        res3.balance += this.code_no ? 0 :ren.balance;                
+                    })                     
                     return [date, res2, res3];
                 })
-                this.total_amount = total_amount;
-                this.total_price =total_price;
-                this.total_discount =total_discount;
+             
                 return [{supplier_name, company}, gbc];                     
             })
            // console.log(data)

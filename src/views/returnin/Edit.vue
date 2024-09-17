@@ -89,7 +89,7 @@
                                             <td class="col-1 text-center ">Amount</td>                                          
                                         </tr>    
                                     </tbody>                                  
-                                    <tbody>                                                                         
+                                    <tbody class="text-nowrap text-break">                                                                         
                                         <tr class="" v-if="rtInItems.length > 0" v-for="(s, i) in rtInItems" :key="s.id" @mouseenter="setEdit(s)"  >
                                             <td class="position-relative text-center">
                                                 <span v-if="rtInMode=='Return In / New'">

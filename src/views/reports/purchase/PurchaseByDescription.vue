@@ -5,12 +5,12 @@
                 <tr class="fw-bold text-center">
                     <td class="col-1">Code</td>
                     <td class="col-2">Description</td>
-                    <td class="col-1">Packing size</td>
+                    <td class="col-1">Packing Size</td>
                     <td class="col-1">Qty</td>
-                    <td class="col-1">Unit price</td>
+                    <td class="col-1">Unit Price</td>
                     <td class="col-1">Amount</td>
                     <td class="col-1">Discount</td>                                              
-                    <td class="col-1">Price</td>
+                    <td class="col-1">Unit Cost</td>
                 </tr> 
                 </tbody>
                 <tbody v-if="reports.length > 0">                       
@@ -28,23 +28,33 @@
                         </td>                   
                         <td class="text-end">{{fM(st.amount)}}</td>
                         <td class="text-end">{{fM(st.discount)}}</td>
-                        <td class="text-end">{{fM(st.price)}}</td>
+                        <td class="text-end">{{fM(st.unit_cost)}}</td>
                     </tr>
                     <tr class="text-end">                              
                         <td class="fw-bold border-bottom rm-b-b pe-2" colspan="5" >Total (Ks)</td>
                         <td class="">{{fM(reports[1].amount)}}</td>                                                                                      
-                        <td class="">{{fM(total_discount)}}</td>
-                        <td class="">{{fM(reports[1].price)}}</td>                                  
+                        <td class="">{{fM(reports[1].discount)}}</td>
+                        <td class="">{{fM(reports[1].unit_cost)}}</td>                                  
                     </tr>
-                  
-                    <tr>
-                        <td class="text-end fw-bold border-bottom rm-b-b pe-2" colspan="7">Extra discount (Ks)</td>
-                        <td class="text-end">{{fM(extra_discount)}}</td>
-                    </tr>
-                    <tr>
-                        <td  class="text-end fw-bold pe-2" colspan="7">Net price (Ks)</td>
-                        <td class="text-end">{{fM(total_price - extra_discount)}}</td>
-                    </tr>
+            </tbody>
+            <tbody>
+                <tr >
+                    <td class="text-end fw-bold  border-bottom rm-b-b  pe-2" colspan="7">Total amount (Ks)</td>
+                    <td class="text-end">{{fM(total_amount)}}</td>                                
+                </tr>                        
+            
+                <tr>
+                    <td class="text-end fw-bold border-bottom   rm-b-b  pe-2" colspan="7">Total extra discount (Ks)</td>
+                    <td class="text-end">{{fM(total_extra_discount)}}</td>
+                </tr>
+                <tr>
+                    <td class="text-end fw-bold  border-bottom   rm-b-b  pe-2" colspan="7">Total paid (Ks)</td>
+                    <td class="text-end">{{fM(total_paid)}}</td>
+                </tr>
+                <tr>
+                    <td class="text-end fw-bold    pe-2" colspan="7">Total Balance (Ks)</td>
+                    <td class="text-end">{{fM(total_balance)}}</td>
+                </tr>
             </tbody>
         </table>
         <div v-if="isLoading">
@@ -72,9 +82,9 @@ export default {
             reports:[],
             purchaseData:[],        
             total_amount:0,
-            total_discount:0,
-            extra_discount:0,
-            total_price:0,
+            total_extra_discount:0,
+            total_paid:0,
+            total_balance:0,
             isLoading:false,
             msg : {
                 type :"",
@@ -137,7 +147,10 @@ export default {
             let purchase=[]
             this.purchaseData.map((res)=>{
                 if(!this.code_no){
-                    this.extra_discount += res.extra_discount;
+                    this.total_extra_discount += res.extra_discount;
+                    this.total_amount += res.total;
+                    this.total_paid += res.paid;
+                    this.total_balance += res.balance;
                 }
                     res.products.map((data)=>{
                         let index = purchase.findIndex((item) => item.voucher_no == res.voucher_no);
@@ -169,7 +182,7 @@ export default {
                         qty_pur_price:0, 
                         qty_pur_price_unit: "",
                         amount:0,
-                        price:0,
+                        unit_cost:0,
                       }
                     res[1].map((ren)=>{
                         item.code_no=ren.code_no;
@@ -178,32 +191,22 @@ export default {
                         item.qty_pur_price = ren.qty_pur_price;
                         item.qty_pur_price_unit=ren.qty_pur_price_unit;
                         item.packing_size=ren.packing_size;
-                        item.price += ren.price;                        
+                        item.unit_cost += ren.unit_cost;                        
                         item.discount += ren.discount ? ren.discount : 0;
                         item.extra_discount += ren.extra_discount;
                     })
                     return item;
                 }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)
 
-                let amount=0;
-                let price=0;
-                let discount=0;
+        
 
-                const res3={amount: 0, price:0, discount:0}
+                const res3={amount: 0, unit_cost:0, discount:0}
                 res2.map((ren)=>{
                     res3.amount += ren.amount;
                     res3.discount += ren.discount;
-                    res3.price += ren.price;
-
-                    amount += ren.amount;
-                    price += ren.price;
-                    discount += ren.discount;
+                    res3.unit_cost += ren.unit_cost;          
                 })
-                const newData=[[...res2], res3]
-
-                this.total_amount +=amount;
-                this.total_discount += discount;
-                this.total_price += price;    
+                const newData=[[...res2], res3]           
                               
               this.reports=newData;
         

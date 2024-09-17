@@ -50,17 +50,17 @@
                     </div>
                 </div>                 
                    <table class="table table-bordered mb-0 table-hover">
-                        <tbody>
+                        <tbody class="table-group-divider">
                             <tr class="small text-center fw-bold table-secondary">
                                 <td class="col-1">Code</td>
                                 <td class="col-2">Description</td>
-                                <td class="col-1">Exp. date</td>
-                                <td class="col-1">Packing size</td>
+                                <td class="col-1">Exp. Date</td>
+                                <td class="col-1">Packing Size</td>
                                 <td class="col-1">Qty</td>
-                                <td class="col-1">Unit price</td>
+                                <td class="col-1">Unit Price</td>
                                 <td class="col-1">Amount</td>
                                 <td class="col-1">Discount</td>                                              
-                                <td class="col-1">Price</td>
+                                <td class="col-1">Unit Cost</td>
                             </tr>
                         </tbody>
                         <tbody>
@@ -81,26 +81,33 @@
                                 </td>                   
                                 <td class="text-end">{{fM(st.amount)}}</td>
                                 <td class="text-end">{{st.discount ? fM(st.discount) : 0}}</td>
-                                <td class="text-end">{{fM(st.price)}}</td>                               
-                            </tr>
-                            <tr class="small">
-                                <td colspan="8" class="text-end fw-bold border-bottom rm-b-b pe-2">Total amount (Ks)</td>
-                                <td class="text-end">{{fM(p.total_amount)}}</td>
-                            </tr>
-                            <tr class="small">
-                                <td colspan="8" class="text-end fw-bold border-bottom rm-b-b pe-2">Total discount (Ks)</td>
-                                <td class="text-end ">{{fM(p.total_discount)}}</td>
-                            </tr>
-                            <tr class="small">
-                                <td colspan="8" class="text-end fw-bold border-bottom rm-b-b pe-2">Extra discount (Ks)</td>
-                                <td class="text-end">{{fM(p.extra_discount)}}</td>
-                            </tr>
-                            <tr class="small">
-                                <td colspan="8" class="text-end fw-bold pe-2">Total price (Ks)</td>
-                                <td class="text-end">{{fM(p.total_price)}}</td>
-                            </tr>                           
+                                <td class="text-end">{{fM(st.unit_cost)}}</td>                               
+                            </tr>                                                    
                         </tbody>
-                   </table>                          
+                   </table>          
+                   <table class="table table-bordered table-hover mb-0">
+                    <tbody class="table-group-divider" >                      
+                        <tr class="small">
+                            <td  class="text-end col-3 pe-2 fw-bold">Total</td>
+                            <td class="text-end col-3">{{fM(p.total)}}</td>
+                            <td  class="text-end col-3 pe-2 fw-bold">Extra discount</td>
+                            <td class="text-end col-3">
+                                {{fM(p.extra_discount)}}
+                            </td>
+                        </tr>                            
+                        <tr class="small">
+                            <td  class="text-end pe-2 fw-bold">Paid</td>
+                            <td class="text-end">{{fM(p.paid)}}</td>
+                            <td  class="text-end pe-2 fw-bold">Banalce</td>
+                            <td class="text-end">{{fM(p.balance)}}</td>
+                        </tr>
+                        <tr>
+                            <td  class="text-end pe-2 fw-bold">Remark</td>
+                            <td colspan="3">{{p.remark}}</td>
+                        </tr>
+                    </tbody>
+                 </table>
+                      
                 </div>
             </div>
             </div>
