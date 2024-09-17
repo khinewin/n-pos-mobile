@@ -89,6 +89,7 @@ export default {
         
         calDiscount(ev){
             const e=this.ei;
+            console.log(e.sale_type)
             if(e.dis_amount){
                         e.discount=e.dis_amount;
                     }else if(e.dis_percent){
@@ -100,13 +101,31 @@ export default {
                         })  
                        const dis_unit=d_units[0][0]  
                        let discount=0;
-                       if(dis_unit=="largest_unit"){
-                           discount=e.pur_price.largest_unit * e.dis_qty
-                       }else if(dis_unit=="medium_unit"){
-                            discount=e.pur_price.medium_unit * e.dis_qty;
-                       }else if(dis_unit=="smallest_unit"){
-                            discount=e.pur_price.smallest_unit * e.dis_qty;
-                       }    
+                        if(e.sale_type===undefined){
+                            if(dis_unit=="largest_unit"){
+                                    discount=e.pur_price.largest_unit * e.dis_qty
+                            }else if(dis_unit=="medium_unit"){
+                                    discount=e.pur_price.medium_unit * e.dis_qty;
+                            }else if(dis_unit=="smallest_unit"){
+                                    discount=e.pur_price.smallest_unit * e.dis_qty;
+                            }    
+                        }else if(e.sale_type=="retail"){
+                            if(dis_unit=="largest_unit"){
+                                    discount=e.retail_price.largest_unit * e.dis_qty
+                            }else if(dis_unit=="medium_unit"){
+                                    discount=e.retail_price.medium_unit * e.dis_qty;
+                            }else if(dis_unit=="smallest_unit"){
+                                    discount=e.retail_price.smallest_unit * e.dis_qty;
+                            }    
+                        }else if(e.sale_type=="whole_sale"){
+                            if(dis_unit=="largest_unit"){
+                                    discount=e.whole_sale_price.largest_unit * e.dis_qty
+                            }else if(dis_unit=="medium_unit"){
+                                    discount=e.whole_sale_price.medium_unit * e.dis_qty;
+                            }else if(dis_unit=="smallest_unit"){
+                                    discount=e.whole_sale_price.smallest_unit * e.dis_qty;
+                            }    
+                        }
                        e.discount=discount;                        
                     }
                     else{

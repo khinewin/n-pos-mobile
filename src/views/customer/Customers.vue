@@ -5,13 +5,13 @@
                <div class="row  justify-content-end">  
                 <div class="col-sm-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
-                        <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete</span>
+                        <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
                     </button>
                 </div>                           
                 <div class="col-sm-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCustomer">
-                        <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                        <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                     </button>
                 </div>   
@@ -190,7 +190,12 @@ import { required, email ,helpers} from '@vuelidate/validators'
         this.checkDatabase();
         this.isLoading=true;
         this.fetchCustomer();
+        window.addEventListener('keydown', this.handleCtrl);
+
        },
+       beforeUnmount() {
+         window.removeEventListener('keydown', this.handleCtrl);
+     },
        computed:{
            user(){
                return this.$store.getters.user;
@@ -209,7 +214,16 @@ import { required, email ,helpers} from '@vuelidate/validators'
            }
        },
        methods:{
-
+        handleCtrl(event) {
+            if (event.ctrlKey && event.key === 'd') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.deleteMultiple();
+            }
+            if (event.ctrlKey && event.key === 's') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.saveCustomer(); // Call your custom function
+            }                 
+        },
         async deleteMultiple(){
             const is_has=this.customers.filter((f)=>f.is_deleted)
             if(is_has.length <=0) return false;

@@ -132,9 +132,9 @@
                                             <td class="text-end">
                                                 {{change}}
                                             </td> 
-                                            <td  class="text-end pe-2 fw-bold">Credit</td>
+                                            <td  class="text-end pe-2 fw-bold">Balance</td>
                                             <td class="text-end">
-                                                {{credit}}
+                                                {{balance}}
                                             </td>
                                         </tr>
                                         <tr>
@@ -165,7 +165,7 @@
                     paid:this.paid,
                     change:this.change,
                     user: this.user,     
-                    credit: this.credit,    
+                    balance: this.balance,    
                     rtInMode: this.rtInMode,   
             }  " />
         </div>       
@@ -221,7 +221,7 @@ export default {
             total_amount:0,
          //   net_amount:0,
         //    extra_discount:0,
-            credit:0,
+            balance:0,
             charges:0,
             paid:0,
             change:0,
@@ -440,7 +440,7 @@ export default {
 
             this.total_amount=total_amount;
          //   this.net_amount=this.extra_discount ? this.total_amount - this.extra_discount : this.total_amount;
-           this.credit=this.paid ? Math.abs(this.total_amount) - this.paid :  this.total_amount;
+           this.balance=this.paid ? Math.abs(this.total_amount) - this.paid :  this.total_amount;
         },
         setInput(e){
            if(e.target.value==0){
@@ -482,7 +482,7 @@ export default {
          //   this.extra_discount=s.extra_discount;
             this.paid=s.paid;
             this.sale_type=s.sale_type
-            this.credit=s.credit
+            this.balance=s.balance
             this.sale_user=s.user;
             this.remark=s.remark;
             this.customer.name=s.customer.name;
@@ -536,8 +536,8 @@ export default {
                     paid: this.paid ? this.paid : 0,
                     change:this.change,
                     customer : this.customer,
-                    credit: this.credit,
-                    payment_type: this.credit > 0 ? "Credit" : "Paid"
+                    balance: this.balance,
+                    payment_type: this.balance > 0 ? "Credit" : "Paid"
                 }                                    
 
                 const saveDocument=doc(db, "returnIn", this.id)
@@ -586,7 +586,7 @@ export default {
              //   this.net_amount=0;
                 this.paid=0,
                 this.change=0
-                this.credit=0
+                this.balance=0
                 this.remark="";
               //  this.voucher_no=new Date().getTime();
                 //this.rt_in_date=hp.setToday();      
@@ -645,7 +645,7 @@ export default {
         },*/
         calPaid(){
             this.change=this.paid - this.total_amount > 0 ? this.paid - this.total_amount : 0;
-            this.credit=this.paid - this.total_amount < 0 ? Math.abs(this.paid - this.total_amount) : 0;
+            this.balance=this.paid - this.total_amount < 0 ? Math.abs(this.paid - this.total_amount) : 0;
         },
        
          editShowTime(t){

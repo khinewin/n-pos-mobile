@@ -17,7 +17,7 @@
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                             </button>
                         </div>-->
-                        <div class="col-6 d-grid"><button class="btn btn-sm text-dark" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button></div>
+                        <div class="col-6 d-grid"><button class="btn btn-sm text-dark close-s-p-z" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+h)</button></div>
                     </div> 
                    <div class="row g-2">
                     <div class="col-12">

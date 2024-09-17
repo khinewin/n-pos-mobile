@@ -5,16 +5,16 @@
             <div class="row  justify-content-end">   
                 <div class="col-sm-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
-                        <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete</span>
+                        <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
                     </button>
                 </div>       
                 <div class="col-sm-2 d-grid">
-                    <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn"><i class="fa-solid fa-boxes-packing"></i> Packing size</button>
+                    <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn btn-sm p-z"><i class="fa-solid fa-boxes-packing"></i> Packing size (shift+z)</button>
                 </div>                            
                 <div class="col-sm-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCode">
-                        <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                        <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                     </button>
                 </div>    
@@ -113,8 +113,8 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr class="table-primary"  data-bs-toggle="modal" data-bs-target="#selectPackingSizeModal">
-                                        <td class="col-1">Packing size <span class="float-end"><i class="fa-solid fa-caret-right"></i></span></td>
+                                    <tr class="table-primary packing-size"  data-bs-toggle="modal" data-bs-target="#selectPackingSizeModal">
+                                        <td class="col-1">Packing size (shift+p) <span class="float-end"><i class="fa-solid fa-caret-right"></i></span></td>
                                         <td :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]" class="text-center col-3">
                                             <div v-if="editItem.packing_size.smallest_unit && editItem.packing_size.medium_unit">
                                                     {{calPackingSize(editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit, editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty)}}
@@ -208,13 +208,13 @@
                                     <tr>
                                         <td class="small">
                                             <div class="form-check form-switch">
-                                                <input  v-model="editItem.auto_cal" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
-                                                <label class="form-check-label" for="flexSwitchCheckChecked">Auto cal</label>
+                                                <input  v-model="editItem.auto_cal" class="form-check-input auto-cal" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+                                                <label class="form-check-label" for="flexSwitchCheckChecked">Auto (shift+a)</label>
                                               </div>                                              
                                         </td>
                                         <td colspan="3" class="p-0 text-end">
                                             <button class="btn btn-sm" @click="savePrice">                     
-                                            <span v-if="!isSavePrice"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                                            <span v-if="!isSavePrice"><i class="fa-solid fa-hard-drive"></i> Save (shift+s)</span>
                                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSavePrice"></span>
                                              </button>
                                         </td>
@@ -293,8 +293,12 @@ export default {
         this.isLoading=true;
         this.fetchProducts();
         this.checkDatabase();
-       
+        window.addEventListener('keydown', this.handleCtrl);
+
     },
+    beforeUnmount() {
+         window.removeEventListener('keydown', this.handleCtrl);
+     },
     computed:{
         user(){
             return this.$store.getters.user;
@@ -315,6 +319,43 @@ export default {
     },
 
     methods:{   
+        handleCtrl(event) {
+            if (event.ctrlKey && event.key === 'h') {
+                event.preventDefault(); // Prevent the default browser save dialog
+               const p=document.querySelector(".close-p-z")
+               const sp=document.querySelector(".close-s-p-z")
+                p.click();
+                sp.click();
+            }
+            if (event.ctrlKey && event.key === 's') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.saveCode(); // Call your custom function
+            }  
+            if (event.ctrlKey && event.key === 'd') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.deleteMultiple(); // Call your custom function
+            }  
+            if (event.shiftKey && event.key.toLowerCase() === 's') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.savePrice(); // Call your custom function
+            }   
+            if (event.shiftKey && event.key.toLowerCase() === 'a') {
+                event.preventDefault(); // Prevent the default browser save dialog
+               const a=document.querySelector(".auto-cal")
+               a.click();
+            }  
+            if (event.shiftKey && event.key.toLowerCase() === 'p') {
+                event.preventDefault(); // Prevent the default browser save dialog
+               const a=document.querySelector(".packing-size")
+               a.click();
+            }    
+            if (event.shiftKey && event.key.toLowerCase() === 'z') {
+                event.preventDefault(); // Prevent the default browser save dialog
+               const a=document.querySelector(".p-z")
+               a.click();
+            }          
+         
+        },
         async deleteMultiple(){
             const is_has=this.products.filter((f)=>f.is_deleted)
             if(is_has.length <=0) return false;

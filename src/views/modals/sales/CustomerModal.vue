@@ -38,8 +38,8 @@
                                     <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
                                     <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                 </button></div>-->
-                                <div class="col-6 d-grid"><button class="btn btn-sm text-dark" data-bs-dismiss="modal">
-                                    <i class="fa-solid fa-circle-xmark"></i> Close</button>
+                                <div class="col-6 d-grid"><button class="btn btn-sm text-dark customer-modal" data-bs-dismiss="modal">
+                                    <i class="fa-solid fa-circle-xmark"></i> Close (cltr+h)</button>
                                 </div>     
                              </div> 
                         </div>

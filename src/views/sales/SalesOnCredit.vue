@@ -4,18 +4,18 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                                     
                 <div class="col-sm-2 d-grid">
-                    <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#customerModal"><i class="fa-solid fa-folder-tree"></i> Browse</button>
+                    <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#customerModal"><i class="fa-solid fa-folder-tree"></i> Open (cltr+o)</button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                    <button  class="btn btn-sm"  @click="print"><i class="fa-solid fa-print" ></i> Print</button>
+                    <button  class="btn btn-sm" :disabled="!customer.code"  @click="print"><i class="fa-solid fa-print" ></i> Print (cltr+p)</button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                        <button type="button" @click="savePaid" class="btn btn-sm" v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save
+                        <button type="button" @click="savePaid" class="btn btn-sm" v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save (cltr+s)
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                        <button @click="closePage" class="btn btn-sm" :disabled="!customer.id"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                        <button @click="closePage" class="btn btn-sm close" :disabled="!customer.id"><i class="fa-solid fa-circle-xmark"></i> Close (cltr+q)</button>
                 </div>
             </div>
         </div>     
@@ -204,8 +204,12 @@ export default {
     mounted() {
         this.voucher_no=new Date().getTime();
         this.paid_date=hp.setToday();
+        window.addEventListener('keydown', this.handleCtrl);
 
     },
+    beforeUnmount() {
+         window.removeEventListener('keydown', this.handleCtrl);
+     },
   
     watch:{
         msg:{
@@ -227,6 +231,33 @@ export default {
       
     },
     methods:{
+        handleCtrl(event) {
+            if (event.ctrlKey && event.key === 's') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.savePaid(); // Call your custom function
+            }
+            if (event.ctrlKey && event.key === 'q') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.closePage();
+            }
+            if (event.ctrlKey && event.key === 'p') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.print(); // Call your custom function
+            }
+            if (event.ctrlKey && event.key === 'o') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const open=document.querySelector(".open")
+                open.click();
+            }
+      
+        
+            if (event.ctrlKey && event.key === 'h') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const cus=document.querySelector(".customer-modal")
+                cus.click();
+            }
+         
+        },
         async checkDatabase(){ 
             const query_url=query(collection(db, "sales"), where("customer.id", "==", this.customer.id));           
                 onSnapshot(query_url, async(snapShot) =>{
@@ -366,6 +397,7 @@ export default {
    
         async print () {
         // Pass the element id here
+        if(!this.customer.code) return false;
         if(this.printData.saleItems.length <=0) return false;
          await this.$htmlToPaper('printMe');
         },

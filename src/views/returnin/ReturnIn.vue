@@ -9,7 +9,7 @@
                 </div>
                 
                 <div class="col-sm-2 d-grid">
-                    <button class="btn btn-sm" id="browse" data-bs-toggle="modal" data-bs-target="#returnInModal"><i class="fa-solid fa-folder-tree"></i> Browse (ctrl+b)</button>
+                    <button class="btn btn-sm open"  data-bs-toggle="modal" data-bs-target="#returnInModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
                 </div>
                 <div class="col-sm-2 d-grid">
                     <button :disabled="rtInItems.length <=0 || rtInMode=='Return In / New'" class="btn btn-sm"  @click="printRtIn"><i class="fa-solid fa-print" ></i> Print (ctrl+p)</button>
@@ -138,9 +138,9 @@
                                             <td class="text-end">
                                                 {{change}}
                                             </td> 
-                                            <td  class="text-end pe-2 fw-bold">Credit</td>
+                                            <td  class="text-end pe-2 fw-bold">Balance</td>
                                             <td class="text-end">
-                                                {{credit}}
+                                                {{balance}}
                                             </td>
                                         </tr>
                                         <tr>
@@ -171,7 +171,7 @@
                     paid:this.paid,
                     change:this.change,
                     user: this.user,     
-                    credit: this.credit,    
+                    balance: this.balance,    
                     rtInMode: this.rtInMode,   
             }  " />
         </div>       
@@ -226,7 +226,7 @@ export default {
             total_amount:0,
          //   net_amount:0,
         //    extra_discount:0,
-            credit:0,
+            balance:0,
             charges:0,
             paid:0,
             change:0,
@@ -312,9 +312,9 @@ export default {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.printRtIn(); // Call your custom function
             }
-            if (event.ctrlKey && event.key === 'b') {
+            if (event.ctrlKey && event.key === 'o') {
                 event.preventDefault(); // Prevent the default browser save dialog
-                const browse=document.getElementById("browse")
+                const browse=document.querySelector(".open")
                 browse.click();
             }
             if (event.ctrlKey && event.key === 'e') {
@@ -324,6 +324,13 @@ export default {
             if (event.ctrlKey && event.key === 'i') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 const des=document.getElementById("description")
+                des.click();
+            }
+            if (event.ctrlKey && event.key === 'h') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const des=document.querySelector(".product-modal")
+                const rtIn=document.querySelector(".rt-in-modal")
+                rtIn.click();
                 des.click();
             }
         },
@@ -444,7 +451,7 @@ export default {
 
             this.total_amount=total_amount;
          //   this.net_amount=this.extra_discount ? this.total_amount - this.extra_discount : this.total_amount;
-           this.credit=this.paid ? Math.abs(this.total_amount) - this.paid :  this.total_amount;
+           this.balance=this.paid ? Math.abs(this.total_amount) - this.paid :  this.total_amount;
         },
         setInput(e){
            if(e.target.value==0){
@@ -486,7 +493,7 @@ export default {
          //   this.extra_discount=s.extra_discount;
             this.paid=s.paid;
             this.sale_type=s.sale_type
-            this.credit=s.credit
+            this.balance=s.balance
             this.sale_user=s.user;
             this.remark=s.remark;
             this.customer.name=s.customer.name;
@@ -534,8 +541,8 @@ export default {
                     paid: this.paid ? this.paid : 0,
                     change:this.change,
                     customer : this.customer,
-                    credit: this.credit,
-                    payment_type: this.credit > 0 ? "Credit" : "Paid"
+                    balance: this.balance,
+                    payment_type: this.balance > 0 ? "Credit" : "Paid"
                 }                           
                 const saveDocument=collection(db, "returnIn")
                 await addDoc(saveDocument, voucher)           
@@ -562,7 +569,7 @@ export default {
              //   this.net_amount=0;
                 this.paid=0,
                 this.change=0
-                this.credit=0
+                this.balance=0
                 this.remark="";
                 this.rtInMode="Return In / New";                
                 this.voucher_no=new Date().getTime();
@@ -622,7 +629,7 @@ export default {
         },*/
         calPaid(){
             this.change=this.paid - this.total_amount > 0 ? this.paid - this.total_amount : 0;
-            this.credit=this.paid - this.total_amount < 0 ? Math.abs(this.paid - this.total_amount) : 0;
+            this.balance=this.paid - this.total_amount < 0 ? Math.abs(this.paid - this.total_amount) : 0;
         },
        
          editShowTime(t){

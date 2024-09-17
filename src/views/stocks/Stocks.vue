@@ -4,19 +4,19 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">
                 <div class="col-sm-2 d-grid">
-                    <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print</button>
+                    <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print (ctrl+p)</button>
                 </div>                
                 <div class="col-sm-2 d-grid">
-                        <button @click="goEdit" class="btn btn-sm" :class="{'disabled': !voucher_no || stock_user.uid !== user.uid}"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                        <button @click="goEdit" class="btn btn-sm" :class="{'disabled': !voucher_no || stock_user.uid !== user.uid}"><i class="fa-solid fa-pen-to-square"></i> Edit (ctrl+e)</button>
                 </div>                
                 <div class="col-sm-2 d-grid">
-                    <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#stocksModal"><i class="fa-solid fa-folder-tree"></i> Browse</button>
+                    <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#stocksModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                    <router-link :to="{name : 'NewStocks'}" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New</router-link>
+                    <router-link :to="{name : 'NewStocks'}" class="btn btn-sm new"><i class="fa-solid fa-square-plus"></i> New (shift+n)</router-link>
             </div>
                 <div class="col-sm-2 d-grid">
-                        <button @click="closeStocks" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                        <button @click="closeStocks" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
                 </div>
             </div>
             <div class="card shadow min-vh-75" id="printMe">
@@ -143,20 +143,48 @@ export default {
     computed:{
         user(){
             return this.$store.getters.user;
-        },    
-      
+        },          
     },
-    watch:{
-       editItem(data){
-           
-       }
+    mounted() {
+        window.addEventListener('keydown', this.handlectrl);
     },
-    created() {     
-      
-    },
+    beforeUnmount() {
+         window.removeEventListener('keydown', this.handlectrl);
+     },
     
     methods:{    
-       
+        handlectrl(event) {
+         
+         if (event.ctrlKey && event.key === 'h') {
+             event.preventDefault(); // Prevent the default browser save dialog
+             const modal=document.querySelector(".close-stock-modal");
+             modal.click();
+         }
+         if (event.ctrlKey && event.key === 'q') {
+             event.preventDefault(); // Prevent the default browser save dialog             
+             this.closeStocks(); // Call your custom function
+         }
+         if (event.ctrlKey && event.key === 'p') {
+             event.preventDefault(); // Prevent the default browser save dialog
+             //this.printSale(); // Call your custom function
+             this.print();
+         }
+         if (event.ctrlKey && event.key === 'o') {
+             event.preventDefault(); // Prevent the default browser save dialog
+             const browse=document.querySelector(".open")
+             browse.click();
+         }
+         if (event.ctrlKey && event.key === 'e') {
+             event.preventDefault(); // Prevent the default browser save dialog
+              this.goEdit();
+         }
+         if(event.shiftKey && event.key.toLowerCase()=== 'n') {
+             event.preventDefault(); // Prevent the default browser save dialog
+             const add=document.querySelector(".new")
+             add.click();
+         }
+      
+     },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
@@ -168,6 +196,7 @@ export default {
          await this.$htmlToPaper('printMe');
         }, 
         goEdit(){           
+            if(this.stock_user.uid != this.user.uid) return false;
             this.$router.push({name: 'EditStocks', params: {id: this.voucher_no}})
         },
         closeStocks(){

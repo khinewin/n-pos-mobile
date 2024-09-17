@@ -49,8 +49,8 @@
                               </table>
                             </div>
                             <div class="col-12">
-                                <table class="table table-bordered table-hover border-dark mt-2 mb-0">
-                                    <tbody class="">
+                                <table class="table table-bordered table-hover mt-2 mb-0">
+                                    <tbody class="table-group-divider">
                                         <tr class="text-center fw-bold">
                                             <td class="col-1">No.</td>
                                             <td class="col-2">Description</td>
@@ -59,7 +59,7 @@
                                             <td class="col-1 text-center">Unit price</td>
                                             <td class="col-1 text-center">Amount</td>
                                             <td class="col-1 text-center">Discount</td>
-                                            <td class="col-1 text-center">Final amount</td>
+                                            <td class="col-1 text-center">Total Amt</td>
                                         </tr>
                                         <tr class="" v-if="sale.products.length > 0" v-for="(s, i) in sale.products" :key="s.id" >     
                                             <td class="text-center">{{i+1}}</td>                   
@@ -79,37 +79,41 @@
                                             <td class=" text-end">{{fM(s.final_amount)}}</td>
                                            
                                         </tr>                        
-                                    </tbody>
-                                    <tbody>
-                                        <tr>
-                                            <td colspan="7" class="text-end pe-2 rm-b-b">Total amount (Ks)</td>
-                                            <td class="text-end ">{{fM(sale.total_amount)}}</td>
-                                        </tr>                     
-                                        <tr>
-                                            <td colspan="7" class="text-end  pe-2 rm-b-b">Extra discount (Ks)</td>
-                                            <td class="text-end ">
-                                                {{fM(sale.extra_discount)}}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="7" class="text-end   pe-2 rm-b-b">Net amount (Ks)</td>
-                                            <td class="text-end ">{{fM(sale.net_amount)}}</td>
-                                        </tr>
-                                        <tr >
-                                            <td colspan="7" class="text-end   pe-2 rm-b-b">Paid (Ks)</td>
-                                            <td class="text-end">
-                                                {{fM(sale.paid)}}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="7" class="text-end   pe-2 " >Change (Ks)</td>
-                                            <td class="text-end ">
-                                                {{fM(sale.change)}}
-                                            </td>
-                                        </tr>    
-                                                                 
-                                    </tbody>
-                              </table>                             
+                                    </tbody>                                    
+                              </table>  
+                              <table class="table table-bordered table-hover mb-0">
+                                <tbody class="table-group-divider">
+                                    <tr>
+                                        <td  class="text-end pe-2 rm-b-b col-3">Total amount (Ks)</td>
+                                        <td class="text-end col-3 ">{{fM(sale.total_amount)}}</td>
+                                        <td  class="text-end  pe-2 col-3 rm-b-b">Extra discount (Ks)</td>
+                                        <td class="text-end col-3 ">
+                                            {{fM(sale.extra_discount)}}
+                                        </td>
+                                    </tr>                     
+                                    <tr>
+                                       
+                                        <td  class="text-end col-3  pe-2 rm-b-b">Net amount (Ks)</td>
+                                        <td class="text-end col-3 ">{{fM(sale.net_amount)}}</td>
+                                                    
+                                        <td  class="text-end pe-2 rm-b-b">Paid (Ks)</td>
+                                        <td class="text-end">
+                                            {{fM(sale.paid)}}
+                                        </td>                                            
+                                    </tr>
+                                    <tr>
+                                        <td  class="text-end   pe-2" >Change (Ks)</td>
+                                        <td class="text-end ">
+                                            {{fM(sale.change)}}
+                                        </td>        
+                                        <td  class="text-end   pe-2 " >Credit (Ks)</td>
+                                        <td class="text-end ">
+                                            {{fM(sale.credit)}}
+                                        </td>
+                                    </tr>    
+                                                             
+                                </tbody>
+                              </table>                           
                             </div>                          
                         </div>
                     </div>

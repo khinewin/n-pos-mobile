@@ -1,6 +1,6 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="Edit adjustment" page-code="editAdjustment" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader page-title="Adjustment / Edit" page-code="editAdjustment" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                
                 <div class="col-sm-2 d-grid">

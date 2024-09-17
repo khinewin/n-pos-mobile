@@ -5,12 +5,12 @@
             <div class="row mb-2 justify-content-end">                
                 <div class="col-sm-2 d-grid">
                         <button type="button" @click="saveStocks" class="btn btn-sm" :disabled="isLoading || storeItems.length <=0">
-                            <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                            <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                         </button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                        <router-link :to="{name : 'Stocks'}" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> Close</router-link>
+                        <router-link :to="{name : 'Stocks'}" class="btn btn-sm close"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</router-link>
                 </div>
             </div>
             <div class="card shadow min-vh-75">
@@ -40,7 +40,7 @@
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
-                                    <td class="col-2" data-bs-toggle="modal" data-bs-target="#searchCode" style="cursor: context-menu;"><i class="fa-solid fa-circle-plus"></i> Description</td>
+                                    <td class="col-2" data-bs-toggle="modal" id="description" data-bs-target="#searchCode" style="cursor: context-menu;"><i class="fa-solid fa-circle-plus"></i> Description (ctrl+i)</td>
                                     <td class="col-1">Packing size</td>
                                     <td class="col-1 table-info">Main Inv Bal</td>     
                                     <td class="col-1 table-info">Pharmacy Inv Bal</td>   
@@ -160,10 +160,38 @@ export default {
         this.voucher_no=new Date().getTime();
         this.created_at=hp.setToday();
         this.checkDatabase();
+        window.addEventListener('keydown', this.handleCtrl);
+
     },
+    beforeUnmount() {
+         window.removeEventListener('keydown', this.handleCtrl);
+     },
     
     methods:{       
      
+        handleCtrl(event) {
+            if (event.ctrlKey && event.key === 'h') {
+                event.preventDefault(); // Prevent the default browser save dialog
+               const p=document.querySelector(".close-product")
+                p.click();
+            }
+            if (event.ctrlKey && event.key === 's') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.saveStocks(); // Call your custom function
+            }
+            if (event.ctrlKey && event.key === 'q') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const des=document.querySelector(".close")
+                des.click();
+            }
+         
+          
+            if (event.ctrlKey && event.key === 'i') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const des=document.getElementById("description")
+                des.click();
+            }
+        },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },

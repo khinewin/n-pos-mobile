@@ -12,7 +12,7 @@ const returnIn=(arr)=>{
              change: data.change,
              total_amount:data.total_amount,
              customer : data.customer,
-             credit: data.credit,
+             balance: data.balance,
              payment_type: data.payment_type,
              remark: data.remark,
         };                                     

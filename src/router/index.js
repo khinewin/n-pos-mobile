@@ -224,19 +224,19 @@ const router = createRouter({
       path: '/adjustments',
       name: 'Adjustments',     
       component: Adjustments,
-      meta : {title: "N-Pharmacy | Adjustments"}
+      meta : {title: "N-Pharmacy | Adjustment"}
     },
     {
       path: '/adjustments/add',
       name: 'NewAdjustment',     
       component: NewAdjustment,
-      meta : {title: "N-Pharmacy | Adjustments / New"}
+      meta : {title: "N-Pharmacy | Adjustment / New"}
     },
     {
       path: '/adjustments/:id/edit',
       name: 'EditAdjustment',     
       component: EditAdjustment,
-      meta : {title: "N-Pharmacy | Adjustments / Edit"}
+      meta : {title: "N-Pharmacy | Adjustment / Edit"}
     },
     {
       path: '/user/profile',

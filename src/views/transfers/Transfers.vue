@@ -4,19 +4,19 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                
                 <div class="col-sm-2 d-grid">
-                    <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print</button>
+                    <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print (ctrl+p)</button>
                 </div>                
                 <!--<div class="col-sm-2 d-grid">
                         <button @click="goEdit" class="btn btn-sm" :class="{'disabled': !voucher_no || transfer_user.uid !== user.uid}"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
                 </div>-->               
                 <div class="col-sm-2 d-grid">
-                    <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#transfersModal"><i class="fa-solid fa-folder-tree"></i> Browse</button>
+                    <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#transfersModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                    <router-link :to="{name : 'AddTransfer'}" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New</router-link>
+                    <router-link :to="{name : 'AddTransfer'}" class="btn btn-sm new"><i class="fa-solid fa-square-plus"></i> New (shift+n)</router-link>
             </div>
                 <div class="col-sm-2 d-grid">
-                        <button @click="closeTransfer" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                        <button @click="closeTransfer" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
                 </div>
             </div>
             <div class="card shadow min-vh-75" id="printMe">
@@ -165,16 +165,43 @@ export default {
         },    
       
     },
-    watch:{
-       editItem(data){
-           
-       }
+    mounted() {
+        window.addEventListener('keydown', this.handlectrl);
     },
-    created() {     
-      
-    },
+    beforeUnmount() {
+         window.removeEventListener('keydown', this.handlectrl);
+     },
     
     methods:{
+        handlectrl(event) {
+         
+         if (event.ctrlKey && event.key === 'h') {
+             event.preventDefault(); // Prevent the default browser save dialog
+             const modal=document.querySelector(".close-transfer-modal");
+             modal.click();
+         }
+         if (event.ctrlKey && event.key === 'q') {
+             event.preventDefault(); // Prevent the default browser save dialog             
+             this.closeTransfer(); // Call your custom function
+         }
+         if (event.ctrlKey && event.key === 'p') {
+             event.preventDefault(); // Prevent the default browser save dialog
+             //this.printSale(); // Call your custom function
+             this.print();
+         }
+         if (event.ctrlKey && event.key === 'o') {
+             event.preventDefault(); // Prevent the default browser save dialog
+             const browse=document.querySelector(".open")
+             browse.click();
+         }
+    
+         if(event.shiftKey && event.key.toLowerCase()=== 'n') {
+             event.preventDefault(); // Prevent the default browser save dialog
+             const add=document.querySelector(".new")
+             add.click();
+         }
+      
+     },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },

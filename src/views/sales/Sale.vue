@@ -24,7 +24,7 @@
                 </div>
                 
                 <div class="col-sm-2 d-grid">
-                    <button class="btn btn-sm" id="browse" data-bs-toggle="modal" data-bs-target="#salesModal"><i class="fa-solid fa-folder-tree"></i> Browse (ctrl+b)</button>
+                    <button class="btn btn-sm" id="open" data-bs-toggle="modal" data-bs-target="#salesModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
                 </div>
                 <div class="col-sm-2 d-grid">
                     <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print (ctrl+p)</button>
@@ -79,7 +79,7 @@
                                                             <input type="text" @click="changeCustomer" v-model="customer.name" class="form-control-plaintext py-0 border-bottom" id="customer_name" placeholder="Name">                                                
                                                         </div>
                                                         <div class="col-6 border-bottom text-center">
-                                                            <span class="d-block text-primary" :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#customerModal']" ><i class="fa-solid fa-pen"></i></span>
+                                                            <span class="d-block text-primary customer" :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#customerModal']" ><i class="fa-solid fa-pen"></i> (shift+c)</span>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -340,10 +340,10 @@ export default {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.printSale(); // Call your custom function
             }
-            if (event.ctrlKey && event.key === 'b') {
+            if (event.ctrlKey && event.key === 'o') {
                 event.preventDefault(); // Prevent the default browser save dialog
-                const browse=document.getElementById("browse")
-                browse.click();
+                const open=document.getElementById("open")
+                open.click();
             }
             if (event.ctrlKey && event.key === 'e') {
                 event.preventDefault(); // Prevent the default browser save dialog
@@ -352,6 +352,20 @@ export default {
             if (event.ctrlKey && event.key === 'i') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 const des=document.getElementById("description")
+                des.click();
+            }
+            if (event.ctrlKey && event.key === 'h') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const cus=document.querySelector(".customer-modal")
+                const sale=document.querySelector(".sale-modal")
+                const product=document.querySelector(".product-modal")
+                sale.click();
+                product.click();
+                cus.click();
+            }
+            if (event.shiftKey && event.key.toLowerCase() === 'c') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const des=document.querySelector(".customer")
                 des.click();
             }
         },
@@ -469,7 +483,8 @@ export default {
             this.editItem={...item,               
                 input_l_qty: item.input_l_qty ? item.input_l_qty : "",
                 input_m_qty: item.input_m_qty ? item.input_m_qty : "",
-                input_s_qty: item.input_s_qty  ? item.input_s_qty  : ""
+                input_s_qty: item.input_s_qty  ? item.input_s_qty  : "",
+                sale_type: this.sale_type,
             };
         },
         calEdit(i){
@@ -529,7 +544,9 @@ export default {
         async print () {
         // Pass the element id here
          await this.$htmlToPaper('printMe');
-         this.clearSaleItem();
+         if(this.saleMode=="Sale / New"){
+            this.clearSaleItem();
+         }
         },
         printSale(){         
            this.print();      

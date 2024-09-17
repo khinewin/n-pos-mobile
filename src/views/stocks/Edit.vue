@@ -5,12 +5,12 @@
             <div class="row mb-2 justify-content-end">                
                 <div class="col-sm-2 d-grid">
                         <button type="button" @click="saveStocks" class="btn btn-sm" :disabled="isLoading">
-                            <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                            <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                        <router-link :to="{name : 'Stocks'}" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> Close</router-link>
+                        <router-link :to="{name : 'Stocks'}" class="btn btn-sm close"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</router-link>
                 </div>
             </div>
             <div class="card shadow min-vh-75">
@@ -144,7 +144,12 @@ export default {
         this.voucher_no=this.$route.params.id;
         this.fetchStock();
         this.checkDatabase();
+        window.addEventListener('keydown', this.handleCtrl);
+
     },  
+    beforeUnmount() {
+         window.removeEventListener('keydown', this.handleCtrl);
+     },
     computed:{
         user(){
             return this.$store.getters.user;
@@ -164,7 +169,19 @@ export default {
    },
    
     methods:{
-
+        handleCtrl(event) {
+          
+          if (event.ctrlKey && event.key === 's') {
+              event.preventDefault(); // Prevent the default browser save dialog
+              this.saveStocks(); // Call your custom function
+          }
+          if (event.ctrlKey && event.key === 'q') {
+              event.preventDefault(); // Prevent the default browser save dialog
+              const des=document.querySelector(".close")
+              des.click();
+          }
+        
+      },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
