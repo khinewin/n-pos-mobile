@@ -1,14 +1,14 @@
 <template lang="">
     <!-- Products Modal -->
     <div class="modal fade" id="purchaseModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-       <div class="modal-dialog modal-xl">
+       <div class="modal-dialog modal-fullscreen">
          <div class="modal-content">               
            <div>
-               <div class="card">
+               <div class="card border-0">
                    <div class="card-body p-2">
-                    <div class="row g-1 m-0">
+                    <div class="row g-2">
                         <div class="col-lg-3">                                                         
-                                <div class="card shadow">
+                                <div class="card shadow-sm">
                                     <div class="card-body p-2">
                                        <div class="row g-1 small">
                                         <div class="col-md-6 col-lg-12">
@@ -55,7 +55,7 @@
                                 
                                 <div class="row mt-2">
                                         <div class="col-6 d-grid">
-                                            <button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
+                                            <button class="btn btn-sm text-dark clear-search-purchase" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                         </div>
                                         <!--<div class="col-4 d-grid">
                                             <button class="btn btn-sm text-dark" @click="updatePurchases">
@@ -71,22 +71,22 @@
                             </div>                                                                                                              
                         </div>
                         <div class="col-lg-9">
-                            <div class="card shadow vh-80 overflow-y-auto">
+                            <div class="card shadow-sm">
                                 <div class="card-body p-2">
                                     <table class="table table-bordered table-hover m-0">
                                         <tbody class="">
                                             <tr class="table-secondary text-center">
-                                                <td>Voucher no.</td>
-                                                <td>Pur date</td>                                    
-                                                <td>Supplier</td>
-                                                <td>Location</td>
-                                                <td>User</td>
+                                                <td class="col-1">Voucher no.</td>
+                                                <td class="col-1">Pur date</td>                                    
+                                                <td class="col-4">Supplier</td>
+                                                <td class="col-1">Location</td>
+                                                <td class="col-1">User</td>
 
                                             </tr>                                
-                                            <tr v-if="purchases.length > 0" v-for="p in purchases" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal" aria-label="Close" style="cursor: context-menu;">
+                                            <tr class="change-cursor" v-if="purchases.length > 0" v-for="p in purchases" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal" aria-label="Close" >
                                                 <td class="text-center">{{p.voucher_no}}</td>
                                                 <td class="text-center">{{showTime(p.pur_date)}}</td>
-                                                <td>{{p.supplier.name}} ({{p.supplier.company}})</td>
+                                                <td>{{p.supplier.name}} <span v-if="p.supplier.company">({{p.supplier.company}})</span></td>
                                                 <td class="text-center">{{p.location}}</td>
                                                 <td class="text-center">{{p.user.displayName}}</td>
 

@@ -40,7 +40,7 @@
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
-                                    <td class="col-2" data-bs-toggle="modal" id="description" data-bs-target="#searchCode" style="cursor: context-menu;"><i class="fa-solid fa-circle-plus"></i> Description (ctrl+i)</td>
+                                    <td class="col-2 change-cursor" data-bs-toggle="modal" id="description" data-bs-target="#searchCode" style="cursor: context-menu;"><i class="fa-solid fa-circle-plus"></i> Description (ctrl+i)</td>
                                     <td class="col-1">Packing size</td>
                                     <td class="col-1 table-info">Main Inv Bal</td>     
                                     <td class="col-1 table-info">Pharmacy Inv Bal</td>   
@@ -59,21 +59,21 @@
                                     <td class="">
                                         {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                     </td>
-                                    <td class="table-info text-end" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                    <td class="table-info text-end change-cursor" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.main_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td> 
-                                    <td class="table-info text-end" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                    <td class="table-info text-end change-cursor" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td> 
-                                    <td class="text-end table-primary" data-bs-toggle="modal" data-bs-target="#setPricesModal">
+                                    <td class="text-end table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setPricesModal">
                                         <span v-if="st.packing_size.largest_unit"> {{st.pur_price.largest_unit}}' {{st.packing_size.largest_unit}}</span>
                                         <span v-else>{{st.pur_price.medium_unit}}' {{st.packing_size.medium_unit}}</span>
                                     </td>       
-                                    <td class="text-end table-primary" data-bs-toggle="modal" data-bs-target="#setPricesModal">
+                                    <td class="text-end table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setPricesModal">
                                         <span v-if="st.packing_size.largest_unit">{{st.retail_price.largest_unit}}' {{st.packing_size.largest_unit}} </span>
                                         <span v-else>{{st.retail_price.medium_unit}}' {{st.packing_size.medium_unit}}</span>
                                     </td>
-                                    <td class="text-end table-primary" data-bs-toggle="modal" data-bs-target="#setPricesModal">
+                                    <td class="text-end table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setPricesModal">
                                         <span v-if="st.packing_size.largest_unit">{{st.whole_sale_price.largest_unit}}' {{st.packing_size.largest_unit}} </span>
                                         <span v-else>{{st.whole_sale_price.medium_unit}}' {{st.packing_size.medium_unit}}</span>
                                     </td>                                                                                    
@@ -86,7 +86,7 @@
             </div>
         </div>
        
-        <ProductModal @setCode="setCode"  />
+        <ProductModal @setCode="setCode" :stockItems="storeItems" />
         <SetQty :ei="editItem" @saveQty="saveQty" />
         <SetPrice :ei="editItem" @saveAutoCal="saveAutoCal" />
     </div>
@@ -166,6 +166,18 @@ export default {
     beforeUnmount() {
          window.removeEventListener('keydown', this.handleCtrl);
      },
+     watch:{
+        msg:{
+            handler(val){
+                if(val.type){
+                    setTimeout(()=>{
+                        this.msg.type="";
+                        this.msg.info="";
+                    }, 3000)
+                }
+            },deep:true
+        }
+    },
     
     methods:{       
      
@@ -183,12 +195,26 @@ export default {
                 event.preventDefault(); // Prevent the default browser save dialog
                 const des=document.querySelector(".close")
                 des.click();
-            }
-         
+            }         
           
+            if (event.ctrlKey && event.key === 'z') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const des=document.querySelector(".clear-search-product")
+                des.click();
+            }
             if (event.ctrlKey && event.key === 'i') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 const des=document.getElementById("description")
+                des.click();
+            }
+            if (event.ctrlKey && event.key === 'a') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const des=document.querySelector(".add-all")
+                des.click();
+            }
+            if (event.shiftKey && event.key.toLowerCase() === 'a') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const des=document.querySelector(".auto-cal")
                 des.click();
             }
         },

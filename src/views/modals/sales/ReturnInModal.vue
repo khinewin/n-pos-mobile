@@ -1,14 +1,14 @@
 <template lang="">
     <!-- products Modal -->
     <div class="modal fade" id="returnInModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdrosLabel" aria-hidden="true">
-       <div class="modal-dialog modal-xl">
+       <div class="modal-dialog modal-fullscreen">
          <div class="modal-content">               
            <div>
-               <div class="">
-                   <div class="p-2">
-                    <div class="row g-1 m-0">
+               <div class="card border-0">
+                   <div class="card-body p-2">
+                    <div class="row g-2">
                         <div class="col-lg-3">                                                         
-                                <div class="card shadow">
+                                <div class="card shadow-sm">
                                     <div class="card-body p-2">
                                         <div class="row g-1 small">
                                            <div class="col-md-4 col-lg-12">
@@ -44,7 +44,7 @@
                                     </div>
                                     <div class="row mt-2">
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
+                                                <button class="btn btn-sm text-dark clear-rtin-modal"  @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                             </div>
                                             <!--<div class="col-4 d-grid">
                                                 <button class="btn btn-sm text-dark" @click="updateSales">
@@ -60,18 +60,18 @@
                                 </div>                                                                                                              
                         </div>
                         <div class="col-lg-9">
-                            <div class="card shadow vh-80 overflow-y-auto">
+                            <div class="card shadow-sm">
                                 <div class="card-body p-2">
                                     <table class="table table-bordered table-hover m-0">
                                         <tbody>
-                                            <tr class="table-secondary text-center">
+                                            <tr class="table-secondary text-center fw-bold">
                                                 <td>Voucher no.</td>
                                                 <td class="">Name</td>
                                                 <td>Phone</td>
                                                 <td>Return In date</td>
                                                 <td class="">User</td>                                    
                                             </tr>                                
-                                            <tr v-if="sales.length > 0" v-for="s in sales" :key="s.id" @click="setCode(s)" data-bs-dismiss="modal" style="cursor: context-menu;">
+                                            <tr class="change-cursor" v-if="sales.length > 0" v-for="s in sales" :key="s.id" @click="setCode(s)" data-bs-dismiss="modal" >
                                                 <td class="text-center">{{s.voucher_no}}</td>
                                                 <td>{{s.customer.name}}</td>
                                                 <td class="text-center">{{s.customer.phone}}</td>

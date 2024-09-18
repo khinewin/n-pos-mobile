@@ -42,12 +42,12 @@
                             </div>
                         </div>
                        
-                        <div class="vh-60 overflow-y-auto">
+                        <div class="vh-65 overflow-y-auto">
                         <table class="table table-bordered  mb-0 table-hover">
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
-                                    <td class="col-2" id="description" data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Description (ctrl+i)</td>
+                                    <td class="col-2 change-cursor" id="description" data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Description (ctrl+i)</td>
                                     <td class="col-1">Packing size</td>
                                     <td class="col-1">Before Adj</td>
                                     <td class="col-1">Adj type</td>
@@ -99,7 +99,7 @@
                 </div>
             </div>
         </div>
-        <ProductModal @setCode="setCode" :storePurchase="storeItems" />
+        <ProductModal @setCode="setCode" :storeItems="storeItems" />
         <setQtyModal @setQty="setAdjQty" :ei="editItem" />
     </div>
 </template>

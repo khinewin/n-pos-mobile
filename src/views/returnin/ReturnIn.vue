@@ -63,8 +63,8 @@
                                                         <div class="col-6">
                                                             <input type="text" @click="changeCustomer" v-model="customer.name" class="form-control-plaintext py-0 border-bottom" id="customer_name" placeholder="Name">                                                
                                                         </div>
-                                                        <div class="col-6 border-bottom text-center">
-                                                            <span class="d-block text-primary" :data-bs-toggle="[rtInMode=='Return In / History' ? '' : 'modal']" :data-bs-target="[rtInMode=='Return In / History' ? '' : '#customerModal']" ><i class="fa-solid fa-pen"></i></span>
+                                                        <div class="col-6 border-bottom text-center change-cursor">
+                                                            <span class="d-block text-primary customer " :data-bs-toggle="[rtInMode=='Return In / History' ? '' : 'modal']" :data-bs-target="[rtInMode=='Return In / History' ? '' : '#customerModal']" ><i class="fa-solid fa-pen"></i> (shift+c)</span>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -107,14 +107,14 @@
                                             <td class="">
                                                 {{calPackingSize(s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit, s.packing_size.medium_qty, s.packing_size.smallest_qty)}}
                                             </td>                                        
-                                            <td class=" text-end table-primary" id="setQty" :data-bs-toggle="[rtInMode=='Return In / History' ? '' : 'modal']" :data-bs-target="[rtInMode=='Return In / History' ? '' : '#setQtyModal']">
+                                            <td class=" text-end table-primary change-cursor" id="setQty" :data-bs-toggle="[rtInMode=='Return In / History' ? '' : 'modal']" :data-bs-target="[rtInMode=='Return In / History' ? '' : '#setQtyModal']">
                                                 {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
                                             </td>                                            
                                             <td class=" table-info col-1">
                                                 <input @keyup="calEdit"   type="number"  v-model="s.qty_sale_price" class="form-control-plaintext py-0  text-center" placeholder="Price">                                        
                                             </td>
                                             <td class=" table-info col-0">
-                                                <select @change="calEdit" class="form-control-plaintext p-0 text-center" v-model="s.qty_sale_price_unit">
+                                                <select @change="calEdit" class="form-control-plaintext py-0 change-cursor text-center" v-model="s.qty_sale_price_unit">
                                                     <option   v-for="pu in onlyString(s.packing_size)">{{pu}}</option>
                                                 </select>
                                             </td>
@@ -156,7 +156,7 @@
                 </div>
             </div>
         </div> 
-        <ProductModal @setCode="setCode" :sale_type="sale_type" :rtInItems="rtInItems"/>
+        <ProductModal @setCode="setCode" :sale_type="sale_type" :saleItems="rtInItems"/>
         <ReturnInModal @setCode="setOldCode" />
         <CustomerModal @setCustomer="setCustomer" />
         <!--Print item start-->
@@ -300,6 +300,13 @@ export default {
     },
     methods:{
         handleCtrl(event) {
+            if (event.ctrlKey && event.key === 'z') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const rt=document.querySelector(".clear-rtin-modal")
+                const sCus=document.querySelector(".clear-search-customer")
+                sCus.click();
+                rt.click();
+            }
             if (event.ctrlKey && event.key === 's') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.saveReturnIn(); // Call your custom function
@@ -326,10 +333,17 @@ export default {
                 const des=document.getElementById("description")
                 des.click();
             }
+            if (event.shiftKey && event.key.toLowerCase() === 'c') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const des=document.querySelector(".customer")
+                des.click();
+            }
             if (event.ctrlKey && event.key === 'h') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 const des=document.querySelector(".product-modal")
                 const rtIn=document.querySelector(".rt-in-modal")
+                const cus=document.querySelector(".customer-modal")
+                cus.click();
                 rtIn.click();
                 des.click();
             }

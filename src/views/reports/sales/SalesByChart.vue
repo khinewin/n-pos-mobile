@@ -153,10 +153,10 @@ export default {
                 responsive: true,
             },        
             chartOptions: {              
-                colors : ["orange", "blue","green", "brown"]
+                colors : ["blue", "orange","red", "green"]
             },
             monthlyChartOptions: {              
-                colors : ["orange", "blue","green"]
+                colors : ["blue", "orange","red", "green"]
             },
             monthlySalesAmountOptions: {              
                 colors : ["red", "orange","yellow", "green","teal","blue"],
@@ -210,13 +210,15 @@ export default {
                     let sale_amount=0;
                     let pur_amount=0;
                     let profit=0;
+                    let extra_discount=0;
 
                     res[1].map((r)=>{
                             sale_amount += r.final_amount
                             pur_amount +=r.pur_price.smallest_unit * r.sale_qty;
+                            extra_discount += r.extra_discount;
                             profit += (r.final_amount - (r.pur_price.smallest_unit * r.sale_qty)) - r.extra_discount;                         
                     })
-                   return [date, pur_amount, sale_amount, profit]
+                   return [date,  sale_amount, pur_amount, extra_discount, profit]
             })
             const salesData= gbm.map((res)=>{
                     const date=res[0];
@@ -226,7 +228,7 @@ export default {
                     })
                    return [date,sale_amount]
             })
-            const title=["Month","Pur amount", "Sales amount", "Profit"]
+            const title=["Month", "Sales Amt", "Pur Amt", "Discount", "Profit"]
             const salesTitle=["Month", "Sales amount"]
             data.unshift(title)
             salesData.unshift(salesTitle)
@@ -274,15 +276,17 @@ export default {
                         sale_amount : 0,
                         pur_amount :0,
                         profit: 0,
+                        extra_discount:0
                     }                            
                     res[1].map((r)=>{  
                             item.sale_amount += r.final_amount
                             item.pur_amount +=r.pur_price.smallest_unit * r.sale_qty;
+                            item.extra_discount += r.extra_discount;
                            item.profit += (r.final_amount - (r.pur_price.smallest_unit * r.sale_qty)) - r.extra_discount;  
                     })                    
-                   return [item.date, item.pur_amount, item.sale_amount, item.profit]
+                   return [item.date, item.sale_amount, item.pur_amount, item.extra_discount, item.profit]
             })
-            const title=["Date", "Pur Amt", "Sales Amt", "Profit"]
+            const title=["Date", "Sales Amt", "Pur Amt", "Discount", "Profit"]
             data.unshift(title)
             this.products=data;            
             //cal qty

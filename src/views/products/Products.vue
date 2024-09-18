@@ -433,8 +433,8 @@ export default {
                 pur_price: {},
                 main_qty:0,
                 is_deleted:this.is_deleted,
-                edit_user: {uid: this.user.uid, type: 'added'}
-
+                edit_user: {uid: this.user.uid, type: 'added'},
+                auto_cal: true,
             }
             const result=await addDoc(dataCollection, data);                    
         },

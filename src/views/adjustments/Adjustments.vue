@@ -171,6 +171,11 @@ export default {
              const modal=document.querySelector(".close-adj-modal");
              modal.click();
          }
+         if (event.ctrlKey && event.key === 'z') {
+             event.preventDefault(); // Prevent the default browser save dialog
+             const modal=document.querySelector(".clear-adj-modal");
+             modal.click();
+         }
          if (event.ctrlKey && event.key === 'q') {
              event.preventDefault(); // Prevent the default browser save dialog             
              this.closeAdjustment(); // Call your custom function

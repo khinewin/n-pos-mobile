@@ -2,15 +2,15 @@
     <div>          
       <!-- Products Modal -->
     <div class="modal fade" id="customerModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-fullscreen">
           <div class="modal-content"> 
-           <div class="card">
+           <div class="card border-0">
             <div class="card-body p-2">
-               <div class="row g-1">
+               <div class="row g-2">
                    <div class="col-lg-3">
-                       <div class="card shadow">
+                       <div class="card shadow-sm">
                         <div class="card-body p-2 small">
-                            <div class="row g-1">
+                            <div class="row g-2">
                                 <div class="col-md-4 col-lg-12">
                                     <div class="form-floating">
                                         <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchCustomer" placeholder="Code" class="form-control-plaintext border-bottom">
@@ -31,8 +31,8 @@
                                 </div> 
                             </div>
                              <div class="row mt-2">
-                                <div class="col-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch">
-                                    <i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
+                                <div class="col-6 d-grid"><button class="btn btn-sm text-dark clear-search-customer" @click="clearSearch">
+                                    <i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                 </div>
                                 <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateCustomer">
                                     <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
@@ -46,20 +46,20 @@
                        </div>                                                                                                          
                    </div>                        
                    <div class="col-lg-9">
-                       <div class="card shadow vh-80 overflow-y-auto">
+                       <div class="card shadow-sm">
                            <div class="card-body p-2 table-responsive">
                                <table class="table table-bordered table-hover mb-0">
                                    <tbody class="small">
-                                       <tr class="text-center table-secondary" style="cursor: context-menu;">
-                                           <td @click="sortCustomers('code')"><i class="fa-solid fa-sort"></i> Code</td>
-                                           <td @click="sortCustomers('name')" class="text-start"><i class="fa-solid fa-sort"></i> Name</td>
-                                           <td @click="sortCustomers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
-                                           <td @click="sortCustomers('address')"><i class="fa-solid fa-sort"></i> Address</td>
-                                           <td @click="sortCustomers('created_at')"><i class="fa-solid fa-sort"></i> Member date</td>
+                                       <tr class="text-center table-secondary " >
+                                           <td class="col-1" @click="sortCustomers('code')"><i class="fa-solid fa-sort"></i> Code</td>
+                                           <td @click="sortCustomers('name')" class="col-2"><i class="fa-solid fa-sort"></i> Name</td>
+                                           <td class="col-1" @click="sortCustomers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
+                                           <td class="col-4" @click="sortCustomers('address')"><i class="fa-solid fa-sort"></i> Address</td>
+                                           <td class="col-1" @click="sortCustomers('created_at')"><i class="fa-solid fa-sort"></i> Member date</td>
                                        </tr>
                                      
                                        
-                                       <tr class="" data-bs-dismiss="modal" @click="setCustomer(p)" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id" style="cursor:context-menu">                                         
+                                       <tr class="change-cursor" data-bs-dismiss="modal" @click="setCustomer(p)" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id" >                                         
                                            <td :class="{'table-secondary': sort_item ==='code'}" class="text-center">
                                                 {{p.code}}
                                             </td>

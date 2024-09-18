@@ -1,16 +1,16 @@
 <template lang="">
     <!-- Products Modal -->
     <div class="modal fade" id="transfersModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-       <div class="modal-dialog modal-xl">
+       <div class="modal-dialog modal-fullscreen">
          <div class="modal-content">               
            <div>
-               <div class="card min-vh-100">
+               <div class="card border-0">
                    <div class="card-body p-2">
-                    <div class="row g-1 m-0">
+                    <div class="row g-2">
                         <div class="col-lg-3">                                                         
-                                <div class="card shadow">
+                                <div class="card shadow-sm">
                                     <div class="card-body p-2">
-                                       <div class="row g-1 small">
+                                       <div class="row g-2 small">
                                         <div class="col-md-6 col-lg-12">
                                             <div class="form-floating ">
                                                 <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchTransfers" placeholder="Voucher no." class="form-control-plaintext border-bottom">
@@ -47,9 +47,9 @@
                                         </div>
                                     </div>   
                                 
-                                <div class="row">
+                                <div class="row g-2 mt-2">
                                         <div class="col-6 d-grid">
-                                            <button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
+                                            <button class="btn btn-sm text-dark clear-transfer-modal" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                         </div>
                                         <!--<div class="col-4 d-grid">
                                             <button class="btn btn-sm text-dark" @click="updateTransfers">
@@ -65,18 +65,18 @@
                             </div>                                                                                                              
                         </div>
                         <div class="col-lg-9">
-                            <div class="card shadow">
+                            <div class="card shadow-sm">
                                 <div class="card-body p-2">
                                     <table class="table table-bordered table-hover m-0">
                                         <tbody class="">
-                                            <tr class="table-secondary text-center">
+                                            <tr class="table-secondary text-center fw-bold">
                                                 <td>Voucher no.</td>
                                                 <td>From location</td>
                                                 <td>To Location</td>
                                                 <td>Transfer date</td>                                    
                                                 <td>User</td>
                                             </tr>                                
-                                            <tr v-if="transfers.length > 0" v-for="p in transfers" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal" aria-label="Close" style="cursor: context-menu;">
+                                            <tr class="change-cursor text-center" v-if="transfers.length > 0" v-for="p in transfers" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal" aria-label="Close">
                                                 <td class="text-center">{{p.voucher_no}}</td>
                                                 <td>{{p.from_location}}</td>
                                                 <td>{{p.to_location}}</td>

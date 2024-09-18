@@ -37,7 +37,7 @@
                         <td>{{fM(profit_amount)}}</td>
                     </tr>
                     <tr>
-                        <td colspan="6" class="text-end fw-bold border-bottom rm-b-b pe-2">Extra discount (Ks)</td>
+                        <td colspan="6" class="text-end fw-bold border-bottom rm-b-b pe-2">Total Extra Discount (Ks)</td>
                         <td class="text-end">{{fM(extra_discount)}}</td>                  
                     </tr>
                     <tr>

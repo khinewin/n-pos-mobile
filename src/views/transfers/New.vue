@@ -107,7 +107,7 @@
                 </div>
             </div>
         </div>
-        <ProductModal @setCode="setCode" :storePurchase="storeItems" />
+        <ProductModal @setCode="setCode" :storeItems="storeItems" />
         <setQtyModal @setQty="setTransferQty" :ei="editItem" />
 
     </div>

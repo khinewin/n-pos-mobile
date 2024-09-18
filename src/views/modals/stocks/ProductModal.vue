@@ -1,14 +1,14 @@
 <template lang="">
      <!-- Products Modal -->
      <div class="modal fade" id="searchCode" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-fullscreen">
           <div class="modal-content">               
             <div>
-                <div class="card">
-                    <div class="card-body p-2">                                             
-                        <div class="row g-1">
+                <div class="card border-0">
+                    <div class="card-body  p-2">                                             
+                        <div class="row g-2">
                             <div class="col-lg-3">
-                                <div class="card  shadow">
+                                <div class="card  shadow -sm">
                                     <div class="card-body p-2 ">
                                         <div class="row g-1 small">
                                             <div class="col-md-6 col-lg-12">
@@ -26,7 +26,7 @@
                                         </div>
                                         <div class="row mt-2">
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
+                                                <button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                             </div>
                                             <!--<div class="col-4 d-grid">
                                                 <button class="btn btn-sm text-dark" @click="updateProducts">
@@ -40,21 +40,33 @@
                                         </div>   
                                         
                                     </div>
-                                </div>                                
+                                </div>      
+                                <div class="card shadow-sm mt-2" v-if="stockItems.length>0">
+                                    <div class="card-body p-2">
+                                        <table class="table table-bordered table-hover mb-0">
+                                            <tbody>
+                                                <tr v-for="item in stockItems" :key="item.id">
+                                                        <td class="col-1">{{item.code_no}}</td>
+                                                        <td class="col-4">{{item.item_name}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>                          
                             </div>
                             <div class="col-lg-9">
-                                <div class="card shadow vh-80 overflow-y-auto">
+                                <div class="card shadow-sm">
                                     <div class="card-body p-2">
                                         <table class="table table-bordered mb-0 table-hover">
                                             <tbody class="small">
-                                                <tr class="table-secondary text-center">
+                                                <tr class="table-secondary text-center fw-bold">
                                                     <td class="col-1">Code</td>
-                                                    <td class="col-2" @click="insertAllItem" style="cursor: context-menu;"><i class="fa-solid fa-check-double"></i> Description</td>
+                                                    <td class="col-2 change-cursor add-all" @click="insertAllItem" ><i class="fa-solid fa-check-double"></i> Description (ctrl+a)</td>
                                                     <td class="col-1">Packing size</td>
                                                     <td class="col-1">Pharmacy Inv</td>
                                                     <td class="col-1">Main Inv</td>
                                                 </tr>                                      
-                                                <tr class="" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"   style="cursor:context-menu">
+                                                <tr class="change-cursor" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)" >
                                                     <td class="text-center">{{p.code_no}}</td>
                                                     <td>{{p.item_name}}</td>
                                                     <td class="col-1">
@@ -97,6 +109,7 @@ import db from '@/firebase/firestore'
 import * as lib from "@/lib/snapshot/products"
 import * as hp  from "@/lib/helper"
 export default {   
+props:['stockItems'],
  data(){
         return{
             products:[],

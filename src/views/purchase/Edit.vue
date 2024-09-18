@@ -42,15 +42,20 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>                                      
                                         <tr>
-                                            <td class="text-end col-4">Pur date :</td>
+                                            <td class="text-end col-4">Purchase date :</td>
                                             <td class="col-8">
                                                 <flat-pickr class="form-control-plaintext  p-0 border-bottom" v-model="pur_date" :config="config" />
                                             </td>
                                         </tr>
                                         <tr>
                                             <td class="text-end">Supplier :</td>
-                                            <td class="">
-                                                <input type="text" :class="{'border-0 border-bottom border-danger' : v$.supplier.name.$errors.length > 0}"  v-model="supplier.name" data-bs-toggle="modal" data-bs-target="#searchSupplier"  class="form-control-plaintext p-0 border-bottom">                                                
+                                            <td class="row g-2">
+                                                <div class="col-6">
+                                                    <input type="text"  @click="changeSupplier" v-model="supplier.name"  class="form-control-plaintext p-0  border-bottom">                                                
+                                                </div>
+                                                <div class="col-6 border-bottom text-center">
+                                                    <span class="d-block text-primary supplier change-cursor" data-bs-toggle="modal" data-bs-target="#searchSupplier" ><i class="fa-solid fa-pen"></i> (shift+c)</span>
+                                                </div>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -63,7 +68,7 @@
                                 <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
                                     <td class="col-2" > Descrption</td>
-                                    <td class="col-1">Exp. Date</td>     
+                                    <td class="col-1 table-info">Exp. Date</td>     
                                     <td class="col-1">Packing Size</td>                              
                                     <td class="col-1 table-primary" colspan="1">Qty</td>
                                     <td class="col-2 table-info" colspan="2">Unit Price</td>     
@@ -77,32 +82,32 @@
                                         {{st.code_no}}                                                                                         
                                     </td>                                    
                                     <td class="">{{st.item_name}}</td>
-                                    <td class=" position-relative" >
+                                    <td class=" position-relative table-info" >
                                         <a v-if="st.tmp_exp_date" class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeExpDate(st)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                         <flat-pickr class="form-control-plaintext py-0 text-center" v-model="st.tmp_exp_date" @change="setExpDate(st.id)"  :config="config" />
                                     </td>
                                     <td class="">
                                          {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                     </td>
-                                   <td class=" text-end table-primary" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                   <td class=" text-end table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.pur_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                    </td>
                                    <td class=" table-info w-10">
                                         <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.qty_pur_price" class="form-control-plaintext py-0  text-center" placeholder="Price">                                        
                                     </td>
                                     <td class=" table-info w-5">
-                                        <select @change="calEdit" class="form-control-plaintext py-0  text-center" v-model="st.qty_pur_price_unit">
+                                        <select @change="calEdit" class="form-control-plaintext py-0  text-center change-cursor" v-model="st.qty_pur_price_unit">
                                             <option  v-for="pu in onlyString(st.packing_size)">{{pu}}</option>
                                         </select>
                                     </td>
                                     <td class="text-end ">{{st.amount}}</td>
 
-                                    <td class="text-center  table-warning" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
+                                    <td class="text-center  table-warning change-cursor" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
                                         <span v-if="st.dis_qty">{{st.dis_qty}}{{st.dis_qty_unit}}</span>
                                             <span v-if="st.dis_amount">{{st.dis_amount}}$</span>
                                             <span v-if="st.dis_percent">{{st.dis_percent}}%</span>                                      
                                     </td>  
-                                    <td class="text-end  table-warning" data-bs-toggle="modal" data-bs-target="#setDiscountModal">{{st.discount}}</td>
+                                    <td class="text-end  table-warning change-cursor" data-bs-toggle="modal" data-bs-target="#setDiscountModal">{{st.discount}}</td>
                                     <td class="text-end ">{{st.unit_cost}}</td>
                                 </tr>
 
@@ -140,7 +145,7 @@
                 </form>
        
           
-            <ProductModal @setCode="setCode" :storePurchase="storePurchase" />
+            <ProductModal @setCode="setCode" :storeItems="storePurchase" />
             <SupplierModal @setCode="setSupplier" />
         </div>
         </div>
@@ -219,7 +224,16 @@ export default {
             msg : {
                 type :"",
                 info :"",
-            }
+            },
+            supplierData: {
+                id: 123456789,
+                code: 123456789,
+                name:"General Supplier",
+                phone:"09xxxxxxxxx",
+                company :"",
+                created_at : Timestamp.fromDate(new Date()),
+            },
+
 
         }
     },
@@ -254,6 +268,9 @@ export default {
    },
     
     methods:{
+        changeSupplier(){
+            this.setSupplier(this.supplierData)
+        },
         handleCtrl(event) {
           
             if (event.ctrlKey && event.key === 's') {
@@ -263,6 +280,11 @@ export default {
             if (event.ctrlKey && event.key === 'q') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 const des=document.getElementById("close")
+                des.click();
+            }
+            if (event.shiftKey && event.key.toLowerCase() === 'c') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const des=document.querySelector(".supplier")
                 des.click();
             }
           

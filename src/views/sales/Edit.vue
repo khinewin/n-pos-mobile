@@ -34,13 +34,13 @@
                                     <table class="table mb-0 table-borderless">
                                         <tbody class="">
                                             <tr class="">
-                                                <td class="text-end col-4 ">Voucher no. :</td>
+                                                <td class="text-end col-4 ">Voucher No. :</td>
                                                 <td class="col-8">
                                                     <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext   border-bottom py-0" id="voucher_no" placeholder="Voucher no">                                                
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-end">Sale date :</td>
+                                                <td class="text-end">Sale Date :</td>
                                                 <td class="">
                                                     <flat-pickr class="form-control-plaintext py-0  border-bottom" v-model="sale_date" id="sale_date" :config="config" />
                                                 </td>
@@ -60,7 +60,7 @@
                                                             <input type="text" @click="changeCustomer" v-model="customer.name" class="form-control-plaintext py-0 border-bottom" id="customer_name" placeholder="Name">                                                
                                                         </div>
                                                         <div class="col-6 border-bottom text-center">
-                                                            <span class="d-block text-primary" data-bs-toggle="modal" data-bs-target="#customerModal" ><i class="fa-solid fa-pen"></i></span>
+                                                            <span class="d-block text-primary change-cursor customer" data-bs-toggle="modal" data-bs-target="#customerModal" ><i class="fa-solid fa-pen"></i> (shift+c)</span>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -85,9 +85,9 @@
                                             <td id="description" class="col-3 text-center" style="cursor: context-menu;">
                                                  Description
                                             </td>  
-                                            <td class="col-1  text-center">Packing size</td>                                                                                    
+                                            <td class="col-1  text-center">Packing Size</td>                                                                                    
                                             <td class="col-1 text-center  table-primary">Qty</td>
-                                            <td class="col-2 text-center  table-info" colspan="2">Unit price</td>
+                                            <td class="col-2 text-center  table-info" colspan="2">Unit Price</td>
                                             <td class="col-1 text-center ">Amount</td>
                                             <td class="col-2 text-center  table-warning" colspan="2">Discount</td>
                                             <td class="col-1 text-center ">Total Amt</td>
@@ -102,24 +102,24 @@
                                             <td class="">
                                                 {{calPackingSize(s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit, s.packing_size.medium_qty, s.packing_size.smallest_qty)}}
                                             </td>                                        
-                                            <td class=" text-end table-primary" id="setQty" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                            <td class=" text-end table-primary change-cursor" id="setQty" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                                 {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
                                             </td>                                            
                                             <td class=" table-info col-1">
                                                 <input disabled  type="number"  v-model="s.qty_sale_price" class="form-control-plaintext py-0  text-center" placeholder="Price">                                        
                                             </td>
                                             <td class=" table-info col-0">
-                                                <select @change="calEdit" class="form-control-plaintext p-0 text-center" v-model="s.qty_sale_price_unit">
+                                                <select @change="calEdit" class="form-control-plaintext py-0 text-center change-cursor" v-model="s.qty_sale_price_unit">
                                                     <option   v-for="pu in onlyString(s.packing_size)">{{pu}}</option>
                                                 </select>
                                             </td>
                                             <td class=" text-end">{{s.amount}}</td>
-                                            <td class=" text-center table-warning" id="setDiscount" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
+                                            <td class=" text-center table-warning change-cursor" id="setDiscount" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
                                                 <span v-if="s.dis_qty">{{s.dis_qty}}{{s.dis_qty_unit}}</span>
                                                 <span v-if="s.dis_amount">{{s.dis_amount}}$</span>
                                                 <span v-if="s.dis_percent">{{s.dis_percent}}%</span>      
                                             </td>
-                                            <td class=" text-end table-warning" data-bs-toggle="modal" data-bs-target="#setDiscountModal">{{s.discount}}</td>
+                                            <td class=" text-end table-warning change-cursor" data-bs-toggle="modal" data-bs-target="#setDiscountModal">{{s.discount}}</td>
                                             <td class="text-end">{{s.final_amount}}</td>
                                         </tr> 
                                     </tbody>
@@ -128,13 +128,13 @@
                                 <table class="table table-bordered">
                                     <tbody class="table-group-divider">
                                         <tr>
-                                            <td  class="text-end pe-2 fw-bold col-3">Total amount</td>
+                                            <td  class="text-end pe-2 fw-bold col-3">Total Amount</td>
                                             <td class="text-end col-3">{{total_amount}}</td>                                        
-                                            <td  class="text-end col-3 pe-2 fw-bold">Net amount</td>
+                                            <td  class="text-end col-3 pe-2 fw-bold">Net Amount</td>
                                             <td class="text-end col-3">{{net_amount}}</td>
                                         </tr>                 
                                         <tr>
-                                            <td  class="text-end pe-2 fw-bold " >Extra discount</td>
+                                            <td  class="text-end pe-2 fw-bold " >Extra Discount</td>
                                             <td class="text-end ">
                                                 <input @click="setInput" @mouseleave="setInput"  type="number"   @change="calTotal" @keyup="calTotal" v-model="extra_discount" class="form-control-plaintext py-0  text-end m-0">
                                             </td>    
@@ -331,6 +331,11 @@ export default {
             if (event.ctrlKey && event.key === 'i') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 const des=document.getElementById("description")
+                des.click();
+            }
+            if (event.shiftKey && event.key.toLowerCase() === 'c') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const des=document.querySelector(".customer")
                 des.click();
             }
         },

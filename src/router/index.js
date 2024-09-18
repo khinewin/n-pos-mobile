@@ -25,7 +25,6 @@ import EditTransfer from '@/views/transfers/Edit.vue'
 import ReportsTransfers from '@/views/reports/Transfers.vue'
 import Adjustments from '@/views/adjustments/Adjustments.vue'
 import NewAdjustment from '@/views/adjustments/New.vue'
-import EditAdjustment from '@/views/adjustments/Edit.vue'
 import ReportAdjustments from '@/views/reports/Adjustments.vue'
 import SalesOnCredit from '@/views/sales/SalesOnCredit.vue'
 import ReportsSoc from '@/views/reports/Soc.vue'
@@ -232,12 +231,7 @@ const router = createRouter({
       component: NewAdjustment,
       meta : {title: "N-Pharmacy | Adjustment / New"}
     },
-    {
-      path: '/adjustments/:id/edit',
-      name: 'EditAdjustment',     
-      component: EditAdjustment,
-      meta : {title: "N-Pharmacy | Adjustment / Edit"}
-    },
+   
     {
       path: '/user/profile',
       name: 'Profile',     

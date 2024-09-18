@@ -76,7 +76,7 @@ export default {
     mounted() {    
             if(this.user !==null){
                 this.isLoading=true;
-                this.fetchStocks();  
+                this.fetchTransfers();  
             }
             this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
             this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
@@ -99,7 +99,7 @@ export default {
         user(data){
             if(data){
                 this.isLoading=true;
-                this.fetchStocks();  
+                this.fetchTransfers();  
             }
         }   
    },
@@ -143,7 +143,7 @@ export default {
         showTime(t){
             return hp.showTime(t)
         },
-        async fetchStocks(){
+        async fetchTransfers(){
             const from_date=Timestamp.fromDate(new Date(this.fromDate))
             const to_date=Timestamp.fromDate(new Date(this.toDate))
             const query_url = query(collection(db, "transfers"), 

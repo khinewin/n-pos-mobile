@@ -67,8 +67,8 @@
                                 <tr>
                                     <td class="ps-2 pt-2" colspan="4">
                                         <div class="form-check form-switch">
-                                            <input @change="saveAutoCal" v-model="ei.auto_cal" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
-                                            <label class="form-check-label" for="flexSwitchCheckChecked">Auto cal</label>
+                                            <input @change="saveAutoCal" v-model="ei.auto_cal" class="form-check-input auto-cal" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+                                            <label class="form-check-label" for="flexSwitchCheckChecked">Auto cal (shift+a)</label>
                                           </div>                                              
                                     </td>
                                  </tr>               

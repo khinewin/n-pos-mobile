@@ -1,14 +1,14 @@
 <template lang="">
      <!-- Products Modal -->
      <div class="modal fade" id="searchCode" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-fullscreen">
           <div class="modal-content">               
             <div>
-                <div class="card">
+                <div class="card border-0">
                     <div class="card-body p-2">                                             
-                        <div class="row g-1">
+                        <div class="row g-2">
                             <div class="col-lg-3">
-                                <div class="card  shadow">
+                                <div class="card  shadow-sm" :class="{'border-danger border-3' : isError}">
                                     <div class="card-body p-2 small">
                                         <div class="row g-1">
                                             <div class="col-md-6 col-lg-12">
@@ -26,7 +26,7 @@
                                         </div>
                                         <div class="row mt-2">
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
+                                                <button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                             </div>
                                             <!--<div class="col-4 d-grid">
                                                 <button class="btn btn-sm text-dark" @click="updateProducts">
@@ -39,10 +39,22 @@
                                             </div>
                                         </div>   
                                     </div>
-                                </div>                                
+                                </div>   
+                                <div class="card shadow-sm mt-2" v-if="saleItems.length>0">
+                                    <div class="card-body p-2">
+                                        <table class="table table-bordered table-hover mb-0">
+                                            <tbody>
+                                                <tr v-for="s in saleItems">
+                                                    <td class="col-1">{{s.code_no}}</td>
+                                                    <td class="col-4">{{s.item_name}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>                             
                             </div>
                             <div class="col-lg-9">
-                                <div class="card shadow vh-80 overflow-y-auto">
+                                <div class="card shadow-sm">
                                     <div class="card-body p-2">
                                         <table class="table table-bordered mb-0 table-hover">
                                             <tbody class="small text-nowrap text-break ">
@@ -55,7 +67,7 @@
                                                     <td class="col-1" v-if="sale_type=='whole_sale'">Wholesale price</td>
 
                                                 </tr>                                      
-                                                <tr class="" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"   style="cursor:context-menu">
+                                                <tr class="change-cursor" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"  >
                                                     <td class="text-center">{{p.code_no}}</td>
                                                     <td class="text-nowrap text-break">{{p.item_name}}</td>
                                                     <td class="text-nowrap text-break">
@@ -114,6 +126,7 @@ export default {
             search_by_item_name:"",
             isUpdating:false,
             isLoading:false,
+            isError:false,
         }
     },   
     mounted() {
@@ -124,30 +137,29 @@ export default {
                     search_by_code.focus();
                 }, 500)              
         })
+        this.isLoading=true; 
+        this.fetchProducts(); 
     },
-    created(){
-        if(this.user !==null){         
-                this.isLoading=true; 
-                this.fetchProducts();                 
+
+    watch:{
+        isError:{
+            handler(val){
+                if(val){
+                    setTimeout(()=>{
+                      this.isError=false;
+                    }, 1000)
+                }
+            },deep:true
         }
-    },   
+    },
+    
     computed:{
         user(){
             return this.$store.getters.user;
-        },
-        storeProducts(){
-            return this.$store.getters.products;
-        }
+        },      
+        
     },
-    watch:{       
-        user(data){
-                if(data !==null){         
-                    this.isLoading=true;          
-                    this.fetchProducts();           
-            }
-        },
   
-    },
     methods:{
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
@@ -175,16 +187,20 @@ export default {
             }, 300)
         },
         setCodeOnPaste(){
-            const item=this.productsData.filter((f)=>f.code_no===this.search_by_code);
-            if(item.length){
-                this.setCode(item[0])
+            const items=this.productsData.filter((f)=>f.code_no==this.search_by_code);
+            if(items.length){
+                const item=items[0];
+                if(item.qty <=0){
+                    this.isError=true;
+                }
+                this.setCode(items[0])
                 this.search_by_code="";
             }
        },
         searchProducts(){
             if(this.search_by_code){
                 this.products=this.productsData.filter((f)=>{
-                        return f.code_no===this.search_by_code;
+                        return f.code_no==this.search_by_code;
                 })
             }else if(this.search_by_item_name){
                 this.products=this.productsData.filter((f)=>{
@@ -202,7 +218,8 @@ export default {
         async fetchProducts(){
         const query_url = query(collection(db, "products"), where("is_deleted", "==", false), orderBy("created_at", "desc"));
         onSnapshot(query_url, async(snapShot) =>{                  
-                    const products=lib.products(snapShot)       
+                    let products=lib.products(snapShot)       
+                    products=products.filter((f)=>f.packing_size.smallest_unit && f.packing_size.medium_unit)
                     this.productsData=products;
                     this.searchProducts();
                     this.isLoading=false;
@@ -221,54 +238,4 @@ export default {
     
 </style>
 
- <!--
-                        <div class="card">
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item list-group-item-action bg-secondary-subtle">
-                                        <div class="row">
-                                            <div class="col-lg-3">
-                                                    <div class="small fw-lighter ">Code</div>
-                                            </div>
-                                            <div class="col-lg-5">
-                                                    <div class="small fw-lighter ">Description</div>
-                                            </div>
-                                            <div class="col-lg-1">
-                                                    <div class="small fw-lighter">Qty</div>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <div class="small fw-lighter">Created date</div>
-                                        </div>
-                                            
-                                    </div>
-                                    </li>
-                                 
-                                    <li class="list-group-item" v-if="isLoading">
-                                        <div class="d-flex justify-content-center my-5">
-                                            <div class="spinner-border text-primary"  role="status">
-                                              <span class="visually-hidden">Loading...</span>
-                                            </div>
-                                          </div>
-                                    </li>
-                             
-                                    <li v-if="products.length > 0" class="list-group-item list-group-item-action" v-for="p in products" :key="p.id" >
-                                            <div class="row" @click="setCode(p)" data-bs-dismiss="modal" style="cursor: context-menu;">
-                                                    <div class="col-lg-3 small">
-                                                            <div>{{p.code_no}}</div>
-                                                    </div>
-                                                    <div class="col-lg-5 small">
-                                                            <div>{{p.item_name}}</div>
-                                                    </div>
-                                                    <div class="col-lg-1 small">
-                                                            <div>{{p.qty}}</div>
-                                                    </div>
-                                                    <div class="col-lg-3 small">
-                                                        <div>{{showTime(p.created_at)}}</div>
-                                                    </div>
-                                            </div>
-                                    </li>
-                            </ul>
-                            </div>
-                        </div>
-                    -->
-                            
+ 

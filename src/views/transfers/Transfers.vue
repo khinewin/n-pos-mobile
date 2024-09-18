@@ -194,6 +194,11 @@ export default {
              const browse=document.querySelector(".open")
              browse.click();
          }
+         if (event.ctrlKey && event.key === 'z') {
+             event.preventDefault(); // Prevent the default browser save dialog
+             const browse=document.querySelector(".clear-transfer-modal")
+             browse.click();
+         }
     
          if(event.shiftKey && event.key.toLowerCase()=== 'n') {
              event.preventDefault(); // Prevent the default browser save dialog

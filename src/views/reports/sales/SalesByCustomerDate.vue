@@ -47,11 +47,11 @@
                                                 <td class="text-end">{{fM(res[2].profit_amount)}}</td>
                                             </tr>
                                             <tr>
-                                                <td colspan="6" class="text-end fw-bold   border-bottom rm-b-b  pe-2">Extra discount (Ks)</td>
+                                                <td colspan="6" class="text-end fw-bold   border-bottom rm-b-b  pe-2">Total Extra Discount (Ks)</td>
                                                 <td class="text-end">{{fM(res[2].extra_discount)}}</td>                  
                                             </tr>
                                             <tr>
-                                                <td colspan="6" class="text-end fw-bold   border-bottom rm-b-b  pe-2">Total profit (Ks)</td>
+                                                <td colspan="6" class="text-end fw-bold   border-bottom rm-b-b  pe-2">Net Profit (Ks)</td>
                                                 <td class="text-end">{{fM(res[2].profit_amount - res[2].extra_discount)}}</td>                  
                                             </tr>
                                         </tbody>
@@ -67,42 +67,26 @@
                         <table class="table table-bordered border-dark mb-0 table-group-divider table-hover">
                             <tbody>
                                 <tr>
-                                    <td class="text-end fw-bold col-10   border-bottom rm-b-b  pe-2">Grand total sale amount (Ks)</td>
+                                    <td class="text-end fw-bold col-10   border-bottom rm-b-b  pe-2">Grand Total Sale Amount (Ks)</td>
                                     <td class="text-end col-2">{{fM(total_sale_amount)}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-end fw-bold   border-bottom rm-b-b  pe-2">Grand total pur amount (Ks)</td>
+                                    <td class="text-end fw-bold   border-bottom rm-b-b  pe-2">Grand Total Pur Amount (Ks)</td>
                                     <td class="text-end">{{fM(total_pur_amount)}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-end fw-bold   border-bottom rm-b-b  pe-2">Total discount (Ks)</td>
+                                    <td class="text-end fw-bold   border-bottom rm-b-b  pe-2">Grand Tota Extra Diiscount (Ks)</td>
                                     <td class="text-end">{{fM(total_discount)}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-end fw-bold   pe-2">Grand total profit (Ks)</td>
+                                    <td class="text-end fw-bold   pe-2">Grand Total Profit (Ks)</td>
                                     <td class="text-end">{{fM(total_profit - total_discount)}}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </td>
                 </tr>                                                
-                <!--<tr>
-                    <td class="text-end fw-bold">Grand total sale amount</td>
-                    <td class="text-start">{{total_sale_amount}}</td>
-                </tr>
-                <tr>
-                    <td class="text-end fw-bold">Grand total pur amount</td>
-                    <td class="text-start">{{total_pur_amount}}</td>
-                </tr>
-                <tr>
-                    <td class="text-end fw-bold">Total discount</td>
-                    <td class="text-start">{{total_discount}}</td>
-                </tr>
-                <tr>
-                    <td class="text-end fw-bold">Grand total profit</td>
-                    <td class="text-start">{{total_profit - total_discount}}</td>
-                </tr>--> 
-              
+            
             </tbody>
         </table>
         <div v-if="isLoading">

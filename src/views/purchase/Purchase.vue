@@ -30,7 +30,7 @@
                         <table class="table mb-0 table-borderless">
                             <tbody>
                                 <tr>
-                                    <td class=" col-4 text-end">Voucher no. <span class="">:</span></td>
+                                    <td class=" col-4 text-end">Voucher No. <span class="">:</span></td>
                                     <td class="col-8" >
                                         {{voucher_no}}
                                     </td>
@@ -49,7 +49,7 @@
                         <table class="table mb-0 table-borderless">
                             <tbody>                              
                                 <tr>
-                                    <td class="col-4 text-end">Pur date <span class="">:</span></td>
+                                    <td class="col-4 text-end">Purchase Date <span class="">:</span></td>
                                     <td class="col-8"  >
                                         <div  v-if="pur_date">
                                             {{showTime(pur_date)}}
@@ -59,7 +59,7 @@
                                 <tr>
                                     <td class="text-end">Supplier <span class="">:</span></td>
                                     <td class=""  >
-                                        {{supplier_name}}
+                                        {{supplier.name}} <span v-if="supplier.company">{{supplier.company}}</span>
                                     </td>
                                 </tr>
                             </tbody>
@@ -115,8 +115,8 @@
                         <tr class="small">
                             <td  class="text-end col-3 pe-2 fw-bold">Total</td>
                             <td class="text-end col-3">{{fM(total)}}</td>
-                            <td  class="text-end pe-2 fw-bold">Extra discount</td>
-                            <td class="text-end">
+                            <td  class="text-end pe-2 col-3 fw-bold">Extra Discount</td>
+                            <td class="text-end col-3">
                                 {{fM(extra_discount)}}
                             </td>
                         </tr>                            
@@ -163,7 +163,6 @@ export default {
             location:"",
             pur_date:"",
             supplier : "",
-            supplier_name:"",
             products:[],
             pur_user:{},
             total_amount:0,
@@ -225,6 +224,11 @@ export default {
                 event.preventDefault(); // Prevent the default browser save dialog
                  this.goEdit();
             }
+            if (event.ctrlKey && event.key === 'z') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                const s= document.querySelector(".clear-search-purchase")
+                s.click();
+            }
             if(event.shiftKey && event.key.toLowerCase()=== 'n') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 const add=document.getElementById("add")
@@ -266,7 +270,6 @@ export default {
             this.id=p.id;
             this.voucher_no=p.voucher_no;
             this.pur_date=p.pur_date;
-            this.supplier_name=`${p.supplier.name} (${p.supplier.company})`;
             this.supplier=p.supplier;
             this.pur_user=p.user;
             this.location=p.location;

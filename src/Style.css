@@ -43,6 +43,15 @@
     border-left-style: hidden !important;
 }
 
+.vh-95{
+    min-height: 95vh !important;
+}
+.vh-90{
+    min-height: 90vh !important;
+}
+.vh-85{
+    min-height: 85vh !important;
+}
 .min-vh-80{
     min-height: 80vh !important;
 }
@@ -85,6 +94,9 @@ min-height: 60vh !important;
 .vh-55{
     height: 55vh !important;
 }
+.vh-10{
+    height: 10vh !important;
+}
 .w-5{
     width: 5% !important;
 }
@@ -123,7 +135,7 @@ min-height: 60vh !important;
 }
 
 .change-cursor{
-    cursor: context-menu  !important;
+    cursor:pointer  !important;
 }
 
 input[type="number"] {

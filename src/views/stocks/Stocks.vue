@@ -178,6 +178,11 @@ export default {
              event.preventDefault(); // Prevent the default browser save dialog
               this.goEdit();
          }
+         if (event.ctrlKey && event.key === 'z') {
+             event.preventDefault(); // Prevent the default browser save dialog
+            const s=document.querySelector(".clear-search-stocks")
+            s.click();
+         }
          if(event.shiftKey && event.key.toLowerCase()=== 'n') {
              event.preventDefault(); // Prevent the default browser save dialog
              const add=document.querySelector(".new")

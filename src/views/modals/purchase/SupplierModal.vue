@@ -1,13 +1,13 @@
 <template lang="">
     <!-- Products Modal -->
     <div class="modal fade" id="searchSupplier" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-       <div class="modal-dialog modal-xl">
+       <div class="modal-dialog modal-fullscreen">
          <div class="modal-content p-2">               
-            <div class="row g-1">
+            <div class="row g-2">
                 <div class="col-lg-3">
-                   <div class="card shadow">
+                   <div class="card  shadow-sm">
                      <div class="card-body p-2">
-                        <div class="row g-1">
+                        <div class="row g-2">
                             <div class="col-md-4 col-lg-12">
                                 <div class="form-floating">
                                     <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchSuppliers" placeholder="Code" class="form-control-plaintext border-bottom">
@@ -28,7 +28,7 @@
                             </div>
                         </div>
                           <div class="row mt-2">
-                            <div class="col-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
+                            <div class="col-6 d-grid"><button class="btn btn-sm text-dark clear-supplier" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button></div>
                             <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                 </button>
@@ -41,19 +41,19 @@
                    </div>                                                                                                          
                 </div>                        
                 <div class="col-lg-9">
-                    <div class="card shadow vh-80 overflow-y-auto">
+                    <div class="card shadow-sm">
                         <div class="card-body p-2 table-responsive">
                             <table class="table table-bordered table-hover mb-0">
                                 <tbody>
-                                    <tr class="text-center table-secondary" style="cursor: context-menu;">
-                                        <td @click="sortSuppliers('code')"><i class="fa-solid fa-sort"></i> Code</td>
-                                        <td @click="sortSuppliers('name')"><i class="fa-solid fa-sort"></i> Name</td>
-                                        <td @click="sortSuppliers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
-                                        <td @click="sortSuppliers('company')"><i class="fa-solid fa-sort"></i> Company</td>
-                                        <td @click="sortSuppliers('created_at')"><i class="fa-solid fa-sort"></i> Date</td>
+                                    <tr class="text-center table-secondary">
+                                        <td class="col-1" @click="sortSuppliers('code')"><i class="fa-solid fa-sort"></i> Code</td>
+                                        <td class="col-2" @click="sortSuppliers('name')"><i class="fa-solid fa-sort"></i> Name</td>
+                                        <td class="col-1" @click="sortSuppliers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
+                                        <td class="col-4" @click="sortSuppliers('company')"><i class="fa-solid fa-sort"></i> Company</td>
+                                        <td class="col-1" @click="sortSuppliers('created_at')"><i class="fa-solid fa-sort"></i> Date</td>
                                     </tr>
                                    
-                                    <tr style="cursor: context-menu;" class="" v-if="suppliers.length > 0"  v-for="(p, i) in suppliers" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal">                                         
+                                    <tr  class="change-cursor" v-if="suppliers.length > 0"  v-for="(p, i) in suppliers" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal">                                         
                                         <td :class="{'table-secondary': sort_item ==='code'}" class="text-center">
                                              {{p.code}}
                                          </td>

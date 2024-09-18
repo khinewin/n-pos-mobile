@@ -46,7 +46,7 @@
                                 </tr>
                                 <tr>
                                     <td class="pt-2 text-center">
-                                        $
+                                        Ks
                                     </td>
                                     <td class="p-0">
                                         <input @keypress.enter="pressSetDiscountBtn" @keyup="calDiscount" @change="calDiscount" type="number" v-model="ei.dis_amount" class="form-control-plaintext form-control-sm text-center">

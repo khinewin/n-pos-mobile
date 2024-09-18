@@ -1,11 +1,11 @@
 <template lang="">
     <!-- Products Modal -->
     <div class="modal fade" id="stocksModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-       <div class="modal-dialog modal-xl">
+       <div class="modal-dialog modal-fullscreen">
          <div class="modal-content p-2">                         
                     <div class="row g-2">
                         <div class="col-4">                                                         
-                              <div class="card shadow ">
+                              <div class="card shadow-sm">
                                 <div class="card-body p-2">
                                         <div class="row small">
                                             <div class="col-12">
@@ -36,7 +36,7 @@
                                             
                                         <div class="row mt-2">
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark" @click="clearSearch"> <i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
+                                                <button class="btn btn-sm text-dark clear-search-stocks" @click="clearSearch"> <i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                                 </div>
                                                 <!--<div class="col-4 d-grid">
                                                     <button class="btn btn-sm text-dark" @click="updatestocks">
@@ -52,7 +52,7 @@
                               </div>                                                                            
                         </div>
                         <div class="col-8 table-responsive">
-                            <div class="card shadow vh-80 overflow-y-auto">
+                            <div class="card shadow-sm">
                                 <div class="card-body p-2">
                                     <table class="table table-bordered table-hover m-0">
                                         <tbody class="small text-center">
@@ -70,7 +70,7 @@
                                                       </div>
                                                 </td>
                                             </tr>
-                                            <tr v-if="stocks.length > 0" v-for="p in stocks" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal" style="cursor: context-menu;">
+                                            <tr class="change-cursor" v-if="stocks.length > 0" v-for="p in stocks" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal" >
                                                 <td>{{p.voucher_no}}</td>
                                                 <td>{{showTime(p.created_at)}}</td>
                                                 <td>{{p.user.displayName}}</td>

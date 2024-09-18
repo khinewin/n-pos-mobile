@@ -40,7 +40,7 @@
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
-                                    <td class="col-2" data-bs-toggle="modal" data-bs-target="#searchCode" style="cursor: context-menu;"><i class="fa-solid fa-circle-plus"></i> Description</td>
+                                    <td class="col-2 change-cursor" id="description" data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Description (ctrl+i)</td>
                                     <td class="col-1">Packing size</td>
                                     <td class="col-1 table-info">Main Inv Bal</td>     
                                     <td class="col-1 table-info">Pharmacy Inv Bal</td>   
@@ -58,21 +58,21 @@
                                     <td class="">
                                         {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                     </td>
-                                    <td class=" text-end table-info" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                    <td class=" text-end table-info change-cursor" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.main_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td> 
-                                    <td class=" text-end table-info" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                    <td class=" text-end table-info change-cursor" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td> 
-                                    <td class="text-end table-primary" data-bs-toggle="modal" data-bs-target="#setPricesModal">
+                                    <td class="text-end table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setPricesModal">
                                         <span v-if="st.packing_size.largest_unit"> {{st.pur_price.largest_unit}}' {{st.packing_size.largest_unit}}</span>
                                         <span v-else>{{st.pur_price.medium_unit}}' {{st.packing_size.medium_unit}}</span>
                                     </td>       
-                                    <td class="text-end table-primary " data-bs-toggle="modal" data-bs-target="#setPricesModal">
+                                    <td class="text-end table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setPricesModal">
                                         <span v-if="st.packing_size.largest_unit">{{st.retail_price.largest_unit}}' {{st.packing_size.largest_unit}} </span>
                                         <span v-else>{{st.retail_price.medium_unit}}' {{st.packing_size.medium_unit}}</span>
                                     </td>
-                                    <td class="text-end table-primary" data-bs-toggle="modal" data-bs-target="#setPricesModal">
+                                    <td class="text-end table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setPricesModal">
                                         <span v-if="st.packing_size.largest_unit">{{st.whole_sale_price.largest_unit}}' {{st.packing_size.largest_unit}} </span>
                                         <span v-else>{{st.whole_sale_price.medium_unit}}' {{st.packing_size.medium_unit}}</span>
                                     </td>                                                                                    
@@ -84,7 +84,7 @@
                 </div>
             </div>
         </div>
-        <ProductModal @setCode="setCode" :storePurchase="storeItems" />
+        <ProductModal @setCode="setCode" :stockItems="storeItems" />
         <SetQty :ei="editItem" @saveQty="saveQty" />
         <SetPrice :ei="editItem" />
     </div>
@@ -95,7 +95,7 @@
 import { required, email ,helpers} from '@vuelidate/validators'
 import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query, increment} from 'firebase/firestore'
 import db from '@/firebase/firestore'
-import ProductModal from '@/views/modals/purchase/ProductModal.vue'
+import ProductModal from '@/views/modals/stocks/ProductModal.vue'
 import SetQty from '@/views/modals/stocks/SetQty.vue'
 import SetPrice from '@/views/modals/stocks/SetPrice.vue'
 import * as ss from "@/lib/snapshot/stocks"
@@ -180,7 +180,21 @@ export default {
               const des=document.querySelector(".close")
               des.click();
           }
-        
+          if (event.ctrlKey && event.key === 'i') {
+              event.preventDefault(); // Prevent the default browser save dialog
+              const d=document.getElementById("description")
+              d.click();
+          }
+          if (event.ctrlKey && event.key === 'h') {
+              event.preventDefault(); // Prevent the default browser save dialog
+              const close=document.querySelector(".close-product")
+              close.click();
+          }
+          if (event.ctrlKey && event.key === 'a') {
+              event.preventDefault(); // Prevent the default browser save dialog
+              const close=document.querySelector(".add-all")
+              close.click();
+          }
       },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);

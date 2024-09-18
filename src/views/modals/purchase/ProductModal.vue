@@ -1,14 +1,14 @@
 <template lang="">
      <!-- Products Modal -->
      <div class="modal fade" id="searchCode" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-fullscreen">
           <div class="modal-content">               
             <div>
-                <div class="card">
+                <div class="card border-0">
                     <div class="card-body p-2">                                             
-                        <div class="row g-1">
-                            <div class="col-lg-3">
-                                <div class="card  shadow">
+                        <div class="row g-2">
+                            <div class="col-lg-3 ">
+                                <div class="card  shadow-sm">
                                     <div class="card-body p-2 small">
                                         <div class="row g-1">
                                             <div class="col-md-6 col-lg-12">
@@ -26,7 +26,7 @@
                                         </div>
                                         <div class="row mt-2">
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
+                                                <button class="btn btn-sm text-dark clear-search" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                             </div>
                                             <!--<div class="col-4 d-grid">
                                                 <button class="btn btn-sm text-dark" @click="updateProducts">
@@ -38,22 +38,39 @@
                                                 <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (cltr+h)</button>
                                             </div>
                                         </div>   
+                                        
                                     </div>
-                                </div>                                
+                                </div>    
+                                <div class="card shadow-sm mt-2 " v-if="storeItems.length >0">
+                                    <div class="card-body p-2">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <table class="table table-bordered mb-0 table-hover">
+                                                    <tbody>
+                                                        <tr  v-for="s in storeItems">
+                                                            <td class="col-1">{{s.code_no}}</td>
+                                                            <td class="col-5">{{s.item_name}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>                            
                             </div>
                             <div class="col-lg-9">
-                                <div class="card shadow vh-80 overflow-y-auto">
+                                <div class="card shadow-sm">
                                     <div class="card-body p-2">
                                         <table class="table table-bordered mb-0 table-hover text-nowrap text-break">
                                             <tbody class="small">
-                                                <tr class="table-secondary text-center">
+                                                <tr class="table-secondary text-center fw-bold">
                                                     <td class="col-1">Code</td>
                                                     <td class="col-2">Description</td>
                                                     <td class="col-1">Packing size</td>
                                                     <td class="col-1">Pharmacy Inv Bal</td>
                                                     <td class="col-1">Main Inv Bal</td>
                                                 </tr>                                      
-                                                <tr class="" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"   style="cursor:context-menu">
+                                                <tr class="change-cursor" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)" >
                                                     <td class="text-center">{{p.code_no}}</td>
                                                     <td>{{p.item_name}}</td>
                                                     <td class="col-1">
@@ -96,7 +113,7 @@ import db from '@/firebase/firestore'
 import * as lib from "@/lib/snapshot/products"
 import * as hp  from "@/lib/helper"
 export default {   
-    props:['storePurchase'],
+    props:['storeItems'],
     data(){
         return{
             products:[],
@@ -162,7 +179,7 @@ export default {
         },
         setCode(p){
             this.$emit("setCode", p)
-            this.clearSearch();
+          //  this.clearSearch();
         },
         clearSearch(){
             this.search_by_code="";
@@ -176,7 +193,7 @@ export default {
             }, 300)
         },
         setCodeOnPaste(){
-            const item=this.productsData.filter((f)=>f.code_no===this.search_by_code);
+            const item=this.productsData.filter((f)=>f.code_no==this.search_by_code);
             if(item){
                 this.setCode(item[0])
                 this.search_by_code="";
@@ -185,7 +202,7 @@ export default {
         searchProducts(){
             if(this.search_by_code){
                 this.products=this.productsData.filter((f)=>{
-                        return f.code_no===this.search_by_code;
+                        return f.code_no==this.search_by_code;
                 })
             }else if(this.search_by_item_name){
                 this.products=this.productsData.filter((f)=>{
@@ -203,7 +220,8 @@ export default {
         async fetchProducts(){
         const query_url = query(collection(db, "products"), where("is_deleted","==", false), orderBy("created_at", "desc"));
         onSnapshot(query_url, async(snapShot) =>{                  
-                    const products=lib.products(snapShot)       
+                    let products=lib.products(snapShot)      
+                    products=products.filter((f)=>f.packing_size.smallest_unit && f.packing_size.medium_unit)
                     this.productsData=products;
                     this.searchProducts();
                     this.isLoading=false;
