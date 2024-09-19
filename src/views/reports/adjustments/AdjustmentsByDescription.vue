@@ -5,7 +5,7 @@
                     <tr class="fw-bold text-center">
                         <td class="col-1">Code</td>
                         <td class="col-2">Description</td>
-                        <td class="col-1">Packing size</td>
+                        <td class="col-1">Packing Size</td>
                         <td class="col-1">Before Adj</td>
                         <td class="col-1">Adj type</td>
                         <td class="col-1">Qty</td>      
@@ -45,9 +45,9 @@
                     </tr>
                     <tr class="text-center fw-bold">
                         <td colspan="6" class="border-bottom rm-b-b"></td>
-                        <td>Pur amount</td>
-                        <td>Retail amount</td>
-                        <td>WS amount</td>
+                        <td>Pur Amount</td>
+                        <td>Retail Amount</td>
+                        <td>WS Amount</td>
                     </tr>
                     <tr>
                         <td colspan="6" class="text-end fw-bold pe-2">Total (Ks)</td>

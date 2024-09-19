@@ -15,7 +15,7 @@
                                             <tr class="fw-bold text-center">
                                                 <td class="col-1">Code</td>
                                                 <td class="col-2">Description</td>
-                                                <td class="col-1">Packing size</td>
+                                                <td class="col-1">Packing Size</td>
                                                 <td class="col-1 text-center">Qty</td>
                                                 <td class="col-1 text-center">Sale Amount</td>
                                                 <td class="col-1 text-center">Pur Amount</td>

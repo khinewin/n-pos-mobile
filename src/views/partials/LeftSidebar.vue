@@ -46,6 +46,9 @@
                             <router-link class="nav-link py-2 px-3" :to="{name : 'ReturnIn'}"><i class="fa-solid fa-file-import"></i> Return In</router-link>
                           </li>
                           <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
+                            <router-link class="nav-link py-2 px-3" :to="{name : 'ReturnOut'}"><i class="fa-solid fa-file-export"></i> Return Out</router-link>
+                          </li>
+                          <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
                             <router-link class="nav-link py-2 px-3" :to="{name : 'Reports'}"><i class="fa-solid fa-chart-pie"></i> Reports</router-link>
                           </li>
                           <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">

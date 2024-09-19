@@ -14,7 +14,7 @@
                 <div class="d-none d-print-block">
                     <LargePrintHeader />
                 </div>
-                <h6>Reports Medicine code  {{displayReportType}}</h6>
+                <h6>Reports Medicine Code  {{displayReportType}}</h6>
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="" v-if="code_no">Code : {{item_name}}</div>
@@ -95,15 +95,15 @@ export default {
                 this.displayReportType="Stock list"
             }else 
             if(this.reportType==="stock_list_sale_price"){
-                this.displayReportType="Stock list with sale price"
+                this.displayReportType="Stock list with Sale Price"
                 this.is_stock_list_sale_price=true;
             }else
             if(this.reportType==="stock_list_pur_price"){
-                this.displayReportType="Stock list with purchase price"
+                this.displayReportType="Stock list with Purchase Price"
                 this.is_stock_list_pur_price=true;
             }else
             if(this.reportType==="stock_list_pur_sale_price"){
-                this.displayReportType="Stock list with purchase and sale price"
+                this.displayReportType="Stock list with Purchase and Sale Price"
                 this.is_stock_list_pur_sale_price=true;
             }
     },

@@ -24,9 +24,7 @@ export default {
        // await disableNetwork(db)
      //  await enableNetwork(db)
     },
-    mounted() {
-        
-    },
+  
     
     watch:{        
        

@@ -50,7 +50,7 @@
                                                         <td class="text-end">{{fM(res[2].unit_cost)}}</td>
                                                     </tr>
                                                     <tr class="text-end">
-                                                        <td colspan="7" class="text-end fw-bold  border-0 border-bottom rm-b-b  pe-2">Extra discount (Ks)</td>
+                                                        <td colspan="7" class="text-end fw-bold  border-0 border-bottom rm-b-b  pe-2">Extra Discount (Ks)</td>
                                                         <td>{{fM(res[2].extra_discount)}}</td>                  
                                                     </tr>
                                                     <tr class="text-end">
@@ -75,16 +75,16 @@
                     <table class="table table-bordered border-dark table-hover mb-0" >
                         <tbody class="table-group-divider">
                             <tr >
-                                <td class="text-end fw-bold  border-bottom rm-b-b  pe-2" colspan="8">Total amount (Ks)</td>
+                                <td class="text-end fw-bold  border-bottom rm-b-b  pe-2" colspan="8">Total Amount (Ks)</td>
                                 <td class="text-end">{{fM(total_amount)}}</td>                                
                             </tr>                        
                         
                             <tr>
-                                <td class="text-end fw-bold border-bottom   rm-b-b  pe-2" colspan="8">Total extra discount (Ks)</td>
+                                <td class="text-end fw-bold border-bottom   rm-b-b  pe-2" colspan="8">Total Extra Discount (Ks)</td>
                                 <td class="text-end">{{fM(total_extra_discount)}}</td>
                             </tr>
                             <tr>
-                                <td class="text-end fw-bold  border-bottom   rm-b-b  pe-2" colspan="8">Total paid (Ks)</td>
+                                <td class="text-end fw-bold  border-bottom   rm-b-b  pe-2" colspan="8">Total Paid (Ks)</td>
                                 <td class="text-end">{{fM(total_paid)}}</td>
                             </tr>
                             <tr>

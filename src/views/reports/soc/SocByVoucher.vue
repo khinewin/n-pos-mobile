@@ -54,12 +54,12 @@
                                         <tr class="text-center fw-bold">
                                             <td class="col-1">No.</td>
                                             <td class="col-2">Description</td>
-                                            <td class="col-1 text-center">Packing size</td>                                                                                    
+                                            <td class="col-1 text-center">Packing Size</td>                                                                                    
                                             <td class="col-1 text-center">Qty</td>
-                                            <td class="col-1 text-center">Unit price</td>
+                                            <td class="col-1 text-center">Unit Price</td>
                                             <td class="col-1 text-center">Amount</td>
                                             <td class="col-1 text-center">Discount</td>
-                                            <td class="col-1 text-center">Final amount</td>
+                                            <td class="col-1 text-center">Total Amt</td>
                                         </tr>
                                         <tr class="" v-if="sale.products.length > 0" v-for="(s, i) in sale.products" :key="s.id" >     
                                             <td class="text-center">{{i+1}}</td>                   
@@ -82,17 +82,17 @@
                                     </tbody>
                                     <tbody>
                                         <tr>
-                                            <td colspan="7" class="text-end pe-2 border-bottom fw-bold rm-b-b" >Total amount (Ks)</td>
+                                            <td colspan="7" class="text-end pe-2 border-bottom fw-bold rm-b-b" >Total Amount (Ks)</td>
                                             <td class="text-end ">{{fM(sale.total_amount)}}</td>
                                         </tr>                     
                                         <tr>
-                                            <td colspan="7" class="text-end  pe-2 border-bottom fw-bold rm-b-b " >Extra discount (Ks)</td>
+                                            <td colspan="7" class="text-end  pe-2 border-bottom fw-bold rm-b-b " >Extra Discount (Ks)</td>
                                             <td class="text-end ">
                                                 {{fM(sale.extra_discount)}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="7" class="text-end   pe-2 border-bottom fw-bold rm-b-b" >Net amount (Ks)</td>
+                                            <td colspan="7" class="text-end   pe-2 border-bottom fw-bold rm-b-b" >Net Amount (Ks)</td>
                                             <td class="text-end ">{{fM(sale.net_amount)}}</td>
                                         </tr>
                                         <tr >
@@ -125,9 +125,9 @@
             <table class="table table-bordered border-dark table-hover">
                 <tbody>
                     <tr class="text-center fw-bold">
-                        <td>Total amount</td>
-                        <td>total paid</td>
-                        <td>Total credit</td>
+                        <td>Total Amount</td>
+                        <td>Total Paid</td>
+                        <td>Total Credit</td>
                     </tr>
                     <tr class="text-end">
                         <td>{{fM(total_amount)}}</td>

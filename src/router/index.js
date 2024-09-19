@@ -32,6 +32,8 @@ import BackupRestore from '@/views/backup/BackupRestore.vue'
 import EditSale from '@/views/sales/Edit.vue'
 import ReturnIn from '@/views/returnin/ReturnIn.vue'
 import EditReturnIn from '@/views/returnin/Edit.vue'
+import Returnout from '@/views/returnout/Returnout.vue'
+import EditReturnOut from '@/views/returnout/Edit.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),  
@@ -55,6 +57,20 @@ const router = createRouter({
       name: 'Dashboard',     
       component: Dashboard,
       meta : {title: "N-Pharmacy | Admin dashboard"}
+    },
+    {
+      path: '/return-out',
+      name: 'ReturnOut',     
+      component: Returnout,
+      meta : {title: "N-Pharmacy | Return Out"}
+
+    },
+    {
+      path: '/return-out/:id/edit',
+      name: 'EditReturnOut',     
+      component: EditReturnOut,
+      meta : {title: "N-Pharmacy | Return Out / Edit"}
+
     },
     {
       path: '/return-in',

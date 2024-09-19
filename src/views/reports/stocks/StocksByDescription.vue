@@ -5,12 +5,12 @@
                 <tr class="fw-bold text-center">
                     <td class="col-1">Code</td>
                     <td class="col-2">Description</td>
-                    <td class="col-1">Packing size</td>
+                    <td class="col-1">Packing Size</td>
                     <td class="col-1 " v-if="location=='Main' || location=='All'">Main Inv Bal</td>         
                     <td class="col-1" v-if="location=='Pharmacy' || location=='All'">Pharmacy Inv Bal</td>                                           
-                    <td class="col-1">Pur price</td>
-                    <td class="col-1">Retail price</td>
-                    <td class="col-1">Wholesale price</td>                                            
+                    <td class="col-1">Pur Price</td>
+                    <td class="col-1">Retail Price</td>
+                    <td class="col-1">Wholesale Price</td>                                            
                 </tr>   
                 </tbody>
                 <tbody  v-if="reports.length > 0">                     
@@ -37,7 +37,7 @@
                     </td>
                     </tr>
                     <tr>
-                        <td :colspan="[location=='All' ? 6 : 5]" class="text-end fw-bold pe-2">Total amount (Ks)</td>                        
+                        <td :colspan="[location=='All' ? 6 : 5]" class="text-end fw-bold pe-2">Total Amount (Ks)</td>                        
                         <td class="text-end">{{fM(total_retail_amount)}}</td>
                         <td class="text-end">{{fM(total_whole_sale_amount)}}</td>
                     </tr>

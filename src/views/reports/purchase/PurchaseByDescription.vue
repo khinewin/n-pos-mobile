@@ -39,16 +39,16 @@
             </tbody>
             <tbody>
                 <tr >
-                    <td class="text-end fw-bold  border-bottom rm-b-b  pe-2" colspan="7">Total amount (Ks)</td>
+                    <td class="text-end fw-bold  border-bottom rm-b-b  pe-2" colspan="7">Total Amount (Ks)</td>
                     <td class="text-end">{{fM(total_amount)}}</td>                                
                 </tr>                        
             
                 <tr>
-                    <td class="text-end fw-bold border-bottom   rm-b-b  pe-2" colspan="7">Total extra discount (Ks)</td>
+                    <td class="text-end fw-bold border-bottom   rm-b-b  pe-2" colspan="7">Total Extra Discount (Ks)</td>
                     <td class="text-end">{{fM(total_extra_discount)}}</td>
                 </tr>
                 <tr>
-                    <td class="text-end fw-bold  border-bottom   rm-b-b  pe-2" colspan="7">Total paid (Ks)</td>
+                    <td class="text-end fw-bold  border-bottom   rm-b-b  pe-2" colspan="7">Total Paid (Ks)</td>
                     <td class="text-end">{{fM(total_paid)}}</td>
                 </tr>
                 <tr>

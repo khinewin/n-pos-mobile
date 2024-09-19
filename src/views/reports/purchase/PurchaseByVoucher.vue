@@ -90,7 +90,7 @@
                         <tr class="small">
                             <td  class="text-end col-3 pe-2 fw-bold">Total</td>
                             <td class="text-end col-3">{{fM(p.total)}}</td>
-                            <td  class="text-end col-3 pe-2 fw-bold">Extra discount</td>
+                            <td  class="text-end col-3 pe-2 fw-bold">Extra Discount</td>
                             <td class="text-end col-3">
                                 {{fM(p.extra_discount)}}
                             </td>

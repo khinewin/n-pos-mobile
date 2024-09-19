@@ -5,7 +5,7 @@
                 <tr class="fw-bold text-center">
                     <td class="col-1">Code</td>
                     <td class="col-2">Description</td>
-                    <td class="col-1 text-center">Packing size</td>                                                                                    
+                    <td class="col-1 text-center">Packing Size</td>                                                                                    
                      <td class="col-1 text-center">Qty</td>
                     <td class="col-1 text-center">Sale Amount</td>
                     <td class="col-1 text-center">Pur Amount</td>
@@ -41,7 +41,7 @@
                         <td class="text-end">{{fM(extra_discount)}}</td>                  
                     </tr>
                     <tr>
-                        <td colspan="6" class="text-end fw-bold  pe-2">Net profit (Ks)</td>
+                        <td colspan="6" class="text-end fw-bold  pe-2">Net Profit (Ks)</td>
                         <td class="text-end">{{fM(profit_amount - extra_discount)}}</td>                  
                     </tr>
                   

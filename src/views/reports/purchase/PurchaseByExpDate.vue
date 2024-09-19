@@ -2,7 +2,7 @@
     <div class="">
         <table class="table table-bordered mb-0 border-dark table-hover">
             <tbody class="fw-bold text-center">
-                <tr><td class="col-1" rowspan="2">Exp. date</td></tr>
+                <tr><td class="col-1" rowspan="2">Exp. Date</td></tr>
                 <tr>
                     <td class="col-1">Code</td>
                     <td class="col-2">Description</td>

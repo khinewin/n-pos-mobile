@@ -74,7 +74,7 @@
                                             <option>Decrement</option>
                                         </select>
                                     </td>
-                                    <td class="text-center pt-2 table-primary" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                    <td class="text-center pt-2 table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>     
                                     <td class="pt-2 text-center">
@@ -207,6 +207,17 @@ export default {
         },
         setAdjQty(){
             const e=this.editItem;
+            if(this.location=="Pharmacy" && e.qty <=0 && e.adj_type=="Decrement"){
+                    this.msg.info="Pharmacy inventory balance is not enough to decrement"
+                    this.msg.type="error"
+                    return false;
+            }
+            if(this.location=="Main" && e.main_qty <=0 && e.adj_type=="Decrement"){
+                     this.msg.info="Main inventory balance is not enough to decrement"
+                    this.msg.type="error"
+                    return false;
+            }
+
                 let adj_qty=0;              
                 adj_qty += e.input_l_qty ? e.input_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
                 adj_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty: 0;

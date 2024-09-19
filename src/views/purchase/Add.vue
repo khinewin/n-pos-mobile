@@ -88,8 +88,7 @@
                                     <td class="pt-2">{{st.item_name}}</td>
                                     <td class="p-0 position-relative table-info">
                                         <a v-if="st.tmp_exp_date" class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeExpDate(st)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
-
-                                        <flat-pickr class="form-control-plaintext  text-center" v-model="st.tmp_exp_date" @change="setExpDate(st.id)"  :config="config" />
+                                        <flat-pickr class="form-control-plaintext  text-center py-0" v-model="st.tmp_exp_date" @change="setExpDate(st.id)"  :config="config" />
                                     </td>
                                     <td class="pt-2">
                                         {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}

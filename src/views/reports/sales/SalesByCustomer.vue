@@ -6,7 +6,7 @@
                 <tr >
                     <td class="col-1">Code</td>
                     <td class="col-2">Description</td>
-                    <td class="col-1">Packing size</td>
+                    <td class="col-1">Packing Size</td>
                     <td class="col-1 text-center">Qty</td>
                     <td class="col-1 text-center">Sale Amount</td>
                     <td class="col-1 text-center">Pur Amount</td>
@@ -64,7 +64,7 @@
                     <td class="text-end">{{fM(total_discount)}}</td>
                 </tr>
                 <tr>
-                    <td class="text-end fw-bold   pe-2" colspan="7">Grand total profit (Ks)</td>
+                    <td class="text-end fw-bold   pe-2" colspan="7">Grand Total Profit (Ks)</td>
                     <td class="text-end">{{fM(total_profit - total_discount)}}</td>
                 </tr>   
             </tbody>

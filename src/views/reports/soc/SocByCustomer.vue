@@ -6,7 +6,7 @@
                 <tr >
                     <td class="col-1">Code</td>
                     <td class="col-2">Description</td>
-                    <td class="col-1">Packing size</td>
+                    <td class="col-1">Packing Size</td>
                     <td class="col-1 text-center">Qty</td>
                     <td class="col-1 text-center">Sale Amount</td>                
                 </tr>
@@ -27,7 +27,7 @@
                     <td class="text-end">{{fM(p.final_amount)}}</td>               
                 </tr>
                 <tr>
-                    <td colspan="4" class="text-end fw-bold border-bottom rm-b-b pe-2">Total sale amount (Ks)</td>
+                    <td colspan="4" class="text-end fw-bold border-bottom rm-b-b pe-2">Total Sale Amount (Ks)</td>
                     <td class="text-end">{{fM(r[2].sale_amount)}}</td>               
                 </tr>
                 <tr>
@@ -42,15 +42,15 @@
 
             <tbody v-if="reports.length" class="table-group-divider">
                 <tr>
-                    <td class="text-end fw-bold border-bottom rm-b-b pe-2" colspan="5">Net total sale amount (Ks)</td>
+                    <td class="text-end fw-bold border-bottom rm-b-b pe-2" colspan="5">Net Total Sale Amount (Ks)</td>
                     <td class="text-end">{{fM(total_sale_amount)}}</td>
                 </tr>            
                 <tr>
-                    <td class="text-end fw-bold border-bottom rm-b-b pe-2" colspan="5">Total paid (Ks)</td>
+                    <td class="text-end fw-bold border-bottom rm-b-b pe-2" colspan="5">Total Paid (Ks)</td>
                     <td class="text-end">{{fM(total_paid)}}</td>
                 </tr>
                 <tr>
-                    <td class="text-end fw-bold pe-2" colspan="5">Total credit (Ks)</td>
+                    <td class="text-end fw-bold pe-2" colspan="5">Total Credit (Ks)</td>
                     <td class="text-end">{{fM(total_credit)}}</td>
                 </tr>   
             </tbody>

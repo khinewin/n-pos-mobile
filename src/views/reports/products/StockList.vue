@@ -5,12 +5,12 @@
                 <tr class="text-center fw-bold">
                     <td class="col-1"  @click="sortProducts('code_no')"> Code</td>
                     <td class="col-2"  @click="sortProducts('item_name')"> Description</td>
-                    <td class="col-1">Packing size</td>
+                    <td class="col-1">Packing Size</td>
                     <td class="col-1" @click="sortProducts('main_qty')" v-if="location =='All' || location=='Main'">Main Inv Bal</td>
                     <td class="col-1" @click="sortProducts('qty')" v-if="location =='All' || location=='Pharmacy'"> Pharmacy Inv Bal</td>
-                    <td class="col-1"  v-if="pur_price"  @click="sortProducts('pur_price')"> Pur price</td>
-                    <td class="col-1" v-if="sale_price"  @click="sortProducts('retail_price')"> Retail price</td>
-                    <td class="col-1" v-if="sale_price"  @click="sortProducts('whole_sale_price')"> Wholesale price</td>
+                    <td class="col-1"  v-if="pur_price"  @click="sortProducts('pur_price')"> Pur Price</td>
+                    <td class="col-1" v-if="sale_price"  @click="sortProducts('retail_price')"> Retail Price</td>
+                    <td class="col-1" v-if="sale_price"  @click="sortProducts('whole_sale_price')"> Wholesale Price</td>
                 </tr>   
             </tbody>  
             <tbody>                                                  

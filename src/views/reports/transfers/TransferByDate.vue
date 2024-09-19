@@ -6,7 +6,7 @@
                 <tr class="">
                     <td class="col-1">Code</td>
                     <td class="col-2">Description</td>
-                    <td class="col-1">Packing size</td>
+                    <td class="col-1">Packing Size</td>
                     <td class="col-1">From Loc Bal</td> 
                     <td class="col-1">To Loc Bal</td> 
                     <td class="col-1">Transfer Bal</td>
