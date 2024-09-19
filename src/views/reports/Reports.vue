@@ -191,6 +191,11 @@
                                             <ReportList @report="reportSoc" title="SOC" :arr="soc" />
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>
+                                            <ReportList @report="reportReturnIn" title="Return In" :arr="returnIn" />
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>   
                         </div>                                          
@@ -302,6 +307,13 @@ export default {
                 {code : "by_customer", name: "by customer", active: true},
                 {code: "by_customer_date", name:"by customer and date", active: true},
                 {code: "by_voucher", name: "by voucher", active: true},               
+             ],
+             returnIn:[
+                {code : "by_date", name: "by date", active: true},
+                {code: "by_description", name:"by description", active: true},
+                {code: "by_voucher", name: "by voucher", active: true},    
+                {code: "by_customer", name:"by customer", active: true},
+                {code: "by_customer_date", name: "by customer and date", active: true},    
              ],
            
         }
@@ -437,7 +449,12 @@ export default {
                 customer_name: this.customer.name ? this.customer.name : null, code_no: this.code_no ? this.code_no : null, item_name: this.item_name ? this.item_name : null}
             })
         },
-        
+        reportReturnIn(r_type){                     
+            this.$router.push({name: "ReportsReturnIn", params :{"reportType": r_type, "fromDate": this.from_date, "toDate": this.to_date},
+            query : {voucher_no: this.voucher_no,  customer_code: this.customer.code ? this.customer.code : null,
+                customer_name: this.customer.name ? this.customer.name : null, code_no: this.code_no ? this.code_no : null, item_name: this.item_name ? this.item_name : null}
+            })
+        },        
      
     }
 }

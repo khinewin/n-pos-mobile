@@ -329,7 +329,7 @@ export default {
             
             this.updateProducts();
             
-            const created_at=hp.insertDateNoTime(this.created_at)
+            const created_at=hp.insertDate(this.created_at)
             const voucher={
                 voucher_no: this.voucher_no,
                 created_at: Timestamp.fromDate(created_at),           

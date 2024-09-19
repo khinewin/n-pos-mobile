@@ -237,14 +237,7 @@ export default {
             rt_out_user:{},
             location:"",
             remark:"",
-            supplierData: {
-                id: 123456789,
-                code: 123456789,
-                name:"General Supplier",
-                phone:"09xxxxxxxxx",
-                company :"",
-                created_at : Timestamp.fromDate(new Date()),
-            },
+          
             msg : {
                 type :"",
                 info :"",
@@ -296,6 +289,9 @@ export default {
         user(){
             return this.$store.getters.user;
         },
+        general_supplier(){
+            return this.$store.getters.general_supplier;
+        }
       
     },
     methods:{
@@ -493,7 +489,7 @@ export default {
            this.print();      
         },
         changeSupplier(){
-            this.setSupplier(this.supplierData)
+            this.setSupplier(this.general_supplier)
         },
         setSupplier(s){
             this.supplier_name=s.name;

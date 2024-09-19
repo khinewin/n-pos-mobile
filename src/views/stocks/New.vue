@@ -336,7 +336,7 @@ export default {
             this.msg.type="";
             this.msg.info="";
         
-            const created_at=hp.insertDateNoTime(this.created_at)
+            const created_at=hp.insertDate(this.created_at)
 
             const voucher={
                 voucher_no: this.voucher_no,

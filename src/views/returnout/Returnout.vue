@@ -237,14 +237,7 @@ export default {
             print_date:"",
             rt_out_user:{},
             remark:"",
-            supplierData: {
-                id: 123456789,
-                code: 123456789,
-                name:"General Supplier",
-                phone:"09xxxxxxxxx",
-                company :"",
-                created_at : Timestamp.fromDate(new Date()),
-            },
+           
             msg : {
                 type :"",
                 info :"",
@@ -264,7 +257,7 @@ export default {
         this.voucher_no=new Date().getTime();
         this.rt_out_date=hp.setToday()
         this.print_date=hp.setToday();
-        this.setSupplier(this.supplierData)
+        this.setSupplier(this.general_supplier)
         this.fetchProducts();
        setTimeout(()=>{
         const code_no=document.getElementById("code_no");
@@ -295,7 +288,9 @@ export default {
         user(){
             return this.$store.getters.user;
         },
-      
+        general_supplier(){
+            return this.$store.getters.general_supplier;
+        }      
     },
     methods:{
         handleCtrl(event) {
@@ -411,6 +406,8 @@ export default {
         setRtOutQty(){           
          //   const isCheck=this.checkEditQty();
             const e=this.editItem;
+                if(this.location=="Main" && e.main_qty <=0) return false;
+                if(this.location=="Pharmacy" && e.qty <=0) return false;
                 let pur_qty=0;
                 pur_qty += e.input_l_qty ? e.input_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
                 pur_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty: 0;
@@ -499,7 +496,7 @@ export default {
            this.print();      
         },
         changeSupplier(){
-            this.setSupplier(this.supplierData)
+            this.setSupplier(this.general_supplier)
         },
         setSupplier(s){
             this.supplier_name=s.name;
@@ -607,7 +604,7 @@ export default {
                 this.rt_out_date=hp.setToday();      
                 this.print_date=hp.setToday();  
                 this.location="Pharmacy";
-                this.setSupplier(this.supplierData)
+                this.setSupplier(this.general_supplier)
                 this.isLoading=false;
                 this.v$.$reset()
 

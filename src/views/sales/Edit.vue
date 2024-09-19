@@ -243,14 +243,7 @@ export default {
             products:[],
             print_date:"",
             isOffline: false,
-            customerData: {
-                id: 123456789,
-                code: 123456789,
-                name:"Default Customer",
-                phone:"09xxxxxxxxx",
-                address :"",
-                created_at : Timestamp.fromDate(new Date()),
-            },
+            
             msg : {
                 type :"",
                 info :"",
@@ -270,7 +263,7 @@ export default {
         //this.voucher_no=new Date().getTime();
       //  this.sale_date=hp.setToday()
       //  this.print_date=hp.setToday();
-     //   this.setCustomer(this.customerData)
+     //   this.setCustomer(this.default_customer)
         this.fetchSale();
        setTimeout(()=>{
        // const code_no=document.getElementById("code_no");
@@ -302,6 +295,9 @@ export default {
         user(){
             return this.$store.getters.user;
         },
+        default_customer(){
+            return this.$store.getters.default_customer;
+        }
       
     },
     methods:{   
@@ -516,7 +512,7 @@ export default {
         },
         
         changeCustomer(){
-           this.setCustomer(this.customerData)
+           this.setCustomer(this.default_customer)
         },
         setCustomer(p){
             this.customer.id=p.id;
@@ -639,7 +635,7 @@ export default {
                 this.voucher_no=new Date().getTime();
                 this.sale_date=hp.setToday();      
                 this.print_date=hp.setToday();  
-                this.setCustomer(this.customerData)
+                this.setCustomer(this.default_customer)
                 this.isLoading=false;
                 this.v$.$reset()
 

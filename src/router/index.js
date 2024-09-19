@@ -34,6 +34,7 @@ import ReturnIn from '@/views/returnin/ReturnIn.vue'
 import EditReturnIn from '@/views/returnin/Edit.vue'
 import Returnout from '@/views/returnout/Returnout.vue'
 import EditReturnOut from '@/views/returnout/Edit.vue'
+import ReportReturnIn from '@/views/reports/ReturnIn.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),  
@@ -216,6 +217,12 @@ const router = createRouter({
       name: "ReportsSoc",
       component: ReportsSoc,
       meta : {title: "N-Pharmacy | Report SOC"}
+    },
+    {
+      path: "/reports/return-in/:reportType/:fromDate/:toDate",
+      name: "ReportsReturnIn",
+      component: ReportReturnIn,
+      meta : {title: "N-Pharmacy | Report Return In"}
     },
     {
       path: '/transfers/:id/edit',

@@ -12,7 +12,7 @@
                                             <tr>
                                                 <td>Name <span class="float-end">:</span> </td>
                                                 <td>
-                                                    <input @keypress="saveUsername" type="text" class="form-control-plaintext form-control-sm" v-model="userName">
+                                                    <input @keypress.enter="saveUsername" type="text" class="form-control-plaintext form-control-sm" v-model="userName">
                                                 </td>
                                             </tr>
                                             <tr>

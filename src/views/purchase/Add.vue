@@ -228,14 +228,7 @@ export default {
                 type :"",
                 info :"",
             },
-            supplierData: {
-                id: 123456789,
-                code: 123456789,
-                name:"General Supplier",
-                phone:"09xxxxxxxxx",
-                company :"",
-                created_at : Timestamp.fromDate(new Date()),
-            },
+           
 
         }
     },
@@ -244,7 +237,9 @@ export default {
         user(){
             return this.$store.getters.user;
         },    
-      
+        general_supplier(){
+            return this.$store.getters.general_supplier;
+        }      
     },
     watch:{
         msg:{
@@ -263,7 +258,7 @@ export default {
         this.checkDatabase();      
         this.pur_date=hp.setToday()
         window.addEventListener('keydown', this.handleCtrl);
-        this.setSupplier(this.supplierData)
+        this.setSupplier(this.general_supplier)
 
     },
     beforeUnmount() {
@@ -348,7 +343,7 @@ export default {
            p.exp_date=p.tmp_exp_date ? Timestamp.fromDate(exp_date)  : null;
         },
         changeSupplier(){
-            this.setSupplier(this.supplierData)
+            this.setSupplier(this.general_supplier)
         },
         setSupplier(s){
             this.supplier_name=s.name;
@@ -510,7 +505,7 @@ export default {
             this.msg.type="";
             this.msg.info="";
         
-            const pur_date=hp.insertDateNoTime(this.pur_date)
+            const pur_date=hp.insertDate(this.pur_date)
             const voucher={
                 voucher_no: this.voucher_no,
                 pur_date: Timestamp.fromDate(pur_date),
@@ -553,7 +548,6 @@ export default {
             this.isLoading=false;
             this.voucher_no=new Date().getTime();
             this.pur_date=hp.setToday()
-            this.supplier={}
             this.storePurchase=[]
             this.purchase_item=null
             this.editItem={},
@@ -565,6 +559,7 @@ export default {
             this.total=0;
             this.paid=0;
             this.remark="";
+            this.setSupplier(this.general_supplier)
             this.v$.$reset()
         },
         setInput(e){

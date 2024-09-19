@@ -206,7 +206,6 @@ export default {
         const snapShot=await getDocs(query_url)
         const products=lib.products(snapShot)       
         this.productsData=products;
-        this.$store.dispatch("setProducts", products)
         this.isLoading=false;
         this.isUpdating=false;
         this.searchProducts();

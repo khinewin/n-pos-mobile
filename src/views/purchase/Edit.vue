@@ -225,16 +225,7 @@ export default {
                 type :"",
                 info :"",
             },
-            supplierData: {
-                id: 123456789,
-                code: 123456789,
-                name:"General Supplier",
-                phone:"09xxxxxxxxx",
-                company :"",
-                created_at : Timestamp.fromDate(new Date()),
-            },
-
-
+          
         }
     },
   
@@ -242,6 +233,9 @@ export default {
         user(){
             return this.$store.getters.user;
         },       
+        general_supplier(){
+            return this.$store.getters.general_supplier;
+        }
       
     },
    mounted() {
@@ -269,7 +263,7 @@ export default {
     
     methods:{
         changeSupplier(){
-            this.setSupplier(this.supplierData)
+            this.setSupplier(this.general_supplier)
         },
         handleCtrl(event) {
           
@@ -557,7 +551,7 @@ export default {
             this.updateProducts();
            this.updateStoreItem();
 
-           const pur_date=hp.insertDateNoTime(this.pur_date)
+           const pur_date=hp.insertDate(this.pur_date)
 
             const voucher={
                 voucher_no: this.voucher_no,

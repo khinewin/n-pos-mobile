@@ -64,7 +64,7 @@
                                                 </td>
                                             </tr>      
                                             <tr>
-                                                <td class="text-end" >Cashier :</td>
+                                                <td class="text-end" >User :</td>
                                                 <td class="">
                                                     {{sale_user.uid ? sale_user.displayName : user.displayName}}
                                                 </td>
@@ -80,7 +80,7 @@
                                             <td class="col-1 text-center">
                                                 <input :disabled="rtInMode=='Return In / History'" @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext p-0  text-center" placeholder="Scan code here">
                                             </td>
-                                            <td id="description" class="col-3 text-center" style="cursor: context-menu;">
+                                            <td id="description" class="col-3 text-center ">
                                                 Description 
                                             </td>  
                                             <td class="col-1  text-center">Packing size</td>                                                                                    
@@ -150,7 +150,7 @@
                 </div>
             </div>
         </div> 
-        <ProductModal @setCode="setCode" :sale_type="sale_type" :rtInItems="rtInItems"/>
+        <ProductModal @setCode="setCode" :sale_type="sale_type" :saleItems="rtInItems"/>
         <ReturnInModal @setCode="setOldCode" />
         <CustomerModal @setCustomer="setCustomer" />
         <!--Print item start-->
@@ -233,14 +233,7 @@ export default {
             isOffline: false,
             sale_user:{},
             remark:"",
-            customerData: {
-                id: 123456789,
-                code: 123456789,
-                name:"Default Customer",
-                phone:"09xxxxxxxxx",
-                address :"",
-                created_at : Timestamp.fromDate(new Date()),
-            },
+           
             msg : {
                 type :"",
                 info :"",
@@ -261,7 +254,7 @@ export default {
        // this.rt_in_date=hp.setToday()
        this.fetchReturnIn();
         this.print_date=hp.setToday();
-       // this.setCustomer(this.customerData)
+       // this.setCustomer(this.default_customer)
         this.fetchProducts();
        setTimeout(()=>{
         const code_no=document.getElementById("code_no");
@@ -292,7 +285,9 @@ export default {
         user(){
             return this.$store.getters.user;
         },
-      
+        default_customer(){
+            return this.$store.getters.default_customer;
+        }
     },
     methods:{
         handleCtrl(event) {
@@ -459,7 +454,7 @@ export default {
            this.print();      
         },
         changeCustomer(){
-           this.setCustomer(this.customerData)
+           this.setCustomer(this.default_customer)
         },
         setCustomer(p){
             this.customer.id=p.id;
@@ -591,7 +586,7 @@ export default {
               //  this.voucher_no=new Date().getTime();
                 //this.rt_in_date=hp.setToday();      
                 this.print_date=hp.setToday();  
-                //this.setCustomer(this.customerData)
+                //this.setCustomer(this.default_customer)
                 this.isLoading=false;
                 this.v$.$reset()
 
