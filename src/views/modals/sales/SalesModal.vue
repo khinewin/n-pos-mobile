@@ -11,41 +11,41 @@
                                 <div class="card shadow-sm">
                                     <div class="card-body p-2">
                                         <div class="row g-1 small">
-                                           <div class="col-md-4 col-lg-12">
+                                           <div class="col-6 col-md-3 col-lg-12">
                                             <div class="form-floating">
                                                 <input type="search" id="search_by_voucher_no" @paste="searchSales" v-model="search_by_voucher_no" @keypress.enter="searchSales" placeholder="Voucher no." class="form-control-plaintext border-bottom">
-                                                <label for="search_by_voucher_no" class="">Voucher no.</label>
+                                                <label for="search_by_voucher_no" class="">Voucher No.</label>
                                             </div>
                                            </div>
                                            
-                                           <div class="col-md-4 col-lg-12">
+                                           <div class="col-6 col-md-3 col-lg-12">
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
                                                     <flat-pickr @change="searchSales" class="form-control-plaintext border-bottom" v-model="search_by_from_sale_date" id="from_date" :config="config" />
-                                                    <label for="from_date">From date</label>
+                                                    <label for="from_date">From Date</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                                </div>
                                            </div>
-                                           <div class="col-md-4 col-lg-12">
+                                           <div class="col-6 col-md-3 col-lg-12">
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
                                                     <flat-pickr @change="searchSales" class="form-control-plaintext border-bottom" v-model="search_by_to_sale_date" id="to_date" :config="config" />
-                                                    <label for="to_date">To date</label>
+                                                    <label for="to_date">To Date</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                                </div>
                                            </div>   
-                                           <div class="col-md-4 col-lg-12">
+                                           <div class="col-6 col-md-3 col-lg-12">
                                             <div class="form-floating">
                                                 <input type="search" id="search_by_customer" v-model="search_by_customer" @keyup="searchSales" placeholder="Customer name" class="form-control-plaintext border-bottom">
-                                                <label for="search_by_customer" class="">Customer name</label>
+                                                <label for="search_by_customer" class="">Customer</label>
                                             </div>
                                            </div>                                   
                                     </div>
                                     <div class="row mt-2">
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark clear-search-sale" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
+                                                <button class="btn btn-sm  text-dark clear-search-sale" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                             </div>
                                             <!--<div class="col-4 d-grid">
                                                 <button class="btn btn-sm text-dark" @click="updateSales">

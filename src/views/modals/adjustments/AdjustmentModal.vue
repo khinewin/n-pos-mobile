@@ -2,19 +2,21 @@
     <!-- Products Modal -->
     <div class="modal fade" id="adjustmentModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
        <div class="modal-dialog modal-fullscreen">
-         <div class="modal-content p-2">                         
+         <div class="modal-content">
+                <div class="card border-0">
+                    <div class="card-body p-2">                                        
                     <div class="row g-2">
-                        <div class="col-4">                                                         
+                        <div class="col-12 col-md-4">                                                         
                               <div class="card shadow-sm">
                                 <div class="card-body p-2">
                                         <div class="row g-1 small">
-                                            <div class="col-12">
+                                            <div class="col-6 col-md-12">
                                                 <div class="form-floating mb-2">
                                                     <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchAdjustments" placeholder="Voucher no." class="form-control-plaintext border-bottom">
                                                    <label for="search_by_voucher_no" class=" ">Voucher No.</label>
                                                   </div>
                                             </div>                                           
-                                            <div class="col-12">
+                                            <div class="col-6 col-md-12">
                                                 <div class="input-group mb-2">
                                                     <div class="form-floating">
                                                         <flat-pickr @change="searchAdjustments" class="form-control-plaintext border-bottom" v-model="search_by_from_date" id="from_date" :config="config" />
@@ -23,7 +25,7 @@
                                                     <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                                    </div>
                                             </div>
-                                            <div class="col-12">
+                                            <div class="col-6 col-md-12">
                                                 <div class="input-group mb-2">
                                                     <div class="form-floating">
                                                         <flat-pickr @change="searchAdjustments" class="form-control-plaintext border-bottom" v-model="search_by_to_date" id="from_date" :config="config" />
@@ -32,7 +34,7 @@
                                                     <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                                    </div>
                                             </div>
-                                            <div class="col-12">
+                                            <div class="col-6 col-md-12">
                                                 <div class="form-floating ">
                                                     <select class="form-control-plaintext border-bottom" @change="searchAdjustments" v-model="search_by_location" aria-placeholder="Location">
                                                         <option value="">All</option>
@@ -44,7 +46,7 @@
                                             </div>
                                         </div>                                       
                                                         
-                                        <div class="row">
+                                        <div class="row mt-2">
                                             <div class="col-6 d-grid">
                                                 <button class="btn btn-sm text-dark clear-search-adj" @click="clearSearch"> <i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                                 </div>
@@ -61,7 +63,7 @@
                                 </div>
                               </div>                                                                            
                         </div>
-                        <div class="col-8">
+                        <div class="col-12 col-md-8">
                             <div class="card shadow-sm">
                                 <div class="card-body p-2 vh-95 overflow-y-auto">
                                     <table class="table table-bordered table-hover m-0">
@@ -92,7 +94,9 @@
                                 </div>
                             </div>                          
                         </div>
-                    </div>                                                                                                     
+                    </div>  
+                </div>
+            </div>                                                                                                   
          </div>
        </div>
      </div>
@@ -119,12 +123,7 @@ export default {
            search_by_location: "",
            isLoading:false,
            isUpdating:false,
-           config: {
-                dateFormat: 'd/m/Y', // Flatpickr options
-                enableTime: false,
-                wrap: true, // set wrap to true only when using 'input-group'
-               // altFormat: 'M j, Y',
-            },  
+          
        }
    },
   
@@ -142,6 +141,9 @@ export default {
        user(){
            return this.$store.getters.user;
        },
+       config(){
+        return this.$store.getters.flat_pickr_config;
+       }
        
    },
   

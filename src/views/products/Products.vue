@@ -3,16 +3,16 @@
         <PageHeader page-title="Medicine code" page-code="medicineCode" :msg-type="msg.type" :msg-info="msg.info"/>
         <div class="container-fluid">
             <div class="row  justify-content-end">   
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
                     </button>
                 </div>       
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                     <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn btn-sm p-z"><i class="fa-solid fa-boxes-packing"></i> Packing size (shift+z)</button>
                 </div>                            
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCode">
                         <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
@@ -52,11 +52,11 @@
                                 <table class="table table-bordered mb-0">
                                     <tbody> 
                                         <tr class="text-center table-secondary" style="cursor: context-menu;">
-                                            <td class="co-1">
-                                                <input type="checkbox" @click="checkAll" v-model="is_check_all">
+                                            <td class="co-0">
+                                                <input type="checkbox" @click="checkAll" v-model="is_check_all" class="form-check-input">
                                             </td>
                                             <td class="col-3">Code</td>
-                                            <td class="col-8">Description</td>
+                                            <td class="col-9">Description</td>
                                         </tr>                                                                    
                                         <tr>
                                             <td class="position-relative">
@@ -71,8 +71,8 @@
                                         </tr>     
                                                                 
                                     <tr class="text-center"  v-if="products.length > 0"  v-for="(p, i) in products" :key="p.id"  :class="{'table-secondary' : editItem.id === p.id}">   
-                                        <td class="position-relative">
-                                            <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" v-model="p.is_deleted">
+                                        <td class="">
+                                            <input class=" form-check-input" type="checkbox" v-model="p.is_deleted">
                                         </td>                                 
                                         <td :class="{'table-secondary': sort_item ==='code_no'}" class="p-0  position-relative">
                                             <!---<a class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeProduct(i, p)"><i class="fa-solid fa-square-minus"></i></a>-->                                                                                       
@@ -82,7 +82,7 @@
                                         </td>
                                         <td :class="{'table-secondary': sort_item ==='item_name'}" class="p-0">
                                             <span>
-                                                <input @click="setEdit(p)" @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext py-0 mx-2" v-model="p.item_name">
+                                                <input @click="setEdit(p)" @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext py-0" v-model="p.item_name">
                                             </span>
                                         </td>                                       
                                     </tr>

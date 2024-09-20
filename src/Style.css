@@ -101,6 +101,9 @@
     padding-left: 2px;
     padding-right: 2px;
 }
+.inside-table {
+    min-width: 1300px !important;
+}
 
 .rm-b-b {
     border-bottom-style: hidden !important;
@@ -136,6 +139,9 @@
 .vh-70{
     height: 70vh !important;
 }
+.max-vh-65{
+  max-height: 65vh !important;
+  }
 .min-vh-65{
 min-height: 65vh !important;
 }
@@ -206,6 +212,10 @@ min-height: 60vh !important;
 
 input[type="number"] {
     direction: rtl; 
+  }
+  .parent-rm:hover .child-rm{
+      display: block;
+      position: absolute;
   }
 
   /*

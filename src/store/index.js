@@ -21,12 +21,19 @@ import {Timestamp} from 'firebase/firestore'
     address :"",
     created_at : Timestamp.fromDate(new Date()),
   },
+  flat_pickr_config: {
+    dateFormat: 'd/m/Y', // Flatpickr options
+    enableTime: false,
+    disableMobile: true,
+    wrap: true, // set wrap to true only when using 'input-group'
+  },  
   },
 
   getters: {
     user : state=> state.user,
     general_supplier:state=>state.general_supplier,
     default_customer:state=>state.default_customer,
+    flat_pickr_config:state=>state.flat_pickr_config,
   },
 
   mutations: {

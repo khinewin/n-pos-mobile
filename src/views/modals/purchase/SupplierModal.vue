@@ -8,13 +8,13 @@
                    <div class="card  shadow-sm">
                      <div class="card-body p-2">
                         <div class="row g-2">
-                            <div class="col-md-4 col-lg-12">
+                            <div class="col-6 col-md-4 col-lg-12">
                                 <div class="form-floating">
                                     <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchSuppliers" placeholder="Code" class="form-control-plaintext border-bottom">
                                     <label for="search_by_code" class="small">Code</label>
                                 </div>
                             </div>
-                            <div class="col-md-4 col-lg-12">
+                            <div class="col-6 col-md-4 col-lg-12">
                                 <div class="form-floating ">
                                     <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchSuppliers" placeholder="Description" class="form-control-plaintext border-bottom">
                                     <label for="search_by_name" class="small ">Name</label>

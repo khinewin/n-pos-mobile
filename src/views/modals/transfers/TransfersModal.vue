@@ -11,13 +11,13 @@
                                 <div class="card shadow-sm">
                                     <div class="card-body p-2">
                                        <div class="row g-2 small">
-                                        <div class="col-md-6 col-lg-12">
+                                        <div class="col-sm-6 col-md-3 col-lg-12">
                                             <div class="form-floating ">
                                                 <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchTransfers" placeholder="Voucher no." class="form-control-plaintext border-bottom">
                                                 <label for="search_by_voucher_no" class="">Voucher No.</label>
                                             </div>
                                         </div>
-                                        <div class="col-md-6 col-lg-12">
+                                        <div class="col-sm-6 col-md-3 col-lg-12">
                                             <div class="input-group mb-2">
                                             <div class="form-floating">
                                                 <flat-pickr @change="searchTransfers" class="form-control-plaintext border-bottom" v-model="search_from_date" id="from_date" :config="config" />
@@ -26,7 +26,7 @@
                                             <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                            </div>
                                         </div>
-                                        <div class="col-md-6 col-lg-12">
+                                        <div class="col-sm-6 col-md-3 col-lg-12">
                                             <div class="input-group mb-2">
                                             <div class="form-floating">
                                                 <flat-pickr @change="searchTransfers" class="form-control-plaintext border-bottom" v-model="search_to_date" id="from_date" :config="config" />
@@ -35,7 +35,7 @@
                                             <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                            </div>
                                         </div>
-                                        <div class="col-md-6 col-lg-12">
+                                        <div class="col-sm-6 col-md-3 col-lg-12">
                                             <div class="form-floating ">
                                                 <select class="form-control-plaintext border-bottom" @change="searchTransfers" v-model="search_from_location" aria-placeholder="From location">
                                                     <option value="">All</option>
@@ -132,12 +132,7 @@ export default {
 
             isUpdating:false,
            isLoading:false,
-           config: {
-                dateFormat: 'd/m/Y', // Flatpickr options
-                enableTime: false,
-                wrap: true, // set wrap to true only when using 'input-group'
-               // altFormat: 'M j, Y',
-            },  
+          
        }
    },
   
@@ -154,6 +149,9 @@ export default {
        user(){
            return this.$store.getters.user;
        },
+       config(){
+        return this.$store.getters.flat_pickr_config;
+       }
        
    },
  

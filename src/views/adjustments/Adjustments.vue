@@ -3,19 +3,19 @@
         <PageHeader page-title="Adjustment / History" page-code="adjustments" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                     <button @click="print" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-print"></i> Print (ctrl+p)</button>
                 </div>                
                 <!--<div class="col-sm-2 d-grid">
                         <button @click="goEdit" class="btn btn-sm" :class="{'disabled': !voucher_no || stock_user.uid !== user.uid}"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
                 </div>-->              
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                     <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#adjustmentModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
                 </div>
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                     <router-link :to="{name : 'NewAdjustment'}" class="btn btn-sm new"><i class="fa-solid fa-square-plus"></i> New (shift+n)</router-link>
             </div>
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                         <button @click="closeAdjustment" class="btn btn-sm" :disabled=" !voucher_no"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
                 </div>
             </div>
@@ -64,7 +64,7 @@
                             </div>
                         </div>
                         <div class="vh-65 overflow-y-auto">
-                        <table class="table table-bordered mb-0  table-hover">
+                        <table class="table table-bordered mb-0  table-hover inside-table">
                             <tbody>
                                     <tr class="text-center fw-bold table-secondary">
                                         <td class="col-1">Code</td>

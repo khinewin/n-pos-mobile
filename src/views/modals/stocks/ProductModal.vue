@@ -8,55 +8,60 @@
                     <div class="card-body  p-2">                                             
                         <div class="row g-2">
                             <div class="col-lg-3">
-                                <div class="card  shadow -sm">
-                                    <div class="card-body p-2 ">
-                                        <div class="row g-1 small">
-                                            <div class="col-md-6 col-lg-12">
-                                                <div class="form-floating">
-                                                    <input type="text" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
-                                                    <label for="search_by_code" class="">Code</label>
+                                <div class="row g-2">
+                                    <div class="col-sm-6 col-lg-12">
+                                        <div class="card  shadow -sm">
+                                            <div class="card-body p-2 ">
+                                                <div class="row g-1 small">
+                                                    <div class="col-md-6 col-lg-12">
+                                                        <div class="form-floating">
+                                                            <input type="text" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
+                                                            <label for="search_by_code" class="">Code</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 col-lg-12">
+                                                        <div class="form-floating">
+                                                            <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
+                                                            <label for="search_by_item_name" class="">Description</label>
+                                                        </div> 
+                                                    </div>
                                                 </div>
+                                                <div class="row mt-2">
+                                                    <div class="col-6 d-grid">
+                                                        <button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
+                                                    </div>
+                                                    <!--<div class="col-4 d-grid">
+                                                        <button class="btn btn-sm text-dark" @click="updateProducts">
+                                                            <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
+                                                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
+                                                        </button>
+                                                    </div>-->
+                                                    <div class="col-6 d-grid">
+                                                        <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
+                                                    </div>
+                                                </div>                                          
                                             </div>
-                                            <div class="col-md-6 col-lg-12">
-                                                <div class="form-floating">
-                                                    <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
-                                                    <label for="search_by_item_name" class="">Description</label>
-                                                </div> 
-                                            </div>
-                                        </div>
-                                        <div class="row mt-2">
-                                            <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
-                                            </div>
-                                            <!--<div class="col-4 d-grid">
-                                                <button class="btn btn-sm text-dark" @click="updateProducts">
-                                                    <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
-                                                    <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
-                                                </button>
-                                            </div>-->
-                                            <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
-                                            </div>
-                                        </div>   
-                                        
+                                        </div> 
                                     </div>
-                                </div>      
-                                <div class="card shadow-sm mt-2" >
-                                    <div class="card-body p-2 vh-65 overflow-y-auto">
-                                        <table class="table table-bordered table-hover mb-0">
-                                            <tbody>
-                                                <tr class="text-center fw-bold table-secondary">
-                                                    <td>Code</td>
-                                                    <td>Description</td>
-                                                </tr>
-                                                <tr v-if="stockItems.length>0" v-for="item in stockItems" :key="item.id">
-                                                        <td class="col-1">{{item.code_no}}</td>
-                                                        <td class="col-4">{{item.item_name}}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                    <div class="col-sm-6 col-lg-12">
+                                        <div class="card shadow-sm" >
+                                            <div class="card-body p-2 max-vh-65 overflow-y-auto">
+                                                <table class="table table-bordered table-hover mb-0">
+                                                    <tbody>
+                                                        <tr class="text-center fw-bold table-secondary">
+                                                            <td>Code</td>
+                                                            <td>Description</td>
+                                                        </tr>
+                                                        <tr v-if="stockItems.length>0" v-for="item in stockItems" :key="item.id">
+                                                                <td class="col-1">{{item.code_no}}</td>
+                                                                <td class="col-4">{{item.item_name}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>  
                                     </div>
-                                </div>                          
+                                </div>                                                                                            
                             </div>
                             <div class="col-lg-9">
                                 <div class="card shadow-sm">

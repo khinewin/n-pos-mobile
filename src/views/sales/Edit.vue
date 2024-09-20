@@ -4,22 +4,22 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                           
        
-                <div class="col-sm-2 d-grid">
-                    <select class="form-control-plaintext text-center" @change="changeSaleType" v-model="sale_type">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                    <select class="form-control-plaintext text-center small" @change="changeSaleType" v-model="sale_type">
                         <option value="retail">Retail</option>
                         <option value="whole_sale">Wholesale</option>
                     </select>
                 </div>
             
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                     <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print (cltr+p)</button>
                 </div>
-                <div class="col-sm-2 d-grid">                     
+                <div class="col-6 col-sm-4 col-md-2 d-grid">                     
                         <button v-if="saleMode =='Sale / Edit'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length<=0" ><i class="fa-solid fa-hard-drive"></i> Save (cltr+s)
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                     <router-link :to="{name: 'Sale'}" id="close" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> Close (cltr+q)</router-link>
                 </div>
             </div>
@@ -76,7 +76,7 @@
                                 </div>
                             </div>                               
                               <div class="vh-50 overflow-y-auto">
-                                <table class="table table-bordered table-hover mb-0">
+                                <table class="table table-bordered table-hover mb-0 inside-table">
                                     <tbody class="small fw-bold table-group-divider">
                                         <tr class="table-secondary">
                                             <td class="col-1 text-center">
@@ -220,12 +220,7 @@ export default {
     },
     data(){
         return{    
-            config: {
-                dateFormat: 'd/m/Y', // Flatpickr options
-                enableTime: false,
-                wrap: true, // set wrap to true only when using 'input-group'
-               // altFormat: 'M j, Y',
-            },  
+         
             saleMode: "Sale / Edit",
             isLoading:false,
             sale_type: "retail",
@@ -304,6 +299,9 @@ export default {
         },
         default_customer(){
             return this.$store.getters.default_customer;
+        },
+        config(){
+            return this.$store.getters.flat_pickr_config;
         }
       
     },

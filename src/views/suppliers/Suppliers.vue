@@ -3,13 +3,13 @@
            <PageHeader page-title="Suppliers" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info"/>
            <div class="container-fluid">
                <div class="row  justify-content-end">   
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
                     </button>
                 </div>                           
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveSupplier">
                         <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
@@ -53,7 +53,7 @@
                                    <tbody class="">
                                        <tr class="text-center table-secondary change-cursor">
                                         <td class="col-0">
-                                            <input type="checkbox" @click="checkAll" v-model="is_check_all">
+                                            <input type="checkbox" class="form-check-input" @click="checkAll" v-model="is_check_all">
                                         </td>
                                            <td  @click="sortSuppliers('code')" class="col-2"><i class="fa-solid fa-sort"></i> Code</td>
                                            <td @click="sortSuppliers('name')" class="col-2"><i class="fa-solid fa-sort"></i> Name</td>
@@ -62,8 +62,8 @@
                                            <td @click="sortSuppliers('created_at')" class="col-2"><i class="fa-solid fa-sort"></i> Date</td>
                                        </tr>
                                        <tr>
-                                        <td class="position-relative">
-                                            <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" @click="checkAll" v-model="is_deleted">
+                                        <td class="">
+                                            <input class="form-check-input" type="checkbox" @click="checkAll" v-model="is_deleted">
                                         </td>
                                             <td class="">
                                                 <input @keypress.enter="saveSupplier" type="text" v-model="code" class="form-control-plaintext py-0 text-center" id="code" placeholder="Code">                                                                                       
@@ -83,8 +83,8 @@
                                         </tr>
                                        
                                        <tr class="text-center" v-if="suppliers.length > 0"  v-for="(p, i) in suppliers" :key="p.id" @mouseenter="setEdit(p)" >                                           
-                                        <td class="position-relative">
-                                            <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" v-model="p.is_deleted">
+                                        <td class="">
+                                            <input class="form-check-input" type="checkbox" v-model="p.is_deleted">
                                         </td>
                                            <td :class="{'table-secondary': sort_item ==='code'}" class="position-relative">
                                                 <!--<a class="text-danger position-absolute start-0 top-50 translate-middle ps-2" href="#!" @click="removeSupplier(i, p)"><i class="fa-solid fa-square-minus"></i></a>-->                                                                                        
@@ -148,12 +148,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
     },
        data(){
            return{
-            config: {
-                dateFormat: 'd/m/Y', // Flatpickr options
-                enableTime: false,
-                wrap: true, // set wrap to true only when using 'input-group'
-               // altFormat: 'M j, Y',
-            },   
+           
             code :"",
             name:"",
             phone:"",
@@ -195,6 +190,9 @@ import { required, email ,helpers} from '@vuelidate/validators'
        computed:{
            user(){
                return this.$store.getters.user;
+           },
+           config(){
+            return this.$store.getters.flat_pickr_config;
            }
        },
        watch:{        

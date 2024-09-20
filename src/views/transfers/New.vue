@@ -3,13 +3,13 @@
         <PageHeader page-title="Transfer / New" page-code="addTransfer" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                         <button type="button" @click="saveTransfers" class="btn btn-sm" :disabled="isLoading">
                             <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                         </button>
                 </div>
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                         <router-link :to="{name : 'Transfers'}" class="btn btn-sm close"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</router-link>
                 </div>
             </div>
@@ -67,7 +67,7 @@
                             </div>
                         </div>    
                         <div class="vh-65 overflow-y-auto">                
-                        <table class="table table-bordered  mb-0 table-hover">
+                        <table class="table table-bordered  mb-0 table-hover inside-table">
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary" >
                                     <td class="col-1">Code</td>
@@ -149,12 +149,7 @@ export default {
     },
     data(){
         return{      
-            config: {
-                dateFormat: 'd/m/Y', // Flatpickr options
-                enableTime: false,
-                wrap: true, // set wrap to true only when using 'input-group'
-               // altFormat: 'M j, Y',
-            },    
+         
             voucher_no:"", 
             created_at:"",        
             from_location:"Main",
@@ -176,7 +171,10 @@ export default {
     computed:{
         user(){
             return this.$store.getters.user;
-        },    
+        },
+        config(){
+            return this.$store.getters.flat_pickr_config;
+        }    
       
     },
     watch:{

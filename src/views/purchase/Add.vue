@@ -63,7 +63,7 @@
                             </div>
                         </div>
                         <div class="vh-55 overflow-y-auto">
-                        <table class="table table-bordered mb-0  table-hover" :class="{'border-danger':v$.storePurchase.$errors.length > 0}" >
+                        <table class="table table-bordered mb-0  table-hover inside-table" :class="{'border-danger':v$.storePurchase.$errors.length > 0}" >
                             <tbody>
                                 <tr class="small text-center fw-bold table-secondary">
                                     <td class="col-1"> 
@@ -191,13 +191,7 @@ export default {
     },
     data(){
         return{       
-            config: {
-                dateFormat: 'd/m/Y', // Flatpickr options
-                enableTime: false,
-                wrap: true, // set wrap to true only when using 'input-group'
-               // altFormat: 'M j, Y',
-              // mode:"multiple"
-            },  
+          
             voucher_no:"", 
             tmp_exp_date:"",
             pur_date:"",
@@ -239,7 +233,10 @@ export default {
         },    
         general_supplier(){
             return this.$store.getters.general_supplier;
-        }      
+        },
+        config(){
+            return this.$store.getters.flat_pickr_config;
+        } 
     },
     watch:{
         msg:{

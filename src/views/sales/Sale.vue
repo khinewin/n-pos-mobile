@@ -4,29 +4,29 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                           
            
-                <div class="col-sm-2 d-grid">
-                    <select class="form-control-plaintext text-center" @change="changeSaleType" :disabled="saleMode=='Sale / History'" v-model="sale_type">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                    <select class="form-control-plaintext text-center small" @change="changeSaleType" :disabled="saleMode=='Sale / History'" v-model="sale_type">
                         <option value="retail">Retail</option>
                         <option value="whole_sale">Wholesale</option>
                     </select>
                 </div>    
-                <div class="col-sm-2 d-grid">    
+                <div class="col-6 col-sm-4 col-md-2 d-grid">    
                     <button class="btn btn-sm" @click="goEdit" :disabled="!id || user.uid != sale_user.uid"><i class="fa-solid fa-pen-to-square"></i> Edit (ctrl+e)</button>
                 </div>
                 
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                     <button class="btn btn-sm open"  data-bs-toggle="modal" data-bs-target="#salesModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
                 </div>
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                     <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print (ctrl+p)</button>
                 </div>
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                         <button v-if="saleMode=='Sale / New' || saleMode=='Sale / History'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length <=0 || saleMode=='Sale / History' " >
                             <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>                      
                 </div>
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                         <button @click="clearSaleItem" class="btn btn-sm" :disabled="saleItems.length <=0"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
                 </div>
             </div>
@@ -83,11 +83,14 @@
                                 </div>
                             </div>                               
                               <div class="vh-50 overflow-y-auto">
-                                <table class="table table-bordered table-hover mb-0">
+                                <table class="table table-bordered table-hover mb-0 inside-table">
                                     <tbody class="small fw-bold table-group-divider">
                                         <tr class="table-secondary">
-                                            <td class="col-1 text-center">
-                                                <input :disabled="saleMode=='Sale / History'" @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext p-0  text-center" placeholder="Scan code here">
+                                            <td v-if="saleMode=='Sale / New'" class="col-0">
+                                                <a  class="text-danger" href="#!" @click="removeSaleItems" ><i class="fa-solid fa-square-minus"></i></a>                                                                                         
+                                            </td>
+                                            <td class=" text-center col-1">
+                                                <input :disabled="saleMode=='Sale / History'" @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext py-0  text-center" placeholder="Scan code here">
                                             </td>
                                             <td class="col-3 text-center change-cursor description" :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#searchCode']" style="cursor: context-menu;">
                                                 <span v-if="saleMode=='Sale / New'"><i class="fa-solid fa-circle-plus"></i></span> Description <span v-if="saleMode=='Sale / New'">(cltr+i)</span>
@@ -101,11 +104,11 @@
                                         </tr>    
                                     </tbody>                                  
                                     <tbody class="text-nowrap text-break">                                                                         
-                                        <tr class="" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(s)"  >
-                                            <td class="position-relative text-center">
-                                                <span v-if="saleMode=='Sale / New'">
-                                                    <a  class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeSaleItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
-                                                </span>
+                                        <tr  v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(s)"  >
+                                            <td v-if="saleMode=='Sale / New'" >
+                                                    <input type="checkbox" v-model="s.is_check" class="form-check-input">
+                                            </td>
+                                            <td class="text-center position-relative ">                                                
                                                 {{s.code_no}}
                                             </td>
                                             <td class="">{{s.item_name}}</td>   
@@ -118,7 +121,7 @@
                                             <td class=" table-info col-1">
                                                 <input disabled  type="number"  v-model="s.qty_sale_price" class="form-control-plaintext py-0  text-center" placeholder="Price">                                        
                                             </td>
-                                            <td class=" table-info col-0">
+                                            <td class=" table-info col-1">
                                                 <select @change="calEdit" class="form-control-plaintext py-0 text-center change-cursor" v-model="s.qty_sale_price_unit">
                                                     <option   v-for="pu in onlyString(s.packing_size)">{{pu}}</option>
                                                 </select>
@@ -130,7 +133,7 @@
                                                 <span v-if="s.dis_percent">{{s.dis_percent}}%</span>      
                                             </td>
                                             <td class=" text-end table-warning change-cursor" data-bs-toggle="modal" data-bs-target="#setDiscountModal">{{s.discount}}</td>
-                                            <td class="text-end">{{s.final_amount}}</td>
+                                            <td class="  text-end">{{s.final_amount}}</td>
                                         </tr> 
                                     </tbody>
                                 </table>
@@ -230,12 +233,7 @@ export default {
     },
     data(){
         return{    
-            config: {
-                dateFormat: 'd/m/Y', // Flatpickr options
-                enableTime: false,
-                wrap: true, // set wrap to true only when using 'input-group'
-               // altFormat: 'M j, Y',
-            },  
+           
             id:"",
             saleMode: "Sale / New",
             isLoading:false,
@@ -314,6 +312,9 @@ export default {
         },
         default_customer(){
             return this.$store.getters.default_customer;
+        },
+        config(){
+            return this.$store.getters.flat_pickr_config;
         }
     },
     methods:{
@@ -665,9 +666,13 @@ export default {
                 this.v$.$reset()
 
         },
-        removeSaleItem(i){
+      /*  removeSaleItem(i){
             this.saleItems.splice(i, 1)
             this.calTotal();
+        },*/
+        removeSaleItems(){
+            this.saleItems=this.saleItems.filter((f)=>!f.is_check)
+            this.calTotal()
         },
      
         checkQty(p){

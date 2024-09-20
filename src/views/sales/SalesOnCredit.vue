@@ -3,18 +3,18 @@
         <PageHeader page-title="SOC" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                                     
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                     <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#customerModal"><i class="fa-solid fa-folder-tree"></i> Open (cltr+o)</button>
                 </div>
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                     <button  class="btn btn-sm" :disabled="!customer.code"  @click="print"><i class="fa-solid fa-print" ></i> Print (cltr+p)</button>
                 </div>
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                         <button type="button" @click="savePaid" class="btn btn-sm" v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save (cltr+s)
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-2 d-grid">
                         <button @click="closePage" class="btn btn-sm close" :disabled="!customer.id"><i class="fa-solid fa-circle-xmark"></i> Close (cltr+q)</button>
                 </div>
             </div>
@@ -22,31 +22,22 @@
         <div class="container-fluid my-2">
             <div class="card shadow">
                 <div class="card-body p-2">
-                    <div class="row justify-content-end">
-                        <div class="col-10 mb-2">
-                                <table class="table  table-borderless mb-0">
-                                    <tbody>                                        
-                                        <tr>
-                                            <td class="col-1">
-                                                <input @change="filterData" @keyup="filterData" type="number" class="form-control-plaintext py-0 text-center" v-model="display_item">
-                                            </td>
-                                            <td class="col-1">
-                                                <select class="form-control-plaintext  py-0 text-center" v-model="display_type" @change="filterData">
-                                                    <option>Paid</option>
-                                                    <option>Credit</option>
-                                                </select>
-                                            </td>                                          
-
-                                            <td class="text-end col-1 position-relative"><span class="position-absolute top-50 start-50 translate-middle fw-bold">Customer :</span></td>
-                                            <td class="col-1 position-relative"><span class="position-absolute top-50 start-0 translate-middle">{{customer.name}}</span></td>
-                                            <td class="text-end col-1 position-relative"><span class="position-absolute top-50 start-50 translate-middle fw-bold">Phone :</span></td>
-                                            <td class="col-1 position-relative"><span class="position-absolute top-50 start-0 translate-middle">{{customer.phone}}</span></td>
-                                            <td class="text-end col-1 position-relative"><span class="position-absolute top-50 start-50 translate-middle fw-bold">Code :</span></td>
-                                            <td class="col-1 position-relative"><span class="position-absolute top-50 start-0 translate-middle">{{customer.code}}</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                    <div class="row justify-content-end small mb-2">
+                        <div class="col-6 col-sm-4 col-md-3">
+                            <input @change="filterData" @keyup="filterData" type="number" class="form-control-plaintext py-0 text-center" v-model="display_item">
                         </div>
+                        <div class="col-6 col-sm-4 col-md-3">
+                            <select class="form-control-plaintext  py-0 text-center" v-model="display_type" @change="filterData">
+                                <option>Paid</option>
+                                <option>Credit</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3">
+                            <span>Customer : </span><span>{{customer.name}}</span>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3">
+                            <span>Code : </span><span>{{customer.code}}</span>
+                        </div>                                           
                     </div>
                 <div class="row g-2">
                     <div class="col-7">
