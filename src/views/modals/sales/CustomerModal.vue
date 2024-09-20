@@ -57,7 +57,13 @@
                                            <td class="col-4" @click="sortCustomers('address')"><i class="fa-solid fa-sort"></i> Address</td>
                                            <td class="col-1" @click="sortCustomers('created_at')"><i class="fa-solid fa-sort"></i> Member date</td>
                                        </tr>
-                                     
+                                     <tr @click="setCustomer(default_customer)" data-bs-dismiss="modal" class="change-cursor">
+                                        <td class="text-center">{{default_customer.code}}</td>
+                                        <td>{{default_customer.name}}</td>
+                                        <td class="text-center">{{default_customer.phone}}</td>
+                                        <td>{{default_customer.address}}</td>
+                                        <td class="text-center">{{showTime(default_customer.created_at)}}</td>
+                                     </tr>
                                        
                                        <tr class="change-cursor" data-bs-dismiss="modal" @click="setCustomer(p)" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id" >                                         
                                            <td :class="{'table-secondary': sort_item ==='code'}" class="text-center">
@@ -148,6 +154,9 @@ import { required, email ,helpers} from '@vuelidate/validators'
        computed:{
            user(){
                return this.$store.getters.user;
+           },
+           default_customer(){
+                return this.$store.getters.default_customer;
            }
        },
        watch:{

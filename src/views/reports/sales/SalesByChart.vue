@@ -25,7 +25,7 @@
                           
                         />
                         </div>
-                        <div class="my-5 text-center" v-else >No data.</div>
+                        <div class="my-5 text-center" v-if="topSalesQty.length <=1 && !isLoading" >No data.</div>
                     </div>
                     </div>
                    </div>
@@ -56,7 +56,7 @@
                                 :options="chartOptions"
                             />
                             </div>
-                            <div class="my-5 text-center" v-else >No data.</div>
+                            <div class="my-5 text-center" v-if="products.length <=1 && !isLoading" >No data.</div>
                         </div>
                         </div>
                       </div>
@@ -87,7 +87,7 @@
                                 :options="monthlyChartOptions"
                             />
                             </div>
-                            <div class="my-5 text-center" v-else >No data.</div>
+                            <div class="my-5 text-center" v-if="monthlyProducts.length  <= 1 && !isLoading" >No data.</div>
                         </div>
                        </div>
                     </div>
@@ -117,7 +117,7 @@
 
                             />
                             </div>
-                            <div class="my-5 text-center" v-else >No data.</div>
+                            <div class="my-5 text-center" v-if="monthlySalesProducts.length <= 1 && !isLoading" >No data.</div>
                         </div>
                       </div>
                     </div>
@@ -153,10 +153,10 @@ export default {
                 responsive: true,
             },        
             chartOptions: {              
-                colors : ["blue", "orange","red", "green"]
+                colors : ["blue", "orange", "green"]
             },
             monthlyChartOptions: {              
-                colors : ["blue", "orange","red", "green"]
+                colors : ["blue", "orange", "green"]
             },
             monthlySalesAmountOptions: {              
                 colors : ["red", "orange","yellow", "green","teal","blue"],
@@ -213,12 +213,12 @@ export default {
                     let extra_discount=0;
 
                     res[1].map((r)=>{
-                            sale_amount += r.final_amount
+                            sale_amount += r.final_amount - r.extra_discount
                             pur_amount +=r.pur_price.smallest_unit * r.sale_qty;
                             extra_discount += r.extra_discount;
                             profit += (r.final_amount - (r.pur_price.smallest_unit * r.sale_qty)) - r.extra_discount;                         
                     })
-                   return [date,  sale_amount, pur_amount, extra_discount, profit]
+                   return [date,  sale_amount, pur_amount, profit]
             })
             const salesData= gbm.map((res)=>{
                     const date=res[0];
@@ -228,7 +228,7 @@ export default {
                     })
                    return [date,sale_amount]
             })
-            const title=["Month", "Sales Amt", "Pur Amt", "Discount", "Profit"]
+            const title=["Month", "Sales Amt", "Pur Amt", "Profit"]
             const salesTitle=["Month", "Sales amount"]
             data.unshift(title)
             salesData.unshift(salesTitle)
@@ -279,14 +279,14 @@ export default {
                         extra_discount:0
                     }                            
                     res[1].map((r)=>{  
-                            item.sale_amount += r.final_amount
+                            item.sale_amount += r.final_amount - r.extra_discount;
                             item.pur_amount +=r.pur_price.smallest_unit * r.sale_qty;
                             item.extra_discount += r.extra_discount;
                            item.profit += (r.final_amount - (r.pur_price.smallest_unit * r.sale_qty)) - r.extra_discount;  
                     })                    
-                   return [item.date, item.sale_amount, item.pur_amount, item.extra_discount, item.profit]
+                   return [item.date, item.sale_amount, item.pur_amount, item.profit]
             })
-            const title=["Date", "Sales Amt", "Pur Amt", "Discount", "Profit"]
+            const title=["Date", "Sales Amt", "Pur Amt", "Profit"]
             data.unshift(title)
             this.products=data;            
             //cal qty

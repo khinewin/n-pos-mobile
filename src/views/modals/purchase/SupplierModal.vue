@@ -52,7 +52,13 @@
                                         <td class="col-4" @click="sortSuppliers('company')"><i class="fa-solid fa-sort"></i> Company</td>
                                         <td class="col-1" @click="sortSuppliers('created_at')"><i class="fa-solid fa-sort"></i> Date</td>
                                     </tr>
-                                   
+                                   <tr @click="setCode(general_supplier)" data-bs-dismiss="modal" class="change-cursor">
+                                        <td class="text-center">{{general_supplier.code}}</td>
+                                        <td>{{general_supplier.name}}</td>
+                                        <td class="text-center">{{general_supplier.phone}}</td>
+                                        <td>{{general_supplier.company}}</td>
+                                        <td class="text-center">{{showTime(general_supplier.created_at)}}</td>
+                                   </tr>
                                     <tr  class="change-cursor" v-if="suppliers.length > 0"  v-for="(p, i) in suppliers" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal">                                         
                                         <td :class="{'table-secondary': sort_item ==='code'}" class="text-center">
                                              {{p.code}}
@@ -128,6 +134,9 @@
         computed:{
             user(){
                 return this.$store.getters.user;
+            },
+            general_supplier(){
+                return this.$store.getters.general_supplier;
             }
         },
         watch:{

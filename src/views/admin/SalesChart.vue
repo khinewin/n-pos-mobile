@@ -14,15 +14,16 @@
                                 </div>
                             </div>
                         </div>   
-                        <div v-if="monthlySales.length > 1">
+                        <div v-if="monthlySales.length>1">
                             <GChart
                             :settings="{ packages: ['corechart', 'table', 'map'] }"
                             type="ColumnChart"
                             :data="monthlySales"
                             :options="monthlyChartOptions"
+                            @ready="onChartReady"
                         />
                         </div>
-                        <div class="my-5 text-center" v-else >No data.</div>
+                        <div class="my-5 text-center" v-if="monthlySales.length <=1 && isLoading==false">No data.</div>
                     </div>
                 </div>
             </div>
@@ -51,25 +52,21 @@ export default {
         }
     },
     mounted() {
-        if(this.user !==null){
-               this.isLoading=true;
-                this.fetchSalesMonthly();
-            }
+        this.isLoading=true;
+         this.fetchSalesMonthly();
+            
     },
-    watch:{   
-       user(data){
-           if(data){
-               this.isLoading=true;
-               this.fetchSalesMonthly();
-           }
-       }   
-  },
+   
     computed:{
         user(){
             return this.$store.getters.user;
         },
     },
     methods:{
+        onChartReady() {
+      // Once the chart is ready, hide the loading message
+        this.isLoading = false;
+        },
         monthlyReports(){
             let sales=[]
             this.salesMonthlyData.map((res)=>{                  
@@ -87,7 +84,7 @@ export default {
             const title=["Month","Sales Amt"]
             data.unshift(title)
             this.monthlySales=data;
-            this.isLoading=false;
+           // this.isLoading=false;
         },
         async fetchSalesMonthly(){
             const currentDate = new Date();
@@ -100,9 +97,13 @@ export default {
             const query_url= query(collection(db, "sales"),  
             where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date"));            
             onSnapshot(query_url,(snapShot)=>{
-                let saleItems=ss.sales(snapShot);           
-                this.salesMonthlyData=saleItems;
-                this.monthlyReports();
+                let saleItems=ss.sales(snapShot);        
+               this.salesMonthlyData=saleItems;
+              this.monthlyReports();
+              if(saleItems.length<=0){
+                    this.isLoading=false;
+              }
+               
             })
         },     
         monthlyShowTime(t){

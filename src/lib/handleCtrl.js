@@ -1,5 +1,5 @@
 const handleCtrl=(event)=> {
-    if (event.ctrlKey && event.key === 'h') {
+    /*if (event.ctrlKey && event.key === 'h') {
         event.preventDefault(); // Prevent the default browser save dialog
        const closeProduct=document.querySelector(".close-product")
         closeProduct !==null &&  closeProduct.click();
@@ -21,7 +21,7 @@ const handleCtrl=(event)=> {
         closeRtin !==null && closeRtin.click();
         const closeRtout=document.querySelector(".close-rtout")
         closeRtout !==null && closeRtout.click();
-    }
+    }*/
     if (event.ctrlKey && event.key === 'z') {
         event.preventDefault(); // Prevent the default browser save dialog
        const clearSearchProduct=document.querySelector(".clear-search-product")

@@ -61,15 +61,15 @@
                         <table class="table table-bordered border-dark mb-0 table-group-divider table-hover">
                             <tbody>
                                 <tr>
-                                    <td class="text-end fw-bold rm-b-b border-bottom pe-2" colspan="6">Grand Total  Amount (Ks)</td>
-                                    <td class="text-end"> {{fM(total_amount)}}</td>
+                                    <td class="text-end fw-bold rm-b-b border-bottom pe-2 col-10">Grand Total  Amount (Ks)</td>
+                                    <td class="text-end col-2"> {{fM(total_amount)}}</td>
                                 </tr>                     
                                 <tr>
-                                    <td class="text-end fw-bold rm-b-b   border-bottom pe-2" colspan="6">Grand Total Paid (Ks)</td>
+                                    <td class="text-end fw-bold rm-b-b   border-bottom pe-2" >Grand Total Paid (Ks)</td>
                                     <td class="text-end"> {{fM(total_paid)}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-end fw-bold  pe-2" colspan="6">Grand Total Balance (Ks)</td>
+                                    <td class="text-end fw-bold  pe-2" >Grand Total Balance (Ks)</td>
                                     <td class="text-end"> {{fM(total_balance)}}</td>
                                 </tr>
                             

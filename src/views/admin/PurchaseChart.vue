@@ -20,9 +20,10 @@
                             type="PieChart"
                             :data="monthlyPurchase"
                             :options="monthlyChartOptions"
+                            @ready="onChartReady"
                         />
                         </div>
-                        <div class="my-5 text-center" v-else >No data.</div>
+                        <div class="my-5 text-center" v-if="monthlyPurchase.length <=1 && !isLoading" >No data.</div>
                     </div>
                 </div>
             </div>
@@ -52,25 +53,20 @@ export default {
         }
     },
     mounted() {
-        if(this.user !==null){
-               this.isLoading=true;
-                this.fetchPurchaseMonthly();
-            }
+        this.isLoading=true;
+        this.fetchPurchaseMonthly();
+            
     },
-    watch:{   
-       user(data){
-           if(data){
-               this.isLoading=true;
-               this.fetchPurchaseMonthly();
-           }
-       }   
-  },
+  
     computed:{
         user(){
             return this.$store.getters.user;
         },
     },
     methods:{
+        onChartReady(){
+            this.isLoading=false;
+        },
         monthlyReports(){
             let purchase=[]
             this.purchaseMonthlyData.map((res)=>{                  
@@ -99,9 +95,12 @@ export default {
             const query_url= query(collection(db, "purchases"),  
             where("pur_date", ">=", from_date), where("pur_date", "<=", to_date), orderBy("pur_date"));            
             onSnapshot(query_url,(snapShot)=>{
-                let purchaseItems=ss.purchases(snapShot);           
+                let purchaseItems=ss.purchases(snapShot);      
                 this.purchaseMonthlyData=purchaseItems;
                 this.monthlyReports();
+                if(purchaseItems.length<=0){
+                    this.isLoading=false;
+                }
             })            
         },     
         monthlyShowTime(t){

@@ -46,7 +46,7 @@
                                     </div>    
                                 </div>
                             </div> 
-                            <div class="row g-2">
+                            <!--<div class="row g-2">
                                 <div class="col-5">
                                     <div class="mb-2 input-group">
                                         <div class="form-floating ">
@@ -73,7 +73,7 @@
                                         <label for="packing_unit">Packing Unit</label>
                                     </div>
                                 </div>
-                               </div>
+                               </div>-->
                             <div class="form-floating mb-2">
                                 <select v-model="location" class="form-control-plaintext border-bottom">
                                     <option>All</option>
@@ -196,6 +196,11 @@
                                             <ReportList @report="reportReturnIn" title="Return In" :arr="returnIn" />
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>
+                                            <ReportList @report="reportReturnOut" title="Return Out" :arr="returnOut" />
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>   
                         </div>                                          
@@ -315,6 +320,15 @@ export default {
                 {code: "by_voucher", name: "by voucher", active: true},    
                 {code: "by_customer", name:"by customer", active: true},
                 {code: "by_customer_date", name: "by customer and date", active: true},    
+             ],
+             returnOut:[
+                {code : "by_date", name: "by date", active: true},
+                {code: "by_description", name:"by description", active: true},
+                {code: "by_voucher", name: "by voucher", active: true},    
+                {code: "by_supplier", name:"by supplier", active: true},
+                {code: "by_supplier_date", name: "by supplier and date", active: true},    
+                {code: "by_exp_date", name: "by expire date", active: true},    
+
              ],
            
         }
@@ -463,7 +477,13 @@ export default {
             query : {voucher_no: this.voucher_no,  customer_code: this.customer.code ? this.customer.code : null,
                 customer_name: this.customer.name ? this.customer.name : null, code_no: this.code_no ? this.code_no : null, item_name: this.item_name ? this.item_name : null}
             })
-        },        
+        },  
+        reportReturnOut(r_type){                     
+            this.$router.push({name: "ReportsReturnOut", params :{"reportType": r_type, "fromDate": this.from_date, "toDate": this.to_date},
+            query : {voucher_no: this.voucher_no,  supplier_code: this.supplier.code ? this.supplier.code : null,
+                supplier_name: this.supplier.name ? this.supplier.name : null, code_no: this.code_no ? this.code_no : null, item_name: this.item_name ? this.item_name : null}
+            })
+        },            
      
     }
 }
