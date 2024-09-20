@@ -35,17 +35,21 @@
                                                 </button>
                                             </div>-->
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+h)</button>
+                                                <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                                             </div>
                                         </div>   
                                         
                                     </div>
                                 </div>      
-                                <div class="card shadow-sm mt-2" v-if="stockItems.length>0">
-                                    <div class="card-body p-2">
+                                <div class="card shadow-sm mt-2" >
+                                    <div class="card-body p-2 vh-65 overflow-y-auto">
                                         <table class="table table-bordered table-hover mb-0">
                                             <tbody>
-                                                <tr v-for="item in stockItems" :key="item.id">
+                                                <tr class="text-center fw-bold table-secondary">
+                                                    <td>Code</td>
+                                                    <td>Description</td>
+                                                </tr>
+                                                <tr v-if="stockItems.length>0" v-for="item in stockItems" :key="item.id">
                                                         <td class="col-1">{{item.code_no}}</td>
                                                         <td class="col-4">{{item.item_name}}</td>
                                                 </tr>
@@ -56,7 +60,7 @@
                             </div>
                             <div class="col-lg-9">
                                 <div class="card shadow-sm">
-                                    <div class="card-body p-2">
+                                    <div class="card-body p-2 vh-95 overflow-y-auto">
                                         <table class="table table-bordered mb-0 table-hover">
                                             <tbody class="small">
                                                 <tr class="table-secondary text-center fw-bold">

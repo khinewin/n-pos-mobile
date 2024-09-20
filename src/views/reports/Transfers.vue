@@ -2,10 +2,10 @@
     <div class="container-fluid my-4">   
         <div class="row fixed-top ps-2 pt-2">
             <div class="col-2">
-                <button class="btn" @click="goBack"><i class="fa-solid fa-circle-chevron-left"></i></button>
+                <button class="btn" @click="goBack"><i class="fa-solid fa-circle-chevron-left"></i> (Esc)</button>
             </div>
             <div class="col-2">
-                <button class="btn" @click="print"><i class="fa-solid fa-print"></i></button>
+                <button class="btn" @click="print"><i class="fa-solid fa-print"></i> (ctrl+p)</button>
             </div>    
         </div>         
         <div class="row"  id="printMe" >
@@ -78,12 +78,14 @@ export default {
         }
     },
    
-    mounted() {    
-      
-            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-         
+    mounted() {         
+        this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
+        this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
+         window.addEventListener('keydown', this.handleCtrl);
     },
+    beforeUnmount() {
+         window.removeEventListener('keydown', this.handleCtrl);
+     },
    watch:{
    
     msg:{
@@ -106,6 +108,16 @@ export default {
       
     },
     methods:{
+        handleCtrl(event) {                    
+            if (event.ctrlKey && event.key === 'p') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.print(); // Call your custom function
+            }   
+            if (event.key==="Escape") {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.goBack();
+            }                                   
+        },
         displayReportType(reportType){
             return rt.displayReportType(reportType)
         },

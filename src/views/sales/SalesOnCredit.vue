@@ -31,17 +31,17 @@
                                                 <input @change="filterData" @keyup="filterData" type="number" class="form-control-plaintext py-0 text-center" v-model="display_item">
                                             </td>
                                             <td class="col-1">
-                                                <select class="form-control-plaintext py-0 text-center" v-model="display_type" @change="filterData">
+                                                <select class="form-control-plaintext  py-0 text-center" v-model="display_type" @change="filterData">
                                                     <option>Paid</option>
                                                     <option>Credit</option>
                                                 </select>
                                             </td>                                          
 
-                                            <td class="text-end col-1 position-relative"><span class="position-absolute top-50 start-50 translate-middle">Customer :</span></td>
+                                            <td class="text-end col-1 position-relative"><span class="position-absolute top-50 start-50 translate-middle fw-bold">Customer :</span></td>
                                             <td class="col-1 position-relative"><span class="position-absolute top-50 start-0 translate-middle">{{customer.name}}</span></td>
-                                            <td class="text-end col-1 position-relative"><span class="position-absolute top-50 start-50 translate-middle">Phone :</span></td>
+                                            <td class="text-end col-1 position-relative"><span class="position-absolute top-50 start-50 translate-middle fw-bold">Phone :</span></td>
                                             <td class="col-1 position-relative"><span class="position-absolute top-50 start-0 translate-middle">{{customer.phone}}</span></td>
-                                            <td class="text-end col-1 position-relative"><span class="position-absolute top-50 start-50 translate-middle">Code :</span></td>
+                                            <td class="text-end col-1 position-relative"><span class="position-absolute top-50 start-50 translate-middle fw-bold">Code :</span></td>
                                             <td class="col-1 position-relative"><span class="position-absolute top-50 start-0 translate-middle">{{customer.code}}</span></td>
                                         </tr>
                                     </tbody>
@@ -160,7 +160,7 @@ import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/sales"
 import PrintSoc from "@/views/sales/PrintSoc.vue"
 import FlatPickr from 'vue-flatpickr-component';
-
+import * as hc from "@/lib/handleCtrl"
 
 export default {
     components: {
@@ -244,18 +244,7 @@ export default {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.print(); // Call your custom function
             }
-            if (event.ctrlKey && event.key === 'o') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const open=document.querySelector(".open")
-                open.click();
-            }
-      
-        
-            if (event.ctrlKey && event.key === 'h') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const cus=document.querySelector(".customer-modal")
-                cus.click();
-            }
+            return hc.handleCtrl(event)
          
         },
         async checkDatabase(){ 

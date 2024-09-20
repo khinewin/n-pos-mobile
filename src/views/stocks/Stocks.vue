@@ -4,10 +4,10 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">
                 <div class="col-sm-2 d-grid">
-                    <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print (ctrl+p)</button>
+                    <button @click="print" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-print"></i> Print (ctrl+p)</button>
                 </div>                
                 <div class="col-sm-2 d-grid">
-                        <button @click="goEdit" class="btn btn-sm" :class="{'disabled': !voucher_no || stock_user.uid !== user.uid}"><i class="fa-solid fa-pen-to-square"></i> Edit (ctrl+e)</button>
+                        <button @click="goEdit" class="btn btn-sm" :disabled="!voucher_no || stock_user.uid !== user.uid"><i class="fa-solid fa-pen-to-square"></i> Edit (ctrl+e)</button>
                 </div>                
                 <div class="col-sm-2 d-grid">
                     <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#stocksModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
@@ -16,10 +16,10 @@
                     <router-link :to="{name : 'NewStocks'}" class="btn btn-sm new"><i class="fa-solid fa-square-plus"></i> New (shift+n)</router-link>
             </div>
                 <div class="col-sm-2 d-grid">
-                        <button @click="closeStocks" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
+                        <button @click="closeStocks" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
                 </div>
             </div>
-            <div class="card shadow min-vh-75" id="printMe">
+            <div class="card shadow" id="printMe">
                 <div class="d-none d-print-block">
                     <LargePrintHeader />
                     <div>Stocks</div>
@@ -31,13 +31,26 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4 ">Voucher no. :</td>
+                                            <td class="text-end col-4 fw-bold">Remark :</td>
+                                            <td class="col-8">
+                                                {{remark}}
+                                            </td>
+                                        </tr>
+                                                                            
+                                    </tbody>
+                              </table>
+                            </div>
+                            <div class="col-sm-6">
+                                <table class="table mb-0 table-borderless">
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-end col-4 fw-bold ">Voucher no. :</td>
                                             <td class="col-8">
                                                 {{voucher_no}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end">Date :</td>
+                                            <td class="text-end fw-bold">Date :</td>
                                             <td class="">
                                                <span v-if="created_at"> {{showTime(created_at)}}</span>
                                             </td>
@@ -46,6 +59,7 @@
                               </table>
                             </div>
                         </div>
+                        <div class="vh-65 overflow-y-auto">
                         <table class="table table-bordered mb-0  table-hover">
                             <tbody>
                                 <tr class=" fw-bold table-secondary text-center">
@@ -88,7 +102,8 @@
                                 </tr>
                                                                                                               
                             </tbody>
-                        </table>                                                                                                                    
+                        </table>  
+                        </div>                                                                                                                  
                 </form>               
           
             <StocksModal @setCode="setCode" />
@@ -108,6 +123,7 @@ import StocksModal from '@/views/modals/stocks/StocksModal.vue'
 import * as hp from "@/lib/helper.js"
 import * as ss from "@/lib/snapshot/stocks"
 import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
+import * as hc from "@/lib/handleCtrl"
 
 export default {
     components: {
@@ -132,6 +148,7 @@ export default {
             store_item: {},
             storeItems: [],         
             isLoading:false,
+            remark:"",
             msg : {
                 type :"",
                 info :"",
@@ -153,13 +170,7 @@ export default {
      },
     
     methods:{    
-        handlectrl(event) {
-         
-         if (event.ctrlKey && event.key === 'h') {
-             event.preventDefault(); // Prevent the default browser save dialog
-             const modal=document.querySelector(".close-stock-modal");
-             modal.click();
-         }
+        handlectrl(event) {        
          if (event.ctrlKey && event.key === 'q') {
              event.preventDefault(); // Prevent the default browser save dialog             
              this.closeStocks(); // Call your custom function
@@ -168,26 +179,17 @@ export default {
              event.preventDefault(); // Prevent the default browser save dialog
              //this.printSale(); // Call your custom function
              this.print();
-         }
-         if (event.ctrlKey && event.key === 'o') {
-             event.preventDefault(); // Prevent the default browser save dialog
-             const browse=document.querySelector(".open")
-             browse.click();
-         }
+         }        
          if (event.ctrlKey && event.key === 'e') {
              event.preventDefault(); // Prevent the default browser save dialog
               this.goEdit();
-         }
-         if (event.ctrlKey && event.key === 'z') {
-             event.preventDefault(); // Prevent the default browser save dialog
-            const s=document.querySelector(".clear-search-stocks")
-            s.click();
-         }
+         }      
          if(event.shiftKey && event.key.toLowerCase()=== 'n') {
              event.preventDefault(); // Prevent the default browser save dialog
              const add=document.querySelector(".new")
              add.click();
          }
+         return hc.handleCtrl(event)
       
      },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
@@ -213,6 +215,7 @@ export default {
             this.total_retail_amount=0,
            this.total_whole_sale_amount=0;
            this.total_pur_amount=0;
+           this.remark="";
         },
      
         setCode(p){           
@@ -227,6 +230,7 @@ export default {
             this.total_pur_amount=p.total_pur_amount
             this.total_main_retail_amount=p.total_main_retail_amount
             this.total_main_whole_sale_amount=p.total_main_whole_sale_amount;
+            this.remark=p.remark;
         },    
         
        showTime(t){

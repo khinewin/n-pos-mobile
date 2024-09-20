@@ -52,7 +52,7 @@
                            <div class="card-body p-2 table-responsive">
                                <table class="table table-bordered table-hover mb-0">
                                    <tbody class="small">
-                                       <tr class="text-center table-secondary" style="cursor: context-menu;">
+                                       <tr class="text-center table-secondary change-cursor">
                                         <td class="col-0">
                                             <input type="checkbox" @click="checkAll" v-model="is_check_all">
                                         </td>

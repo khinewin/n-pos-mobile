@@ -11,14 +11,14 @@
                                             <div class="col-12">
                                                 <div class="form-floating mb-2">
                                                     <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchAdjustments" placeholder="Voucher no." class="form-control-plaintext border-bottom">
-                                                   <label for="search_by_voucher_no" class=" ">Voucher no.</label>
+                                                   <label for="search_by_voucher_no" class=" ">Voucher No.</label>
                                                   </div>
                                             </div>                                           
                                             <div class="col-12">
                                                 <div class="input-group mb-2">
                                                     <div class="form-floating">
                                                         <flat-pickr @change="searchAdjustments" class="form-control-plaintext border-bottom" v-model="search_by_from_date" id="from_date" :config="config" />
-                                                        <label for="from_date">From date</label>
+                                                        <label for="from_date">From Date</label>
                                                     </div>
                                                     <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                                    </div>
@@ -27,7 +27,7 @@
                                                 <div class="input-group mb-2">
                                                     <div class="form-floating">
                                                         <flat-pickr @change="searchAdjustments" class="form-control-plaintext border-bottom" v-model="search_by_to_date" id="from_date" :config="config" />
-                                                        <label for="from_date">To date</label>
+                                                        <label for="from_date">To Date</label>
                                                     </div>
                                                     <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                                    </div>
@@ -46,7 +46,7 @@
                                                         
                                         <div class="row">
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark clear-adj-modal" @click="clearSearch"> <i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
+                                                <button class="btn btn-sm text-dark clear-search-adj" @click="clearSearch"> <i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                                 </div>
                                                 <!--<div class="col-4 d-grid">
                                                     <button class="btn btn-sm text-dark" @click="updateadjustments">
@@ -55,7 +55,7 @@
                                                     </button>
                                                 </div>-->
                                                 <div class="col-6 d-grid">
-                                                    <button class="btn btn-sm text-dark close-adj-modal" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+h)</button>
+                                                    <button class="btn btn-sm text-dark close-adj" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                                                 </div>
                                         </div>    
                                 </div>
@@ -63,7 +63,7 @@
                         </div>
                         <div class="col-8">
                             <div class="card shadow-sm">
-                                <div class="card-body p-2">
+                                <div class="card-body p-2 vh-95 overflow-y-auto">
                                     <table class="table table-bordered table-hover m-0">
                                         <tbody class="small text-center">
                                             <tr class="table-secondary fw-bold">

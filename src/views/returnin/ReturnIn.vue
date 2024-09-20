@@ -38,13 +38,13 @@
                                     <table class="table mb-0 table-borderless">
                                         <tbody class="">
                                             <tr class="">
-                                                <td class="text-end col-4 ">Voucher no. :</td>
+                                                <td class="text-end col-4 fw-bold">Voucher No. :</td>
                                                 <td class="col-8">
                                                     <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext   border-bottom py-0" id="voucher_no" placeholder="Voucher no">                                                
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-end">Return in date :</td>
+                                                <td class="text-end fw-bold">Return In Date :</td>
                                                 <td class="">
                                                     <flat-pickr class="form-control-plaintext py-0  border-bottom" v-model="rt_in_date" id="rt_in_date" :config="config" />
                                                 </td>
@@ -57,20 +57,20 @@
                                     <table class="table mb-0 table-borderless">
                                         <tbody class="">                                           
                                             <tr>
-                                                <td class="text-end col-4">Customer :</td>
+                                                <td class="text-end col-4 fw-bold">Customer :</td>
                                                 <td class="col-8">
                                                     <div class="row g-2">
                                                         <div class="col-6">
                                                             <input type="text" @click="changeCustomer" v-model="customer.name" class="form-control-plaintext py-0 border-bottom" id="customer_name" placeholder="Name">                                                
                                                         </div>
                                                         <div class="col-6 border-bottom text-center change-cursor">
-                                                            <span class="d-block text-primary customer " :data-bs-toggle="[rtInMode=='Return In / History' ? '' : 'modal']" :data-bs-target="[rtInMode=='Return In / History' ? '' : '#customerModal']" ><i class="fa-solid fa-pen"></i> (shift+c)</span>
+                                                            <span class="d-block text-primary customer" :data-bs-toggle="[rtInMode=='Return In / History' ? '' : 'modal']" :data-bs-target="[rtInMode=='Return In / History' ? '' : '#customerModal']" ><i class="fa-solid fa-pen"></i> (shift+c)</span>
                                                         </div>
                                                     </div>
                                                 </td>
                                             </tr>      
                                             <tr>
-                                                <td class="text-end" >User :</td>
+                                                <td class="text-end fw-bold" >User :</td>
                                                 <td class="">
                                                     {{sale_user.uid ? sale_user.displayName : user.displayName}}
                                                 </td>
@@ -79,14 +79,14 @@
                                   </table>
                                 </div>
                             </div>                               
-                              <div class="vh-50 overflow-y-auto">
+                              <div class="vh-55 overflow-y-auto">
                                 <table class="table table-bordered table-hover mb-0">
                                     <tbody class="small fw-bold table-group-divider">
                                         <tr class="table-secondary">
                                             <td class="col-1 text-center">
                                                 <input :disabled="rtInMode=='Return In / History'" @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext p-0  text-center" placeholder="Scan code here">
                                             </td>
-                                            <td id="description" class="col-3 text-center change-cursor" :data-bs-toggle="[rtInMode=='Return In / History' ? '' : 'modal']" :data-bs-target="[rtInMode=='Return In / History' ? '' : '#searchCode']" style="cursor: context-menu;">
+                                            <td  class="col-3 text-center change-cursor description" :data-bs-toggle="[rtInMode=='Return In / History' ? '' : 'modal']" :data-bs-target="[rtInMode=='Return In / History' ? '' : '#searchCode']" style="cursor: context-menu;">
                                                 <span v-if="rtInMode=='Return In / New'"><i class="fa-solid fa-circle-plus" ></i></span> Description <span v-if="rtInMode=='Return In / New'">(cltr+i)</span>
                                             </td>  
                                             <td class="col-1  text-center">Packing size</td>                                                                                    
@@ -123,7 +123,7 @@
                                     </tbody>
                                 </table>
                                 </div>
-                                <table class="table table-bordered">
+                                <table class="table table-bordered table-hover mb-0">
                                     <tbody class="table-group-divider">
                                         <tr>
                                             <td  class="text-end pe-2 fw-bold col-3">Paid</td>
@@ -196,7 +196,7 @@ import * as ss from "@/lib/snapshot/products"
 import setQtyModal from "@/views/modals/setQtyModal.vue";
 import setDiscountModal from "@/views/modals/setDiscountModal.vue";
 import FlatPickr from 'vue-flatpickr-component';
-
+import * as hc from "@/lib/handleCtrl"
 
 export default {
     components: {
@@ -295,13 +295,7 @@ export default {
     },
     methods:{
         handleCtrl(event) {
-            if (event.ctrlKey && event.key === 'z') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const rt=document.querySelector(".clear-rtin-modal")
-                const sCus=document.querySelector(".clear-search-customer")
-                sCus.click();
-                rt.click();
-            }
+          
             if (event.ctrlKey && event.key === 's') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.saveReturnIn(); // Call your custom function
@@ -313,35 +307,13 @@ export default {
             if (event.ctrlKey && event.key === 'p') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.printRtIn(); // Call your custom function
-            }
-            if (event.ctrlKey && event.key === 'o') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const browse=document.querySelector(".open")
-                browse.click();
-            }
+            }         
             if (event.ctrlKey && event.key === 'e') {
                 event.preventDefault(); // Prevent the default browser save dialog
                  this.goEdit();
             }
-            if (event.ctrlKey && event.key === 'i') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const des=document.getElementById("description")
-                des.click();
-            }
-            if (event.shiftKey && event.key.toLowerCase() === 'c') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const des=document.querySelector(".customer")
-                des.click();
-            }
-            if (event.ctrlKey && event.key === 'h') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const des=document.querySelector(".product-modal")
-                const rtIn=document.querySelector(".rt-in-modal")
-                const cus=document.querySelector(".customer-modal")
-                cus.click();
-                rtIn.click();
-                des.click();
-            }
+            return hc.handleCtrl(event)
+         
         },
        
         goEdit(){           
@@ -405,8 +377,8 @@ export default {
                         f.input_s_qty= e.input_s_qty  ? e.input_s_qty  : 0;
                         f.qty_sale_price_unit=e.input_l_qty ? e.packing_size.largest_unit : e.input_m_qty ? e.packing_size.medium_unit : e.packing_size.smallest_unit ;
                     }
-               }) //&&
-                //this.calEdit();
+               }) &&
+                this.calEdit();
         },
      
         setEdit(item){
@@ -425,17 +397,17 @@ export default {
                             return ft[1]==f.qty_sale_price_unit;
                         })  
                        const sale_unit=units[0][0]     
-                       let amount=0;
-                    //   let qty_sale_price=0;
-                     /*  if(sale_unit=="largest_unit"){
-                            qty_sale_price=this.sale_type=='retail' ? f.retail_price.largest_unit : f.whole_sale_price.largest_unit
+                      let qty_sale_price=0;
+                       if(sale_unit=="largest_unit"){
+                            qty_sale_price=f.whole_sale_price.largest_unit
                          }else if(sale_unit=="medium_unit"){
-                            qty_sale_price=this.sale_type=='retail' ? f.retail_price.medium_unit : f.whole_sale_price.medium_unit
+                            qty_sale_price= f.whole_sale_price.medium_unit
                         }else if(sale_unit=="smallest_unit"){
-                            qty_sale_price=this.sale_type=='retail' ? f.retail_price.smallest_unit : f.whole_sale_price.smallest_unit
-                        }*/ //get price from retail or wholesale
-                      // f.qty_sale_price=oeiqty_sale_price;
+                            qty_sale_price= f.whole_sale_price.smallest_unit
+                        }//get price from retail or wholesale
+                      f.qty_sale_price=f.qty_sale_price> 0 ? f.qty_sale_price : qty_sale_price;
 
+                      let amount=0;
                        if(sale_unit=="largest_unit"){
                            amount=Math.floor((f.qty_sale_price / (f.packing_size.medium_qty * f.packing_size.smallest_qty)) * f.sale_qty)
                        }else if(sale_unit=="medium_unit"){

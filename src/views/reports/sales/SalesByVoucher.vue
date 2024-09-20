@@ -111,6 +111,10 @@
                                             {{fM(sale.credit)}}
                                         </td>
                                     </tr>    
+                                    <tr>
+                                        <td class="text-end fw-bold pe-2">Remark</td>
+                                        <td colspan="3">{{sale.remark}}</td>
+                                    </tr>
                                                              
                                 </tbody>
                               </table>                           

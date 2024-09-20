@@ -3,7 +3,7 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>     
-        <div>                     
+        <div class="roboto-regular">                     
                 <RouterView />       
         </div>        
 </template>
@@ -20,24 +20,10 @@ export default {
         return{
         }
     },
-    async created(){
-       // await disableNetwork(db)
-     //  await enableNetwork(db)
-    },
-  
     
-    watch:{        
-       
-    },
-    computed:{
+  
+    methods:{   
         
-    },
-    methods:{       
-
-        setCusrot(){
-          
-         },
-       
         checkLogin() {
             const auth = getAuth();
             onAuthStateChanged(auth, (user) => {

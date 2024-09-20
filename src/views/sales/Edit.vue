@@ -34,13 +34,13 @@
                                     <table class="table mb-0 table-borderless">
                                         <tbody class="">
                                             <tr class="">
-                                                <td class="text-end col-4 ">Voucher No. :</td>
+                                                <td class="text-end col-4 fw-bold">Voucher No. :</td>
                                                 <td class="col-8">
                                                     <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext   border-bottom py-0" id="voucher_no" placeholder="Voucher no">                                                
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-end">Sale Date :</td>
+                                                <td class="text-end fw-bold">Sale Date :</td>
                                                 <td class="">
                                                     <flat-pickr class="form-control-plaintext py-0  border-bottom" v-model="sale_date" id="sale_date" :config="config" />
                                                 </td>
@@ -53,7 +53,7 @@
                                     <table class="table mb-0 table-borderless">
                                         <tbody class="">                                           
                                             <tr>
-                                                <td class="text-end col-4">Customer :</td>
+                                                <td class="text-end col-4 fw-bold">Customer :</td>
                                                 <td class="col-8">
                                                     <div class="row g-2">
                                                         <div class="col-6">
@@ -66,7 +66,7 @@
                                                 </td>
                                             </tr>      
                                             <tr>
-                                                <td class="text-end" >Cashier :</td>
+                                                <td class="text-end fw-bold" >Cashier :</td>
                                                 <td class="">
                                                     {{user.displayName}}
                                                 </td>
@@ -125,7 +125,7 @@
                                     </tbody>
                                 </table>
                                 </div>
-                                <table class="table table-bordered">
+                                <table class="table table-bordered mb-0 table-hover">
                                     <tbody class="table-group-divider">
                                         <tr>
                                             <td  class="text-end pe-2 fw-bold col-3">Total Amount</td>
@@ -153,6 +153,12 @@
                                             <td class="text-end">
                                                 {{credit}}
                                             </td>
+                                        </tr>
+                                        <tr>
+                                            <td  class="text-end pe-2 fw-bold">Remark</td>
+                                            <td class="text-end" colspan="3">
+                                                <input :disabled="saleMode=='Sale / History'" @keypress.enter="saveSale" type="text" v-model="remark" class="form-control-plaintext py-0">
+                                            </td>                                                                         
                                         </tr>
                                     </tbody>
                                 </table>
@@ -203,7 +209,7 @@ import * as ss from "@/lib/snapshot/sales"
 import setQtyModal from "@/views/modals/setQtyModal.vue";
 import setDiscountModal from "@/views/modals/setDiscountModal.vue";
 import FlatPickr from 'vue-flatpickr-component';
-
+import * as hc from "@/lib/handleCtrl"
 
 export default {
     components: {
@@ -243,6 +249,7 @@ export default {
             products:[],
             print_date:"",
             isOffline: false,
+            remark:"",
             
             msg : {
                 type :"",
@@ -315,25 +322,7 @@ export default {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.printSale(); // Call your custom function
             }
-            if (event.ctrlKey && event.key === 'b') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const browse=document.getElementById("browse")
-                browse.click();
-            }
-            if (event.ctrlKey && event.key === 'e') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                 this.goEdit();
-            }
-            if (event.ctrlKey && event.key === 'i') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const des=document.getElementById("description")
-                des.click();
-            }
-            if (event.shiftKey && event.key.toLowerCase() === 'c') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const des=document.querySelector(".customer")
-                des.click();
-            }
+           return hc.handleCtrl(event);
         },
         changeSaleType(){
           this.saleItems= this.saleItems.map((s)=>{
@@ -537,6 +526,7 @@ export default {
             this.paid=s.paid;
             this.sale_type=s.sale_type
             this.credit=s.credit
+            this.remark=s.remark
             this.customer.name=s.customer.name;
             this.customer.phone=s.customer.phone;
         },
@@ -593,6 +583,7 @@ export default {
                     sale_type:this.sale_type,
                     customer : this.customer,
                     credit: this.credit,
+                    remark: this.remark,
                     payment_type: this.credit > 0 ? "Credit" : "Paid"
                 }                           
                 const saveDocument=doc(db, "sales", this.id)

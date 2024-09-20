@@ -1,7 +1,7 @@
 <template lang="">
     <div>
          <!-- set qty Modal -->
-         <div class="modal fade" id="setQtyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+         <div class="modal fade" id="setQtyModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-sm">
             <div class="modal-content">               
                 <div class="modal-body p-2">
@@ -17,7 +17,7 @@
                             </button>
                         </div>
                         <div class="col-4">
-                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                         </div>
                     </div>
                     <div v-if="ei">

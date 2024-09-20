@@ -32,13 +32,13 @@
                                     <table class="table mb-0 table-borderless">
                                         <tbody class="">
                                             <tr class="">
-                                                <td class="text-end col-4 ">Voucher no. :</td>
+                                                <td class="text-end col-4 fw-bold">Voucher No. :</td>
                                                 <td class="col-8">
                                                     <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext   border-bottom py-0" id="voucher_no" placeholder="Voucher no">                                                
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-end">Return in date :</td>
+                                                <td class="text-end fw-bold">Return In Date :</td>
                                                 <td class="">
                                                     <flat-pickr class="form-control-plaintext py-0  border-bottom" v-model="rt_in_date" id="rt_in_date" :config="config" />
                                                 </td>
@@ -51,20 +51,20 @@
                                     <table class="table mb-0 table-borderless">
                                         <tbody class="">                                           
                                             <tr>
-                                                <td class="text-end col-4">Customer :</td>
+                                                <td class="text-end col-4 fw-bold">Customer :</td>
                                                 <td class="col-8">
                                                     <div class="row g-2">
                                                         <div class="col-6">
                                                             <input type="text" @click="changeCustomer" v-model="customer.name" class="form-control-plaintext py-0 border-bottom" id="customer_name" placeholder="Name">                                                
                                                         </div>
                                                         <div class="col-6 border-bottom text-center">
-                                                            <span class="d-block text-primary" :data-bs-toggle="[rtInMode=='Return In / History' ? '' : 'modal']" :data-bs-target="[rtInMode=='Return In / History' ? '' : '#customerModal']" ><i class="fa-solid fa-pen"></i></span>
+                                                            <span class="d-block text-primary customer" :data-bs-toggle="[rtInMode=='Return In / History' ? '' : 'modal']" :data-bs-target="[rtInMode=='Return In / History' ? '' : '#customerModal']" ><i class="fa-solid fa-pen"></i> (shift+c)</span>
                                                         </div>
                                                     </div>
                                                 </td>
                                             </tr>      
                                             <tr>
-                                                <td class="text-end" >User :</td>
+                                                <td class="text-end fw-bold" >User :</td>
                                                 <td class="">
                                                     {{sale_user.uid ? sale_user.displayName : user.displayName}}
                                                 </td>
@@ -73,7 +73,7 @@
                                   </table>
                                 </div>
                             </div>                               
-                              <div class="vh-50 overflow-y-auto">
+                              <div class="vh-55 overflow-y-auto">
                                 <table class="table table-bordered table-hover mb-0">
                                     <tbody class="small fw-bold table-group-divider">
                                         <tr class="table-secondary">
@@ -101,14 +101,14 @@
                                             <td class="">
                                                 {{calPackingSize(s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit, s.packing_size.medium_qty, s.packing_size.smallest_qty)}}
                                             </td>                                        
-                                            <td class=" text-end table-primary" id="setQty" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                            <td class=" text-end table-primary change-cursor" id="setQty" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                                 {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
                                             </td>                                            
                                             <td class=" table-info col-1">
                                                 <input @keyup="calEdit"   type="number"  v-model="s.qty_sale_price" class="form-control-plaintext py-0  text-center" placeholder="Price">                                        
                                             </td>
                                             <td class=" table-info col-0">
-                                                <select @change="calEdit" class="form-control-plaintext p-0 text-center" v-model="s.qty_sale_price_unit">
+                                                <select @change="calEdit" class="form-control-plaintext change-cursor p-0 text-center" v-model="s.qty_sale_price_unit">
                                                     <option   v-for="pu in onlyString(s.packing_size)">{{pu}}</option>
                                                 </select>
                                             </td>
@@ -117,7 +117,7 @@
                                     </tbody>
                                 </table>
                                 </div>
-                                <table class="table table-bordered">
+                                <table class="table table-bordered table-hover mb-0">
                                     <tbody class="table-group-divider">
                                         <tr>
                                             <td  class="text-end pe-2 fw-bold col-3">Paid</td>
@@ -191,7 +191,7 @@ import * as rtIn from "@/lib/snapshot/returnIn"
 import setQtyModal from "@/views/modals/setQtyModal.vue";
 import setDiscountModal from "@/views/modals/setDiscountModal.vue";
 import FlatPickr from 'vue-flatpickr-component';
-
+import * as hc from '@/lib/handleCtrl'
 
 export default {
     components: {
@@ -303,21 +303,13 @@ export default {
             if (event.ctrlKey && event.key === 'p') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.printRtIn(); // Call your custom function
-            }
-            if (event.ctrlKey && event.key === 'b') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const browse=document.getElementById("browse")
-                browse.click();
-            }
+            }        
             if (event.ctrlKey && event.key === 'e') {
                 event.preventDefault(); // Prevent the default browser save dialog
                  this.goEdit();
             }
-            if (event.ctrlKey && event.key === 'i') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const des=document.getElementById("description")
-                des.click();
-            }
+            return hc.handleCtrl(event)
+        
         },
        
          
@@ -400,17 +392,17 @@ export default {
                             return ft[1]==f.qty_sale_price_unit;
                         })  
                        const sale_unit=units[0][0]     
-                       let amount=0;
-                    //   let qty_sale_price=0;
-                     /*  if(sale_unit=="largest_unit"){
-                            qty_sale_price=this.sale_type=='retail' ? f.retail_price.largest_unit : f.whole_sale_price.largest_unit
+                       let qty_sale_price=0;
+                      if(sale_unit=="largest_unit"){
+                            qty_sale_price= f.whole_sale_price.largest_unit
                          }else if(sale_unit=="medium_unit"){
-                            qty_sale_price=this.sale_type=='retail' ? f.retail_price.medium_unit : f.whole_sale_price.medium_unit
+                            qty_sale_price=f.whole_sale_price.medium_unit
                         }else if(sale_unit=="smallest_unit"){
-                            qty_sale_price=this.sale_type=='retail' ? f.retail_price.smallest_unit : f.whole_sale_price.smallest_unit
-                        }*/ //get price from retail or wholesale
-                      // f.qty_sale_price=oeiqty_sale_price;
+                            qty_sale_price=f.whole_sale_price.smallest_unit
+                        } //get price from retail or wholesale
+                      f.qty_sale_price=f.qty_sale_price> 0 ? f.qty_sale_price : qty_sale_price;
 
+                      let amount=0;
                        if(sale_unit=="largest_unit"){
                            amount=Math.floor((f.qty_sale_price / (f.packing_size.medium_qty * f.packing_size.smallest_qty)) * f.sale_qty)
                        }else if(sale_unit=="medium_unit"){

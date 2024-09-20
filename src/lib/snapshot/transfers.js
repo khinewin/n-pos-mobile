@@ -8,7 +8,8 @@ const transfers=(arr)=>{
             created_at : doc.data().created_at,
             products : doc.data().products,    
             from_location: doc.data().from_location,
-            to_location:doc.data().to_location,                   
+            to_location:doc.data().to_location,              
+            remark: doc.data().remark,     
         };                                       
         transferItems.push(item);                          
     });

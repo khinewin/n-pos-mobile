@@ -11,7 +11,7 @@
                                    <div class="input-group mb-2">
                                     <div class="form-floating">
                                         <flat-pickr class="form-control-plaintext border-bottom" v-model="from_date" id="from_date" :config="config" />
-                                        <label for="from_date">From date</label>
+                                        <label for="from_date">From Date</label>
                                     </div>
                                     <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                    </div>  
@@ -20,7 +20,7 @@
                                     <div class="input-group mb-2">
                                         <div class="form-floating">
                                             <flat-pickr class="form-control-plaintext border-bottom" v-model="to_date" id="to_date" :config="config" />
-                                            <label for="to_date">To date</label>
+                                            <label for="to_date">To Date</label>
                                         </div>
                                         <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                        </div>
@@ -33,7 +33,7 @@
                                             <option>Main</option>
                                             <option>Pharmacy</option>
                                         </select>
-                                        <label for="from_location">From location</label>
+                                        <label for="from_location">From Location</label>
                                     </div>  
                                 </div>
                                 <div class="col-6">
@@ -42,7 +42,7 @@
                                             <option>Main</option>
                                             <option>Pharmacy</option>
                                         </select>
-                                        <label for="to_location">To location</label>
+                                        <label for="to_location">To Location</label>
                                     </div>    
                                 </div>
                             </div> 
@@ -70,7 +70,7 @@
                                         <select v-model="packing_unit" id="packing_unit"  class="form-control-plaintext border-bottom">                                          
                                             <option>S Unit</option>
                                         </select>
-                                        <label for="packing_unit">Packing unit</label>
+                                        <label for="packing_unit">Packing Unit</label>
                                     </div>
                                 </div>
                                </div>
@@ -96,7 +96,7 @@
                                     <div class="mb-2 input-group">
                                         <div class="form-floating ">
                                             <input  type="text" class="form-control-plaintext border-bottom" id="voucher_no" v-model="voucher_no" placeholder="Voucher no.">
-                                            <label for="voucher_no">Voucher no.</label>
+                                            <label for="voucher_no">Voucher No.</label>
                                         </div> 
                                         <span class="input-group-text  bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
                                     </div>
@@ -158,7 +158,7 @@
                                 <tbody>
                                     <tr>
                                         <td>
-                                            <ReportList @report="reportProducts" title="Medicine code" :arr="products" />
+                                            <ReportList @report="reportProducts" title="Medicine Code" :arr="products" />
                                         </td>
                                     </tr>
                                     <tr>
@@ -219,6 +219,7 @@ import CustomerModal from '@/views/modals/sales/CustomerModal.vue'
 import ProductModal from "@/views/modals/reports/ProductModal.vue"
 import ReportList from "@/views/reports/ReportList.vue"
 import FlatPickr from 'vue-flatpickr-component';
+import * as hc from "@/lib/handleCtrl"
 
 export default {
     components: {
@@ -327,7 +328,11 @@ export default {
        this.from_date=firstDay
        this.to_date=lastDay      
 
+       window.addEventListener('keydown', this.handleCtrl);
     },
+    beforeUnmount() {
+         window.removeEventListener('keydown', this.handleCtrl);
+     },
    watch:{
     user(data){
                if(data !==null){             
@@ -352,7 +357,11 @@ export default {
         
     },
     methods:{
+        handleCtrl(event) {
      
+          return hc.handleCtrl(event)
+       
+      },
         parseYMD(dateStr) {
             const [day, month, year] = dateStr.split('-');
             return  `${year}-${month}-${day}`;

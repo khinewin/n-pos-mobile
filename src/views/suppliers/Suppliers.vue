@@ -51,7 +51,7 @@
                            <div class="card-body p-2 table-responsive">
                                <table class="table table-bordered table-hover mb-0">
                                    <tbody class="">
-                                       <tr class="text-center table-secondary" style="cursor: context-menu;">
+                                       <tr class="text-center table-secondary change-cursor">
                                         <td class="col-0">
                                             <input type="checkbox" @click="checkAll" v-model="is_check_all">
                                         </td>
@@ -256,7 +256,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 this.msg.type="success"                                                         
         }, 
         async checkDatabase(){ 
-            const query_url=query(collection(db, "suppliers"), orderBy("created_at", "desc"));           
+            const query_url=query(collection(db, "suppliers"), where('is_deleted',"==", false), orderBy("created_at", "desc"));           
                 onSnapshot(query_url, async(snapShot) =>{
                     const dc=snapShot._snapshot.docChanges;
                     const user=this.user;
@@ -301,6 +301,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
         },
      
         async saveSupplier(){
+            this.saveEdit();
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
             this.isSaving=true;

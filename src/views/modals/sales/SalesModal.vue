@@ -54,7 +54,7 @@
                                                 </button>
                                             </div>-->
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark sale-modal" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (cltr+h)</button>
+                                                <button class="btn btn-sm text-dark close-sale" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                                             </div>
                                     </div>
                                     </div>
@@ -62,10 +62,10 @@
                         </div>
                         <div class="col-lg-9">
                             <div class="card shadow-sm">
-                                <div class="card-body p-2">
+                                <div class="card-body p-2 vh-95 overflow-y-auto">
                                     <table class="table table-bordered table-hover m-0">
                                         <tbody>
-                                            <tr class="table-secondary text-center">
+                                            <tr class="table-secondary text-center fw-bold">
                                                 <td>Voucher no.</td>
                                                 <td class="">Name</td>
                                                 <td>Phone</td>

@@ -8,7 +8,7 @@ const adjustments=(arr)=>{
             location: doc.data().location,
             created_at : doc.data().created_at,          
             products : doc.data().products,    
-                                          
+            remark: doc.data().remark,                                          
         };                                          
         adjItems.push(item);                           
     });

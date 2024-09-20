@@ -13,22 +13,38 @@
             <div class="mb-2"  v-for="adj in reports" :key="adj.id">
                 <div class="card">
                     <div class="card-body p-2">
-                        <div class="mb-2">
-                            <table class="table mb-0 table-borderless">
-                                <tbody class="small">
-                                    <tr>
-                                        <td class="text-end col-2 p-0 fw-bold">Voucher no. :</td>
-                                        <td class="col-2 p-0 ps-2">
-                                            {{adj.voucher_no}}
-                                        </td>                                                             
-                                
-                                        <td class="text-end col-2 p-0 fw-bold">Date :</td>
-                                        <td class="col-2 p-0  ps-2">
-                                           <span v-if="adj.created_at"> {{showTime(adj.created_at)}}</span>
-                                        </td>
-                                    </tr>                               
-                                </tbody>
-                          </table>
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <table class="table mb-0 table-borderless">
+                                    <tbody class="small">
+                                        <tr>
+                                            <td class="text-end col-4 p-0 fw-bold">Remark :</td>
+                                            <td class="col-8 p-0 ps-2">
+                                                {{adj.remark}}
+                                            </td>                                                             
+                                        </tr>
+                                                                     
+                                    </tbody>
+                              </table>
+                            </div>
+                            <div class="col-6">
+                                <table class="table mb-0 table-borderless">
+                                    <tbody class="small">
+                                        <tr>
+                                            <td class="text-end col-4 p-0 fw-bold">Voucher No. :</td>
+                                            <td class="col-8 p-0 ps-2">
+                                                {{adj.voucher_no}}
+                                            </td>                                                             
+                                        </tr>
+                                        <tr>
+                                            <td class="text-end  p-0 fw-bold">Date :</td>
+                                            <td class=" p-0  ps-2">
+                                               <span v-if="adj.created_at"> {{showTime(adj.created_at)}}</span>
+                                            </td>
+                                        </tr>                               
+                                    </tbody>
+                              </table>
+                            </div>
                         </div>         
                         <table class="table table-bordered mb-0 table-hover">
                             <tbody>

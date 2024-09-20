@@ -14,7 +14,7 @@
                                            <div class="col-md-4 col-lg-12">
                                             <div class="form-floating">
                                                 <input type="search" id="search_by_voucher_no" @paste="searchRtIn" v-model="search_by_voucher_no" @keypress.enter="searchRtIn" placeholder="Voucher no." class="form-control-plaintext border-bottom">
-                                                <label for="search_by_voucher_no" class="">Voucher no.</label>
+                                                <label for="search_by_voucher_no" class="">Voucher No.</label>
                                             </div>
                                            </div>
                                            <div class="col-md-4 col-lg-12">
@@ -27,7 +27,7 @@
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
                                                     <flat-pickr @change="searchRtIn" class="form-control-plaintext border-bottom" v-model="search_by_date" id="from_date" :config="config" />
-                                                    <label for="from_date">From date</label>
+                                                    <label for="from_date">From Date</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                                </div>
@@ -36,7 +36,7 @@
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
                                                     <flat-pickr @change="searchRtIn" class="form-control-plaintext border-bottom" v-model="search_to_date" id="to_date" :config="config" />
-                                                    <label for="to_date">To date</label>
+                                                    <label for="to_date">To Date</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                                </div>
@@ -44,7 +44,7 @@
                                     </div>
                                     <div class="row mt-2">
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark clear-rtin-modal"  @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
+                                                <button class="btn btn-sm text-dark clear-search-rtin"  @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                             </div>
                                             <!--<div class="col-4 d-grid">
                                                 <button class="btn btn-sm text-dark" @click="updateSales">
@@ -53,7 +53,7 @@
                                                 </button>
                                             </div>-->
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark rt-in-modal" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+h)</button>
+                                                <button class="btn btn-sm text-dark close-rtin" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                                             </div>
                                     </div>
                                     </div>
@@ -61,14 +61,14 @@
                         </div>
                         <div class="col-lg-9">
                             <div class="card shadow-sm">
-                                <div class="card-body p-2">
+                                <div class="card-body p-2 vh-95 overflow-y-auto">
                                     <table class="table table-bordered table-hover m-0">
                                         <tbody>
                                             <tr class="table-secondary text-center fw-bold">
-                                                <td>Voucher no.</td>
+                                                <td>Voucher No.</td>
                                                 <td class="">Name</td>
                                                 <td>Phone</td>
-                                                <td>Return In date</td>
+                                                <td>Return In Date</td>
                                                 <td class="">User</td>                                    
                                             </tr>                                
                                             <tr class="change-cursor" v-if="sales.length > 0" v-for="s in sales" :key="s.id" @click="setCode(s)" data-bs-dismiss="modal" >

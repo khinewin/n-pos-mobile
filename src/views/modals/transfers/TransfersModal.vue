@@ -1,6 +1,6 @@
 <template lang="">
     <!-- Products Modal -->
-    <div class="modal fade" id="transfersModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal fade" id="transfersModal" data-bs-backdrop="false"  tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
        <div class="modal-dialog modal-fullscreen">
          <div class="modal-content">               
            <div>
@@ -14,14 +14,14 @@
                                         <div class="col-md-6 col-lg-12">
                                             <div class="form-floating ">
                                                 <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchTransfers" placeholder="Voucher no." class="form-control-plaintext border-bottom">
-                                                <label for="search_by_voucher_no" class="">Voucher no.</label>
+                                                <label for="search_by_voucher_no" class="">Voucher No.</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-lg-12">
                                             <div class="input-group mb-2">
                                             <div class="form-floating">
                                                 <flat-pickr @change="searchTransfers" class="form-control-plaintext border-bottom" v-model="search_from_date" id="from_date" :config="config" />
-                                                <label for="from_date">From date</label>
+                                                <label for="from_date">From Date</label>
                                             </div>
                                             <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                            </div>
@@ -30,7 +30,7 @@
                                             <div class="input-group mb-2">
                                             <div class="form-floating">
                                                 <flat-pickr @change="searchTransfers" class="form-control-plaintext border-bottom" v-model="search_to_date" id="from_date" :config="config" />
-                                                <label for="from_date">To date</label>
+                                                <label for="from_date">To Date</label>
                                             </div>
                                             <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                            </div>
@@ -49,7 +49,7 @@
                                 
                                 <div class="row g-2 mt-2">
                                         <div class="col-6 d-grid">
-                                            <button class="btn btn-sm text-dark clear-transfer-modal" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
+                                            <button class="btn btn-sm text-dark clear-search-transfer" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                         </div>
                                         <!--<div class="col-4 d-grid">
                                             <button class="btn btn-sm text-dark" @click="updateTransfers">
@@ -58,7 +58,7 @@
                                             </button>
                                         </div>-->
                                         <div class="col-6 d-grid">
-                                            <button class="btn btn-sm text-dark close-transfer-modal" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+h)</button>
+                                            <button class="btn btn-sm text-dark close-transfer" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                                         </div>
                                 </div>
                                 </div>
@@ -66,7 +66,7 @@
                         </div>
                         <div class="col-lg-9">
                             <div class="card shadow-sm">
-                                <div class="card-body p-2">
+                                <div class="card-body p-2 vh-95 overflow-y-auto">
                                     <table class="table table-bordered table-hover m-0">
                                         <tbody class="">
                                             <tr class="table-secondary text-center fw-bold">

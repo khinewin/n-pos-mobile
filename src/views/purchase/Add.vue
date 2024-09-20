@@ -10,7 +10,7 @@
                         </button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                        <router-link id="close" :to="{name : 'Purchase'}" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</router-link>
+                        <router-link  :to="{name : 'Purchase'}" class="btn btn-sm close"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</router-link>
                 </div>
             </div>
             <div class="card shadow">
@@ -21,13 +21,13 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4">Voucher No. :</td>
+                                            <td class="text-end col-4 fw-bold">Voucher No. :</td>
                                             <td class="col-8">
                                                 <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext  p-0  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end">Location :</td>
+                                            <td class="text-end fw-bold">Location :</td>
                                             <td class="">
                                                 <select class="form-control-plaintext p-0  border-bottom" v-model="location">
                                                     <option value="Main">Main</option>
@@ -42,13 +42,13 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>                                       
                                         <tr>
-                                            <td class="text-end  col-4">Purchase Date :</td>
+                                            <td class="text-end  col-4 fw-bold">Purchase Date :</td>
                                             <td class="col-8">
                                                 <flat-pickr class="form-control-plaintext  p-0 border-bottom" v-model="pur_date"  :config="config" />
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end">Supplier :</td>
+                                            <td class="text-end fw-bold">Supplier :</td>
                                             <td class="row g-2">
                                                 <div class="col-6">
                                                     <input type="text" :class="{'border-0 border-bottom border-danger' : v$.supplier.name.$errors.length > 0}" @click="changeSupplier" v-model="supplier.name"  class="form-control-plaintext p-0  border-bottom">                                                
@@ -62,14 +62,14 @@
                               </table>
                             </div>
                         </div>
-                        <div class="vh-50 overflow-y-auto">
+                        <div class="vh-55 overflow-y-auto">
                         <table class="table table-bordered mb-0  table-hover" :class="{'border-danger':v$.storePurchase.$errors.length > 0}" >
                             <tbody>
                                 <tr class="small text-center fw-bold table-secondary">
                                     <td class="col-1"> 
                                         Code
                                     </td>
-                                    <td class="col-2 change-cursor" id="description" data-bs-toggle="modal" data-bs-target="#searchCode" style="cursor: context-menu;" ><i class="fa-solid fa-circle-plus"></i> Description (cltr+i)</td>
+                                    <td class="col-2 change-cursor description"  data-bs-toggle="modal" data-bs-target="#searchCode" style="cursor: context-menu;" ><i class="fa-solid fa-circle-plus"></i> Description (cltr+i)</td>
                                     <td class="col-1 table-info">Exp. Date</td>     
                                     <td class="col-1">Packing Size</td>                              
                                     <td class="col-1 table-primary" colspan="1">Qty</td>
@@ -118,27 +118,27 @@
                             </tbody>
                         </table>     
                         </div> 
-                        <table class="table table-bordered ">
+                        <table class="table table-bordered mb-0 ">
                             <tbody>                           
                                 <tr class="small">
-                                    <td  class="text-end col-3 pe-2">Total</td>
+                                    <td  class="text-end col-3 pe-2 fw-bold">Total</td>
                                     <td class="text-end col-3">{{total}}</td>
                                   
-                                    <td  class="text-end pe-2 col-3">Extra Discount</td>
+                                    <td  class="text-end pe-2 col-3 fw-bold">Extra Discount</td>
                                     <td class="text-end col-3">
                                         <input @click="setInput" @mouseleave="setInput"  type="number" @keyup="calTotal"  v-model="extra_discount" class="form-control-plaintext p-0  text-end" placeholder="0">
                                     </td>
                                 </tr>                            
                                 <tr class="small">
-                                    <td  class="text-end pe-2">Paid</td>
+                                    <td  class="text-end pe-2 fw-bold">Paid</td>
                                     <td class="text-end">
                                         <input @click="setInput" @mouseleave="setInput" @keypress.enter="savePurchase"  type="number" @keyup="calTotal"  v-model="paid" class="form-control-plaintext p-0  text-end" placeholder="0">
                                     </td>
-                                    <td  class="text-end pe-2">Balance</td>
+                                    <td  class="text-end pe-2 fw-bold">Balance</td>
                                     <td class="text-end">{{balance}}</td>
                                 </tr>
                                 <tr class="small">
-                                    <td  class="text-end pe-2">Remark</td>
+                                    <td  class="text-end pe-2 fw-bold">Remark</td>
                                     <td class="text-end" colspan="3">
                                         <input @keypress.enter="savePurchase"  type="text"   v-model="remark" class="form-control-plaintext p-0 " placeholder="Remark">
                                     </td>                                   
@@ -169,7 +169,7 @@ import * as ss from "@/lib/snapshot/products"
 import setQtyModal from "@/views/modals/setQtyModal.vue";
 import setDiscountModal from "@/views/modals/setDiscountModal.vue";
 import FlatPickr from 'vue-flatpickr-component';
-
+import * as hc from "@/lib/handleCtrl"
 
 export default {
     components: {
@@ -267,44 +267,19 @@ export default {
     
     methods:{
         handleCtrl(event) {
-            if (event.ctrlKey && event.key === 'h') {
-                event.preventDefault(); // Prevent the default browser save dialog
-               const sp=document.querySelector(".close-supplier")
-               const p=document.querySelector(".close-product")
-                p.click();
-               sp.click();
-            }
-            if (event.ctrlKey && event.key === 'z') {
-                event.preventDefault(); // Prevent the default browser save dialog
-               const c=document.querySelector(".clear-search")
-               c.click();
-               const s=document.querySelector(".clear-supplier")
-               s.click();
-            }
+           
             if (event.ctrlKey && event.key === 's') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.savePurchase(); // Call your custom function
             }
             if (event.ctrlKey && event.key === 'q') {
                 event.preventDefault(); // Prevent the default browser save dialog
-                const des=document.getElementById("close")
-                des.click();
+                const close=document.querySelector(".close")
+                close.click();
             }
-            if (event.ctrlKey && event.key === 'p') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                this.printSale(); // Call your custom function
-            }
+           
+            return hc.handleCtrl(event)
           
-            if (event.ctrlKey && event.key === 'i') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const des=document.getElementById("description")
-                des.click();
-            }
-            if (event.shiftKey && event.key.toLowerCase() === 'c') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const des=document.querySelector(".supplier")
-                des.click();
-            }
         },
         
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){

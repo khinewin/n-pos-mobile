@@ -26,7 +26,7 @@
                                         </div>
                                         <div class="row mt-2">
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark clear-search" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
+                                                <button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                             </div>
                                             <!--<div class="col-4 d-grid">
                                                 <button class="btn btn-sm text-dark" @click="updateProducts">
@@ -35,32 +35,32 @@
                                                 </button>
                                             </div>-->
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (cltr+h)</button>
+                                                <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                                             </div>
                                         </div>   
                                         
                                     </div>
                                 </div>    
-                                <div class="card shadow-sm mt-2 " v-if="storeItems.length >0">
-                                    <div class="card-body p-2">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <table class="table table-bordered mb-0 table-hover">
-                                                    <tbody>
-                                                        <tr  v-for="s in storeItems">
-                                                            <td class="col-1">{{s.code_no}}</td>
-                                                            <td class="col-5">{{s.item_name}}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
+                                <div class="card shadow-sm mt-2 ">
+                                    <div class="card-body p-2 vh-65 overflow-y-auto">
+                                        <table class="table table-bordered mb-0 table-hover">
+                                            <tbody>
+                                                <tr class="table-secondary fw-bold text-center">
+                                                    <td>Code</td>
+                                                    <td>Description</td>
+                                                </tr>
+                                                <tr  v-if="storeItems.length >0"  v-for="s in storeItems" :key="s.id">
+                                                    <td class="col-1">{{s.code_no}}</td>
+                                                    <td class="col-5">{{s.item_name}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>                                                                                                                                
                                     </div>
                                 </div>                            
                             </div>
                             <div class="col-lg-9">
                                 <div class="card shadow-sm">
-                                    <div class="card-body p-2">
+                                    <div class="card-body p-2 vh-95 overflow-y-auto">
                                         <table class="table table-bordered mb-0 table-hover text-nowrap text-break">
                                             <tbody class="small">
                                                 <tr class="table-secondary text-center fw-bold">

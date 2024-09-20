@@ -1,13 +1,13 @@
 <template lang="">
     <div>
         <!-- setPrices Modal -->
-        <div class="modal fade" id="setPricesModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal fade" id="setPricesModal" data-bs-backdrop="false"  tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
             <div class="modal-content">               
                 <div class="modal-body p-2">
                     <div class="row mb-2">                                             
                         <div class="col-12 text-end">
-                            <button id="close" type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                            <button id="close" type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                         </div>
                     </div>
                     <div>

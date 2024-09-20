@@ -4,13 +4,13 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">
                 <div class="col-sm-2 d-grid">
-                    <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print (ctrl+p)</button>
+                    <button @click="print" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-print"></i> Print (ctrl+p)</button>
                 </div>   
                 <div class="col-sm-2 d-grid">
                     <button @click="goEdit" class='btn btn-sm' :disabled="!voucher_no || pur_user.uid !==  user.uid"><i class="fa-solid fa-pen-to-square"></i> Edit (ctrl+e)</button>
                 </div>
                 <div class="col-sm-2 d-grid">
-                    <button class="btn btn-sm" id="open" data-bs-toggle="modal" data-bs-target="#purchaseModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
+                    <button class="btn btn-sm open"  data-bs-toggle="modal" data-bs-target="#purchaseModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
                 </div>
                 <div class="col-sm-2 d-grid">
                         <router-link :to="{name : 'AddPurchase'}" id="add" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> New (shift+n)</router-link>
@@ -24,19 +24,19 @@
                     <LargePrintHeader />
                     <div>Purchase</div>
                 </div>
-                <div class=" card-body p-2 table-responsive">
+                <div class=" card-body p-2">
                     <div class="row justify-content-end mb-2">
                     <div class="col-sm-6 ">
                         <table class="table mb-0 table-borderless">
                             <tbody>
                                 <tr>
-                                    <td class=" col-4 text-end">Voucher No. <span class="">:</span></td>
+                                    <td class=" col-4 text-end fw-bold">Voucher No. <span class="">:</span></td>
                                     <td class="col-8" >
                                         {{voucher_no}}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class=" text-end">Location <span class="">:</span></td>
+                                    <td class=" text-end fw-bold">Location <span class="">:</span></td>
                                     <td class=""  >
                                         {{location}}
                                     </td>
@@ -49,7 +49,7 @@
                         <table class="table mb-0 table-borderless">
                             <tbody>                              
                                 <tr>
-                                    <td class="col-4 text-end">Purchase Date <span class="">:</span></td>
+                                    <td class="col-4 text-end fw-bold">Purchase Date <span class="">:</span></td>
                                     <td class="col-8"  >
                                         <div  v-if="pur_date">
                                             {{showTime(pur_date)}}
@@ -57,7 +57,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="text-end">Supplier <span class="">:</span></td>
+                                    <td class="text-end fw-bold">Supplier <span class="">:</span></td>
                                     <td class=""  >
                                         {{supplier.name}} <span v-if="supplier.company">{{supplier.company}}</span>
                                     </td>
@@ -66,7 +66,7 @@
                       </table>
                     </div>
                 </div>  
-                <div class="vh-50">               
+                <div class="vh-55 overflow-y-auto">               
                    <table class="table table-bordered mb-0 table-hover">
                         <tbody class="table-group-divider">
                             <tr class="text-center fw-bold table-secondary">
@@ -109,7 +109,7 @@
                         </tbody>
                    </table>     
                  </div>
-                 <table class="table table-bordered table-hover">
+                 <table class="table table-bordered table-hover mb-0">
                     <tbody class="table-group-divider">
                       
                         <tr class="small">
@@ -150,7 +150,7 @@ import PurchaseModal from '@/views/modals/purchase/PurchaseModal.vue'
 import Footer from '@/views/partials/Footer.vue'
 import * as hp from "@/lib/helper.js"
 import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
-
+import * as hc from "@/lib/handleCtrl"
 export default {
     components: {
         PageHeader, PurchaseModal, Footer, LargePrintHeader
@@ -199,13 +199,8 @@ export default {
         fM(amount){
             return hp.formattedAmount(amount)
         },
-        handlectrl(event) {
+        handlectrl(event) {         
          
-            if (event.ctrlKey && event.key === 'h') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const modal=document.getElementById("closeModal");
-                modal.click();
-            }
             if (event.ctrlKey && event.key === 'q') {
                 event.preventDefault(); // Prevent the default browser save dialog             
                 this.closeVoucher(); // Call your custom function
@@ -215,26 +210,19 @@ export default {
                 //this.printSale(); // Call your custom function
                 this.print();
             }
-            if (event.ctrlKey && event.key === 'o') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const browse=document.getElementById("open")
-                browse.click();
-            }
+         
             if (event.ctrlKey && event.key === 'e') {
                 event.preventDefault(); // Prevent the default browser save dialog
                  this.goEdit();
             }
-            if (event.ctrlKey && event.key === 'z') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const s= document.querySelector(".clear-search-purchase")
-                s.click();
-            }
+     
             if(event.shiftKey && event.key.toLowerCase()=== 'n') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 const add=document.getElementById("add")
                 add.click();
             }
-         
+
+            return hc.handleCtrl(event)
         },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);

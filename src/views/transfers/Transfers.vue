@@ -4,7 +4,7 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                
                 <div class="col-sm-2 d-grid">
-                    <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print (ctrl+p)</button>
+                    <button @click="print" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-print"></i> Print (ctrl+p)</button>
                 </div>                
                 <!--<div class="col-sm-2 d-grid">
                         <button @click="goEdit" class="btn btn-sm" :class="{'disabled': !voucher_no || transfer_user.uid !== user.uid}"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
@@ -16,10 +16,10 @@
                     <router-link :to="{name : 'AddTransfer'}" class="btn btn-sm new"><i class="fa-solid fa-square-plus"></i> New (shift+n)</router-link>
             </div>
                 <div class="col-sm-2 d-grid">
-                        <button @click="closeTransfer" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
+                        <button @click="closeTransfer" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
                 </div>
             </div>
-            <div class="card shadow min-vh-75" id="printMe">
+            <div class="card shadow" id="printMe">
                 <div class="d-none d-print-block">
                     <LargePrintHeader />
                     <div>Transfers</div>
@@ -31,13 +31,13 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4">From location :</td>
+                                            <td class="text-end col-4 fw-bold">From Location :</td>
                                             <td class="col-8">
                                                 {{from_location}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end">To location :</td>
+                                            <td class="text-end fw-bold">To Location :</td>
                                             <td class="">
                                                 {{to_location}}
                                             </td>
@@ -49,22 +49,28 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4">Voucher no. :</td>
+                                            <td class="text-end col-4 fw-bold">Voucher No. :</td>
                                             <td class="col-8">
                                                 {{voucher_no}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end">Date :</td>
+                                            <td class="text-end fw-bold">Date :</td>
                                             <td class="">
                                                 <span v-if="created_at">{{showTime(created_at)}}</span>
+                                            </td>
+                                        </tr>  
+                                        <tr>
+                                            <td class="text-end fw-bold">Remark :</td>
+                                            <td class="">
+                                                {{remark}}
                                             </td>
                                         </tr>                                       
                                     </tbody>
                               </table>
                             </div>
                         </div>
-                       
+                       <div class="vh-65 overflow-y-auto">
                         <table class="table table-bordered  mb-0 table-hover mt-2">
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary">
@@ -105,7 +111,8 @@
                                                                                                                               
                                 </tr>                                                                                                              
                             </tbody>
-                        </table>                                                                                                                    
+                        </table>
+                        </div>                                                                                                                    
                 </form>               
           
             <TransfersModal @setCode="setCode"  />
@@ -125,6 +132,7 @@ import TransfersModal from '@/views/modals/transfers/TransfersModal.vue'
 import * as ss from "@/lib/snapshot/products"
 import * as hp from "@/lib/helper"
 import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
+import * as hc from "@/lib/handleCtrl"
 
 export default {
     components: {
@@ -152,6 +160,7 @@ export default {
             isLoading:false,
             isSaving:false,
             isAddAllLoading:false,
+            remark:"",
             msg : {
                 type :"",
                 info :"",
@@ -173,13 +182,8 @@ export default {
      },
     
     methods:{
-        handlectrl(event) {
-         
-         if (event.ctrlKey && event.key === 'h') {
-             event.preventDefault(); // Prevent the default browser save dialog
-             const modal=document.querySelector(".close-transfer-modal");
-             modal.click();
-         }
+        handlectrl(event) {         
+     
          if (event.ctrlKey && event.key === 'q') {
              event.preventDefault(); // Prevent the default browser save dialog             
              this.closeTransfer(); // Call your custom function
@@ -188,23 +192,13 @@ export default {
              event.preventDefault(); // Prevent the default browser save dialog
              //this.printSale(); // Call your custom function
              this.print();
-         }
-         if (event.ctrlKey && event.key === 'o') {
-             event.preventDefault(); // Prevent the default browser save dialog
-             const browse=document.querySelector(".open")
-             browse.click();
-         }
-         if (event.ctrlKey && event.key === 'z') {
-             event.preventDefault(); // Prevent the default browser save dialog
-             const browse=document.querySelector(".clear-transfer-modal")
-             browse.click();
-         }
-    
+         }        
          if(event.shiftKey && event.key.toLowerCase()=== 'n') {
              event.preventDefault(); // Prevent the default browser save dialog
              const add=document.querySelector(".new")
              add.click();
          }
+         return hc.handleCtrl(event)
       
      },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
@@ -233,6 +227,7 @@ export default {
             this.storeItems=p.products;
             this.from_location=p.from_location;
             this.to_location=p.to_location
+            this.remark=p.remark
         },
         closeTransfer(){
            this.id="";
@@ -242,6 +237,7 @@ export default {
            this.storeItems=[];
            this.from_location=""
            this.to_location=""
+           this.remark="";
         },
       
        showTime(t){

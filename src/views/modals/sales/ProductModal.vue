@@ -35,16 +35,20 @@
                                                 </button>
                                             </div>-->
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark product-modal" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (cltr+h)</button>
+                                                <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                                             </div>
                                         </div>   
                                     </div>
                                 </div>   
-                                <div class="card shadow-sm mt-2" v-if="saleItems.length>0">
-                                    <div class="card-body p-2">
+                                <div class="card shadow-sm mt-2" >
+                                    <div class="card-body p-2 vh-65 overflow-y-auto">
                                         <table class="table table-bordered table-hover mb-0">
                                             <tbody>
-                                                <tr v-for="s in saleItems">
+                                                <tr class="text-center fw-bold table-secondary">
+                                                    <td>Code</td>
+                                                    <td>Description</td>
+                                                </tr>
+                                                <tr v-if="saleItems.length>0" v-for="s in saleItems" :key="s.id">
                                                     <td class="col-1">{{s.code_no}}</td>
                                                     <td class="col-4">{{s.item_name}}</td>
                                                 </tr>
@@ -55,16 +59,16 @@
                             </div>
                             <div class="col-lg-9">
                                 <div class="card shadow-sm">
-                                    <div class="card-body p-2">
+                                    <div class="card-body p-2 vh-95 overflow-y-auto">
                                         <table class="table table-bordered mb-0 table-hover">
                                             <tbody class="small text-nowrap text-break ">
-                                                <tr class="table-secondary text-center">
+                                                <tr class="table-secondary text-center fw-bold">
                                                     <td class="col-1">Code</td>
                                                     <td class="col-2">Description</td>
                                                     <td class="col-1">Packing size</td>
                                                     <td class="col-1">Pharmacy Inv Bal</td>
-                                                    <td class="col-1" v-if="sale_type=='retail'">Retail price</td>
-                                                    <td class="col-1" v-if="sale_type=='whole_sale'">Wholesale price</td>
+                                                    <td class="col-1" >Retail price</td>
+                                                    <td class="col-1">Wholesale price</td>
 
                                                 </tr>                                      
                                                 <tr class="change-cursor" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"  >
@@ -76,12 +80,12 @@
                                                     <td class="text-end ">
                                                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                             
                                                     </td>                                                  
-                                                    <td class="text-end " v-if="sale_type=='retail'">
+                                                    <td class="text-end " >
                                                         <span v-if="p.retail_price.largest_unit">{{p.retail_price.largest_unit}} * </span>
                                                         <span v-if="p.retail_price.medium_unit">{{p.retail_price.medium_unit}} * </span>
                                                         <span v-if="p.retail_price.smallest_unit">{{p.retail_price.smallest_unit}} </span>
                                                     </td>
-                                                    <td class="text-end " v-if="sale_type=='whole_sale'">
+                                                    <td class="text-end " >
                                                         <span v-if="p.whole_sale_price.largest_unit">{{p.whole_sale_price.largest_unit}} * </span>
                                                         <span v-if="p.whole_sale_price.medium_unit">{{p.whole_sale_price.medium_unit}} * </span>
                                                         <span v-if="p.whole_sale_price.smallest_unit">{{p.whole_sale_price.smallest_unit}} </span>
@@ -172,8 +176,15 @@ export default {
                 this.fetchProducts();
         },
         setCode(p){
+            const items=this.productsData.filter((f)=>f.code_no==p.code_no);
+            if(items.length){
+                const item=items[0];
+                if(item.qty <=0){
+                    this.isError=true;
+                }
+            }
             this.$emit("setCode", p)
-            this.clearSearch();
+            //this.clearSearch();
         },
         clearSearch(){
             this.search_by_code="";
@@ -186,16 +197,17 @@ export default {
                 this.setCodeOnPaste();
             }, 300)
         },
-        setCodeOnPaste(){
+        setCodeOnPaste(){    
             const items=this.productsData.filter((f)=>f.code_no==this.search_by_code);
             if(items.length){
                 const item=items[0];
                 if(item.qty <=0){
                     this.isError=true;
                 }
-                this.setCode(items[0])
-                this.search_by_code="";
-            }
+            }     
+            this.setCode(items[0])
+            this.search_by_code="";
+            
        },
         searchProducts(){
             if(this.search_by_code){

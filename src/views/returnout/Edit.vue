@@ -32,13 +32,13 @@
                                     <table class="table mb-0 table-borderless">
                                         <tbody class="">
                                             <tr class="">
-                                                <td class="text-end col-4 ">Voucher no. :</td>
+                                                <td class="text-end col-4 fw-bold ">Voucher No. :</td>
                                                 <td class="col-8">
                                                     <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext   border-bottom py-0" id="voucher_no" placeholder="Voucher no">                                                
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-end">Return Out date :</td>
+                                                <td class="text-end fw-bold">Return Out Date :</td>
                                                 <td class="">
                                                     <flat-pickr class="form-control-plaintext py-0  border-bottom" v-model="rt_out_date" id="rt_out_date" :config="config" />
                                                 </td>
@@ -51,20 +51,20 @@
                                     <table class="table mb-0 table-borderless">
                                         <tbody class="">                                           
                                             <tr>
-                                                <td class="text-end col-4">Supplier :</td>
+                                                <td class="text-end col-4 fw-bold">Supplier :</td>
                                                 <td class="col-8">
                                                     <div class="row g-2">
                                                         <div class="col-6">
                                                             <input type="text" @click="changeSupplier" v-model="supplier.name" class="form-control-plaintext py-0 border-bottom" id="supplier_name" placeholder="Supplier">                                                
                                                         </div>
                                                         <div class="col-6 border-bottom text-center change-cursor">
-                                                            <span class="d-block text-primary supplier-modal" :data-bs-toggle="[rtOutMode=='Return Out / History' ? '' : 'modal']" :data-bs-target="[rtOutMode=='Return Out / History' ? '' : '#searchSupplier']" ><i class="fa-solid fa-pen"></i> (shift+c)</span>
+                                                            <span class="d-block text-primary supplier" :data-bs-toggle="[rtOutMode=='Return Out / History' ? '' : 'modal']" :data-bs-target="[rtOutMode=='Return Out / History' ? '' : '#searchSupplier']" ><i class="fa-solid fa-pen"></i> (shift+c)</span>
                                                         </div>
                                                     </div>
                                                 </td>
                                             </tr>      
                                             <tr>
-                                                <td class="text-end">Location :</td>
+                                                <td class="text-end fw-bold">Location :</td>
                                                 <td class="">
                                                     <select class="form-control-plaintext p-0 disabled change-cursor border-bottom" v-model="location">
                                                         <option value="Main">Main</option>
@@ -76,7 +76,7 @@
                                   </table>
                                 </div>
                             </div>                               
-                              <div class="vh-50 overflow-y-auto">
+                              <div class="vh-55 overflow-y-auto">
                                 <table class="table table-bordered table-hover mb-0">
                                     <tbody class="small fw-bold table-group-divider">
                                         <tr class="table-secondary">
@@ -125,7 +125,7 @@
                                     </tbody>
                                 </table>
                                 </div>
-                                <table class="table table-bordered">
+                                <table class="table table-bordered table-hover mb-0">
                                     <tbody class="table-group-divider">
                                         <tr>
                                             <td  class="text-end pe-2 fw-bold col-3">Paid</td>
@@ -195,7 +195,7 @@ import * as rtOut from "@/lib/snapshot/returnOut"
 import setQtyModal from "@/views/modals/setQtyModal.vue";
 import setDiscountModal from "@/views/modals/setDiscountModal.vue";
 import FlatPickr from 'vue-flatpickr-component';
-
+import * as hc from "@/lib/handleCtrl"
 
 export default {
     components: {
@@ -308,38 +308,9 @@ export default {
             if (event.ctrlKey && event.key === 'p') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.printRtOut(); // Call your custom function
-            }
-            if (event.ctrlKey && event.key === 'b') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const browse=document.getElementById("browse")
-                browse.click();
-            }
-            if (event.ctrlKey && event.key === 'e') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                 this.goEdit();
-            }
-            if (event.ctrlKey && event.key === 'i') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const des=document.getElementById("description")
-                des.click();
-            }
-            if (event.shiftKey && event.key.toLowerCase() === 'c') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const des=document.querySelector(".supplier-modal")
-                des.click();
-            }
-            if (event.ctrlKey && event.key === 'h') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const cus=document.querySelector(".close-supplier")
-                cus.click();
-            
-            }
-            if (event.ctrlKey && event.key === 'z') {
-                event.preventDefault(); // Prevent the default browser save dialog              
-                const sCus=document.querySelector(".clear-supplier")
-                sCus.click();
-               
-            }
+            }        
+         
+            return hc.handleCtrl(event)        
             
         },      
          
@@ -436,15 +407,15 @@ export default {
                         })  
                        const sale_unit=units[0][0]     
                        let amount=0;
-                    //   let qty_pur_price=0;
-                     /*  if(sale_unit=="largest_unit"){
-                            qty_pur_price=this.sale_type=='retail' ? f.retail_price.largest_unit : f.whole_sale_price.largest_unit
+                       let qty_pur_price=0;
+                       if(sale_unit=="largest_unit"){
+                            qty_pur_price= f.pur_price.largest_unit
                          }else if(sale_unit=="medium_unit"){
-                            qty_pur_price=this.sale_type=='retail' ? f.retail_price.medium_unit : f.whole_sale_price.medium_unit
+                            qty_pur_price=f.pur_price.medium_unit
                         }else if(sale_unit=="smallest_unit"){
-                            qty_pur_price=this.sale_type=='retail' ? f.retail_price.smallest_unit : f.whole_sale_price.smallest_unit
-                        }*/ //get price from retail or wholesale
-                      // f.qty_pur_price=oeiqty_pur_price;
+                            qty_pur_price= f.pur_price.smallest_unit
+                        } //get price from retail or wholesale
+                       f.qty_pur_price=f.qty_pur_price >0 ? f.qty_pur_price : qty_pur_price;
 
                        if(sale_unit=="largest_unit"){
                            amount=Math.floor((f.qty_pur_price / (f.packing_size.medium_qty * f.packing_size.smallest_qty)) * f.pur_qty)

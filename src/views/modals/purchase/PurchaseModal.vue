@@ -1,6 +1,6 @@
 <template lang="">
     <!-- Products Modal -->
-    <div class="modal fade" id="purchaseModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal fade" id="purchaseModal" data-bs-backdrop="false"  tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
        <div class="modal-dialog modal-fullscreen">
          <div class="modal-content">               
            <div>
@@ -64,7 +64,7 @@
                                             </button>
                                         </div>-->
                                         <div class="col-6 d-grid">
-                                            <button class="btn btn-sm text-dark" data-bs-dismiss="modal" aria-label="Close" id="closeModal"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+h)</button>
+                                            <button class="btn btn-sm text-dark close-purchase" data-bs-dismiss="modal" aria-label="Close" ><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                                         </div>
                                 </div>
                                 </div>
@@ -72,10 +72,10 @@
                         </div>
                         <div class="col-lg-9">
                             <div class="card shadow-sm">
-                                <div class="card-body p-2">
+                                <div class="card-body p-2 vh-95 overflow-y-auto">
                                     <table class="table table-bordered table-hover m-0">
                                         <tbody class="">
-                                            <tr class="table-secondary text-center">
+                                            <tr class="table-secondary text-center fw-bold">
                                                 <td class="col-1">Voucher no.</td>
                                                 <td class="col-1">Pur date</td>                                    
                                                 <td class="col-4">Supplier</td>

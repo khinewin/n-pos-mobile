@@ -45,7 +45,7 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4 pt-2 fw-bold">Voucher no. :</td>
+                                            <td class="text-end col-4 pt-2 fw-bold">Voucher No. :</td>
                                             <td class="col-8 py-0">
                                                 <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
                                             </td>
@@ -55,7 +55,8 @@
                                             <td class="py-0">
                                                 <input type="date" :class="{'border-0 border-bottom border-danger' : v$.created_at.$errors.length > 0}"  v-model="created_at" class="form-control-plaintext border-bottom" id="created_at" placeholder="Date">                                                
                                             </td>
-                                        </tr>                                       
+                                        </tr>     
+                                                                          
                                     </tbody>
                               </table>
                             </div>

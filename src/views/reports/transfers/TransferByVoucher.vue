@@ -13,35 +13,50 @@
             <div class="col-12 mb-2">
                 <div class="card">
                     <div class="card-body p-2">
-                        <div class="mb-2">
-                            <table class="table mb-0 table-borderless ">
-                                <tbody class="small">
-                                    <tr>
-                                        <td class="text-end col-2 fw-bold">From location :</td>
-                                        <td class="col-4  ps-2">
-                                            {{from_location}}
-                                        </td>                                                            
-                                
-                                        <td class="text-end fw-bold">Voucher no. :</td>
-                                        <td class="ps-2">
-                                            {{stock.voucher_no}}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-end col-2  fw-bold">To location :</td>
-                                        <td class="ps-2 col-4">
-                                           <span > {{to_location}}</span>
-                                        </td>
-                                                                                                    
-                                
-                                        <td class="text-end   fw-bold">Date :</td>
-                                        <td class="ps-2">
-                                           <span v-if="stock.created_at"> {{showTime(stock.created_at)}}</span>
-                                        </td>
-                                    </tr>                               
-                                </tbody>
-                          </table>
-                        </div>         
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <table class="table mb-0 table-borderless ">
+                                    <tbody class="small">
+                                        <tr>
+                                            <td class="text-end col-4 fw-bold">From Location :</td>
+                                            <td class="col-8  ps-2">
+                                                {{from_location}}
+                                            </td>                                                            
+                                        </tr>                                     
+                                        <tr>
+                                            <td class="text-end   fw-bold">To Location :</td>
+                                            <td class="ps-2 ">
+                                               <span > {{to_location}}</span>
+                                            </td>                                                                                                        
+                                        </tr>                                                             
+                                    </tbody>
+                              </table>
+                            </div>   
+                            <div class="col-6">
+                                <table class="table mb-0 table-borderless ">
+                                    <tbody class="small">
+                                        <tr>                                           
+                                            <td class="text-end col-4   fw-bold">Date :</td>
+                                            <td class="ps-2 col-8">
+                                               <span v-if="stock.created_at"> {{showTime(stock.created_at)}}</span>
+                                            </td>                                                        
+                                        </tr>
+                                        <tr>
+                                            <td class="text-end fw-bold">Voucher No. :</td>
+                                            <td class="ps-2">
+                                                {{stock.voucher_no}}
+                                            </td>
+                                        </tr>            
+                                        <tr>
+                                            <td class="text-end fw-bold">Remark :</td>
+                                            <td class="ps-2">
+                                                {{stock.remark}}
+                                            </td>
+                                        </tr>                                                              
+                                    </tbody>
+                              </table>
+                            </div>      
+                        </div>   
                         <table class="table table-bordered  table-hover mb-0">
                             <tbody>
                                 <tr class="small text-center fw-bold table-secondary">

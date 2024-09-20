@@ -2,10 +2,10 @@
     <div class="container-fluid my-4">   
         <div class="row fixed-top ps-2 pt-2">
             <div class="col-2">
-                <button class="btn" @click="goBack"><i class="fa-solid fa-circle-chevron-left"></i></button>
+                <button class="btn" @click="goBack"><i class="fa-solid fa-circle-chevron-left"></i> (Esc)</button>
             </div>
             <div class="col-2">
-                <button class="btn" @click="print"><i class="fa-solid fa-print"></i></button>
+                <button class="btn" @click="print"><i class="fa-solid fa-print"></i> (ctrl+p)</button>
             </div>
           
         </div>        
@@ -106,7 +106,12 @@ export default {
                 this.displayReportType="Stock list with Purchase and Sale Price"
                 this.is_stock_list_pur_sale_price=true;
             }
+        window.addEventListener('keydown', this.handleCtrl);
+
     },
+    beforeUnmount() {
+         window.removeEventListener('keydown', this.handleCtrl);
+     },
    watch:{
    
     msg:{
@@ -125,13 +130,19 @@ export default {
         user(){
             return this.$store.getters.user;
         },
-        report_type(){
-            return this.$store.getters.reportType;
-        },
-      
+    
     },
     methods:{
-        
+        handleCtrl(event) {                    
+            if (event.ctrlKey && event.key === 'p') {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.print(); // Call your custom function
+            }   
+            if (event.key==="Escape") {
+                event.preventDefault(); // Prevent the default browser save dialog
+                this.goBack();
+            }                                   
+        },
         async print () {
         // Pass the element id here
          await this.$htmlToPaper('printMe');

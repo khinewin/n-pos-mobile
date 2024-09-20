@@ -49,8 +49,8 @@
                               </table>
                             </div>
                             <div class="col-12">
-                                <table class="table table-bordered table-hover border-dark mt-2 mb-0">
-                                    <tbody class="">
+                                <table class="table table-bordered table-hover  mt-2 mb-0">
+                                    <tbody class="table-group-divider">
                                         <tr class="text-center fw-bold">
                                             <td class="col-1">No.</td>
                                             <td class="col-2">Description</td>
@@ -80,41 +80,44 @@
                                            
                                         </tr>                        
                                     </tbody>
-                                    <tbody>
+                                  
+                              </table>      
+                              <table class="table table-bordered table-hover mb-0">
+                                    <tbody class="table-group-divider">
                                         <tr>
-                                            <td colspan="7" class="text-end pe-2 border-bottom fw-bold rm-b-b" >Total Amount (Ks)</td>
-                                            <td class="text-end ">{{fM(sale.total_amount)}}</td>
-                                        </tr>                     
-                                        <tr>
-                                            <td colspan="7" class="text-end  pe-2 border-bottom fw-bold rm-b-b " >Extra Discount (Ks)</td>
-                                            <td class="text-end ">
+                                            <td  class="text-end pe-2 rm-b-b col-3 fw-bold">Total Amount (Ks)</td>
+                                            <td class="text-end col-3 ">{{fM(sale.total_amount)}}</td>
+                                            <td  class="text-end  pe-2 col-3 rm-b-b fw-bold">Extra Discount (Ks)</td>
+                                            <td class="text-end col-3 ">
                                                 {{fM(sale.extra_discount)}}
                                             </td>
-                                        </tr>
+                                        </tr>                     
                                         <tr>
-                                            <td colspan="7" class="text-end   pe-2 border-bottom fw-bold rm-b-b" >Net Amount (Ks)</td>
-                                            <td class="text-end ">{{fM(sale.net_amount)}}</td>
-                                        </tr>
-                                        <tr >
-                                            <td colspan="7" class="text-end   pe-2 border-bottom fw-bold rm-b-b " >Paid (Ks)</td>
+                                           
+                                            <td  class="text-end col-3  pe-2 rm-b-b fw-bold">Net Amount (Ks)</td>
+                                            <td class="text-end col-3 ">{{fM(sale.net_amount)}}</td>
+                                                        
+                                            <td  class="text-end pe-2 rm-b-b fw-bold">Paid (Ks)</td>
                                             <td class="text-end">
                                                 {{fM(sale.paid)}}
-                                            </td>
+                                            </td>                                            
                                         </tr>
                                         <tr>
-                                            <td colspan="7" class="text-end   pe-2 border-bottom fw-bold rm-b-b"  >Change</td>
+                                            <td  class="text-end   pe-2 fw-bold" >Change (Ks)</td>
                                             <td class="text-end ">
                                                 {{fM(sale.change)}}
-                                            </td>
-                                        </tr> 
-                                        <tr>
-                                            <td colspan="7" class="text-end   pe-2 fw-bold " >Credit</td>
+                                            </td>        
+                                            <td  class="text-end   pe-2 fw-bold" >Credit (Ks)</td>
                                             <td class="text-end ">
                                                 {{fM(sale.credit)}}
                                             </td>
-                                        </tr>                           
+                                        </tr>    
+                                        <tr>
+                                            <td class="text-end fw-bold pe-2">Remark</td>
+                                            <td colspan="3">{{sale.remark}}</td>
+                                        </tr>
                                     </tbody>
-                              </table>                             
+                              </table>                       
                             </div>                          
                         </div>
                     </div>

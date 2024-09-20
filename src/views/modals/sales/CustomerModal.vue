@@ -38,8 +38,8 @@
                                     <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
                                     <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                 </button></div>-->
-                                <div class="col-6 d-grid"><button class="btn btn-sm text-dark customer-modal" data-bs-dismiss="modal">
-                                    <i class="fa-solid fa-circle-xmark"></i> Close (cltr+h)</button>
+                                <div class="col-6 d-grid"><button class="btn btn-sm text-dark close-customer" data-bs-dismiss="modal">
+                                    <i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                                 </div>     
                              </div> 
                         </div>
@@ -47,10 +47,10 @@
                    </div>                        
                    <div class="col-lg-9">
                        <div class="card shadow-sm">
-                           <div class="card-body p-2 table-responsive">
+                           <div class="card-body p-2 vh-95 overflow-y-auto">
                                <table class="table table-bordered table-hover mb-0">
                                    <tbody class="small">
-                                       <tr class="text-center table-secondary " >
+                                       <tr class="text-center table-secondary fw-bold" >
                                            <td class="col-1" @click="sortCustomers('code')"><i class="fa-solid fa-sort"></i> Code</td>
                                            <td @click="sortCustomers('name')" class="col-2"><i class="fa-solid fa-sort"></i> Name</td>
                                            <td class="col-1" @click="sortCustomers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>

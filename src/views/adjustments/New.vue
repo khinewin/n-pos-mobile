@@ -17,22 +17,38 @@
                 <div class="card-body p-2">
                     <form @submit.prevent="saveAdjustment">
                         <div class="row justify-content-end mb-2">
-                            <div class="col-sm-12">
+                            <div class="col-sm-6">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-2 ">Location :</td>
-                                            <td class="col-2">
+                                            <td class="text-end col-4 fw-bold">Location :</td>
+                                            <td class="col-8">
                                                 <select v-model="location" class="form-control-plaintext py-0  border-bottom" :disabled="storeItems.length > 0">
                                                     <option>Main</option>
                                                     <option>Pharmacy</option>
                                                 </select>
-                                            </td>
-                                            <td class="text-end col-2 ">Voucher no. :</td>
-                                            <td class="col-2">
+                                            </td>                                           
+                                        </tr>        
+                                        <tr>
+                                            <td class="text-end col-4 fw-bold">Remark :</td>
+                                            <td class="col-8">
+                                             <input type="text" v-model="remark" class="form-control-plaintext py-0 border-bottom" placeholder="Remark">
+                                            </td>                                           
+                                        </tr>                                       
+                                    </tbody>
+                              </table>
+                            </div>
+                            <div class="col-sm-6">
+                                <table class="table mb-0 table-borderless">
+                                    <tbody>
+                                        <tr>                                          
+                                            <td class="text-end col-2 fw-bold col-4">Voucher No. :</td>
+                                            <td class="col-8">
                                                 <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext py-0  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
-                                            </td>                                       
-                                            <td class="col-2 text-end ">Date :</td>
+                                            </td> 
+                                        </tr>
+                                        <tr>                                      
+                                            <td class="col-2 text-end fw-bold">Date :</td>
                                             <td class="col-2">
                                                 <flat-pickr class="form-control-plaintext py-0 border-bottom" v-model="created_at"  :config="config" />
                                             </td>
@@ -47,7 +63,7 @@
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
-                                    <td class="col-2 change-cursor" id="description" data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Description (ctrl+i)</td>
+                                    <td class="col-2 change-cursor description"  data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Description (ctrl+i)</td>
                                     <td class="col-1">Packing size</td>
                                     <td class="col-1">Before Adj</td>
                                     <td class="col-1">Adj type</td>
@@ -57,15 +73,15 @@
                                     <td class="col-2">Remark</td>                                                                                       
                                 </tr>
                                 <tr class="" v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id"  @mouseenter="setEdit(i)">
-                                    <td class="text-center position-relative pt-2">
+                                    <td class="text-center position-relative ">
                                             {{st.code_no}}                                           
                                             <a class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                     </td>
-                                    <td class="pt-2">{{st.item_name}}</td>
-                                    <td class="pt-2">
+                                    <td class="">{{st.item_name}}</td>
+                                    <td class="">
                                         {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                     </td>
-                                    <td class="pt-2 text-center">
+                                    <td class=" text-center">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.before_adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>
                                     <td>
@@ -74,20 +90,20 @@
                                             <option>Decrement</option>
                                         </select>
                                     </td>
-                                    <td class="text-center pt-2 table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                    <td class="text-center  table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>     
-                                    <td class="pt-2 text-center">
+                                    <td class=" text-center">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.after_adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>      
-                                    <td class="p-0">
+                                    <td class="">
                                         <select class="form-control-plaintext py-0 text-center" v-model="st.rts_rfs">
                                             <option>Yes</option>
                                             <option>No</option>
                                         </select>
                                     </td>                                                         
                                     <td class="p-0">
-                                        <input  type="text" v-model="st.remark" class="form-control-plaintext py-0 text-center" placeholder="Remark">                                       
+                                        <input  type="text" v-model="st.remark" class="form-control-plaintext py-0" placeholder="Remark">                                       
                                     </td>              
                                                                                             
                                 </tr>         
@@ -113,7 +129,7 @@ import ProductModal from '@/views/modals/purchase/ProductModal.vue'
 import * as hp from "@/lib/helper"
 import setQtyModal from "@/views/modals/setQtyModal.vue";
 import FlatPickr from 'vue-flatpickr-component';
-
+import * as hc from "@/lib/handleCtrl"
 
 export default {
     components: {
@@ -143,6 +159,7 @@ export default {
             adj_item: {},
             storeItems: [],
             editItem: {},         
+            remark:"",
            
             isLoading:false,
             isSaving:false,
@@ -184,11 +201,7 @@ export default {
     
     methods:{
         handleCtrl(event) {
-            if (event.ctrlKey && event.key === 'h') {
-                event.preventDefault(); // Prevent the default browser save dialog
-               const p=document.querySelector(".close-product")
-                p.click();
-            }
+          
             if (event.ctrlKey && event.key === 's') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.saveAdjustment(); // Call your custom function
@@ -197,13 +210,8 @@ export default {
                 event.preventDefault(); // Prevent the default browser save dialog
                 const des=document.querySelector(".close")
                 des.click();
-            }         
-          
-            if (event.ctrlKey && event.key === 'i') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const des=document.getElementById("description")
-                des.click();
-            }
+            }                 
+            return hc.handleCtrl(event)
         },
         setAdjQty(){
             const e=this.editItem;
@@ -315,7 +323,8 @@ export default {
                 created_at: Timestamp.fromDate(created_at),    
                 location: this.location,       
                 products : this.storeItems,
-                user : {uid: this.user.uid, displayName: this.user.displayName},              
+                user : {uid: this.user.uid, displayName: this.user.displayName},          
+                remark: this.remark,    
             }      
             const saveDocument=collection(db, "adjustments")
             await addDoc(saveDocument, voucher)                                
@@ -328,6 +337,7 @@ export default {
             this.storeItems=[]
             this.adj_item=null
             this.editItem={}           
+            this.remark="";
             this.v$.$reset()
        }, 
        updateProducts(){

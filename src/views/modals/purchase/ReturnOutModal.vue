@@ -14,7 +14,7 @@
                                            <div class="col-md-4 col-lg-12">
                                             <div class="form-floating">
                                                 <input type="search" id="search_by_voucher_no" @paste="searchRtOut" v-model="search_by_voucher_no" @keypress.enter="searchRtOut" placeholder="Voucher no." class="form-control-plaintext border-bottom">
-                                                <label for="search_by_voucher_no" class="">Voucher no.</label>
+                                                <label for="search_by_voucher_no" class="">Voucher No.</label>
                                             </div>
                                            </div>
                                            <div class="col-md-4 col-lg-12">
@@ -27,7 +27,7 @@
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
                                                     <flat-pickr @change="searchRtOut" class="form-control-plaintext border-bottom" v-model="search_by_date" id="from_date" :config="config" />
-                                                    <label for="from_date">From date</label>
+                                                    <label for="from_date">From Date</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                                </div>
@@ -36,7 +36,7 @@
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
                                                     <flat-pickr @change="searchRtOut" class="form-control-plaintext border-bottom" v-model="search_to_date" id="to_date" :config="config" />
-                                                    <label for="to_date">To date</label>
+                                                    <label for="to_date">To Date</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                                </div>
@@ -44,7 +44,7 @@
                                     </div>
                                     <div class="row mt-2">
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark clear-rtout-modal"  @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
+                                                <button class="btn btn-sm text-dark clear-search-rtout"  @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                             </div>
                                             <!--<div class="col-4 d-grid">
                                                 <button class="btn btn-sm text-dark" @click="updatertOuts">
@@ -53,7 +53,7 @@
                                                 </button>
                                             </div>-->
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark rt-out-modal" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+h)</button>
+                                                <button class="btn btn-sm text-dark close-rtout" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                                             </div>
                                     </div>
                                     </div>
@@ -61,11 +61,11 @@
                         </div>
                         <div class="col-lg-9">
                             <div class="card shadow-sm">
-                                <div class="card-body p-2">
+                                <div class="card-body p-2 vh-95 overflow-y-auto">
                                     <table class="table table-bordered table-hover m-0">
                                         <tbody>
                                             <tr class="table-secondary text-center fw-bold">
-                                                <td class="col-1">Voucher no.</td>
+                                                <td class="col-1">Voucher No.</td>
                                                 <td class="col-1">Location</td>
                                                 <td class="col-2">Supplier</td>
                                                 <td class="col-1">Phone</td>

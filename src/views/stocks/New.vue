@@ -13,7 +13,7 @@
                         <router-link :to="{name : 'Stocks'}" class="btn btn-sm close"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</router-link>
                 </div>
             </div>
-            <div class="card shadow min-vh-75">
+            <div class="card shadow">
                 <div class="card-body p-2">
                     <form @submit.prevent="saveStocks" >
                         <div class="row justify-content-end mb-2">
@@ -21,13 +21,26 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4">Voucher no. :</td>
+                                            <td class="text-end col-4 fw-bold">Remark :</td>
+                                            <td class="col-8">
+                                                <input type="text" v-model="remark" class="form-control-plaintext p-0  border-bottom" id="remark" placeholder="Remark">                                                
+                                            </td>
+                                        </tr>
+                                                                            
+                                    </tbody>
+                              </table>
+                            </div>
+                            <div class="col-sm-6">
+                                <table class="table mb-0 table-borderless">
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-end col-4 fw-bold">Voucher No. :</td>
                                             <td class="col-8">
                                                 <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext p-0  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end">Date :</td>
+                                            <td class="text-end fw-bold">Date :</td>
                                             <td class="">
                                                 <flat-pickr class="form-control-plaintext p-0 border-bottom" v-model="created_at"  :config="config" />
                                             </td>
@@ -35,12 +48,13 @@
                                     </tbody>
                               </table>
                             </div>
-                        </div>                       
+                        </div>    
+                        <div class="vh-65 overflow-y-auto">                   
                         <table class="table table-bordered  mb-0 table-hover">
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
-                                    <td class="col-2 change-cursor" data-bs-toggle="modal" id="description" data-bs-target="#searchCode" style="cursor: context-menu;"><i class="fa-solid fa-circle-plus"></i> Description (ctrl+i)</td>
+                                    <td class="col-2 change-cursor description" data-bs-toggle="modal"  data-bs-target="#searchCode" style="cursor: context-menu;"><i class="fa-solid fa-circle-plus"></i> Description (ctrl+i)</td>
                                     <td class="col-1">Packing size</td>
                                     <td class="col-1 table-info">Main Inv Bal</td>     
                                     <td class="col-1 table-info">Pharmacy Inv Bal</td>   
@@ -79,7 +93,8 @@
                                     </td>                                                                                    
                                 </tr>                                                                                                                
                             </tbody>
-                        </table>                                                                                                                    
+                        </table>    
+                        </div>                                                                                                                
                     </form>               
           
                 </div>
@@ -101,7 +116,7 @@ import ProductModal from '@/views/modals/stocks/ProductModal.vue'
 import SetQty from '@/views/modals/stocks/SetQty.vue'
 import SetPrice from '@/views/modals/stocks/SetPrice.vue'
 import FlatPickr from 'vue-flatpickr-component';
-
+import * as hc from "@/lib/handleCtrl"
 
 import * as ss from "@/lib/snapshot/products"
 import * as hp from "@/lib/helper"
@@ -118,6 +133,7 @@ export default {
                 voucher_no: {required},             
                 created_at: {required},              
                 storeItems : {required}
+                
             }
     },
     data(){
@@ -132,7 +148,8 @@ export default {
             created_at:"",         
             stock_item: {},
             storeItems: [],
-            editItem: {},        
+            editItem: {},    
+            remark:"",    
           //  total_retail_amount:0,
           //  total_whole_sale_amount:0, 
            // total_main_retail_amount:0,
@@ -181,12 +198,7 @@ export default {
     
     methods:{       
      
-        handleCtrl(event) {
-            if (event.ctrlKey && event.key === 'h') {
-                event.preventDefault(); // Prevent the default browser save dialog
-               const p=document.querySelector(".close-product")
-                p.click();
-            }
+        handleCtrl(event) {          
             if (event.ctrlKey && event.key === 's') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.saveStocks(); // Call your custom function
@@ -195,18 +207,7 @@ export default {
                 event.preventDefault(); // Prevent the default browser save dialog
                 const des=document.querySelector(".close")
                 des.click();
-            }         
-          
-            if (event.ctrlKey && event.key === 'z') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const des=document.querySelector(".clear-search-product")
-                des.click();
-            }
-            if (event.ctrlKey && event.key === 'i') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const des=document.getElementById("description")
-                des.click();
-            }
+            }                         
             if (event.ctrlKey && event.key === 'a') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 const des=document.querySelector(".add-all")
@@ -217,6 +218,7 @@ export default {
                 const des=document.querySelector(".auto-cal")
                 des.click();
             }
+            return hc.handleCtrl(event)
         },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
@@ -342,7 +344,8 @@ export default {
                 voucher_no: this.voucher_no,
                 created_at: Timestamp.fromDate(created_at),           
                 products : this.storeItems,
-                user : {uid: this.user.uid, displayName: this.user.displayName},              
+                user : {uid: this.user.uid, displayName: this.user.displayName},        
+                remark:this.remark,      
             }      
             const saveDocument=collection(db, "stocks")
             await addDoc(saveDocument, voucher)                                                  
@@ -369,6 +372,7 @@ export default {
             this.storeItems=[]
             this.stock_item=null
             this.editItem={}        
+            this.remark="",
             this.v$.$reset()
         },
        showTime(t){

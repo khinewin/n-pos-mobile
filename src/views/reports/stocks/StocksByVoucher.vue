@@ -10,24 +10,39 @@
          <div class="row" v-if="reports" v-for="stock in reports">
             <div class="col-12 mb-2">
                 <div class="card">
-                    <div class="card-body p-2">
-                        <div class="mb-2">
-                            <table class="table mb-2  table-borderless">
-                                <tbody class="small">
-                                    <tr>
-                                        <td class="text-end col-2 p-0 fw-bold">Voucher no. :</td>
-                                        <td class="col-2 p-0 ps-2">
-                                            {{stock.voucher_no}}
-                                        </td>                                                             
-                                
-                                        <td class="text-end col-2 p-0 fw-bold">Date :</td>
-                                        <td class="col-2 p-0  ps-2">
-                                           <span v-if="stock.created_at"> {{showTime(stock.created_at)}}</span>
-                                        </td>
-                                    </tr>                               
-                                </tbody>
-                          </table>
-                        </div>         
+                    <div class="card-body p-2 ">
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <table class="table table-borderless mb-0">
+                                    <tbody class="small">
+                                        <tr>
+                                            <td class="text-end col-4 p-0 fw-bold">Remark :</td>
+                                            <td class="col-8 p-0 ps-2">
+                                                {{stock.remark}}
+                                            </td>                                                                                              
+                                        </tr>                               
+                                    </tbody>
+                              </table>
+                            </div>   
+                            <div class="col-6">
+                                <table class="table  table-borderless mb-0">
+                                    <tbody class="small">
+                                        <tr>
+                                            <td class="text-end col-4 p-0 fw-bold">Voucher no. :</td>
+                                            <td class="col-8 p-0 ps-2">
+                                                {{stock.voucher_no}}
+                                            </td>                                                             
+                                        </tr>
+                                        <tr>
+                                            <td class="text-end  p-0 fw-bold">Date :</td>
+                                            <td class=" p-0  ps-2">
+                                               <span v-if="stock.created_at"> {{showTime(stock.created_at)}}</span>
+                                            </td>
+                                        </tr>                               
+                                    </tbody>
+                              </table>
+                            </div>   
+                        </div>
                         <table class="table table-bordered mb-0  table-hover">
                             <tbody>
                                 <tr class="small text-center fw-bold table-secondary">

@@ -4,7 +4,7 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">
                 <div class="col-sm-2 d-grid">
-                    <button @click="print" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-print"></i> Print (ctrl+p)</button>
+                    <button @click="print" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-print"></i> Print (ctrl+p)</button>
                 </div>                
                 <!--<div class="col-sm-2 d-grid">
                         <button @click="goEdit" class="btn btn-sm" :class="{'disabled': !voucher_no || stock_user.uid !== user.uid}"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
@@ -16,7 +16,7 @@
                     <router-link :to="{name : 'NewAdjustment'}" class="btn btn-sm new"><i class="fa-solid fa-square-plus"></i> New (shift+n)</router-link>
             </div>
                 <div class="col-sm-2 d-grid">
-                        <button @click="closeAdjustment" class="btn btn-sm" :class="{'disabled': !voucher_no}"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
+                        <button @click="closeAdjustment" class="btn btn-sm" :disabled=" !voucher_no"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
                 </div>
             </div>
             <div class="card shadow" id="printMe">
@@ -26,26 +26,39 @@
                 </div>
                 <div class="card-body p-2">
                         <div class="row justify-content-end mb-2">
-                            <div class="col-sm-12">
+                            <div class="col-sm-6">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-2">Location :</td>
-                                            <td class="col-2">
+                                            <td class="text-end col-4 fw-bold">Location :</td>
+                                            <td class="col-8">
                                                     {{location}}
                                             </td>
-
-                                            <td class="text-end col-2">Voucher no. :</td>
-                                            <td class="col-2">
-                                                {{voucher_no}}
-                                            </td>
-                                     
-                                            <td class="text-end col-2">Date :</td>
-                                            <td class="col-2">
-                                               <span v-if="created_at"> {{showTime(created_at)}}</span>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-end col-4 fw-bold">Remark :</td>
+                                            <td class="col-8">
+                                                    {{remark}}
                                             </td>
                                         </tr>
-                                       
+                                    </tbody>
+                              </table>
+                            </div>
+                            <div class="col-sm-6">
+                                <table class="table mb-0 table-borderless">
+                                    <tbody>
+                                        <tr>                                         
+                                            <td class="text-end col-4 fw-bold">Voucher No. :</td>
+                                            <td class="col-8">
+                                                {{voucher_no}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-end  fw-bold">Date :</td>
+                                            <td class="">
+                                               <span v-if="created_at"> {{showTime(created_at)}}</span>
+                                            </td>
+                                        </tr>                                       
                                     </tbody>
                               </table>
                             </div>
@@ -114,6 +127,7 @@ import AdjustmentModal from '@/views/modals/adjustments/AdjustmentModal.vue'
 import * as hp from "@/lib/helper.js"
 import * as ss from "@/lib/snapshot/adjustments"
 import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
+import * as hc from "@/lib/handleCtrl"
 
 export default {
     components: {
@@ -142,6 +156,7 @@ export default {
             total_whole_sale_amount:0,    
             total_pur_amount:0,  
             isLoading:false,
+            remark:"",
             msg : {
                 type :"",
                 info :"",
@@ -165,17 +180,7 @@ export default {
     
     methods:{    
         handlectrl(event) {
-         
-         if (event.ctrlKey && event.key === 'h') {
-             event.preventDefault(); // Prevent the default browser save dialog
-             const modal=document.querySelector(".close-adj-modal");
-             modal.click();
-         }
-         if (event.ctrlKey && event.key === 'z') {
-             event.preventDefault(); // Prevent the default browser save dialog
-             const modal=document.querySelector(".clear-adj-modal");
-             modal.click();
-         }
+       
          if (event.ctrlKey && event.key === 'q') {
              event.preventDefault(); // Prevent the default browser save dialog             
              this.closeAdjustment(); // Call your custom function
@@ -184,18 +189,13 @@ export default {
              event.preventDefault(); // Prevent the default browser save dialog
              //this.printSale(); // Call your custom function
              this.print();
-         }
-         if (event.ctrlKey && event.key === 'o') {
-             event.preventDefault(); // Prevent the default browser save dialog
-             const browse=document.querySelector(".open")
-             browse.click();
-         }
-    
+         }          
          if(event.shiftKey && event.key.toLowerCase()=== 'n') {
              event.preventDefault(); // Prevent the default browser save dialog
              const add=document.querySelector(".new")
              add.click();
          }
+         return hc.handleCtrl(event)
       
      },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
@@ -221,6 +221,7 @@ export default {
             this.total_retail_amount=0,
            this.total_whole_sale_amount=0;
            this.total_pur_amount=0;
+           this.remark="";
         },
      
         setCode(p){           
@@ -234,6 +235,7 @@ export default {
             this.total_retail_amount=p.total_retail_amount;
             this.total_pur_amount=p.total_pur_amount
             this.total_whole_sale_amount=p.total_whole_sale_amount
+            this.remark=p.remark;
         },    
         
        showTime(t){

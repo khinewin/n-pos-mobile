@@ -28,13 +28,13 @@
                             </div>
                         </div>
                           <div class="row mt-2">
-                            <div class="col-6 d-grid"><button class="btn btn-sm text-dark clear-supplier" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button></div>
+                            <div class="col-6 d-grid"><button class="btn btn-sm text-dark clear-search-supplier" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button></div>
                             <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                 </button>
                             </div>-->
                             <div class="col-6 d-grid">
-                                <button class="btn btn-sm text-dark close-supplier" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (cltr+h)</button>
+                                <button class="btn btn-sm text-dark close-supplier" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                             </div>
                           </div> 
                      </div>
@@ -42,10 +42,10 @@
                 </div>                        
                 <div class="col-lg-9">
                     <div class="card shadow-sm">
-                        <div class="card-body p-2 table-responsive">
+                        <div class="card-body p-2 table-responsive vh-95 overflow-y-auto">
                             <table class="table table-bordered table-hover mb-0">
                                 <tbody>
-                                    <tr class="text-center table-secondary">
+                                    <tr class="text-center table-secondary fw-bold">
                                         <td class="col-1" @click="sortSuppliers('code')"><i class="fa-solid fa-sort"></i> Code</td>
                                         <td class="col-2" @click="sortSuppliers('name')"><i class="fa-solid fa-sort"></i> Name</td>
                                         <td class="col-1" @click="sortSuppliers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>

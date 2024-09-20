@@ -21,13 +21,13 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4">Voucher no. :</td>
+                                            <td class="text-end col-4 fw-bold">Voucher no. :</td>
                                             <td class="col-8">
                                                 <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext p-0  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end ">Location :</td>
+                                            <td class="text-end fw-bold ">Location :</td>
                                             <td class="">
                                                 <select class="form-control-plaintext p-0 border-bottom" v-model="location" disabled>
                                                     <option value="Main">Main</option>
@@ -42,13 +42,13 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>                                      
                                         <tr>
-                                            <td class="text-end col-4">Purchase date :</td>
+                                            <td class="text-end col-4 fw-bold">Purchase date :</td>
                                             <td class="col-8">
                                                 <flat-pickr class="form-control-plaintext  p-0 border-bottom" v-model="pur_date" :config="config" />
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end">Supplier :</td>
+                                            <td class="text-end fw-bold">Supplier :</td>
                                             <td class="row g-2">
                                                 <div class="col-6">
                                                     <input type="text"  @click="changeSupplier" v-model="supplier.name"  class="form-control-plaintext p-0  border-bottom">                                                
@@ -110,7 +110,6 @@
                                     <td class="text-end  table-warning change-cursor" data-bs-toggle="modal" data-bs-target="#setDiscountModal">{{st.discount}}</td>
                                     <td class="text-end ">{{st.unit_cost}}</td>
                                 </tr>
-
                                 
                             </tbody>
                         </table>
@@ -118,24 +117,24 @@
                         <table class="table table-bordered table-hover">
                             <tbody>
                                 <tr class="small">
-                                    <td  class="text-end col-3 pe-2">Total</td>
+                                    <td  class="text-end col-3 pe-2 fw-bold">Total</td>
                                     <td class="text-end col-3">{{total}}</td>
                                   
-                                    <td  class="text-end pe-2 col-3">Extra discount</td>
+                                    <td  class="text-end pe-2 col-3 fw-bold">Extra discount</td>
                                     <td class="text-end col-3">
                                         <input @click="setInput" @mouseleave="setInput"  type="number" @keyup="calTotal"  v-model="extra_discount" class="form-control-plaintext p-0  text-end" placeholder="0">
                                     </td>
                                 </tr>                            
                                 <tr class="small">
-                                    <td  class="text-end pe-2">Paid</td>
+                                    <td  class="text-end pe-2 fw-bold">Paid</td>
                                     <td class="text-end">
                                         <input @click="setInput" @mouseleave="setInput" @keypress.enter="savePurchase"  type="number" @keyup="calTotal"  v-model="paid" class="form-control-plaintext p-0  text-end" placeholder="0">
                                     </td>
-                                    <td  class="text-end pe-2">Balance</td>
+                                    <td  class="text-end pe-2 fw-bold">Balance</td>
                                     <td class="text-end">{{balance}}</td>
                                 </tr>
                                 <tr class="small">
-                                    <td  class="text-end pe-2">Remark</td>
+                                    <td  class="text-end pe-2 fw-bold">Remark</td>
                                     <td class="text-end" colspan="3">
                                         <input @keypress.enter="savePurchase"  type="text"   v-model="remark" class="form-control-plaintext p-0 " placeholder="Remark">
                                     </td>                                   
@@ -168,7 +167,7 @@ import * as hp  from "@/lib/helper"
 import setQtyModal from "@/views/modals/setQtyModal.vue";
 import setDiscountModal from "@/views/modals/setDiscountModal.vue";
 import FlatPickr from 'vue-flatpickr-component';
-
+import * as hc from "@/lib/handleCtrl"
 
 export default {
     components: {
@@ -276,11 +275,7 @@ export default {
                 const des=document.getElementById("close")
                 des.click();
             }
-            if (event.shiftKey && event.key.toLowerCase() === 'c') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                const des=document.querySelector(".supplier")
-                des.click();
-            }
+          return hc.handleCtrl(event)
           
         },
         

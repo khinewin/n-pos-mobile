@@ -10,7 +10,7 @@
                         <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateData"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                         </button></div>-->
-                        <div class="col-4 d-grid"><button class="btn btn-sm text-dark close-p-z" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+h)</button></div>
+                        <div class="col-4 d-grid"><button class="btn btn-sm text-dark close-p-z" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button></div>
                  </div>
                    <div class="row g-2">
                     <div class="col-12 vh-75 overflow-y-auto">
