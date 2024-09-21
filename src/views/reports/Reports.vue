@@ -3,7 +3,7 @@
         <PageHeader page-title="Reports" page-code="reports" :msg-type="msg.type" :msg-info="msg.info" />        
             <div class="container-fluid">
             <div class="row g-2">
-                <div class="col-sm-6">
+                <div class="col-sm-8">
                     <div class="card  shadow min-vh-80">
                         <div class="card-body p-2 rounded small">
                             <div class="row g-2">                              
@@ -151,7 +151,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-4">
                     <div class="card shadow min-vh-80">
                         <div class="card-body p-2 small report">                                                                                      
                             <table class="table table-bordered table-hover">
@@ -235,12 +235,7 @@ export default {
     },
     data(){
         return{      
-            config: {
-                dateFormat: 'd/m/Y', // Flatpickr options
-                enableTime: false,
-                wrap: true, // set wrap to true only when using 'input-group'
-               // altFormat: 'M j, Y',
-            },  
+          
             adj_type:"",   
             rts_rfs: "",
             gt_equal:null,
@@ -367,6 +362,9 @@ export default {
     computed:{
         user(){
             return this.$store.getters.user;
+        },
+        config(){
+            return this.$store.getters.flat_pickr_config;
         }
         
     },

@@ -3,26 +3,26 @@
         <PageHeader page-title="SOC" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                                     
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-4 d-grid">
                     <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#customerModal"><i class="fa-solid fa-folder-tree"></i> Open (cltr+o)</button>
                 </div>
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-4 d-grid">
                     <button  class="btn btn-sm" :disabled="!customer.code"  @click="print"><i class="fa-solid fa-print" ></i> Print (cltr+p)</button>
                 </div>
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-4 d-grid">
                         <button type="button" @click="savePaid" class="btn btn-sm" v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save (cltr+s)
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-4 d-grid">
                         <button @click="closePage" class="btn btn-sm close" :disabled="!customer.id"><i class="fa-solid fa-circle-xmark"></i> Close (cltr+q)</button>
                 </div>
             </div>
         </div>     
         <div class="container-fluid my-2">
             <div class="card shadow">
-                <div class="card-body p-2">
-                    <div class="row justify-content-end small mb-2">
+                <div class="card-body p-2 small">
+                    <div class="row justify-content-end  mb-2">
                         <div class="col-6 col-sm-4 col-md-3">
                             <input @change="filterData" @keyup="filterData" type="number" class="form-control-plaintext py-0 text-center" v-model="display_item">
                         </div>
@@ -33,14 +33,14 @@
                             </select>
                         </div>
                         <div class="col-6 col-sm-4 col-md-3">
-                            <span>Customer : </span><span>{{customer.name}}</span>
+                            <span class="fw-bold">Customer : </span><span>{{customer.name}}</span>
                         </div>
                         <div class="col-6 col-sm-4 col-md-3">
-                            <span>Code : </span><span>{{customer.code}}</span>
+                            <span class="fw-bold">Code : </span><span>{{customer.code}}</span>
                         </div>                                           
                     </div>
                 <div class="row g-2">
-                    <div class="col-7">
+                    <div class="col-12 col-md-7">
                         <div class="card">
                             <div class="card-body p-2 vh-65 overflow-y-auto">
                                     <table class="table table-hover table-bordered mb-0">
@@ -98,10 +98,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-5">
+                    <div class="col-12 col-md-5">
                         <div class="card">
-                            <div class="card-body p-2 vh-65 overflow-y-auto">
-                                <table class="table table-hover      table-bordered ">
+                            <div class="card-body p-2 max-vh-65 overflow-y-auto">
+                                <table class="table table-hover      table-bordered  mb-0">
                                     <tbody>
                                         <tr class="text-center fw-bold table-secondary">
                                             <td class="col-1">Pay for</td>
@@ -159,12 +159,7 @@ export default {
     },
     data(){
         return{    
-            config: {
-                dateFormat: 'd/m/Y', // Flatpickr options
-                enableTime: false,
-                wrap: true, // set wrap to true only when using 'input-group'
-               // altFormat: 'M j, Y',
-            },   
+           
             display_item: 1,
             isLoading:false,
             customer:{},
@@ -218,7 +213,9 @@ export default {
         user(){
             return this.$store.getters.user;
         },
-        
+        config(){
+            return this.$store.getters.flat_pickr_config;
+        }
       
     },
     methods:{

@@ -84,8 +84,8 @@
                             </div>                                                     
                         </div>
                         <div class="col-12">
-                            <div class="h5  mb-2">Delete</div>
-                            <div class="row g-2">                                   
+                            <div class="h5  mb-2 change-cursor" @click="showDelete=!showDelete">Delete</div>
+                            <div class="row g-2" v-if="showDelete">                                   
                                 <div class="col-6 col-sm-4 d-grid">
                                     <button :disabled="products.length <=0" @click="deleteProducts" class="btn py-4 btn-outline-danger">Medicines Code ({{products.length}})</button>
                                 </div>
@@ -172,6 +172,7 @@ export default {
 
                 restore_file:"",
                 restore_name:"",
+                showDelete:false,
 
                 msg:{
                     info:"",
@@ -421,7 +422,7 @@ export default {
         },
 
         fetchProducts(){       
-            const query_url = query(collection(db, "products"), where("is_deleted", "==", false));
+            const query_url = query(collection(db, "products"));
             onSnapshot(query_url, async(snapShot) =>{                  
                         let products=hp_products.products(snapShot)  
                         products=products.map((p)=>{

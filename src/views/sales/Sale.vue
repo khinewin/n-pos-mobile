@@ -4,29 +4,29 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                           
            
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <select class="form-control-plaintext text-center small" @change="changeSaleType" :disabled="saleMode=='Sale / History'" v-model="sale_type">
                         <option value="retail">Retail</option>
                         <option value="whole_sale">Wholesale</option>
                     </select>
                 </div>    
-                <div class="col-6 col-sm-4 col-md-2 d-grid">    
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">    
                     <button class="btn btn-sm" @click="goEdit" :disabled="!id || user.uid != sale_user.uid"><i class="fa-solid fa-pen-to-square"></i> Edit (ctrl+e)</button>
                 </div>
                 
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button class="btn btn-sm open"  data-bs-toggle="modal" data-bs-target="#salesModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
                 </div>
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print (ctrl+p)</button>
                 </div>
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                         <button v-if="saleMode=='Sale / New' || saleMode=='Sale / History'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length <=0 || saleMode=='Sale / History' " >
                             <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>                      
                 </div>
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                         <button @click="clearSaleItem" class="btn btn-sm" :disabled="saleItems.length <=0"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
                 </div>
             </div>

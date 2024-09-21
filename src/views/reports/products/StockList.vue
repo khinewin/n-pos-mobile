@@ -1,6 +1,6 @@
 <template lang="">
-    <div class="">                                                     
-        <table class="table table-bordered border-dark table-hover mb-0">
+    <div class="overflow-x-auto">                                                     
+        <table class="table table-bordered border-dark table-hover mb-0 inside-table">
             <tbody class="">
                 <tr class="text-center fw-bold">
                     <td class="col-1"  @click="sortProducts('code_no')"> Code</td>

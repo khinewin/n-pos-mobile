@@ -3,13 +3,13 @@
            <PageHeader page-title="customers" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info"/>
            <div class="container-fluid">
                <div class="row  justify-content-end">  
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
                     </button>
                 </div>                           
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCustomer">
                         <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
@@ -243,19 +243,15 @@ import { required, email ,helpers} from '@vuelidate/validators'
            },100)
         },
       
-        async removeCustomer(i, p){
-            const cf=confirm(`Are you sure ? delete the customer : ${p.name} `)
-            if(!cf) return false;
-
-            const updateDocument=doc(db, "customers", p.id)
-            await updateDoc(updateDocument, {edit_user: {uid: this.user.uid, type: 'removed'}})  
-            
-            const document=doc(db, "customers", p.id)     
-            await deleteDoc(document) 
+        async removeCustomer(id){           
+            const document=doc(db, "customers", id)     
+           setTimeout(async()=>{
+                await deleteDoc(document) 
+           }, 1000)
           
         },
         async saveCustomer(){
-            if(Object.keys(this.editItem).length) this.saveEdit();
+         //   if(this.editItem.id) this.saveEdit();
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
             this.isSaving=true;
@@ -320,6 +316,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                                     this.message("removed")
                                     this.isDeleting=false;
                                     this.is_check_all=false;
+                                    this.removeCustomer(change.doc.id)
                             }             
                     });                 
                     const isLocal=snapShot.metadata.formCache;                              

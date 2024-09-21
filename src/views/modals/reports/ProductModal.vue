@@ -11,20 +11,20 @@
                                 <div class="card  shadow-sm ">
                                     <div class="card-body p-2 small">
                                         <div class="row g-1">
-                                            <div class="col-md-6 col-lg-12">
+                                            <div class="col-6 col-lg-12">
                                                 <div class="form-floating">
                                                     <input type="text" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
                                                     <label for="search_by_code" class="">Code</label>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 col-lg-12">
+                                            <div class="col-6 col-lg-12">
                                                 <div class="form-floating">
                                                     <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
                                                     <label for="search_by_item_name" class="">Description</label>
                                                 </div> 
                                             </div>
                                         </div>
-                                        <div class="row">
+                                        <div class="row mt-2">
                                             <div class="col-6 d-grid">
                                                 <button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                             </div>

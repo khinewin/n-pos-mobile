@@ -2,26 +2,24 @@
     <div>           
         <PageHeader :page-title="rtInMode" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
-            <div class="row mb-2 justify-content-end">                            
-               
-              
-                <div class="col-sm-2 d-grid">
+            <div class="row mb-2 justify-content-end">                                                       
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button :disabled="rtInItems.length <=0 || rtInMode=='Return In / New'" class="btn btn-sm"  @click="printRtIn"><i class="fa-solid fa-print" ></i> Print (ctrl+p)</button>
                 </div>
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                         <button  type="button" @click="saveReturnIn" class="btn btn-sm" :disabled="isLoading || rtInItems.length <=0  " >
                             <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>                      
                 </div>
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <router-link id="close" class="btn btn-sm" :disabled="rtInItems.length <=0" :to="{name : 'ReturnIn'}"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</router-link>
                 </div>
             </div>
         </div>     
         <div class="container-fluid my-2">
             <div class="row g-1">
-                <!--<div class="col-lg-4">
+                <!--<div class="col-lg-2">
                         <Products @setCode="setCode" :rtInItems="rtInItems" />
                 </div>-->
                 <div class="col-12">
@@ -58,7 +56,7 @@
                                                             <input type="text" @click="changeCustomer" v-model="customer.name" class="form-control-plaintext py-0 border-bottom" id="customer_name" placeholder="Name">                                                
                                                         </div>
                                                         <div class="col-6 border-bottom text-center">
-                                                            <span class="d-block text-primary customer" :data-bs-toggle="[rtInMode=='Return In / History' ? '' : 'modal']" :data-bs-target="[rtInMode=='Return In / History' ? '' : '#customerModal']" ><i class="fa-solid fa-pen"></i> (shift+c)</span>
+                                                            <span class="d-block text-primary customer change-cursor" :data-bs-toggle="[rtInMode=='Return In / History' ? '' : 'modal']" :data-bs-target="[rtInMode=='Return In / History' ? '' : '#customerModal']" ><i class="fa-solid fa-pen"></i> (shift+c)</span>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -74,7 +72,7 @@
                                 </div>
                             </div>                               
                               <div class="vh-55 overflow-y-auto">
-                                <table class="table table-bordered table-hover mb-0">
+                                <table class="table table-bordered table-hover mb-0 inside-table">
                                     <tbody class="small fw-bold table-group-divider">
                                         <tr class="table-secondary">
                                             <td class="col-1 text-center">

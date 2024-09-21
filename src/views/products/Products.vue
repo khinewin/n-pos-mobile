@@ -3,16 +3,16 @@
         <PageHeader page-title="Medicine code" page-code="medicineCode" :msg-type="msg.type" :msg-info="msg.info"/>
         <div class="container-fluid">
             <div class="row  justify-content-end">   
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
                     </button>
                 </div>       
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn btn-sm p-z"><i class="fa-solid fa-boxes-packing"></i> Packing size (shift+z)</button>
                 </div>                            
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCode">
                         <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
@@ -60,7 +60,7 @@
                                         </tr>                                                                    
                                         <tr>
                                             <td class="position-relative">
-                                                <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" @click="checkAll" v-model="is_deleted">
+                                                <!--<input class="position-absolute start-50 top-50 translate-middle" type="checkbox" @click="checkAll" v-model="is_deleted">-->
                                             </td>
                                             <td>
                                                 <input placeholder="Code"  type="text" v-model="code_no" class="form-control-plaintext py-0  text-center">
@@ -235,7 +235,7 @@
 import PageHeader from "@/views/partials/PageHeader.vue"
 import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {Timestamp,onSnapshot, collection, addDoc, query, where, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore'
+import {Timestamp,onSnapshot, collection, addDoc, query, where, setDoc, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import Footer from '@/views/partials/Footer.vue'
 import * as ss from "@/lib/snapshot/products"
@@ -369,6 +369,12 @@ export default {
                 }
             })
         },
+        async removeProduct(id){          
+            const document=doc(db, "products", id)     
+            setTimeout(async()=>{
+                await deleteDoc(document)  
+            }, 1000)    
+        },
         checkAll(){
             setTimeout(()=>{
                 this.products=this.products.map((s)=>{
@@ -402,18 +408,9 @@ export default {
                     edit_user : this.editItem.edit_user          
                  })  
         },
-        async removeProduct(i, p){
-            const cf=confirm(`Are you sure ? delete the product code : ${p.item_name} `)
-            if(!cf) return false;
-
-            const updateDocument=doc(db, "products", p.id)
-            await updateDoc(updateDocument, {edit_user: {uid: this.user.uid, type: 'removed'}})  
-
-            const document=doc(db, "products", p.id)     
-            await deleteDoc(document)      
-        },
+      
         async saveCode(){
-            if(Object.keys(this.editItem).length) this.saveEdit();
+          //  if(Object.keys(this.editItem).length) this.saveEdit();
 
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
@@ -533,10 +530,11 @@ export default {
                                     this.message("removed")    
                                     this.isDeleting=false;
                                     this.is_check_all=false;
+                                    this.removeProduct(change.doc.id)
+                                    //console.log(change.doc.id)
                                     //this.editItem={}
                             }    
                             this.checkEdit();
-   
                     });                 
             });                              
         } ,

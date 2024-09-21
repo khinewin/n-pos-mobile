@@ -1,6 +1,6 @@
 <template lang="">
-    <div class="">
-        <table class="table table-bordered border-dark table-hover">
+    <div class="overflow-x-auto">
+        <table class="table table-bordered border-dark table-hover inside-table">
             <tbody class="" v-if="reports.length > 0">                            
                 <tr v-for="r in reports" :key="r[0]">
                     <td class="p-0 col-11">

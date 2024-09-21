@@ -3,13 +3,13 @@
            <PageHeader page-title="Suppliers" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info"/>
            <div class="container-fluid">
                <div class="row  justify-content-end">   
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
                     </button>
                 </div>                           
-                <div class="col-6 col-sm-4 col-md-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveSupplier">
                         <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
@@ -231,6 +231,13 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 }
             })
         },
+        async removeSupplier(id){                  
+            const document=doc(db, "suppliers", id)     
+            setTimeout(async()=>{
+                await deleteDoc(document) 
+            }, 1000)                          
+        },
+     
         checkAll(){
             setTimeout(()=>{
                 this.suppliers=this.suppliers.map((s)=>{
@@ -254,7 +261,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 this.msg.type="success"                                                         
         }, 
         async checkDatabase(){ 
-            const query_url=query(collection(db, "suppliers"), where('is_deleted',"==", false), orderBy("created_at", "desc"));           
+            const query_url=query(collection(db, "suppliers"),  orderBy("created_at", "desc"));           
                 onSnapshot(query_url, async(snapShot) =>{
                     const dc=snapShot._snapshot.docChanges;
                     const user=this.user;
@@ -272,9 +279,11 @@ import { required, email ,helpers} from '@vuelidate/validators'
                                     this.message("removed")
                                     this.isDeleting=false;
                                     this.is_check_all=false;
+                                   // console.log(change.doc.id)
+                                    this.removeSupplier(change.doc.id)
                             }             
                     });                 
-                    const isLocal=snapShot.metadata.formCache;                              
+                  //  const isLocal=snapShot.metadata.formCache;                              
             });                              
         } ,
         async fetchSuppliers(){ 
@@ -287,19 +296,9 @@ import { required, email ,helpers} from '@vuelidate/validators'
                     this.isUpdating=false;
             });                              
         } ,
-        async removeSupplier(i, p){
-            const cf=confirm(`Are you sure ? delete the supplier : ${p.name} `)
-            if(!cf) return false;
-
-            const updateDocument=doc(db, "suppliers", p.id)
-            await updateDoc(updateDocument, {edit_user: {uid: this.user.uid, type: 'removed'}})  
-            
-            const document=doc(db, "suppliers", p.id)     
-            await deleteDoc(document)                           
-        },
-     
+       
         async saveSupplier(){
-            this.saveEdit();
+         //   if(this.editItem.id) this.saveEdit();
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
             this.isSaving=true;
@@ -314,7 +313,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 phone: this.phone,
                 company: this.company,
                 created_at : created_at,      
-                is_deleted: this.is_deleted,
+                is_deleted: false,
                 edit_user: {uid: this.user.uid, type: 'added'}         
             }      
             const docRef=await addDoc(dataCollection, data)                          

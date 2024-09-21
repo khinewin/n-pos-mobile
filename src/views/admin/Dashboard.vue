@@ -57,10 +57,10 @@
                 <router-link :to="{name: 'Reports'}" class="btn btn-sm "><i class="fa-solid fa-chart-pie text-info"></i> Reports</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2   d-grid">
-                <router-link class="btn btn-sm" :to="{name : 'ReturnIn'}"><i class="fa-solid fa-file-import"></i> Return In</router-link>
+                <router-link class="btn btn-sm" :to="{name : 'ReturnIn'}"><i class="fa-solid fa-file-import text-success"></i> Return In</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2   d-grid">
-                <router-link class="btn btn-sm" :to="{name : 'ReturnOut'}"><i class="fa-solid fa-file-export"></i> Return Out</router-link>
+                <router-link class="btn btn-sm" :to="{name : 'ReturnOut'}"><i class="fa-solid fa-file-export text-danger"></i> Return Out</router-link>
             </div>
            </div>
            <div class="row g-2">

@@ -43,7 +43,8 @@
                               </table>
                             </div>   
                         </div>
-                        <table class="table table-bordered mb-0  table-hover">
+                        <div class="overflow-x-auto">
+                        <table class="table table-bordered mb-0  table-hover inside-table">
                             <tbody>
                                 <tr class="small text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
@@ -85,7 +86,8 @@
                                     <td class="text-end ">{{fM(stock.whole_sale_amount)}}</td>
                                 </tr>                                                                                     
                             </tbody>
-                        </table>                                     
+                        </table>     
+                        </div>                                
                     </div>
                 </div>
             </div>

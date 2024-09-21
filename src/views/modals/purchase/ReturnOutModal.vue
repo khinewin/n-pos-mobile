@@ -11,19 +11,19 @@
                                 <div class="card shadow-sm">
                                     <div class="card-body p-2">
                                         <div class="row g-1 small">
-                                           <div class="col-md-4 col-lg-12">
+                                           <div class="col-6 col-sm-6 col-md-3 col-lg-12">
                                             <div class="form-floating">
                                                 <input type="search" id="search_by_voucher_no" @paste="searchRtOut" v-model="search_by_voucher_no" @keypress.enter="searchRtOut" placeholder="Voucher no." class="form-control-plaintext border-bottom">
                                                 <label for="search_by_voucher_no" class="">Voucher No.</label>
                                             </div>
                                            </div>
-                                           <div class="col-md-4 col-lg-12">
+                                           <div class="col-6 col-sm-6 col-md-3 col-lg-12">
                                             <div class="form-floating">
                                                 <input type="search" id="search_by_supplier" v-model="search_by_supplier" @keyup="searchRtOut" placeholder="Customer name" class="form-control-plaintext border-bottom">
                                                 <label for="search_by_supplier" class="">Supplier</label>
                                             </div>
                                            </div>
-                                           <div class="col-md-4 col-lg-12">
+                                           <div class="col-6 col-sm-6 col-md-3 col-lg-12">
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
                                                     <flat-pickr @change="searchRtOut" class="form-control-plaintext border-bottom" v-model="search_by_date" id="from_date" :config="config" />
@@ -32,7 +32,7 @@
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                                </div>
                                            </div>
-                                           <div class="col-md-4 col-lg-12">
+                                           <div class="col-6 col-md-3 col-lg-12">
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
                                                     <flat-pickr @change="searchRtOut" class="form-control-plaintext border-bottom" v-model="search_to_date" id="to_date" :config="config" />
@@ -126,12 +126,7 @@ export default {
            search_by_supplier:"",
             isUpdating:false,
            isLoading:false,
-           config: {
-                dateFormat: 'd/m/Y', // Flatpickr options
-                enableTime: false,
-                wrap: true, // set wrap to true only when using 'input-group'
-               // altFormat: 'M j, Y',
-            },  
+        
        }
    },
   
@@ -150,6 +145,9 @@ export default {
        user(){
            return this.$store.getters.user;
        },       
+       config(){
+        return this.$store.getters.flat_pickr_config;
+       }
    },
  
    methods:{

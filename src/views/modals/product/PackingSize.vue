@@ -97,7 +97,6 @@ export default {
         async removePackingSize(p){
             const document=doc(db, "packingSizes", p.id)     
             await deleteDoc(document) //if no items delete document;
-            this.fetchpackingSizes();  
         },
         setEdit(p){
             this.editItem={...p, edit_user : {uid: this.user.uid, type: "modified"}};

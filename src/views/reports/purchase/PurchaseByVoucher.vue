@@ -48,8 +48,9 @@
                             </tbody>
                       </table>
                     </div>
-                </div>                 
-                   <table class="table table-bordered mb-0 table-hover">
+                </div>      
+                <div class="overflow-x-auto">           
+                   <table class="table table-bordered mb-0 table-hover inside-table">
                         <tbody class="table-group-divider">
                             <tr class="small text-center fw-bold table-secondary">
                                 <td class="col-1">Code</td>
@@ -107,7 +108,7 @@
                         </tr>
                     </tbody>
                  </table>
-                      
+                 </div>     
                 </div>
             </div>
             </div>

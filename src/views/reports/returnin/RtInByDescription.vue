@@ -1,6 +1,6 @@
 <template lang="">
-    <div class="">
-        <table class="table table-bordered border-dark table-hover">
+    <div class="overflow-x-auto">
+        <table class="table table-bordered border-dark table-hover inside-table">
             <tbody class="" >    
                 <tr class="fw-bold text-center">
                     <td class="col-1">Code</td>

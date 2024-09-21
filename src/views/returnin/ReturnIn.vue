@@ -2,32 +2,32 @@
     <div>           
         <PageHeader :page-title="rtInMode" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
-            <div class="row mb-2 justify-content-end">                            
+            <div class="row mb-2 justify-content-end">                           
                
-                <div class="col-sm-2 d-grid">    
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">    
                     <button class="btn btn-sm" @click="goEdit" :disabled="!id || user.uid != sale_user.uid"><i class="fa-solid fa-pen-to-square"></i> Edit (ctrl+e)</button>
                 </div>
                 
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button class="btn btn-sm open"  data-bs-toggle="modal" data-bs-target="#returnInModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
                 </div>
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button :disabled="rtInItems.length <=0 || rtInMode=='Return In / New'" class="btn btn-sm"  @click="printRtIn"><i class="fa-solid fa-print" ></i> Print (ctrl+p)</button>
                 </div>
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                         <button v-if="rtInMode=='Return In / New' || rtInMode=='Return In / History'" type="button" @click="saveReturnIn" class="btn btn-sm" :disabled="isLoading || rtInItems.length <=0 || rtInMode=='Return In / History' " >
                             <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>                      
                 </div>
-                <div class="col-sm-2 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                         <button @click="clearReturnIn" class="btn btn-sm" :disabled="rtInItems.length <=0"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
                 </div>
             </div>
         </div>     
         <div class="container-fluid my-2">
-            <div class="row g-1">
-                <!--<div class="col-lg-4">
+            <div class="row g-2">
+                <!--<div class="col-lg-2">
                         <Products @setCode="setCode" :rtInItems="rtInItems" />
                 </div>-->
                 <div class="col-12">
@@ -80,7 +80,7 @@
                                 </div>
                             </div>                               
                               <div class="vh-55 overflow-y-auto">
-                                <table class="table table-bordered table-hover mb-0">
+                                <table class="table table-bordered table-hover mb-0 inside-table">
                                     <tbody class="small fw-bold table-group-divider">
                                         <tr class="table-secondary">
                                             <td class="col-1 text-center">
@@ -207,12 +207,7 @@ export default {
     },
     data(){
         return{    
-            config: {
-                dateFormat: 'd/m/Y', // Flatpickr options
-                enableTime: false,
-                wrap: true, // set wrap to true only when using 'input-group'
-               // altFormat: 'M j, Y',
-            },  
+          
             id:"",
             rtInMode: "Return In / New",
             isLoading:false,
@@ -291,6 +286,9 @@ export default {
         },
         default_customer(){
             return this.$store.getters.default_customer;
+        },
+        config(){
+            return this.$store.getters.flat_pickr_config;
         }
     },
     methods:{

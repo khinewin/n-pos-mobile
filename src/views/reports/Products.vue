@@ -1,10 +1,10 @@
 <template lang="">
     <div class="container-fluid my-4">   
         <div class="row fixed-top ps-2 pt-2">
-            <div class="col-2">
+            <div class="col-4 col-sm-3 col-md-2">
                 <button class="btn" @click="goBack"><i class="fa-solid fa-circle-chevron-left"></i> (Esc)</button>
             </div>
-            <div class="col-2">
+            <div class="col-4 col-sm-3 col-md-2">
                 <button class="btn" @click="print"><i class="fa-solid fa-print"></i> (ctrl+p)</button>
             </div>
           
@@ -15,11 +15,11 @@
                     <LargePrintHeader />
                 </div>
                 <h6>Reports Medicine Code  {{displayReportType}}</h6>
-                <div class="row">
-                    <div class="col-sm-4">
+                <div class="row small">
+                    <div class="col-sm-6 col-md-3">
                         <div class="" v-if="code_no">Code : {{item_name}}</div>
                     </div>
-                    <div class="col-sm-2">
+                    <div class="col-sm-6 col-md-3">
                         <div class="" v-if="gt_equal || lt_equal">Balance : 
                             <span v-if="gt_equal">>= {{gt_equal}} </span> 
                             <span v-if="gt_equal && lt_equal"> and </span>
@@ -27,10 +27,10 @@
                             <span class="ms-2"> {{packing_unit}}</span>
                         </div>
                     </div> 
-                    <div class="col-sm-2">
+                    <div class="col-sm-6 col-md-3">
                         <div class="">Location : {{this.location}} </div>
                     </div>                                       
-                    <div class="col-sm-4">
+                    <div class="col-sm-6 col-md-3">
                         <div  class="" v-if="displayDate">Date : {{showTime(displayDate)}}</div>
                     </div>
                 </div>  

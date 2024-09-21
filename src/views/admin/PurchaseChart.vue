@@ -84,7 +84,7 @@ export default {
             const title=["Month", "Purchase Amt"]
             data.unshift(title)
             this.monthlyPurchase=data;
-            this.isLoading=false;
+           // this.isLoading=false;
         },
         async fetchPurchaseMonthly(){
             const currentDate = new Date();

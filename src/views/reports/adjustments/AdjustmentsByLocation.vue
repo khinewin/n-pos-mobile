@@ -1,6 +1,6 @@
 <template lang="">
-    <div class="">
-        <table class="table table-bordered mb-0 border-dark table-hover">
+    <div class="overflow-x-auto">
+        <table class="table table-bordered mb-0 border-dark table-hover inside-table">
             <tbody class=" text-center fw-bold">
                 <tr><td rowspan="2" class="col-1">Location</td></tr>
                 <tr class="">

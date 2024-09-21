@@ -1,10 +1,10 @@
 <template lang="">
     <div class="container-fluid my-4">   
         <div class="row fixed-top ps-2 pt-2">
-            <div class="col-2">
+            <div class="col-4 col-sm-3 col-md-2">
                 <button class="btn" @click="goBack"><i class="fa-solid fa-circle-chevron-left"></i> (Esc)</button>
             </div>
-            <div class="col-2">
+            <div class="col-4 col-sm-3 col-md-2">
                 <button class="btn" @click="print"><i class="fa-solid fa-print"></i> (ctrl+p)</button>
             </div>    
         </div>
@@ -14,14 +14,14 @@
             </div>
             <div class="col-12 text-center">
                 <h6>Reports Return In {{displayReportType(reportType)}}</h6>
-                <div class="row">
-                    <div class="col-sm-4">
+                <div class="row small">
+                    <div class="col-sm-6 col-lg-4">
                         <div class="" v-if="code_no">Code : {{item_name}}</div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-6 col-lg-4">
                         <div class="" v-if="customer_name">Customer : {{customer_name}}</div>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-lg-4">
                         <div v-if="displayFromDate || displayToDate">Date : From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</div>
                     </div>
                 </div>
