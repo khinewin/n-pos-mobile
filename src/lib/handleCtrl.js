@@ -56,12 +56,16 @@ const handleCtrl=(event)=> {
         open!==null && open.click();
     }    
    
-    if (event.shiftKey && event.key.toLowerCase() === 'c') {
+    if (event.ctrlKey && event.shiftKey && event.key === 'S') {
+        event.preventDefault(); // Prevent the default browser save dialog     
+        const supplier=document.querySelector(".supplier")
+        supplier!==null && supplier.click();
+    }
+    if (event.ctrlKey && event.shiftKey && event.key === 'C') {
         event.preventDefault(); // Prevent the default browser save dialog
         const customer=document.querySelector(".customer")
         customer!==null && customer.click();
-        const supplier=document.querySelector(".supplier")
-        supplier!==null && supplier.click();
+        
     }
   
 }

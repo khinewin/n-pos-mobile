@@ -54,7 +54,7 @@
                                                     <input type="text" :class="{'border-0 border-bottom border-danger' : v$.supplier.name.$errors.length > 0}" @click="changeSupplier" v-model="supplier.name"  class="form-control-plaintext p-0  border-bottom">                                                
                                                 </div>
                                                 <div class="col-6 border-bottom text-center">
-                                                    <span class="d-block text-primary supplier change-cursor" data-bs-toggle="modal" data-bs-target="#searchSupplier" ><i class="fa-solid fa-pen"></i> (shift+c)</span>
+                                                    <span class="d-block text-primary supplier change-cursor" data-bs-toggle="modal" data-bs-target="#searchSupplier" ><i class="fa-solid fa-pen"></i> (ctrl+shift+s)</span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -79,40 +79,40 @@
                                     <td class="col-1">Unit Cost</td>
                                 </tr>
                                 <tr class="small"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase" :key="st.id" @mouseenter="setEdit(i)"  >
-                                    <td class="pt-2 text-center">
+                                    <td class=" text-center">
                                         <div class="position-relative">
-                                            <a class="text-danger position-absolute top-50 start-0 translate-middle p-2" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
+                                            <a class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                             {{st.code_no}}                                           
                                         </div>                                    
                                     </td>
-                                    <td class="pt-2">{{st.item_name}}</td>
+                                    <td class="">{{st.item_name}}</td>
                                     <td class="p-0 position-relative table-info">
                                         <a v-if="st.tmp_exp_date" class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeExpDate(st)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                         <flat-pickr class="form-control-plaintext  text-center py-0" v-model="st.tmp_exp_date" @change="setExpDate(st.id)"  :config="config" />
                                     </td>
-                                    <td class="pt-2">
+                                    <td class="">
                                         {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                     </td>
-                                    <td class="pt-2 text-end table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                    <td class=" text-end table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.pur_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>                                                                   
-                                    <td class="p-0 table-info w-10" >
-                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.qty_pur_price" class="form-control-plaintext   text-center" placeholder="Price">                                        
+                                    <td class="table-info w-10" >
+                                            <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.qty_pur_price" class="form-control-plaintext  py-0  text-center" placeholder="Price">                                        
                                     </td>
-                                    <td class="p-0 table-info w-5">
-                                        <select @change="calEdit" class="form-control-plaintext  change-cursor text-center" v-model="st.qty_pur_price_unit">
+                                    <td class="table-info w-5">
+                                        <select @change="calEdit" class="form-control-plaintext py-0 change-cursor text-center" v-model="st.qty_pur_price_unit">
                                             <option  v-for="pu in onlyString(st.packing_size)">{{pu}}</option>
                                         </select>
                                     </td>
-                                    <td class="text-end pt-2">{{st.amount}}</td>
+                                    <td class="text-end">{{st.amount}}</td>
 
-                                    <td class="text-center pt-2 table-warning change-cursor" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
+                                    <td class="text-center  table-warning change-cursor" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
                                         <span v-if="st.dis_qty">{{st.dis_qty}}{{st.dis_qty_unit}}</span>
                                             <span v-if="st.dis_amount">{{st.dis_amount}}$</span>
                                             <span v-if="st.dis_percent">{{st.dis_percent}}%</span>                                      
                                     </td>                                                                   
-                                    <td class="text-end pt-2 table-warning change-cursor" data-bs-toggle="modal" data-bs-target="#setDiscountModal">{{st.discount}}</td>
-                                    <td class="text-end pt-2">{{st.unit_cost}}</td>
+                                    <td class="text-end  table-warning change-cursor" data-bs-toggle="modal" data-bs-target="#setDiscountModal">{{st.discount}}</td>
+                                    <td class="text-end ">{{st.unit_cost}}</td>
                                 </tr>
                                 
                             </tbody>

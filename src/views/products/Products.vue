@@ -10,7 +10,7 @@
                     </button>
                 </div>       
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn btn-sm p-z"><i class="fa-solid fa-boxes-packing"></i> Packing size (shift+z)</button>
+                    <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn btn-sm packing-unit"><i class="fa-solid fa-boxes-packing"></i> Packing Units (ctrl+u)</button>
                 </div>                            
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCode">
@@ -66,7 +66,7 @@
                                                 <input placeholder="Code"  type="text" v-model="code_no" class="form-control-plaintext py-0  text-center">
                                             </td>
                                             <td>
-                                                <input id="item_name" placeholder="Description" @keypress.enter="saveCode"   type="text" v-model="item_name" class="form-control-plaintext py-0 mx-2">
+                                                <input id="item_name" placeholder="Description" @keypress.enter="saveCode"   type="text" v-model="item_name" class="form-control-plaintext py-0">
                                             </td>                                     
                                         </tr>     
                                                                 
@@ -114,7 +114,7 @@
                                         </td>
                                     </tr>
                                     <tr class="table-primary packing-size"  data-bs-toggle="modal" data-bs-target="#selectPackingSizeModal">
-                                        <td class="col-1">Packing size (shift+p) <span class="float-end"><i class="fa-solid fa-caret-right"></i></span></td>
+                                        <td class="col-1">Packing Size (ctrl+p) <span class="float-end"><i class="fa-solid fa-caret-right"></i></span></td>
                                         <td :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]" class="text-center col-3">
                                             <div v-if="editItem.packing_size.smallest_unit && editItem.packing_size.medium_unit">
                                                     {{calPackingSize(editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit, editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty)}}
@@ -209,12 +209,12 @@
                                         <td class="small">
                                             <div class="form-check form-switch">
                                                 <input  v-model="editItem.auto_cal" class="form-check-input auto-cal" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
-                                                <label class="form-check-label" for="flexSwitchCheckChecked">Auto (shift+a)</label>
+                                                <label class="form-check-label" for="flexSwitchCheckChecked">Auto (ctrl+a)</label>
                                               </div>                                              
                                         </td>
                                         <td colspan="3" class="p-0 text-end">
                                             <button class="btn btn-sm" @click="savePrice">                     
-                                            <span v-if="!isSavePrice"><i class="fa-solid fa-hard-drive"></i> Save (shift+s)</span>
+                                            <span v-if="!isSavePrice"><i class="fa-solid fa-hard-drive"></i> Save</span>
                                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSavePrice"></span>
                                              </button>
                                         </td>
@@ -339,20 +339,20 @@ export default {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.savePrice(); // Call your custom function
             }   
-            if (event.shiftKey && event.key.toLowerCase() === 'a') {
+            if (event.ctrlKey && event.key === 'a') {
                 event.preventDefault(); // Prevent the default browser save dialog
                const a=document.querySelector(".auto-cal")
-               a.click();
+               a.checked=!a.checked
             }  
-            if (event.shiftKey && event.key.toLowerCase() === 'p') {
+            if (event.ctrlKey && event.key === 'p') {
                 event.preventDefault(); // Prevent the default browser save dialog
-               const a=document.querySelector(".packing-size")
-               a.click();
+               const p=document.querySelector(".packing-size")
+               p.click();
             }    
-            if (event.shiftKey && event.key.toLowerCase() === 'z') {
+            if (event.ctrlKey && event.key === 'u') {
                 event.preventDefault(); // Prevent the default browser save dialog
-               const a=document.querySelector(".p-z")
-               a.click();
+               const pu=document.querySelector(".packing-unit")
+               pu.click();
             }          
          
         },

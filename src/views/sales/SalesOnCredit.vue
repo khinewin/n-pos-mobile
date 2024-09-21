@@ -3,18 +3,18 @@
         <PageHeader page-title="SOC" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                                     
-                <div class="col-6 col-sm-4 col-md-3 col-lg-4 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#customerModal"><i class="fa-solid fa-folder-tree"></i> Open (cltr+o)</button>
                 </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-4 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button  class="btn btn-sm" :disabled="!customer.code"  @click="print"><i class="fa-solid fa-print" ></i> Print (cltr+p)</button>
                 </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-4 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                         <button type="button" @click="savePaid" class="btn btn-sm" v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save (cltr+s)
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-4 d-grid">
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                         <button @click="closePage" class="btn btn-sm close" :disabled="!customer.id"><i class="fa-solid fa-circle-xmark"></i> Close (cltr+q)</button>
                 </div>
             </div>

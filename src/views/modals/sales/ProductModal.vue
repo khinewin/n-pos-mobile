@@ -187,8 +187,9 @@ export default {
             const items=this.productsData.filter((f)=>f.code_no==p.code_no);
             if(items.length){
                 const item=items[0];
-                if(item.qty <=0){
+                if(item.qty <=0 && this.sale_type !== undefined){
                     this.isError=true;
+                    return false;
                 }
             }
             this.$emit("setCode", p)
@@ -209,8 +210,9 @@ export default {
             const items=this.productsData.filter((f)=>f.code_no==this.search_by_code);
             if(items.length){
                 const item=items[0];
-                if(item.qty <=0){
+                if(item.qty <=0 && this.sale_type !== undefined){
                     this.isError=true;
+                    return false;
                 }
             }     
             this.setCode(items[0])

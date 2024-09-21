@@ -60,7 +60,7 @@
                                                             <input type="text" @click="changeCustomer" v-model="customer.name" class="form-control-plaintext py-0 border-bottom" id="customer_name" placeholder="Name">                                                
                                                         </div>
                                                         <div class="col-6 border-bottom text-center">
-                                                            <span class="d-block text-primary change-cursor customer" data-bs-toggle="modal" data-bs-target="#customerModal" ><i class="fa-solid fa-pen"></i> (shift+c)</span>
+                                                            <span class="d-block text-primary change-cursor customer" data-bs-toggle="modal" data-bs-target="#customerModal" ><i class="fa-solid fa-pen"></i> (ctrl+shift+c)</span>
                                                         </div>
                                                     </div>
                                                 </td>

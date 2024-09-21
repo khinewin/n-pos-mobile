@@ -54,7 +54,7 @@
                                                     <input type="text"  @click="changeSupplier" v-model="supplier.name"  class="form-control-plaintext p-0  border-bottom">                                                
                                                 </div>
                                                 <div class="col-6 border-bottom text-center">
-                                                    <span class="d-block text-primary supplier change-cursor" data-bs-toggle="modal" data-bs-target="#searchSupplier" ><i class="fa-solid fa-pen"></i> (shift+c)</span>
+                                                    <span class="d-block text-primary supplier change-cursor" data-bs-toggle="modal" data-bs-target="#searchSupplier" ><i class="fa-solid fa-pen"></i> (ctrl+shift+s)</span>
                                                 </div>
                                             </td>
                                         </tr>

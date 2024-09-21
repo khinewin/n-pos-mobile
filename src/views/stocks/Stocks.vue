@@ -13,7 +13,7 @@
                     <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#stocksModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <router-link :to="{name : 'NewStocks'}" class="btn btn-sm new"><i class="fa-solid fa-square-plus"></i> New (shift+n)</router-link>
+                    <router-link :to="{name : 'NewStocks'}" class="btn btn-sm new"><i class="fa-solid fa-square-plus"></i> New (ctrl+shift+n)</router-link>
             </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                         <button @click="closeStocks" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
@@ -22,7 +22,7 @@
             <div class="card shadow" id="printMe">
                 <div class="d-none d-print-block">
                     <LargePrintHeader />
-                    <div>Stocks</div>
+                    <div class="text-center h6">Stocks</div>
                 </div>
                 <div class="card-body p-2">
                     <form @submit.prevent="saveStocks">
@@ -184,7 +184,7 @@ export default {
              event.preventDefault(); // Prevent the default browser save dialog
               this.goEdit();
          }      
-         if(event.shiftKey && event.key.toLowerCase()=== 'n') {
+         if(event.ctrlKey && event.shiftKey && event.key=== 'N') {
              event.preventDefault(); // Prevent the default browser save dialog
              const add=document.querySelector(".new")
              add.click();

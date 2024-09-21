@@ -63,7 +63,7 @@
                                                             <input type="text" @click="changeSupplier" v-model="supplier.name" class="form-control-plaintext py-0 border-bottom" id="supplier_name" placeholder="Name">                                                
                                                         </div>
                                                         <div class="col-6 border-bottom text-center change-cursor">
-                                                            <span class="d-block text-primary customer " :data-bs-toggle="[rtOutMode=='Return Out / History' ? '' : 'modal']" :data-bs-target="[rtOutMode=='Return Out / History' ? '' : '#searchSupplier']" ><i class="fa-solid fa-pen"></i> (shift+c)</span>
+                                                            <span class="d-block text-primary supplier " :data-bs-toggle="[rtOutMode=='Return Out / History' ? '' : 'modal']" :data-bs-target="[rtOutMode=='Return Out / History' ? '' : '#searchSupplier']" ><i class="fa-solid fa-pen"></i> (ctrl+shift+s)</span>
                                                         </div>
                                                     </div>
                                                 </td>

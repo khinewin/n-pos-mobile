@@ -33,7 +33,7 @@
                                         </select>
                                     </td>
                                     <td class="p-0">
-                                        <input @keypress.enter="pressSetDiscountBtn" :disabled="!ei.dis_qty_unit" type="number" @change="calDiscount" @keyup="calDiscount" v-model="ei.dis_qty" class="form-control-plaintext form-control-sm text-center">
+                                        <input @keypress.enter="pressSetDiscountBtn" :disabled="!ei.dis_qty_unit" type="number" @change="calDiscount" @keyup="calDiscount" v-model="ei.dis_qty" class="form-control-plaintext form-control-sm text-center dis_qty" id="dis_qty">
                                     </td>                                    
                                 </tr>
                                 <tr>
@@ -41,7 +41,7 @@
                                         %
                                     </td>
                                     <td class="p-0">
-                                        <input @keypress.enter="pressSetDiscountBtn" @keyup="calDiscount" @change="calDiscount" type="number" v-model="ei.dis_percent" class="form-control-plaintext form-control-sm text-center">
+                                        <input @keypress.enter="pressSetDiscountBtn" @keyup="calDiscount" @change="calDiscount" type="number" v-model="ei.dis_percent" class="form-control-plaintext form-control-sm text-center dis_precent" id="dis_precent">
                                     </td>                                    
                                 </tr>
                                 <tr>
@@ -49,7 +49,7 @@
                                         Ks
                                     </td>
                                     <td class="p-0">
-                                        <input @keypress.enter="pressSetDiscountBtn" @keyup="calDiscount" @change="calDiscount" type="number" v-model="ei.dis_amount" class="form-control-plaintext form-control-sm text-center">
+                                        <input @keypress.enter="pressSetDiscountBtn" @keyup="calDiscount" @change="calDiscount" type="number" v-model="ei.dis_amount" class="form-control-plaintext form-control-sm text-center dis_amount" id="dis_amount">
                                     </td>                                    
                                 </tr>
                                 <tr>
@@ -89,7 +89,18 @@ export default {
         
         calDiscount(ev){
             const e=this.ei;
-            console.log(e.sale_type)
+            if(ev.target.id=="dis_qty"){
+                    e.dis_amount="";
+                    e.dis_percent="";
+            }
+            if(ev.target.id=="dis_percent"){
+                    e.dis_amount="";
+                    e.dis_qty="";
+            }
+            if(ev.target.id=="dis_amount"){
+                    e.dis_qty="";
+                    e.dis_percent="";
+            }
             if(e.dis_amount){
                         e.discount=e.dis_amount;
                     }else if(e.dis_percent){
