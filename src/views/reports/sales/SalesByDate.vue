@@ -129,6 +129,10 @@ export default {
       
     },
     methods:{
+        mmNumber(input) {
+        const myanmarDigits = ['၀', '၁', '၂', '၃', '၄', '၅', '၆', '၇', '၈', '၉'];        
+        return input.toString().replace(/\d/g, (digit) => myanmarDigits[digit]);
+        },
         fM(amount){
             return hp.formattedAmount(amount);
         },

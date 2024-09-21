@@ -8,11 +8,11 @@
           </div>
           <div class="offcanvas-body ">      
             <ul class="list-group small ">
-              <li class="list-group-item list-group-item-a bg-secondary-subtle border-0" data-bs-dismiss="offcanvas" aria-label="Close">
-                <router-link class="nav-link" :to="{name : 'Profile'}"><i class="fa-solid fa-id-card-clip"></i> Profile</router-link>
+              <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0" data-bs-dismiss="offcanvas" aria-label="Close">
+                <router-link class="nav-link py-2 px-3" :to="{name : 'Profile'}"><i class="fa-solid fa-id-card-clip"></i> Profile</router-link>
               </li>
-              <li class="list-group-item list-group-item-a  bg-secondary-subtle border-0" >
-                <a href="#!"  class="nav-link" @click="showConfirm"><i class="fa-solid fa-right-from-bracket" ></i> Logout</a>
+              <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0" >
+                <a href="#!"  class="nav-link py-2 px-3" @click="showConfirm"><i class="fa-solid fa-right-from-bracket" ></i> Logout</a>
               </li>                       
            </ul>
           </div>
@@ -75,11 +75,12 @@ export default {
 }
 </script>
 <style>
-      .list-group-item-a:hover{
-          padding-left: 30px;
-          transition: all 0.4s;
+        .list-group-item-action:hover .nav-link{
+          background-color: rgba(59, 58, 58, 0.5) !important;
+          transition: all .2s;
+          color: white !important;
       }
       .router-link-active {
-          color : red !important
+          color : #0d6efd !important
       }
 </style>
