@@ -217,7 +217,7 @@
                                         </td>
                                         <td colspan="3" class="p-0 text-end">
                                             <button class="btn btn-sm" @click="savePrice">                     
-                                            <span v-if="!isSavePrice"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                                            <span v-if="!isSavePrice"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+shift+s)</span>
                                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSavePrice"></span>
                                              </button>
                                         </td>
@@ -336,7 +336,7 @@ export default {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.deleteMultiple(); // Call your custom function
             }  
-            if (event.shiftKey && event.key.toLowerCase() === 's') {
+            if (event.ctrlKey && event.shiftKey && event.key === 'S') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.savePrice(); // Call your custom function
             }   

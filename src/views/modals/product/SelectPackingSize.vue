@@ -33,7 +33,7 @@
                                 </tr> 
                                 <tr class=" text-center">
                                     <td class="col-">
-                                        <input @keypress.enter="pressSetBtn" type="number" class="form-control-plaintext py-0 text-center" v-model="medium_qty">
+                                        <input :disabled="!largest_unit" @keypress.enter="pressSetBtn" type="number" class="form-control-plaintext py-0 text-center" v-model="medium_qty">
                                     </td>
                                     <td class="col-1">
                                         <select class="form-control-plaintext py-0 text-center" v-model="medium_unit">
@@ -43,7 +43,7 @@
                                 </tr>      
                                 <tr class="text-center">
                                     <td class="col-1">
-                                        <input @keypress.enter="pressSetBtn" type="number" class="form-control-plaintext py-0 text-center" v-model="smallest_qty">
+                                        <input :disabled="!medium_unit" @keypress.enter="pressSetBtn" type="number" class="form-control-plaintext py-0 text-center" v-model="smallest_qty">
                                     </td>
                                     <td class="col-1">
                                         <select class="form-control-plaintext py-0 text-center " v-model="smallest_unit">
