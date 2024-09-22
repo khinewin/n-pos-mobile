@@ -251,7 +251,7 @@ export default {
         }
     },
     mounted() {           
-        this.voucher_no=new Date().getTime();
+        this.voucher_no=this.setVoucherNo();
         this.checkDatabase();      
         this.pur_date=hp.setToday()
         window.addEventListener('keydown', this.handleCtrl);
@@ -263,8 +263,11 @@ export default {
      },
     
     methods:{
-        handleCtrl(event) {
-           
+        setVoucherNo(){
+            return hp.setVoucherNo();
+        },
+
+        handleCtrl(event) {           
             if (event.ctrlKey && event.key === 's') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.savePurchase(); // Call your custom function
@@ -273,10 +276,8 @@ export default {
                 event.preventDefault(); // Prevent the default browser save dialog
                 const close=document.querySelector(".close")
                 close.click();
-            }
-           
-            return hc.handleCtrl(event)
-          
+            }           
+            return hc.handleCtrl(event)          
         },
         
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
@@ -518,7 +519,7 @@ export default {
         },
         clearPurchaseItem(){
             this.isLoading=false;
-            this.voucher_no=new Date().getTime();
+            this.voucher_no=this.setVoucherNo();
             this.pur_date=hp.setToday()
             this.storePurchase=[]
             this.purchase_item=null

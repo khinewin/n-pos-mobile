@@ -510,7 +510,7 @@ export default {
 
                 const rt_in_date=hp.insertDate(this.rt_in_date)
                 const voucher={
-                    voucher_no: Number(this.voucher_no),
+                    voucher_no: this.voucher_no,
                    rt_in_date: Timestamp.fromDate(rt_in_date),
                     products : this.rtInItems,
                     user : {uid: this.user.uid, displayName: this.user.displayName},
@@ -536,7 +536,7 @@ export default {
         },
 
         async fetchReturnIn(){
-            const query_url = query(collection(db, "returnIn"), where("voucher_no", "==", Number(this.voucher_no)));
+            const query_url = query(collection(db, "returnIn"), where("voucher_no", "==", this.voucher_no));
             onSnapshot(query_url, async(snapShot) =>{
                     const rt=rtIn.returnIn(snapShot)   
                     if(rt.length<=0) return false;

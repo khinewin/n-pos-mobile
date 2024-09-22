@@ -130,7 +130,7 @@ export default {
            purchases:[],
            purchasesData: [],
 
-           search_by_voucher_no:"",
+           search_by_voucher_no:"N-",
            search_by_from_pur_date:"",
            search_by_to_pur_date:"",
            search_by_supplier:"",
@@ -174,7 +174,7 @@ export default {
            this.clearSearch();
        },
        clearSearch(){
-           this.search_by_voucher_no="";
+           this.search_by_voucher_no="N-";
            this.search_by_supplier="";
            this.search_by_from_pur_date=hp.setSearchFromDate();
            this.search_by_to_pur_date=hp.setSearchToDate();
@@ -190,13 +190,13 @@ export default {
                        return f.location==this.search_by_location && (f.supplier.name.toLowerCase().includes(this.search_by_supplier.toLowerCase()) || f.supplier.company.toLowerCase().includes(this.search_by_supplier.toLowerCase()))
                })
            }else 
-            if(this.search_by_voucher_no && this.search_by_location){
+            if(this.search_by_voucher_no.length>2 && this.search_by_location){
                this.purchases=this.purchasesData.filter((f)=>{
-                       return f.location==this.search_by_location && f.voucher_no===Number(this.search_by_voucher_no);
+                       return f.location==this.search_by_location && f.voucher_no==this.search_by_voucher_no;
                })
-           }else  if(this.search_by_voucher_no){
+           }else  if(this.search_by_voucher_no.length>2){
                this.purchases=this.purchasesData.filter((f)=>{
-                       return f.voucher_no===Number(this.search_by_voucher_no);
+                       return f.voucher_no==this.search_by_voucher_no;
                })
            }else if(this.search_by_supplier){
                this.purchases=this.purchasesData.filter((f)=>{

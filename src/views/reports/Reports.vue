@@ -250,7 +250,7 @@ export default {
             to_date:"",
            from_date:"",
 
-            voucher_no:"",
+            voucher_no:"N-",
             packing_unit:"S Unit",
             supplier: {
                 name: "",

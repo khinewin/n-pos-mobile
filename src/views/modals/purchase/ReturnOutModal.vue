@@ -120,7 +120,7 @@ export default {
        return{
            rtOuts:[],
            returnOutData: [],
-           search_by_voucher_no:"",
+           search_by_voucher_no:"N-",
            search_by_date:"",
            search_to_date:"",
            search_by_supplier:"",
@@ -164,7 +164,7 @@ export default {
            this.clearSearch();
        },
        clearSearch(){
-           this.search_by_voucher_no="";
+           this.search_by_voucher_no="N-";
            this.search_by_supplier="";
             this.setDate();
            this.searchRtOut();
@@ -177,8 +177,8 @@ export default {
         if(this.search_by_supplier){
             this.rtOuts=this.returnOutData.filter((f)=>f.supplier.name.toLowerCase().includes(this.search_by_supplier.toLowerCase()))
        }else
-       if(this.search_by_voucher_no){
-            this.rtOuts=this.returnOutData.filter((f)=>f.voucher_no==Number(this.search_by_voucher_no))
+       if(this.search_by_voucher_no.length>2){
+            this.rtOuts=this.returnOutData.filter((f)=>f.voucher_no==this.search_by_voucher_no)
        }else{
             this.rtOuts=this.returnOutData;
        }

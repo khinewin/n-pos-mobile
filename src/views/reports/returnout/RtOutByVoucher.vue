@@ -202,7 +202,7 @@ export default {
            let query_url="";
            if(this.voucher_no){
              query_url = query(collection(db, "returnOut"), 
-            where("voucher_no", "==", Number(this.voucher_no)));
+            where("voucher_no", "==", this.voucher_no));
             }else 
             if(this.supplier_code){
                 query_url = query(collection(db, "returnOut"), 

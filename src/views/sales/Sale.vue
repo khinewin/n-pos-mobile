@@ -276,7 +276,8 @@ export default {
     },
    
     mounted() {
-        this.voucher_no=new Date().getTime();
+        this.voucher_no=this.setVoucherNo();
+        this.setVoucherNo();
         this.sale_date=hp.setToday()
         this.print_date=hp.setToday();
         this.setCustomer(this.default_customer)
@@ -318,7 +319,9 @@ export default {
         }
     },
     methods:{
-        
+        setVoucherNo(){
+           return hp.setVoucherNo();
+        },
         handleCtrl(event) {
             if (event.ctrlKey && event.key === 's') {
                 event.preventDefault(); // Prevent the default browser save dialog
@@ -657,7 +660,7 @@ export default {
                 this.change=0
                 this.credit=0
                 this.saleMode="Sale / New";                
-                this.voucher_no=new Date().getTime();
+                this.voucher_no=this.setVoucherNo();
                 this.sale_date=hp.setToday();      
                 this.print_date=hp.setToday();  
                 this.setCustomer(this.default_customer)

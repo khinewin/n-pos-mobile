@@ -177,7 +177,7 @@ export default {
     
     methods:{       
         async fetchTransfers(){
-            const query_url = query(collection(db, "transfers"), where("voucher_no","==", Number(this.voucher_no)));
+            const query_url = query(collection(db, "transfers"), where("voucher_no","==", this.voucher_no));
             const snapShot=await getDocs(query_url)
             const transfers=ss.transfers(snapShot);      
             this.isLoading=false;

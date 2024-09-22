@@ -355,7 +355,7 @@ export default {
             },200)
         },
         async fetchSale(){
-            const query_url = query(collection(db, "sales"), where("voucher_no", "==", Number(this.voucher_no)));
+            const query_url = query(collection(db, "sales"), where("voucher_no", "==",this.voucher_no));
             onSnapshot(query_url, async(snapShot) =>{
                     const sales=ss.sales(snapShot)   
                     if(sales.length<=0) return false;
@@ -569,7 +569,7 @@ export default {
                 
                 const sale_date=hp.insertDate(this.sale_date)
                 const voucher={
-                    voucher_no: Number(this.voucher_no),
+                    voucher_no: this.voucher_no,
                    sale_date: Timestamp.fromDate(sale_date),
                     products : this.saleItems,
                     user : {uid: this.user.uid, displayName: this.user.displayName},

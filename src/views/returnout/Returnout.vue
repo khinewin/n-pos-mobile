@@ -248,7 +248,7 @@ export default {
     },
    
     mounted() {
-        this.voucher_no=new Date().getTime();
+        this.voucher_no=hp.setVoucherNo();
         this.rt_out_date=hp.setToday()
         this.print_date=hp.setToday();
         this.setSupplier(this.general_supplier)
@@ -566,7 +566,7 @@ export default {
                 this.balance=0
                 this.remark="";
                 this.rtOutMode="Return Out / New";                
-                this.voucher_no=new Date().getTime();
+                this.voucher_no=hp.setVoucherNo();
                 this.rt_out_date=hp.setToday();      
                 this.print_date=hp.setToday();  
                 this.location="Pharmacy";

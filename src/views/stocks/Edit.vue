@@ -284,7 +284,7 @@ export default {
             this.remark=item.remark;  
         },
         async fetchStock(){
-            const query_url = query(collection(db, "stocks"), where("voucher_no", "==", Number(this.voucher_no)));
+            const query_url = query(collection(db, "stocks"), where("voucher_no", "==", this.voucher_no));
             onSnapshot(query_url, (snapShot)=>{
                 const stocks=ss.stocks(snapShot);
                 this.setItem(stocks[0])

@@ -59,7 +59,7 @@
                                 <tr>
                                     <td class="text-end fw-bold">Supplier <span class="">:</span></td>
                                     <td class=""  >
-                                        {{supplier.name}} <span v-if="supplier.company">{{supplier.company}}</span>
+                                        {{supplier.name}}
                                     </td>
                                 </tr>
                             </tbody>

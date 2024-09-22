@@ -359,7 +359,7 @@ export default {
                 })
         },
         async fetchPurchase(){
-            const query_url = query(collection(db, "purchases"), where("voucher_no", "==", Number(this.voucher_no)));
+            const query_url = query(collection(db, "purchases"), where("voucher_no", "==", this.voucher_no));
             onSnapshot(query_url, (snapShot)=>{
                     const purchase=ss.purchases(snapShot);      
                     if(purchase.length > 0){

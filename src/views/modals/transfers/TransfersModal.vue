@@ -123,7 +123,7 @@ export default {
            transfers:[],
            transfersData: [],
 
-           search_by_voucher_no:"",
+           search_by_voucher_no:"N-",
            search_from_date:"",
            search_to_date:"",
            search_from_location:"",
@@ -169,7 +169,7 @@ export default {
            this.clearSearch();
        },
        clearSearch(){
-           this.search_by_voucher_no="";
+           this.search_by_voucher_no="N-";
            this.search_from_location="";
            this.setDate();
            this.searchTransfers();
@@ -178,13 +178,13 @@ export default {
             this.fetchTransfers();
        },
        displayTransfers(){
-        if(this.search_by_voucher_no && this.search_from_location){
+        if(this.search_by_voucher_no.length>2 && this.search_from_location){
                this.transfers=this.transfersData.filter((f)=>{
                        return f.from_location===this.search_from_location && f.voucher_no== this.search_by_voucher_no;
                })
-        }else   if(this.search_by_voucher_no){
+        }else   if(this.search_by_voucher_no.length>2){
                this.transfers=this.transfersData.filter((f)=>{
-                       return f.voucher_no===Number(this.search_by_voucher_no);
+                       return f.voucher_no==this.search_by_voucher_no;
                })
            }else if(this.search_from_location){
                 this.transfers=this.transfersData.filter((f)=>{

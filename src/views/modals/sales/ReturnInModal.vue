@@ -116,7 +116,7 @@ export default {
        return{
            sales:[],
            returnInData: [],
-           search_by_voucher_no:"",
+           search_by_voucher_no:"N-",
            search_by_date:"",
            search_to_date:"",
            search_by_customer:"",
@@ -160,7 +160,7 @@ export default {
            this.clearSearch();
        },
        clearSearch(){
-           this.search_by_voucher_no="";
+           this.search_by_voucher_no="N-";
            this.search_by_customer="";
             this.setDate();
            this.searchRtIn();
@@ -173,8 +173,8 @@ export default {
         if(this.search_by_customer){
             this.sales=this.returnInData.filter((f)=>f.customer.name.toLowerCase().includes(this.search_by_customer.toLowerCase()))
        }else
-       if(this.search_by_voucher_no){
-            this.sales=this.returnInData.filter((f)=>f.voucher_no==Number(this.search_by_voucher_no))
+       if(this.search_by_voucher_no.length>2){
+            this.sales=this.returnInData.filter((f)=>f.voucher_no==this.search_by_voucher_no)
        }else{
             this.sales=this.returnInData;
        }

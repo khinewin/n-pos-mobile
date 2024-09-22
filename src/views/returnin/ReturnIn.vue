@@ -250,7 +250,7 @@ export default {
     },
    
     mounted() {
-        this.voucher_no=new Date().getTime();
+        this.voucher_no=hp.setVoucherNo();
         this.rt_in_date=hp.setToday()
         this.print_date=hp.setToday();
         this.setCustomer(this.default_customer)
@@ -551,7 +551,7 @@ export default {
                 this.balance=0
                 this.remark="";
                 this.rtInMode="Return In / New";                
-                this.voucher_no=new Date().getTime();
+                this.voucher_no=hp.setVoucherNo();
                 this.rt_in_date=hp.setToday();      
                 this.print_date=hp.setToday();  
                 this.setCustomer(this.default_customer)

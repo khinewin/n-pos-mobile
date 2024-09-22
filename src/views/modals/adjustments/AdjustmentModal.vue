@@ -117,7 +117,7 @@ export default {
        return{
            adjustments:[],
            adjustmentsData: [],
-           search_by_voucher_no:"",
+           search_by_voucher_no:"N-",
            search_by_from_date:"",
            search_by_to_date:"",
            search_by_location: "",
@@ -165,7 +165,7 @@ export default {
            this.clearSearch();
        },
        clearSearch(){
-           this.search_by_voucher_no="";
+           this.search_by_voucher_no="N-";
            this.search_by_location="";
             this.setDate();
            this.searchAdjustments();
@@ -174,7 +174,7 @@ export default {
             this.fetchAdjustments();
        },
        displayAdjustments(){
-        if(this.search_by_voucher_no && this.search_by_location){
+        if(this.search_by_voucher_no.length>2 && this.search_by_location){
                this.adjustments=this.adjustmentsData.filter((f)=>{
                        return f.location== this.search_by_location && f.voucher_no== this.search_by_voucher_no;
                })
@@ -182,7 +182,7 @@ export default {
                this.adjustments=this.adjustmentsData.filter((f)=>{
                        return f.location== this.search_by_location;
                })
-        }else  if(this.search_by_voucher_no){
+        }else  if(this.search_by_voucher_no.length>2){
                this.adjustments=this.adjustmentsData.filter((f)=>{
                        return f.voucher_no== this.search_by_voucher_no;
                })

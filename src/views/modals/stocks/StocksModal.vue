@@ -101,7 +101,7 @@ export default {
        return{
            stocks:[],
            stocksData: [],
-           search_by_voucher_no:"",
+           search_by_voucher_no:"N-",
            search_by_from_date:"",
            search_by_to_date:"",
            isLoading:false,
@@ -149,7 +149,7 @@ export default {
            this.clearSearch();
        },
        clearSearch(){
-           this.search_by_voucher_no="";
+           this.search_by_voucher_no="N-";
            this.search_by_from_date=hp.setSearchFromDate();
            this.search_by_to_date=hp.setSearchToDate();
            this.searchStocks();
@@ -158,9 +158,9 @@ export default {
             this.fetchStocks();
        },
        displayStocks(){
-           if(this.search_by_voucher_no){
+           if(this.search_by_voucher_no.length>2){
                this.stocks=this.stocksData.filter((f)=>{
-                       return f.voucher_no===Number(this.search_by_voucher_no);
+                       return f.voucher_no===this.search_by_voucher_no;
                })
            }else{
                    this.stocks= this.stocksData.filter((p, i)=>{

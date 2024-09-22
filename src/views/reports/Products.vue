@@ -92,18 +92,18 @@ export default {
     mounted() {      
             this.displayDate=Timestamp.fromDate(new Date())
             if(this.reportType==="stock_list"){
-                this.displayReportType="Stock list"
+                this.displayReportType="Stocks"
             }else 
             if(this.reportType==="stock_list_sale_price"){
-                this.displayReportType="Stock list with Sale Price"
+                this.displayReportType="Stocks with Sale Price"
                 this.is_stock_list_sale_price=true;
             }else
             if(this.reportType==="stock_list_pur_price"){
-                this.displayReportType="Stock list with Purchase Price"
+                this.displayReportType="Stocks with Purchase Price"
                 this.is_stock_list_pur_price=true;
             }else
             if(this.reportType==="stock_list_pur_sale_price"){
-                this.displayReportType="Stock list with Purchase and Sale Price"
+                this.displayReportType="Stocks with Purchase and Sale Price"
                 this.is_stock_list_pur_sale_price=true;
             }
         window.addEventListener('keydown', this.handleCtrl);

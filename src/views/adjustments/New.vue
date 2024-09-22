@@ -186,7 +186,7 @@ export default {
            }
     },
     mounted() {           
-        this.voucher_no=new Date().getTime();
+        this.voucher_no=hp.setVoucherNo();
         this.created_at=hp.setToday();
         this.checkDatabase();
         window.addEventListener('keydown', this.handleCtrl);
@@ -329,7 +329,7 @@ export default {
        resetAdjustments(){
             this.isLoading=false;
             this.isSaving=false;
-            this.voucher_no=new Date().getTime();
+            this.voucher_no=hp.setVoucherNo();
             this.created_at=hp.setToday();
             this.storeItems=[]
             this.adj_item=null
