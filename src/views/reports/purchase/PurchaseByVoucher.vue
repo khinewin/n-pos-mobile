@@ -197,7 +197,7 @@ export default {
            if(this.voucher_no.length>2){
              query_url = query(collection(db, "purchases"), 
             where("voucher_no", "==", this.voucher_no));
-           } if(this.supplier && loc !==null){
+           }else if(this.supplier && loc !==null){
             query_url = query(collection(db, "purchases"),
             where("pur_date", ">=", from_date), where("pur_date", "<=", to_date),
             where('supplier.code',"==", Number(this.supplier)), where("location","==", loc),

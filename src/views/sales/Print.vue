@@ -43,7 +43,7 @@
                 <tbody class="table-group-divider">
                     <tr class="text-center fw-bold">
                         <td class="col-0 border-0 border-bottom border-2 border-dark">No.</td>
-                        <td class="col-5 border-0  border-bottom border-2 border-dark">Description</td>
+                        <td class="col-5 border-0  border-bottom border-2 border-dark">Product Name</td>
                         <td class="col-1 border-0  border-bottom border-2 border-dark">Qty</td>
                         <td class="col-2 border-0  border-bottom border-2 border-dark">Unit Price</td>
                         <td class="col-2 border-0  border-bottom border-2 border-dark">Discount</td>
@@ -148,7 +148,7 @@
                 <tbody class="fw-bold text-center">
                     <tr class="">
                         <td class="">No.</td>
-                        <td class="">Description</td>
+                        <td class="">Product Name</td>
                         <td class="" >Qty</td>
                         <!--<td class="" >Unit price</td>-->
                         <td class="">Discount</td>
