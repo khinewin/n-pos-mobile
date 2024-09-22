@@ -46,7 +46,7 @@
                                                 <select @change="searchPurchase" class="form-control-plaintext border-bottom" v-model="search_by_location">
                                                     <option value="">All</option>
                                                     <option>Main</option>
-                                                    <option>Pharmacy</option>
+                                                    <option>Mart</option>
                                                 </select>
                                                 <label for="search_by_supplier" class="">Location</label>
                                             </div>

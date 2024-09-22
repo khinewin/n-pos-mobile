@@ -6,10 +6,10 @@ const displayReportType=(reportType)=>{
         return "by Voucher"
     }else
     if(reportType==='by_description'){
-        return "by Description"
+        return "by Product Name"
     }else
     if(reportType==='by_description_date'){
-        return "by Description and Date"
+        return "by Product Name and Date"
     }else
     if(reportType==='by_customer'){
         return "by Customer"

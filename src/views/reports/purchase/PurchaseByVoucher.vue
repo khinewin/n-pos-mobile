@@ -18,7 +18,7 @@
                         <table class="table mb-0 table-borderless">
                             <tbody>
                                 <tr class="">
-                                    <td class="text-end pb-0">Voucher no. :</td>
+                                    <td class="text-end pb-0">Voucher No. :</td>
                                     <td class="pb-0" >
                                         {{p.voucher_no}}
                                     </td>                              
@@ -36,7 +36,7 @@
                             <tbody>
                                 <tr class="">
                                                                 
-                                    <td class="text-end pb-0">Pur date :</td>
+                                    <td class="text-end pb-0">Pur Date :</td>
                                     <td class="pb-0" v-if="p.pur_date" >
                                         {{showTime(p.pur_date)}}
                                     </td>                              
@@ -54,7 +54,7 @@
                         <tbody class="table-group-divider">
                             <tr class="small text-center fw-bold table-secondary">
                                 <td class="col-1">Code</td>
-                                <td class="col-2">Description</td>
+                                <td class="col-2">Product Name</td>
                                 <td class="col-1">Exp. Date</td>
                                 <td class="col-1">Packing Size</td>
                                 <td class="col-1">Qty</td>
@@ -194,7 +194,7 @@ export default {
            let query_url="";
            const loc=this.location=="All" ? null : this.location;
 
-           if(this.voucher_no){
+           if(this.voucher_no.length>2){
              query_url = query(collection(db, "purchases"), 
             where("voucher_no", "==", this.voucher_no));
            } if(this.supplier && loc !==null){

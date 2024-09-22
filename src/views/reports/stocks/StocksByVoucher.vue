@@ -48,7 +48,7 @@
                             <tbody>
                                 <tr class="small text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
-                                    <td  class="col-2">Description</td>
+                                    <td  class="col-2">Product Name</td>
                                     <td class="col-1">Packing Size</td>
                                     <td class="col-1 " v-if="location=='Main' || location=='All'">Main Inv Bal</td>         
                                     <td class="col-1" v-if="location=='Shop' || location=='All'">Shop Inv Bal</td>                          
@@ -171,14 +171,14 @@ export default {
             const from_date=Timestamp.fromDate(new Date(this.fromDate))
             const to_date=Timestamp.fromDate(new Date(this.toDate))
             let query_url="";
-            if(this.voucher_no){
+            if(this.voucher_no.length>2){
                 query_url = query(collection(db, "stocks"),  where("voucher_no", "==", this.voucher_no))
             }else{
              query_url = query(collection(db, "stocks"),  
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
             }
             onSnapshot(query_url, (snapShot)=>{ //all on snapshot
-                let stockItems=ss.stocks(snapShot);                          
+                let stockItems=ss.stocks(snapShot);       
                 if(this.code_no){            
                     stockItems=stockItems.map((st)=>{
                         const data=st.products.filter((f)=>{

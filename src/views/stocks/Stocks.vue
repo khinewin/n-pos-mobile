@@ -64,10 +64,10 @@
                             <tbody>
                                 <tr class=" fw-bold table-secondary text-center">
                                     <td class="col-1 ">Code</td>
-                                    <td class="col-2">Description</td>
+                                    <td class="col-2">Product Name</td>
                                     <td class="col-1">Packing size</td>
                                     <td class="col-1">Main Inv Bal</td>     
-                                    <td class="col-1">Pharmacy Inv Bal</td>   
+                                    <td class="col-1">Mart Inv Bal</td>   
                                     <td class="col-1">Pur price</td>
                                     <td class="col-1">Retail price</td>
                                     <td class="col-1">Wholesale price</td>      

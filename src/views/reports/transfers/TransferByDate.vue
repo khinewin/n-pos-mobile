@@ -5,7 +5,7 @@
                 <tr><td class="col-1" rowspan="2">Date</td></tr>
                 <tr class="">
                     <td class="col-1">Code</td>
-                    <td class="col-2">Description</td>
+                    <td class="col-2">Product Name</td>
                     <td class="col-1">Packing Size</td>
                     <td class="col-1">From Loc Bal</td> 
                     <td class="col-1">To Loc Bal</td> 

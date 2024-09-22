@@ -77,7 +77,7 @@
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
-                                    <td class="col-2">Description</td>
+                                    <td class="col-2">Product Name</td>
                                     <td class="col-1">From Loc Bal</td> 
                                     <td class="col-1">To Loc Bal</td> 
                                     <td class="col-1">Transfer Bal</td>

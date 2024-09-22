@@ -1,6 +1,6 @@
 <template lang="">       
  <div>           
-        <PageHeader page-title="Medicine Code" page-code="medicineCode" :msg-type="msg.type" :msg-info="msg.info"/>
+        <PageHeader page-title="Product Code" page-code="medicineCode" :msg-type="msg.type" :msg-info="msg.info"/>
         <div class="container-fluid">
             <div class="row  justify-content-end">   
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
@@ -32,7 +32,7 @@
                                 </div>
                                 <div class="form-floating col-sm-6 col-lg-12">
                                     <input type="search" id="search_by_description" v-model="search_by_description" @keyup="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
-                                    <label for="search_by_description" class="small">Description</label>
+                                    <label for="search_by_description" class="small">Product Name</label>
                                 </div>
                             </div> 
                              <div class="row  mt-2">
@@ -43,20 +43,22 @@
                                     <div class="col-6 d-grid"><button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
                              </div> 
                         </div>
-                    </div>                                                                                                          
+                    </div>       
+                                                                                                                
                 </div>                        
                 <div class="col-lg-5">
                     <div class="card shadow vh-75">
-                        <div class="card-body p-2 table-responsive ">
+                        <div class="card-body p-2">
                             <div>
+
                                 <table class="table table-bordered mb-0">
                                     <tbody> 
                                         <tr class="text-center table-secondary" style="cursor: context-menu;">
                                             <td class="co-0">
-                                                <input type="checkbox" @click="checkAll" v-model="is_check_all" class="form-check-input">
+                                                <input  type="checkbox" @click="checkAll" v-model="is_check_all" class="form-check-input">
                                             </td>
                                             <td class="col-3">Code</td>
-                                            <td class="col-9">Description</td>
+                                            <td class="col-9">Product Name</td>
                                         </tr>                                                                    
                                         <tr>
                                             <td class="position-relative">
@@ -66,7 +68,7 @@
                                                 <input placeholder="Code"  type="text" v-model="code_no" class="form-control-plaintext py-0  text-center">
                                             </td>
                                             <td>
-                                                <input id="item_name" placeholder="Description" @keypress.enter="saveCode"   type="text" v-model="item_name" class="form-control-plaintext py-0">
+                                                <input id="item_name" placeholder="Product Name" @keypress.enter="saveCode"   type="text" v-model="item_name" class="form-control-plaintext py-0">
                                             </td>                                     
                                         </tr>     
                                                                 
@@ -88,6 +90,7 @@
                                     </tr>
                                 </tbody>
                             </table>
+
                             <div v-if="isLoading">
                                 <div colspan="5">
                                     <div class="d-flex justify-content-center my-5">
@@ -122,7 +125,7 @@
                                         </td>
                                     </tr>
                                     <tr class="">
-                                        <td class="">Pharmacy Inv Bal</td>                                       
+                                        <td class="">Mart Inv Bal</td>                                       
                                         <td class="text-center" :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]">
                                             <div  v-if="editItem.packing_size">
                                                 {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            
@@ -244,7 +247,6 @@ import SelectPackingSizeModal from "@/views/modals/product/SelectPackingSize.vue
 import * as hp from "@/lib/helper"
 import * as cp from "@/lib/cal_price"
 
-
 export default {
     components: {
             PageHeader, Footer,PackingSizeModal,SelectPackingSizeModal
@@ -282,6 +284,7 @@ export default {
             is_deleted:false,
             is_check_all: false,
             isDeleting:false,
+            deviceId:"",
         }
     },
     created() {     
@@ -294,11 +297,9 @@ export default {
         this.fetchProducts();
         this.checkDatabase();
         window.addEventListener('keydown', this.handleCtrl);
-
+     
     },
-    beforeUnmount() {
-         window.removeEventListener('keydown', this.handleCtrl);
-     },
+ 
     computed:{
         user(){
             return this.$store.getters.user;
@@ -318,7 +319,7 @@ export default {
         }
     },
 
-    methods:{   
+    methods:{        
         handleCtrl(event) {
             if (event.ctrlKey && event.key === 'h') {
                 event.preventDefault(); // Prevent the default browser save dialog
@@ -359,7 +360,7 @@ export default {
         async deleteMultiple(){
             const is_has=this.products.filter((f)=>f.is_deleted)
             if(is_has.length <=0) return false;
-            const cf=confirm(`Are you sure you want to delete the medicine code ?`)
+            const cf=confirm(`Are you sure you want to delete the product code ?`)
             if(!cf) return false;
             this.isDeleting=true;
             this.products.filter(async (s)=>{
@@ -508,7 +509,7 @@ export default {
                       
         },
         message(type){
-                this.msg.info=hp.message(type, "medicine code")
+                this.msg.info=hp.message(type, "product code")
                 this.msg.type="success"                                                         
         }, 
         async checkDatabase(){ 
@@ -552,7 +553,7 @@ export default {
     }
 }
 </script>
-<style lang="">
-    
+<style>
+ 
 </style>
 

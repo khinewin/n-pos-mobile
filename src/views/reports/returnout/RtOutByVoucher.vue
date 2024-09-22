@@ -16,7 +16,7 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody class="small">  
                                         <tr>
-                                            <td class="col-4 pb-0 fw-bold text-end">Voucher no. <span class="">:</span></td>
+                                            <td class="col-4 pb-0 fw-bold text-end">Voucher No. <span class="">:</span></td>
                                             <td class="col-8  ps-2 pb-0" >
                                                 {{sale.voucher_no}}
                                             </td>
@@ -54,7 +54,7 @@
                                     <tbody class="table-group-divider">
                                         <tr class="text-center fw-bold">
                                             <td class="col-1">No.</td>
-                                            <td class="col-2">Description</td>
+                                            <td class="col-2">Product Name</td>
                                             <td class="col-1 text-center">Packing Size</td>   
                                             <td class="col-1 text-center">Exp Date</td>                                                                                 
                                             <td class="col-1 text-center">Qty</td>
@@ -200,7 +200,7 @@ export default {
             const to_date=Timestamp.fromDate(tDate)
 
            let query_url="";
-           if(this.voucher_no){
+           if(this.voucher_no.length>2){
              query_url = query(collection(db, "returnOut"), 
             where("voucher_no", "==", this.voucher_no));
             }else 

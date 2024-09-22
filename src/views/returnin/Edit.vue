@@ -79,7 +79,7 @@
                                                 <input :disabled="rtInMode=='Return In / History'" @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext p-0  text-center" placeholder="Scan code here">
                                             </td>
                                             <td id="description" class="col-3 text-center ">
-                                                Description 
+                                                Product Name 
                                             </td>  
                                             <td class="col-1  text-center">Packing size</td>                                                                                    
                                             <td class="col-1 text-center  table-primary">Qty</td>

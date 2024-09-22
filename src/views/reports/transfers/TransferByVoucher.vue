@@ -62,7 +62,7 @@
                             <tbody>
                                 <tr class="small text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
-                                    <td class="col-2">Description</td>
+                                    <td class="col-2">Product Name</td>
                                     <td class="col-1">Packing Size</td>
                                     <td class="col-1">From Loc Bal</td> 
                                     <td class="col-1">To Loc Bal</td> 
@@ -180,7 +180,7 @@ export default {
             const from_date=Timestamp.fromDate(new Date(this.fromDate))
             const to_date=Timestamp.fromDate(new Date(this.toDate))
             let query_url="";
-            if(this.voucher_no){
+            if(this.voucher_no.length>2){
                 query_url = query(collection(db, "transfers"),  where("voucher_no", "==", this.voucher_no))
             }else{
              query_url = query(collection(db, "transfers"),  

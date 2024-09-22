@@ -4,10 +4,10 @@
             <tbody class="">
                 <tr class="text-center fw-bold">
                     <td class="col-1"  @click="sortProducts('code_no')"> Code</td>
-                    <td class="col-2"  @click="sortProducts('item_name')"> Description</td>
+                    <td class="col-2"  @click="sortProducts('item_name')"> Product Name</td>
                     <td class="col-1">Packing Size</td>
                     <td class="col-1" @click="sortProducts('main_qty')" v-if="location =='All' || location=='Main'">Main Inv Bal</td>
-                    <td class="col-1" @click="sortProducts('qty')" v-if="location =='All' || location=='Pharmacy'"> Pharmacy Inv Bal</td>
+                    <td class="col-1" @click="sortProducts('qty')" v-if="location =='All' || location=='Mart'"> Mart Inv Bal</td>
                     <td class="col-1"  v-if="pur_price"  @click="sortProducts('pur_price')"> Pur Price</td>
                     <td class="col-1" v-if="sale_price"  @click="sortProducts('retail_price')"> Retail Price</td>
                     <td class="col-1" v-if="sale_price"  @click="sortProducts('whole_sale_price')"> Wholesale Price</td>
@@ -23,7 +23,7 @@
                     <td class="text-end"  v-if="location =='All' || location=='Main'">
                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.main_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
                     </td>
-                    <td class="text-end" v-if="location =='All' || location=='Pharmacy'">
+                    <td class="text-end" v-if="location =='All' || location=='Mart'">
                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
                     </td>
                     <td class="text-end"  v-if="pur_price"  >
@@ -98,7 +98,7 @@
                     this.reports=this.reports.filter((f)=>{
                         return f.main_qty >= Number(this.gt_equal) && f.main_qty <= Number(this.lt_equal)
                     })
-                }else if(this.location=="Pharmacy"){
+                }else if(this.location=="Mart"){
                     this.reports=this.reports.filter((f)=>{
                         return f.qty >= Number(this.gt_equal) && f.qty <= Number(this.lt_equal)
                     })
@@ -114,7 +114,7 @@
                     this.reports=this.reports.filter((f)=>{
                         return f.main_qty >= Number(this.gt_equal)
                     })
-                }else if(this.location=="Pharmacy"){
+                }else if(this.location=="Mart"){
                     this.reports=this.reports.filter((f)=>{
                         return f.qty >= Number(this.gt_equal)
                     })
@@ -129,7 +129,7 @@
                     this.reports=this.reports.filter((f)=>{
                         return f.main_qty <= Number(this.lt_equal)
                     })
-                }else if(this.location=="Pharmacy"){
+                }else if(this.location=="Mart"){
                     this.reports=this.reports.filter((f)=>{
                         return f.qty <= Number(this.lt_equal)
                     })

@@ -71,7 +71,7 @@
                         <tbody class="table-group-divider">
                             <tr class="text-center fw-bold table-secondary">
                                 <td class="col-1">Code</td>
-                                <td class="col-2">Descrption</td>
+                                <td class="col-2">Product Name</td>
                                 <td class="col-1">Exp. Date</td>     
                                 <td class="col-1">Packing Size</td>                              
                                 <td class="col-1" colspan="1">Qty</td>

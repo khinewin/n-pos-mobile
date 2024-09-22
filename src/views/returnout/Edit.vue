@@ -66,7 +66,7 @@
                                                 <td class="">
                                                     <select class="form-control-plaintext p-0 disabled change-cursor border-bottom" v-model="location">
                                                         <option value="Main">Main</option>
-                                                        <option value="Pharmacy">Pharmacy</option>
+                                                        <option value="Mart">Mart</option>
                                                     </select>
                                                 </td>
                                             </tr>                                                      
@@ -82,7 +82,7 @@
                                                 <input :disabled="rtOutMode=='Return Out / History'" @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext p-0  text-center" placeholder="Scan code here">
                                             </td>
                                             <td id="description" class="col-3 text-center" style="cursor: context-menu;">
-                                                Description 
+                                                Product Name 
                                             </td>  
                                             <td class="col-1  text-center">Packing Size</td>                                                                                    
                                             <td class="col-1 text-center table-warning">Exp Date</td>                                                                               
@@ -564,7 +564,7 @@ export default {
                     const pur_qty=p.pur_qty;     
                     const old_pur_qty=p.old_pur_qty;   
                     const updateDocument=doc(db, "products", id)       
-                    if(this.location==="Pharmacy"){
+                    if(this.location==="Mart"){
                         await updateDoc(updateDocument, {                      
                             qty : pur_qty < old_pur_qty ? increment(old_pur_qty - pur_qty) : increment(- (pur_qty - old_pur_qty)),
                         })   

@@ -25,7 +25,7 @@
                                             <td class="col-8">
                                                 <select :disabled="storeItems.length > 0" class="form-control-plaintext py-0 border-bottom" v-model="from_location" @change="handleFromLocation(from_location)">
                                                     <option value="Main">Main</option>
-                                                    <option value="Pharmacy">Pharmacy</option>
+                                                    <option value="Mart">Mart</option>
                                                 </select>
                                             </td>
                                         </tr>
@@ -34,7 +34,7 @@
                                             <td class="">
                                                 <select :disabled="storeItems.length > 0" class="form-control-plaintext py-0 border-bottom" v-model="to_location" @change="handleToLocation(to_location)">
                                                     <option value="Main">Main</option>
-                                                    <option value="Pharmacy">Pharmacy</option>
+                                                    <option value="Mart">Mart</option>
                                                 </select>
                                             </td>
                                         </tr>                                       
@@ -71,7 +71,7 @@
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary" >
                                     <td class="col-1">Code</td>
-                                    <td class="col-2 change-cursor description"  data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Description (ctrl+i)</td>
+                                    <td class="col-2 change-cursor description"  data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Product Name (ctrl+i)</td>
                                     <td class="col-1">Packing size</td>
                                     <td class="col-1">From Loc Bal</td> 
                                     <td class="col-1">To Loc Bal</td> 
@@ -153,7 +153,7 @@ export default {
             voucher_no:"", 
             created_at:"",        
             from_location:"Main",
-            to_location:"Pharmacy", 
+            to_location:"Mart", 
             editItem:{},
             transfer_item: {},
             storeItems: [],        
@@ -307,21 +307,21 @@ export default {
         handleFromLocation(location){
            if(location=="Main"){
                 this.from_location="Main";
-                this.to_location="Pharmacy"
+                this.to_location="Mart"
             } 
-            if(location=="Pharmacy"){
-                this.from_location="Pharmacy";
+            if(location=="Mart"){
+                this.from_location="Mart";
                 this.to_location="Main"
             }           
       },
       handleToLocation(location){
         if(location=="Main"){
-                this.from_location="Pharmacy";
+                this.from_location="Mart";
                 this.to_location="Main"
             } 
-            if(location=="Pharmacy"){
+            if(location=="Mart"){
                 this.from_location="Main";
-                this.to_location="Pharmacy"
+                this.to_location="Mart"
             }     
       },
       
@@ -407,7 +407,7 @@ export default {
                         qty : increment(p.transfer_qty)                   
                  })  
                 }
-                if(this.from_location==="Pharmacy"){
+                if(this.from_location==="Mart"){
                     await updateDoc(updateDocument, {
                         main_qty : increment(p.transfer_qty),    
                         qty : increment(-p.transfer_qty)                   

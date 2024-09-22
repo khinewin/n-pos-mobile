@@ -4,7 +4,7 @@
             <tbody class="" >    
                 <tr class="fw-bold text-center">
                     <td class="col-1">Code</td>
-                    <td class="col-2">Description</td>
+                    <td class="col-2">Product Name</td>
                     <td class="col-1 text-center">Packing Size</td>                                                                                    
                      <td class="col-1 text-center">Unit Price</td>                                 
                      <td class="col-1 text-center">Qty</td>                     

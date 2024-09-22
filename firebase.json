@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "n-pharmacy",
+    "site": "n-pro-pos",
     "public": "dist",
     "ignore": [
       "firebase.json",

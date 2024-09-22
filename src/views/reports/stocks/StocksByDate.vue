@@ -5,7 +5,7 @@
                 <tr><td class="col-1" rowspan="2">Date</td></tr>
                 <tr class="">
                     <td class="col-1">Code</td>
-                    <td class="col-2">Description</td>
+                    <td class="col-2">Product Name</td>
                     <td class="col-1">Packing Size</td>
                     <td class="col-1 " v-if="location=='Main' || location=='All'">Main Inv Bal</td>         
                     <td class="col-1" v-if="location=='Pharmacy' || location=='All'">Pharmacy Inv Bal</td>                                           

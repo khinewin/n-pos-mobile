@@ -21,8 +21,8 @@
                                                     </div>
                                                     <div class="col-md-6 col-lg-12">
                                                         <div class="form-floating">
-                                                            <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
-                                                            <label for="search_by_item_name" class="">Description</label>
+                                                            <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Product Name" class="form-control-plaintext border-bottom">
+                                                            <label for="search_by_item_name" class="">Product Name</label>
                                                         </div> 
                                                     </div>
                                                 </div>
@@ -50,7 +50,7 @@
                                                     <tbody>
                                                         <tr class="text-center fw-bold table-secondary">
                                                             <td>Code</td>
-                                                            <td>Description</td>
+                                                            <td>Product Name</td>
                                                         </tr>
                                                         <tr v-if="stockItems.length>0" v-for="item in stockItems" :key="item.id">
                                                                 <td class="col-1">{{item.code_no}}</td>
@@ -70,9 +70,9 @@
                                             <tbody class="small">
                                                 <tr class="table-secondary text-center fw-bold">
                                                     <td class="col-1">Code</td>
-                                                    <td class="col-2 change-cursor add-all" @click="insertAllItem" ><i class="fa-solid fa-check-double"></i> Description (ctrl+a)</td>
+                                                    <td class="col-2 change-cursor add-all" @click="insertAllItem" ><i class="fa-solid fa-check-double"></i> Product Name (ctrl+a)</td>
                                                     <td class="col-1">Packing size</td>
-                                                    <td class="col-1">Pharmacy Inv</td>
+                                                    <td class="col-1">Mart Inv</td>
                                                     <td class="col-1">Main Inv</td>
                                                 </tr>                                      
                                                 <tr class="change-cursor" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)" >

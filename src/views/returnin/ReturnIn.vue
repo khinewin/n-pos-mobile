@@ -87,7 +87,7 @@
                                                 <input :disabled="rtInMode=='Return In / History'" @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext p-0  text-center" placeholder="Scan code here">
                                             </td>
                                             <td  class="col-3 text-center change-cursor description" :data-bs-toggle="[rtInMode=='Return In / History' ? '' : 'modal']" :data-bs-target="[rtInMode=='Return In / History' ? '' : '#searchCode']" style="cursor: context-menu;">
-                                                <span v-if="rtInMode=='Return In / New'"><i class="fa-solid fa-circle-plus" ></i></span> Description <span v-if="rtInMode=='Return In / New'">(cltr+i)</span>
+                                                <span v-if="rtInMode=='Return In / New'"><i class="fa-solid fa-circle-plus" ></i></span> Product Name <span v-if="rtInMode=='Return In / New'">(cltr+i)</span>
                                             </td>  
                                             <td class="col-1  text-center">Packing size</td>                                                                                    
                                             <td class="col-1 text-center  table-primary">Qty</td>

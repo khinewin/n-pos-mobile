@@ -39,7 +39,7 @@
                                                     <select class="form-control-plaintext border-bottom" @change="searchAdjustments" v-model="search_by_location" aria-placeholder="Location">
                                                         <option value="">All</option>
                                                         <option>Main</option>
-                                                        <option>Pharmacy</option>
+                                                        <option>Mart</option>
                                                     </select>
                                                     <label for="search_from_location" class="">Location</label>
                                                 </div>

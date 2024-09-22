@@ -44,69 +44,69 @@ const router = createRouter({
       path: '/',
       name: 'Welcome',
       component: Login,
-      meta : {title: "N-Pharmacy | Welcome"}
+      meta : {title: "N-PRO-POS | Welcome"}
 
     },
     {
       path: '/auth/login',
       name: 'Login',     
       component: Login,
-      meta : {title: "N-Pharmacy | User signin"}
+      meta : {title: "N-PRO-POS | User signin"}
 
     },
     {
       path: '/admin/dashboard',
       name: 'Dashboard',     
       component: Dashboard,
-      meta : {title: "N-Pharmacy | Admin dashboard"}
+      meta : {title: "N-PRO-POS | Admin dashboard"}
     },
     {
       path: '/return-out',
       name: 'ReturnOut',     
       component: Returnout,
-      meta : {title: "N-Pharmacy | Return Out"}
+      meta : {title: "N-PRO-POS | Return Out"}
 
     },
     {
       path: '/return-out/:id/edit',
       name: 'EditReturnOut',     
       component: EditReturnOut,
-      meta : {title: "N-Pharmacy | Return Out / Edit"}
+      meta : {title: "N-PRO-POS | Return Out / Edit"}
 
     },
     {
       path: '/return-in',
       name: 'ReturnIn',     
       component: ReturnIn,
-      meta : {title: "N-Pharmacy | Return In"}
+      meta : {title: "N-PRO-POS | Return In"}
 
     },
     {
       path: '/return-in/:id/edit',
       name: 'EditReturnIn',     
       component: EditReturnIn,
-      meta : {title: "N-Pharmacy | Return In / Edit"}
+      meta : {title: "N-PRO-POS | Return In / Edit"}
 
     },
     {
       path: '/sale',
       name: 'Sale',     
       component: Sale,
-      meta : {title: "N-Pharmacy | Sale"}
+      meta : {title: "N-PRO-POS | Sale"}
 
     },
     {
       path: '/sale/:id/edit',
       name: 'EditSale',     
       component: EditSale,
-      meta : {title: "N-Pharmacy | Sale / Edit"}
+      meta : {title: "N-PRO-POS | Sale / Edit"}
 
     },
     {
       path: '/soc',
       name: 'Soc',     
       component: SalesOnCredit,
-      meta : {title: "N-Pharmacy | SOC"}
+      meta : {title: "N-PRO-POS | SOC"}
 
     },
     {
@@ -119,160 +119,160 @@ const router = createRouter({
       path: '/products',
       name: 'Products',     
       component: Products,
-      meta : {title: "N-Pharmacy | Medicine code"}
+      meta : {title: "N-PRO-POS | Product Code"}
 
     },
     {
       path: '/stocks',
       name: 'Stocks',     
       component: Stocks,
-      meta : {title: "N-Pharmacy |  Stocks / History"}
+      meta : {title: "N-PRO-POS |  Stocks / History"}
 
     },
     {
       path: '/stocks/new',
       name: 'NewStocks',     
       component: NewStocks,
-      meta : {title: "N-Pharmacy | Stocks / New"}
+      meta : {title: "N-PRO-POS | Stocks / New"}
     },
     {
       path: '/stocks/:id/edit',
       name: 'EditStocks',     
       component: EditStocks,
-      meta : {title: "N-Pharmacy | Stocks / Edit"}
+      meta : {title: "N-PRO-POS | Stocks / Edit"}
     },
     {
       path: '/purchase',
       name: 'Purchase',     
       component: Purchase,
-      meta : {title: "N-Pharmacy | Purchase / History"}
+      meta : {title: "N-PRO-POS | Purchase / History"}
     },
     {
       path: '/purchase/:id/edit',
       name: 'EditPurchase',     
       component: EditPurchase,
-      meta : {title: "N-Pharmacy | Purchase / Edit"}
+      meta : {title: "N-PRO-POS | Purchase / Edit"}
     },
     {
       path: '/purchase/add',
       name: 'AddPurchase',     
       component: AddPurchase,
-      meta : {title: "N-Pharmacy | Purchase / New"}    },
+      meta : {title: "N-PRO-POS | Purchase / New"}    },
    
     {
       path: '/suppliers',
       name: 'Suppliers',     
       component: Suppliers,
-      meta : {title: "N-Pharmacy | Suppliers"}
+      meta : {title: "N-PRO-POS | Suppliers"}
     },
     {
       path: '/customers',
       name: 'Customers',     
       component: Customers,
-      meta : {title: "N-Pharmacy | Customers"}
+      meta : {title: "N-PRO-POS | Customers"}
     },
     {
       path: "/reports",
       name: "Reports",
       component: Reports,
-      meta : {title: "N-Pharmacy | Reports"}
+      meta : {title: "N-PRO-POS | Reports"}
     },
     {
       path: "/reports/products/:reportType/:location",
       name: "ReportsProduct",
       component: ReportProduct,
-      meta : {title: "N-Pharmacy | Report Medicine Code"}
+      meta : {title: "N-PRO-POS | Report Medicine Code"}
     },
     {
       path: "/reports/transfers/:reportType/:fromDate/:toDate/:from_location/:to_location",
       name: "ReportsTransfer",
       component: ReportsTransfers,
-      meta : {title: "N-Pharmacy | Report Transfers"}
+      meta : {title: "N-PRO-POS | Report Transfers"}
     },
     {
       path: "/reports/stocks/:reportType/:fromDate/:toDate/:location",
       name: "ReportsStocks",
       component: ReportStocks,
-      meta : {title: "N-Pharmacy | Report Stocks"}
+      meta : {title: "N-PRO-POS | Report Stocks"}
     },
     {
       path: "/reports/sales/:reportType/:fromDate/:toDate",
       name: "ReportsSales",
       component: ReportSales,
-      meta : {title: "N-Pharmacy | Report Sales"}
+      meta : {title: "N-PRO-POS | Report Sales"}
     },
     {
       path: "/reports/purchase/:reportType/:fromDate/:toDate/:location",
       name: "ReportsPurchase",
       component: ReportPurchase,
-      meta : {title: "N-Pharmacy | Report Purchase"}
+      meta : {title: "N-PRO-POS | Report Purchase"}
     },
     {
       path: "/reports/adjustments/:reportType/:fromDate/:toDate",
       name: "ReportsAdjustments",
       component: ReportAdjustments,
-      meta : {title: "N-Pharmacy | Report Adjustments"}
+      meta : {title: "N-PRO-POS | Report Adjustments"}
     },
     {
       path: "/reports/soc/:reportType/:fromDate/:toDate",
       name: "ReportsSoc",
       component: ReportsSoc,
-      meta : {title: "N-Pharmacy | Report SOC"}
+      meta : {title: "N-PRO-POS | Report SOC"}
     },
     {
       path: "/reports/return-in/:reportType/:fromDate/:toDate",
       name: "ReportsReturnIn",
       component: ReportReturnIn,
-      meta : {title: "N-Pharmacy | Report Return In"}
+      meta : {title: "N-PRO-POS | Report Return In"}
     },
     {
       path: "/reports/return-out/:reportType/:fromDate/:toDate",
       name: "ReportsReturnOut",
       component: ReportReturnOut,
-      meta : {title: "N-Pharmacy | Report Return Out"}
+      meta : {title: "N-PRO-POS | Report Return Out"}
     },
     {
       path: '/transfers/:id/edit',
       name: 'EditTransfer',     
       component: EditTransfer,    
-      meta: { title: 'N-Pharmacy | Transfer / Edit' },
+      meta: { title: 'N-PRO-POS | Transfer / Edit' },
     },
     {
       path: '/transfers/new',
       name: 'AddTransfer',     
       component: NewTransfer,    
-      meta: { title: 'N-Pharmacy | Transfer / New' },
+      meta: { title: 'N-PRO-POS | Transfer / New' },
     },
     {
       path: '/transfer',
       name: 'Transfers',     
       component: Transfers,    
-      meta: { title: 'N-Pharmacy | Transfer' },
+      meta: { title: 'N-PRO-POS | Transfer' },
     },
     {
       path: '/adjustments',
       name: 'Adjustments',     
       component: Adjustments,
-      meta : {title: "N-Pharmacy | Adjustment"}
+      meta : {title: "N-PRO-POS | Adjustment"}
     },
     {
       path: '/adjustments/add',
       name: 'NewAdjustment',     
       component: NewAdjustment,
-      meta : {title: "N-Pharmacy | Adjustment / New"}
+      meta : {title: "N-PRO-POS | Adjustment / New"}
     },
    
     {
       path: '/user/profile',
       name: 'Profile',     
       component: Profile,    
-      meta: { title: 'N-Pharmacy | User profile' },
+      meta: { title: 'N-PRO-POS | User profile' },
     },
     {
       path: '/backup-restore',
       name:'BackupRestore',
       component: BackupRestore,
-      meta: { title: 'N-Pharmacy | Backup / Restore' },
+      meta: { title: 'N-PRO-POS | Backup / Restore' },
     }
   ], 
 })

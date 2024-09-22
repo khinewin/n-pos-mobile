@@ -5,7 +5,7 @@
                 <tr><td class="col-1" rowspan="2">Supplier</td></tr>
                 <tr class="">
                     <td class="col-1">Code</td>
-                    <td class="col-2">Description</td>
+                    <td class="col-2">Product Name</td>
                     <td class="col-1">Packing Size</td>
                     <td class="col-1">Qty</td>
                     <td class="col-1">Unit Price</td>

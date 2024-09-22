@@ -25,7 +25,7 @@
                                             <td class="col-8">
                                                 <select v-model="location" class="form-control-plaintext py-0  border-bottom" :disabled="storeItems.length > 0">
                                                     <option>Main</option>
-                                                    <option>Pharmacy</option>
+                                                    <option>Mart</option>
                                                 </select>
                                             </td>                                           
                                         </tr>        
@@ -63,7 +63,7 @@
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
-                                    <td class="col-2 change-cursor description"  data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Description (ctrl+i)</td>
+                                    <td class="col-2 change-cursor description"  data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Product Name (ctrl+i)</td>
                                     <td class="col-1">Packing size</td>
                                     <td class="col-1">Before Adj</td>
                                     <td class="col-1">Adj type</td>
@@ -150,7 +150,7 @@ export default {
            
             voucher_no:"", 
             created_at:"",         
-            location: "Pharmacy",
+            location: "Mart",
             adj_item: {},
             storeItems: [],
             editItem: {},         
@@ -212,8 +212,8 @@ export default {
         },
         setAdjQty(){
             const e=this.editItem;
-            if(this.location=="Pharmacy" && e.qty <=0 && e.adj_type=="Decrement"){
-                    this.msg.info="Pharmacy inventory balance is not enough to decrement"
+            if(this.location=="Mart" && e.qty <=0 && e.adj_type=="Decrement"){
+                    this.msg.info="Mart inventory balance is not enough to decrement"
                     this.msg.type="error"
                     return false;
             }

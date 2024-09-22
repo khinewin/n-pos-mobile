@@ -31,7 +31,7 @@
                                     <div class="form-floating mb-2">
                                         <select v-model="from_location" class="form-control-plaintext border-bottom" id="from_location" @change="handleFromLocation(from_location)">
                                             <option>Main</option>
-                                            <option>Pharmacy</option>
+                                            <option>Mart</option>
                                         </select>
                                         <label for="from_location">From Location</label>
                                     </div>  
@@ -40,7 +40,7 @@
                                     <div class="form-floating mb-2">
                                         <select v-model="to_location" class="form-control-plaintext border-bottom" id="to_location" @change="handleToLocation(from_location)">
                                             <option>Main</option>
-                                            <option>Pharmacy</option>
+                                            <option>Mart</option>
                                         </select>
                                         <label for="to_location">To Location</label>
                                     </div>    
@@ -78,7 +78,7 @@
                                 <select v-model="location" class="form-control-plaintext border-bottom">
                                     <option>All</option>
                                     <option>Main</option>
-                                    <option>Pharmacy</option>
+                                    <option>Mart</option>
                                 </select>
                                 <label for="location">Location</label>
                             </div>    
@@ -158,7 +158,7 @@
                                 <tbody>
                                     <tr>
                                         <td>
-                                            <ReportList @report="reportProducts" title="Medicine Code" :arr="products" />
+                                            <ReportList @report="reportProducts" title="Product Code" :arr="products" />
                                         </td>
                                     </tr>
                                     <tr>
@@ -241,7 +241,7 @@ export default {
             gt_equal:null,
             lt_equal:null,
             from_location:"Main",
-            to_location:"Pharmacy",
+            to_location:"Mart",
             item_name:"",
             location: "All",
             code_no:"",
@@ -265,32 +265,32 @@ export default {
                 info :"",
             },
             products:[
-                {code : "stock_list", name: "stock list", active: true},
-                {code: "stock_list_sale_price", name:"stock list sale price", active: true},
-                {code: "stock_list_pur_price", name: "stock list pur price", active: true},    
-                {code: "stock_list_pur_sale_price", name: "stock list pur & sale price", active: true},             
+                {code : "stock_list", name: "stocks list", active: true},
+                {code: "stock_list_sale_price", name:"stocks list sale price", active: true},
+                {code: "stock_list_pur_price", name: "stocks list pur price", active: true},    
+                {code: "stock_list_pur_sale_price", name: "stocks list pur & sale price", active: true},             
              ],
              stocks:[
                 {code : "by_date", name: "by date", active: true},
-                {code: "by_description", name:"by description", active: true},
+                {code: "by_description", name:"by product name", active: true},
                 {code: "by_voucher", name: "by voucher", active: true},               
              ],
              adjustments:[
                 {code : "by_date", name: "by date", active: true},
-                {code: "by_description", name:"by description", active: true},
+                {code: "by_description", name:"by product name", active: true},
                 {code: "by_voucher", name: "by voucher", active: true},    
                 {code: "by_location", name: "by location", active: true},  
                 {code: "by_adj_type", name: "by type", active: true},               
              ],
              transfers:[
                 {code : "by_date", name: "by date", active: true},
-                {code: "by_description", name:"by description", active: true},
+                {code: "by_description", name:"by product name", active: true},
                 {code: "by_voucher", name: "by voucher", active: true},               
              ],
             sales:[
                 {code : "by_date", name: "by date", active: true},
-                {code: "by_description", name:"by description", active: true},
-                {code: "by_description_date", name:"by description and date", active: true},
+                {code: "by_description", name:"by product name", active: true},
+                {code: "by_description_date", name:"by product name and date", active: true},
                 {code: "by_voucher", name: "by voucher", active: true},    
                 {code: "by_customer", name:"by customer", active: true},
                 {code: "by_customer_date", name: "by customer and date", active: true},    
@@ -298,7 +298,7 @@ export default {
              ],
             purchase:[
                 {code : "by_date", name: "by date", active: true},
-                {code: "by_description", name:"by description", active: true},
+                {code: "by_description", name:"by product name", active: true},
                 {code: "by_voucher", name: "by voucher", active: true},
                 {code: "by_supplier", name:"by supplier", active: true},
                 {code: "by_supplier_date", name: "by supplier and date", active: true},
@@ -311,14 +311,14 @@ export default {
              ],
              returnIn:[
                 {code : "by_date", name: "by date", active: true},
-                {code: "by_description", name:"by description", active: true},
+                {code: "by_description", name:"by product name", active: true},
                 {code: "by_voucher", name: "by voucher", active: true},    
                 {code: "by_customer", name:"by customer", active: true},
                 {code: "by_customer_date", name: "by customer and date", active: true},    
              ],
              returnOut:[
                 {code : "by_date", name: "by date", active: true},
-                {code: "by_description", name:"by description", active: true},
+                {code: "by_description", name:"by product name", active: true},
                 {code: "by_voucher", name: "by voucher", active: true},    
                 {code: "by_supplier", name:"by supplier", active: true},
                 {code: "by_supplier_date", name: "by supplier and date", active: true},    
@@ -393,7 +393,7 @@ export default {
             this.lt_equal=null;
             this.gt_equal=null;
             this.from_location="Main";
-            this.to_location="Pharmacy";
+            this.to_location="Mart";
             this.location="All";
             this.adj_type="";
             this.rts_rfs="";
@@ -407,21 +407,21 @@ export default {
         handleFromLocation(location){
            if(location=="Main"){
                 this.from_location="Main";
-                this.to_location="Pharmacy"
+                this.to_location="Mart"
             } 
-            if(location=="Pharmacy"){
-                this.from_location="Pharmacy";
+            if(location=="Mart"){
+                this.from_location="Mart";
                 this.to_location="Main"
             }           
       },
       handleToLocation(location){
         if(location=="Main"){
-                this.from_location="Pharmacy";
+                this.from_location="Mart";
                 this.to_location="Main"
             } 
-            if(location=="Pharmacy"){
+            if(location=="Mart"){
                 this.from_location="Main";
-                this.to_location="Pharmacy"
+                this.to_location="Mart"
             }     
       },
         reportAdjustments(r_type){                     

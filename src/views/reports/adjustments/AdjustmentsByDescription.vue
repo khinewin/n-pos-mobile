@@ -4,7 +4,7 @@
             <tbody class="" >    
                     <tr class="fw-bold text-center">
                         <td class="col-1">Code</td>
-                        <td class="col-2">Description</td>
+                        <td class="col-2">Product Name</td>
                         <td class="col-1">Packing Size</td>
                         <td class="col-1">Before Adj</td>
                         <td class="col-1">Adj type</td>

@@ -73,7 +73,7 @@
                                                 <td class="">
                                                     <select class="form-control-plaintext p-0  change-cursor border-bottom" v-model="location">
                                                         <option value="Main">Main</option>
-                                                        <option value="Pharmacy">Pharmacy</option>
+                                                        <option value="Mart">Mart</option>
                                                     </select>
                                                 </td>
                                             </tr>                                          
@@ -89,7 +89,7 @@
                                                 <input :disabled="rtOutMode=='Return Out / History'" @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext p-0  text-center" placeholder="Scan code here">
                                             </td>
                                             <td  class="col-3 text-center change-cursor description" :data-bs-toggle="[rtOutMode=='Return Out / History' ? '' : 'modal']" :data-bs-target="[rtOutMode=='Return Out / History' ? '' : '#searchCode']" style="cursor: context-menu;">
-                                                <span v-if="rtOutMode=='Return Out / New'"><i class="fa-solid fa-circle-plus" ></i></span> Description <span v-if="rtOutMode=='Return Out / New'">(cltr+i)</span>
+                                                <span v-if="rtOutMode=='Return Out / New'"><i class="fa-solid fa-circle-plus" ></i></span> Product Name <span v-if="rtOutMode=='Return Out / New'">(cltr+i)</span>
                                             </td>  
                                             <td class="col-1  text-center">Packing Size</td>     
                                             <td class="col-1 text-center table-warning">Exp Date</td>                                                                               
@@ -212,7 +212,7 @@ export default {
             id:"",
             rtOutMode: "Return Out / New",
             isLoading:false,
-            location: "Pharmacy",
+            location: "Mart",
             sale_type: "retail",
             rtOutItems:[],
             editItem:{},
@@ -373,7 +373,7 @@ export default {
          //   const isCheck=this.checkEditQty();
             const e=this.editItem;
                 if(this.location=="Main" && e.main_qty <=0) return false;
-                if(this.location=="Pharmacy" && e.qty <=0) return false;
+                if(this.location=="Mart" && e.qty <=0) return false;
                 let pur_qty=0;
                 pur_qty += e.input_l_qty ? e.input_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
                 pur_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty: 0;
@@ -542,7 +542,7 @@ export default {
                     const id=p.id;
                     const pur_qty=p.pur_qty;               
                     const updateDocument=doc(db, "products", id)
-                   if(this.location=="Pharmacy"){
+                   if(this.location=="Mart"){
                     await updateDoc(updateDocument, {
                         qty : increment(-pur_qty)
                     })  
@@ -569,7 +569,7 @@ export default {
                 this.voucher_no=hp.setVoucherNo();
                 this.rt_out_date=hp.setToday();      
                 this.print_date=hp.setToday();  
-                this.location="Pharmacy";
+                this.location="Mart";
                 this.setSupplier(this.general_supplier)
                 this.isLoading=false;
                 this.v$.$reset()

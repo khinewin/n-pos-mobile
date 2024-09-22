@@ -21,8 +21,8 @@
                                                     </div>
                                                     <div class="col-md-6 col-lg-12">
                                                         <div class="form-floating">
-                                                            <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
-                                                            <label for="search_by_item_name" class="">Description</label>
+                                                            <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Product Name" class="form-control-plaintext border-bottom">
+                                                            <label for="search_by_item_name" class="">Product Name</label>
                                                         </div> 
                                                     </div>
                                                 </div>
@@ -50,7 +50,7 @@
                                                     <tbody>      
                                                         <tr class="text-center fw-bold table-secondary">
                                                             <td>Code</td>
-                                                            <td>Description</td>
+                                                            <td>Product Name</td>
                                                         </tr>                                         
                                                         <tr v-if="saleItems.length>0" v-for="(s,i) in saleItems" :key="s.id" >
                                                             <td class="text-center col-1">{{s.code_no}}</td>        
@@ -72,9 +72,9 @@
                                             <tbody class="small text-nowrap text-break ">
                                                 <tr class="table-secondary text-center fw-bold">
                                                     <td class="col-1">Code</td>
-                                                    <td class="col-2">Description</td>
+                                                    <td class="col-2">Product Name</td>
                                                     <td class="col-1">Packing size</td>
-                                                    <td class="col-1">Pharmacy Inv Bal</td>
+                                                    <td class="col-1">Mart Inv Bal</td>
                                                     <td class="col-1" >Retail price</td>
                                                     <td class="col-1">Wholesale price</td>
 

@@ -31,7 +31,7 @@
                                             <td class="">
                                                 <select class="form-control-plaintext p-0  border-bottom" v-model="location">
                                                     <option value="Main">Main</option>
-                                                    <option value="Pharmacy">Pharmacy</option>
+                                                    <option value="Mart">Mart</option>
                                                 </select>
                                             </td>
                                         </tr>
@@ -69,7 +69,7 @@
                                     <td class="col-1"> 
                                         Code
                                     </td>
-                                    <td class="col-2 change-cursor description"  data-bs-toggle="modal" data-bs-target="#searchCode" style="cursor: context-menu;" ><i class="fa-solid fa-circle-plus"></i> Description (cltr+i)</td>
+                                    <td class="col-2 change-cursor description"  data-bs-toggle="modal" data-bs-target="#searchCode" style="cursor: context-menu;" ><i class="fa-solid fa-circle-plus"></i> Product Name (cltr+i)</td>
                                     <td class="col-1 table-info">Exp. Date</td>     
                                     <td class="col-1">Packing Size</td>                              
                                     <td class="col-1 table-primary" colspan="1">Qty</td>
@@ -509,7 +509,7 @@ export default {
                      pur_price: p.pur_price
                  })
                 }
-                 if(this.location==="Pharmacy"){
+                 if(this.location==="Mart"){
                     await updateDoc(updateDocument, {
                      qty : increment(pur_qty),
                      pur_price: p.pur_price,

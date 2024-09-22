@@ -13,7 +13,7 @@
                             <div class="col-sm-10 col-md-8">     
                                 <div class="text-center">
                                     <img src="/img/logo.png" alt="" class="img-fluid" style="width: 100px">
-                                    <div class="text-primary logo h2">PHARMACY</div>
+                                    <div class="text-primary logo h2">Point Of Sale</div>
                                 </div>
                                 <div class="d-flex justify-content-center my-5 " v-if="isCheckAuth">
                                     <div class="spinner-border text-primary"  role="status">

@@ -19,8 +19,8 @@
                                             </div>
                                             <div class="col-6 col-lg-12">
                                                 <div class="form-floating">
-                                                    <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
-                                                    <label for="search_by_item_name" class="">Description</label>
+                                                    <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Product Name" class="form-control-plaintext border-bottom">
+                                                    <label for="search_by_item_name" class="">Product Name</label>
                                                 </div> 
                                             </div>
                                         </div>
@@ -48,9 +48,9 @@
                                             <tbody class="small">
                                                 <tr class="table-secondary text-center fw-bold">
                                                     <td class="col-1">Code</td>
-                                                    <td class="col-2">Description</td>
+                                                    <td class="col-2">Product Name</td>
                                                     <td class="col-1">Packing size</td>
-                                                    <td class="col-1">Pharmacy Inv Bal</td>
+                                                    <td class="col-1">Mart Inv Bal</td>
                                                     <td class="col-1">Main Inv Bal</td>
                                                 </tr>                                      
                                                 <tr class="change-cursor" data-bs-dismiss="modal" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"   style="cursor:context-menu">
@@ -231,7 +231,7 @@ export default {
                                                     <div class="small fw-lighter ">Code</div>
                                             </div>
                                             <div class="col-lg-5">
-                                                    <div class="small fw-lighter ">Description</div>
+                                                    <div class="small fw-lighter ">Product Name</div>
                                             </div>
                                             <div class="col-lg-1">
                                                     <div class="small fw-lighter">Qty</div>

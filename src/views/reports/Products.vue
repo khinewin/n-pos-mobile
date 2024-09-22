@@ -92,18 +92,18 @@ export default {
     mounted() {      
             this.displayDate=Timestamp.fromDate(new Date())
             if(this.reportType==="stock_list"){
-                this.displayReportType="Stocks"
+                this.displayReportType="Stocks List"
             }else 
             if(this.reportType==="stock_list_sale_price"){
-                this.displayReportType="Stocks with Sale Price"
+                this.displayReportType="Stocks List with Sale Price"
                 this.is_stock_list_sale_price=true;
             }else
             if(this.reportType==="stock_list_pur_price"){
-                this.displayReportType="Stocks with Purchase Price"
+                this.displayReportType="Stocks List with Purchase Price"
                 this.is_stock_list_pur_price=true;
             }else
             if(this.reportType==="stock_list_pur_sale_price"){
-                this.displayReportType="Stocks with Purchase and Sale Price"
+                this.displayReportType="Stocks List with Purchase and Sale Price"
                 this.is_stock_list_pur_sale_price=true;
             }
         window.addEventListener('keydown', this.handleCtrl);
@@ -161,6 +161,11 @@ export default {
     }
 }
 </script>
-<style lang="">
-    
+<style>
+    #camera-preview {
+      width: 100%;
+      max-width: 500px;
+      height: auto;
+      margin: 20px auto;
+    }
 </style>

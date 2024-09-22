@@ -36,7 +36,7 @@
                 <router-link class="btn btn-sm " :to="{name : 'Stocks'}"><i class="fa-solid fa-money-bill-trend-up text-primary"></i> Stocks</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Products'}"><i class="fa-solid fa-list-check text-warning"></i> Medicine code</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Products'}"><i class="fa-solid fa-list-check text-warning"></i> Product code</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
                 <router-link class="btn btn-sm " :to="{name : 'Suppliers'}"><i class="fa-solid fa-person-walking-luggage text-info"></i> Suppliers</router-link>

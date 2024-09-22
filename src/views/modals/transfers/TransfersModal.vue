@@ -40,7 +40,7 @@
                                                 <select class="form-control-plaintext border-bottom" @change="searchTransfers" v-model="search_from_location" aria-placeholder="From location">
                                                     <option value="">All</option>
                                                     <option>Main</option>
-                                                    <option>Pharmacy</option>
+                                                    <option>Mart</option>
                                                 </select>
                                                 <label for="search_from_location" class="">From location</label>
                                             </div>
