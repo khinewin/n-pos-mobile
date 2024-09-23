@@ -6,13 +6,13 @@
             <table class="table mb-0 table-borderless">
                 <tbody class="small">  
                     <tr>
-                        <td class="col-4 pb-0 fw-bold">Voucher no. <span class="float-end">:</span></td>
+                        <td class="col-4 pb-0 fw-bold">Voucher No. <span class="float-end">:</span></td>
                         <td class="col-8  ps-2 pb-0" >
                             {{data.voucher_no}}
                         </td>
                     </tr>
                     <tr>
-                        <td class="pb-0 fw-bold">Sale date <span class="float-end">:</span></td>
+                        <td class="pb-0 fw-bold">Sale Date <span class="float-end">:</span></td>
                         <td class=" ps-2 pb-0" >
                            <span>{{sale_date}}</span>
                         </td>
@@ -55,7 +55,7 @@
                         <td class="text-center">{{i+1}}</td>                     
                         <td class="">{{s.item_name}}</td> 
                         <td class="text-center">
-                            {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
+                            {{s.sale_qty}}
                         </td>    
                         <td class="text-end">{{fM(s.qty_sale_price)}}' {{s.qty_sale_price_unit}} </td>     
                         <!--<td class="text-center">
@@ -115,13 +115,13 @@
             <table class="small-print-header">
                 <tbody class="">  
                     <tr>
-                        <td class="">Voucher no. <span class="">:</span></td>
+                        <td class="">Voucher No. <span class="">:</span></td>
                         <td class="" >
                             {{data.voucher_no}}
                         </td>
                     </tr>
                     <tr>
-                        <td class="">Sale date <span class="">:</span></td>
+                        <td class="">Sale Date <span class="">:</span></td>
                         <td class="" >
                            <span >{{sale_date}}</span>
                         </td>

@@ -192,12 +192,10 @@ export default {
                 return {...s, 
                     group_price: s.packing_size.largest_unit ? 
                              `${s.retail_price.largest_unit},
-                             ${s.whole_sale_price.largest_unit}, 
                              ${s.pur_price.largest_unit}` 
                              : 
-                             `${s.retail_price.medium_unit},
-                             ${s.whole_sale_price.medium_unit},
-                             ${s.pur_price.medium_unit}
+                             `${s.retail_price.smallest_unit},
+                             ${s.pur_price.smallest_unit}
                              `
                 }
             })

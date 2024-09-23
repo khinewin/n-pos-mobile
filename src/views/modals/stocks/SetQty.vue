@@ -19,17 +19,17 @@
                         <table class="table table-bordered mb-0" v-if="Object.keys(ei).length">
                             <tbody>
                                 <tr>
-                                    <td colspan="3" class="text-center p-2" >{{ei.item_name}}</td>
+                                    <td colspan="2" class="text-center p-2" >{{ei.item_name}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-center col-2">Main Inventory</td>
-                                    <td class="text-center col-2">Pharmacy Inventory</td>
+                                    <!--<td class="text-center col-2">Main Inventory</td>-->
+                                    <td class="text-center col-1">Mart Inv Bal</td>
                                     <td class="text-center col-1">Unit</td>
                                 </tr>
                                 <tr v-if="ei.packing_size.largest_unit">
-                                    <td class="p-0">
+                                   <!--<td class="p-0">
                                         <input @keypress.enter="pressSaveBtn" type="number" v-model="ei.main_l_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
+                                    </td>-->
                                     <td class="p-0">
                                         <input @keypress.enter="pressSaveBtn" type="number" v-model="ei.l_qty" class="form-control-plaintext form-control-sm text-center">
                                     </td>
@@ -40,9 +40,9 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="p-0">
+                                    <!--<td class="p-0">
                                         <input @keypress.enter="pressSaveBtn" type="number" v-model="ei.main_m_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
+                                    </td>-->
                                     <td class="p-0">
                                         <input @keypress.enter="pressSaveBtn" type="number" v-model="ei.m_qty" class="form-control-plaintext form-control-sm text-center">
                                     </td>
@@ -53,9 +53,9 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="p-0">
+                                    <!--<td class="p-0">
                                         <input @keypress.enter="pressSaveBtn" type="number" v-model="ei.main_s_qty" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
+                                    </td>-->
                                     <td class="p-0">
                                         <input @keypress.enter="pressSaveBtn" type="number" v-model="ei.s_qty" class="form-control-plaintext form-control-sm text-center">
                                     </td>

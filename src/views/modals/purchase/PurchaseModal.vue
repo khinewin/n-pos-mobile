@@ -43,7 +43,7 @@
                                         </div>
                                         <div class="col-6 col-lg-12">
                                             <div class="form-floating ">
-                                                <select @change="searchPurchase" class="form-control-plaintext border-bottom" v-model="search_by_location">
+                                                <select disabled @change="searchPurchase" class="form-control-plaintext border-bottom" v-model="search_by_location">
                                                     <option value="">All</option>
                                                     <option>Main</option>
                                                     <option>Mart</option>

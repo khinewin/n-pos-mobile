@@ -7,11 +7,11 @@
                     <td class="col-1">Code</td>
                     <td class="col-2">Product Name</td>
                     <td class="col-1">Packing Size</td>
-                    <td class="col-1 " v-if="location=='Main' || location=='All'">Main Inv Bal</td>         
-                    <td class="col-1" v-if="location=='Pharmacy' || location=='All'">Pharmacy Inv Bal</td>                                           
+                    <!--<td class="col-1 " v-if="location=='Main' || location=='All'">Main Inv Bal</td>-->         
+                    <td class="col-1" v-if="location=='Mart' || location=='All'">Mart Inv Bal</td>                                           
                     <td class="col-1">Pur Price</td>
-                    <td class="col-1">Retail Price</td>
-                    <td class="col-1">Wholesale Price</td>    
+                    <td class="col-1">Sale Price</td>
+                    <!--<td class="col-1">Wholesale Price</td>-->    
                 </tr>
             </tbody>
             <tbody v-if="reports.length > 0" v-for="r in reports" :key="r[0]" class="table-group-divider">       
@@ -22,10 +22,10 @@
                     <td class="">
                         {{calPackingSize(p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit, p.packing_size.medium_qty, p.packing_size.smallest_qty)}}
                     </td>
-                    <td class="text-end"  v-if="location =='All' || location=='Main'">
+                    <!--<td class="text-end"  v-if="location =='All' || location=='Main'">
                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.main_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
-                    </td>
-                    <td class="text-end" v-if="location =='All' || location=='Pharmacy'">
+                    </td>-->
+                    <td class="text-end" v-if="location =='All' || location=='Mart'">
                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
                     </td>
                     <td class="text-end" >
@@ -34,14 +34,14 @@
                     <td class="text-end">
                              {{displayPrice(p.retail_price.largest_unit, p.retail_price.medium_unit, p.retail_price.smallest_unit)}}
                     </td>
-                    <td class="text-end">
+                    <!--<td class="text-end">
                             {{displayPrice(p.whole_sale_price.largest_unit, p.whole_sale_price.medium_unit, p.whole_sale_price.smallest_unit)}}
-                    </td>
+                    </td>-->
                 </tr>
                 <tr>
-                    <td :colspan="[location=='All' ? 6 : 5]" class="text-end fw-bold  pe-2">Total Amount (Ks)</td>
+                    <td :colspan="[location=='All' ? 5 : 4]" class="text-end fw-bold  pe-2">Total Amount (Ks)</td>
                     <td class="text-end fw-bold"> {{fM(r[2].retail_amount)}}</td>
-                    <td class="text-end fw-bold"> {{fM(r[2].whole_sale_amount)}}</td>
+                    <!--<td class="text-end fw-bold"> {{fM(r[2].whole_sale_amount)}}</td>-->
                 </tr>
             </tbody>
         </table>
@@ -154,7 +154,7 @@ export default {
             if(this.location=="Main"){
                 stocks=stocks.filter((f)=>f.main_qty > 0)
             }
-            if(this.location=="Pharmacy"){
+            if(this.location=="Mart"){
                 stocks=stocks.filter((f)=>f.qty > 0)
             }      
             const gbd=Object.entries(hp.gb_date(stocks))

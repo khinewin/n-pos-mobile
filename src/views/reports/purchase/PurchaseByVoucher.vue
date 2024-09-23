@@ -55,7 +55,7 @@
                             <tr class="small text-center fw-bold table-secondary">
                                 <td class="col-1">Code</td>
                                 <td class="col-2">Product Name</td>
-                                <td class="col-1">Exp. Date</td>
+                                <!--<td class="col-1">Exp. Date</td>-->
                                 <td class="col-1">Packing Size</td>
                                 <td class="col-1">Qty</td>
                                 <td class="col-1">Unit Price</td>
@@ -68,9 +68,9 @@
                             <tr class="" v-if="p.products.length > 0" v-for="st in p.products" :key="st.id">
                                 <td class="text-center">{{st.code_no}}</td>
                                 <td class="">{{st.item_name}}</td>
-                                <td class="text-center">                                   
+                                <!--<td class="text-center">                                   
                                      <span v-if="st.exp_date">{{showTime(st.exp_date)}}</span>
-                                </td>
+                                </td>-->
                                 <td class="col-1">
                                     {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                  </td>

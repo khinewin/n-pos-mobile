@@ -23,19 +23,19 @@
                     <div class="col-12">
                         <table class="table table-bordered mb-0">
                             <tbody class="small">
-                                <tr class="text-center">                                    
+                                <!--<tr class="text-center">                                    
                                     <td class="col-1" colspan="2">
                                         <select class="form-control-plaintext py-0 text-center" v-model="largest_unit">
                                             <option value=""></option>
                                             <option v-for="s in packingSizes" :key="s.id">{{s.packing_unit}}</option>
                                         </select>
                                     </td>
-                                </tr> 
+                                </tr>--> 
                                 <tr class=" text-center">
-                                    <td class="col-">
+                                    <!--<td class="col-">
                                         <input :disabled="!largest_unit" @keypress.enter="pressSetBtn" type="number" class="form-control-plaintext py-0 text-center" v-model="medium_qty">
-                                    </td>
-                                    <td class="col-1">
+                                    </td>-->
+                                    <td class="col-2" colspan="2">
                                         <select class="form-control-plaintext py-0 text-center" v-model="medium_unit">
                                             <option v-for="s in packingSizes" :key="s.id">{{s.packing_unit}}</option>
                                         </select>

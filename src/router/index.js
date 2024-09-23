@@ -44,69 +44,69 @@ const router = createRouter({
       path: '/',
       name: 'Welcome',
       component: Login,
-      meta : {title: "N-PRO-POS | Welcome"}
+      meta : {title: "N-POS | Welcome"}
 
     },
     {
       path: '/auth/login',
       name: 'Login',     
       component: Login,
-      meta : {title: "N-PRO-POS | User signin"}
+      meta : {title: "N-POS | User signin"}
 
     },
     {
       path: '/admin/dashboard',
       name: 'Dashboard',     
       component: Dashboard,
-      meta : {title: "N-PRO-POS | Admin dashboard"}
+      meta : {title: "N-POS | Admin dashboard"}
     },
     {
       path: '/return-out',
       name: 'ReturnOut',     
       component: Returnout,
-      meta : {title: "N-PRO-POS | Return Out"}
+      meta : {title: "N-POS | Return Out"}
 
     },
     {
       path: '/return-out/:id/edit',
       name: 'EditReturnOut',     
       component: EditReturnOut,
-      meta : {title: "N-PRO-POS | Return Out / Edit"}
+      meta : {title: "N-POS | Return Out / Edit"}
 
     },
     {
       path: '/return-in',
       name: 'ReturnIn',     
       component: ReturnIn,
-      meta : {title: "N-PRO-POS | Return In"}
+      meta : {title: "N-POS | Return In"}
 
     },
     {
       path: '/return-in/:id/edit',
       name: 'EditReturnIn',     
       component: EditReturnIn,
-      meta : {title: "N-PRO-POS | Return In / Edit"}
+      meta : {title: "N-POS | Return In / Edit"}
 
     },
     {
       path: '/sale',
       name: 'Sale',     
       component: Sale,
-      meta : {title: "N-PRO-POS | Sale"}
+      meta : {title: "N-POS | Sale"}
 
     },
     {
       path: '/sale/:id/edit',
       name: 'EditSale',     
       component: EditSale,
-      meta : {title: "N-PRO-POS | Sale / Edit"}
+      meta : {title: "N-POS | Sale / Edit"}
 
     },
     {
       path: '/soc',
       name: 'Soc',     
       component: SalesOnCredit,
-      meta : {title: "N-PRO-POS | SOC"}
+      meta : {title: "N-POS | SOC"}
 
     },
     {
@@ -119,160 +119,160 @@ const router = createRouter({
       path: '/products',
       name: 'Products',     
       component: Products,
-      meta : {title: "N-PRO-POS | Product Code"}
+      meta : {title: "N-POS | Product Code"}
 
     },
     {
       path: '/stocks',
       name: 'Stocks',     
       component: Stocks,
-      meta : {title: "N-PRO-POS |  Stocks / History"}
+      meta : {title: "N-POS |  Stocks / History"}
 
     },
     {
       path: '/stocks/new',
       name: 'NewStocks',     
       component: NewStocks,
-      meta : {title: "N-PRO-POS | Stocks / New"}
+      meta : {title: "N-POS | Stocks / New"}
     },
     {
       path: '/stocks/:id/edit',
       name: 'EditStocks',     
       component: EditStocks,
-      meta : {title: "N-PRO-POS | Stocks / Edit"}
+      meta : {title: "N-POS | Stocks / Edit"}
     },
     {
       path: '/purchase',
       name: 'Purchase',     
       component: Purchase,
-      meta : {title: "N-PRO-POS | Purchase / History"}
+      meta : {title: "N-POS | Purchase / History"}
     },
     {
       path: '/purchase/:id/edit',
       name: 'EditPurchase',     
       component: EditPurchase,
-      meta : {title: "N-PRO-POS | Purchase / Edit"}
+      meta : {title: "N-POS | Purchase / Edit"}
     },
     {
       path: '/purchase/add',
       name: 'AddPurchase',     
       component: AddPurchase,
-      meta : {title: "N-PRO-POS | Purchase / New"}    },
+      meta : {title: "N-POS | Purchase / New"}    },
    
     {
       path: '/suppliers',
       name: 'Suppliers',     
       component: Suppliers,
-      meta : {title: "N-PRO-POS | Suppliers"}
+      meta : {title: "N-POS | Suppliers"}
     },
     {
       path: '/customers',
       name: 'Customers',     
       component: Customers,
-      meta : {title: "N-PRO-POS | Customers"}
+      meta : {title: "N-POS | Customers"}
     },
     {
       path: "/reports",
       name: "Reports",
       component: Reports,
-      meta : {title: "N-PRO-POS | Reports"}
+      meta : {title: "N-POS | Reports"}
     },
     {
       path: "/reports/products/:reportType/:location",
       name: "ReportsProduct",
       component: ReportProduct,
-      meta : {title: "N-PRO-POS | Report Medicine Code"}
+      meta : {title: "N-POS | Report Medicine Code"}
     },
     {
       path: "/reports/transfers/:reportType/:fromDate/:toDate/:from_location/:to_location",
       name: "ReportsTransfer",
       component: ReportsTransfers,
-      meta : {title: "N-PRO-POS | Report Transfers"}
+      meta : {title: "N-POS | Report Transfers"}
     },
     {
       path: "/reports/stocks/:reportType/:fromDate/:toDate/:location",
       name: "ReportsStocks",
       component: ReportStocks,
-      meta : {title: "N-PRO-POS | Report Stocks"}
+      meta : {title: "N-POS | Report Stocks"}
     },
     {
       path: "/reports/sales/:reportType/:fromDate/:toDate",
       name: "ReportsSales",
       component: ReportSales,
-      meta : {title: "N-PRO-POS | Report Sales"}
+      meta : {title: "N-POS | Report Sales"}
     },
     {
       path: "/reports/purchase/:reportType/:fromDate/:toDate/:location",
       name: "ReportsPurchase",
       component: ReportPurchase,
-      meta : {title: "N-PRO-POS | Report Purchase"}
+      meta : {title: "N-POS | Report Purchase"}
     },
     {
       path: "/reports/adjustments/:reportType/:fromDate/:toDate",
       name: "ReportsAdjustments",
       component: ReportAdjustments,
-      meta : {title: "N-PRO-POS | Report Adjustments"}
+      meta : {title: "N-POS | Report Adjustments"}
     },
     {
       path: "/reports/soc/:reportType/:fromDate/:toDate",
       name: "ReportsSoc",
       component: ReportsSoc,
-      meta : {title: "N-PRO-POS | Report SOC"}
+      meta : {title: "N-POS | Report SOC"}
     },
     {
       path: "/reports/return-in/:reportType/:fromDate/:toDate",
       name: "ReportsReturnIn",
       component: ReportReturnIn,
-      meta : {title: "N-PRO-POS | Report Return In"}
+      meta : {title: "N-POS | Report Return In"}
     },
     {
       path: "/reports/return-out/:reportType/:fromDate/:toDate",
       name: "ReportsReturnOut",
       component: ReportReturnOut,
-      meta : {title: "N-PRO-POS | Report Return Out"}
+      meta : {title: "N-POS | Report Return Out"}
     },
     {
       path: '/transfers/:id/edit',
       name: 'EditTransfer',     
       component: EditTransfer,    
-      meta: { title: 'N-PRO-POS | Transfer / Edit' },
+      meta: { title: 'N-POS | Transfer / Edit' },
     },
     {
       path: '/transfers/new',
       name: 'AddTransfer',     
       component: NewTransfer,    
-      meta: { title: 'N-PRO-POS | Transfer / New' },
+      meta: { title: 'N-POS | Transfer / New' },
     },
     {
       path: '/transfer',
       name: 'Transfers',     
       component: Transfers,    
-      meta: { title: 'N-PRO-POS | Transfer' },
+      meta: { title: 'N-POS | Transfer' },
     },
     {
       path: '/adjustments',
       name: 'Adjustments',     
       component: Adjustments,
-      meta : {title: "N-PRO-POS | Adjustment"}
+      meta : {title: "N-POS | Adjustment"}
     },
     {
       path: '/adjustments/add',
       name: 'NewAdjustment',     
       component: NewAdjustment,
-      meta : {title: "N-PRO-POS | Adjustment / New"}
+      meta : {title: "N-POS | Adjustment / New"}
     },
    
     {
       path: '/user/profile',
       name: 'Profile',     
       component: Profile,    
-      meta: { title: 'N-PRO-POS | User profile' },
+      meta: { title: 'N-POS | User profile' },
     },
     {
       path: '/backup-restore',
       name:'BackupRestore',
       component: BackupRestore,
-      meta: { title: 'N-PRO-POS | Backup / Restore' },
+      meta: { title: 'N-POS | Backup / Restore' },
     }
   ], 
 })

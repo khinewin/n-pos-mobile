@@ -41,7 +41,7 @@
                                     </td>                                        
                                 </tr>
                                 <tr class="">
-                                    <td class="pt-2">Retail price</td>
+                                    <td class="pt-2">Sale Price</td>
                                     <td class="text-center p-0"  v-if="ei.packing_size.largest_unit">
                                         <input @keypress.enter="pressClose" :disabled="!ei.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="ei.retail_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
                                     </td>
@@ -52,7 +52,7 @@
                                             <input @keypress.enter="pressClose" :disabled="!ei.packing_size.smallest_unit" @keyup="calRetailPrice('smallest_unit')" type="number" v-model="ei.retail_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
                                     </td>                                        
                                 </tr>
-                                <tr class="">
+                                <!--<tr class="">
                                     <td class="pt-2">Wholesale price</td>
                                     <td class="text-center p-0"  v-if="ei.packing_size.largest_unit">
                                         <input @keypress.enter="pressClose" :disabled="!ei.packing_size.largest_unit" @keyup="calWholesalePrice('largest_unit')" type="number" v-model="ei.whole_sale_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
@@ -63,7 +63,7 @@
                                     <td class="text-center p-0"  v-if="ei.packing_size.smallest_unit">
                                             <input @keypress.enter="pressClose" :disabled="!ei.packing_size.smallest_unit" @keyup="calWholesalePrice('smallest_unit')" type="number" v-model="ei.whole_sale_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
                                     </td>                                        
-                                </tr>  
+                                </tr>-->  
                                 <tr>
                                     <td class="ps-2 pt-2" colspan="4">
                                         <div class="form-check form-switch">

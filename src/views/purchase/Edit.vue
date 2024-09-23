@@ -29,7 +29,7 @@
                                         <tr>
                                             <td class="text-end fw-bold ">Location :</td>
                                             <td class="">
-                                                <select class="form-control-plaintext p-0 border-bottom" v-model="location" disabled>
+                                                <select  class="form-control-plaintext p-0 border-bottom" v-model="location" disabled>
                                                     <option value="Main">Main</option>
                                                     <option value="Mart">Mart</option>
                                                 </select>
@@ -68,7 +68,7 @@
                                 <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
                                     <td class="col-2" > Product Name</td>
-                                    <td class="col-1 table-info">Exp. Date</td>     
+                                    <!--<td class="col-1 table-info">Exp. Date</td>-->     
                                     <td class="col-1">Packing Size</td>                              
                                     <td class="col-1 table-primary" colspan="1">Qty</td>
                                     <td class="col-2 table-info" colspan="2">Unit Price</td>     
@@ -82,10 +82,10 @@
                                         {{st.code_no}}                                                                                         
                                     </td>                                    
                                     <td class="">{{st.item_name}}</td>
-                                    <td class=" position-relative table-info" >
+                                    <!--<td class=" position-relative table-info" >
                                         <a v-if="st.tmp_exp_date" class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeExpDate(st)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                         <flat-pickr class="form-control-plaintext py-0 text-center" v-model="st.tmp_exp_date" @change="setExpDate(st.id)"  :config="config" />
-                                    </td>
+                                    </td>-->
                                     <td class="">
                                          {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                     </td>

@@ -71,9 +71,9 @@
                                                 <tr class="table-secondary text-center fw-bold">
                                                     <td class="col-1">Code</td>
                                                     <td class="col-2 change-cursor add-all" @click="insertAllItem" ><i class="fa-solid fa-check-double"></i> Product Name (ctrl+a)</td>
-                                                    <td class="col-1">Packing size</td>
-                                                    <td class="col-1">Mart Inv</td>
-                                                    <td class="col-1">Main Inv</td>
+                                                    <td class="col-1">Packing Size</td>
+                                                    <td class="col-1">Mart Inv Bal</td>
+                                                    <!--<td class="col-1">Main Inv</td>-->
                                                 </tr>                                      
                                                 <tr class="change-cursor" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)" >
                                                     <td class="text-center">{{p.code_no}}</td>
@@ -84,9 +84,9 @@
                                                     <td class="text-end col-1">
                                                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                             
                                                     </td>                                                  
-                                                    <td class="text-end col-1">
+                                                    <!--<td class="text-end col-1">
                                                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.main_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
-                                                    </td>
+                                                    </td>-->
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -230,7 +230,7 @@ props:['stockItems'],
         },
       
         async fetchProducts(){
-        const query_url = query(collection(db, "products"), where("is_deleted", "==", false), orderBy("created_at", "desc"));
+        const query_url = query(collection(db, "products"),  orderBy("created_at", "desc"));
         onSnapshot(query_url, async(snapShot) =>{                  
                     const products=lib.products(snapShot)       
                     this.productsData=products;

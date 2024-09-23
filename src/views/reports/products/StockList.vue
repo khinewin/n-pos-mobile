@@ -6,11 +6,11 @@
                     <td class="col-1"  @click="sortProducts('code_no')"> Code</td>
                     <td class="col-2"  @click="sortProducts('item_name')"> Product Name</td>
                     <td class="col-1">Packing Size</td>
-                    <td class="col-1" @click="sortProducts('main_qty')" v-if="location =='All' || location=='Main'">Main Inv Bal</td>
+                    <!--<td class="col-1" @click="sortProducts('main_qty')" v-if="location =='All' || location=='Main'">Main Inv Bal</td>-->
                     <td class="col-1" @click="sortProducts('qty')" v-if="location =='All' || location=='Mart'"> Mart Inv Bal</td>
                     <td class="col-1"  v-if="pur_price"  @click="sortProducts('pur_price')"> Pur Price</td>
-                    <td class="col-1" v-if="sale_price"  @click="sortProducts('retail_price')"> Retail Price</td>
-                    <td class="col-1" v-if="sale_price"  @click="sortProducts('whole_sale_price')"> Wholesale Price</td>
+                    <td class="col-1" v-if="sale_price"  @click="sortProducts('retail_price')"> Sale Price</td>
+                    <!--<td class="col-1" v-if="sale_price"  @click="sortProducts('whole_sale_price')"> Wholesale Price</td>-->
                 </tr>   
             </tbody>  
             <tbody>                                                  
@@ -20,9 +20,9 @@
                     <td class="">
                         {{calPackingSize(p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit, p.packing_size.medium_qty, p.packing_size.smallest_qty)}}
                     </td>
-                    <td class="text-end"  v-if="location =='All' || location=='Main'">
+                    <!--<td class="text-end"  v-if="location =='All' || location=='Main'">
                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.main_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
-                    </td>
+                    </td>-->
                     <td class="text-end" v-if="location =='All' || location=='Mart'">
                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
                     </td>
@@ -32,9 +32,9 @@
                     <td class="text-end"  v-if="sale_price" >
                             {{displayPrice(p.retail_price.largest_unit, p.retail_price.medium_unit, p.retail_price.smallest_unit)}}
                     </td>
-                    <td class="text-end"  v-if="sale_price" >
+                    <!--<td class="text-end"  v-if="sale_price" >
                             {{displayPrice(p.whole_sale_price.largest_unit, p.whole_sale_price.medium_unit, p.whole_sale_price.smallest_unit)}}
-                    </td>
+                    </td>-->
                                                     
                 </tr>
             </tbody>

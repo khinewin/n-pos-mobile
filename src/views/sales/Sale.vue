@@ -4,12 +4,12 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                           
            
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <select class="form-control-plaintext text-center small" @change="changeSaleType" :disabled="saleMode=='Sale / History'" v-model="sale_type">
+                <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                    <select  class="form-control-plaintext text-center small" @change="changeSaleType" :disabled="saleMode=='Sale / History'" v-model="sale_type">
                         <option value="retail">Retail</option>
                         <option value="whole_sale">Wholesale</option>
                     </select>
-                </div>    
+                </div>-->    
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">    
                     <button class="btn btn-sm" @click="goEdit" :disabled="!id || user.uid != sale_user.uid"><i class="fa-solid fa-pen-to-square"></i> Edit (ctrl+e)</button>
                 </div>
@@ -115,14 +115,14 @@
                                             <td class=" ">
                                                 {{calPackingSize(s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit, s.packing_size.medium_qty, s.packing_size.smallest_qty)}}
                                             </td>                                        
-                                            <td class=" text-end table-primary change-cursor" id="setQty"  :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#setQtyModal']">
-                                                {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
+                                            <td class=" text-end table-primary">
+                                                <input type="number" class="form-control-plaintext py-0 text-center" @keyup="setEdit(s)"  @keypress.enter="calEdit" v-model="s.sale_qty" @change="calEdit">
                                             </td>                                            
                                             <td class=" table-info col-1">
                                                 <input disabled  type="number"  v-model="s.qty_sale_price" class="form-control-plaintext py-0  text-center" placeholder="Price">                                        
                                             </td>
                                             <td class=" table-info col-1">
-                                                <select @change="calEdit" class="form-control-plaintext py-0 text-center change-cursor" v-model="s.qty_sale_price_unit">
+                                                <select disabled @change="calEdit" class="form-control-plaintext py-0 text-center change-cursor" v-model="s.qty_sale_price_unit">
                                                     <option   v-for="pu in onlyString(s.packing_size)">{{pu}}</option>
                                                 </select>
                                             </td>
@@ -716,7 +716,9 @@ export default {
            this.store_item ={
                 ...p,           
                 sale_type: this.sale_type,         
-                sale_qty: 0,
+                sale_qty: 1,
+                qty_sale_price_unit:p.packing_size.smallest_unit,
+                qty_sale_price: p.retail_price.smallest_unit,
            }
            const s=this.saleItems;
             let temStore=[]
@@ -728,7 +730,9 @@ export default {
                 this.storingItem();
             }else{
                 this.updateStoringItem();
-            }          
+            }      
+            this.setEdit(p)
+            this.calEdit();
         },
         storingItem(){          
                 this.saleItems.push(this.store_item)

@@ -19,7 +19,7 @@
                         <div class="" v-if="code_no">Code : {{item_name}}</div>
                     </div>
                     <div class="col-sm-6 col-lg-4">
-                        <div>Location : {{location}}</div>
+                        <div class="d-none">Location : {{location}}</div>
                     </div>
                     <div class="col-lg-4">
                          <div v-if="displayFromDate || displayToDate">Date : From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</div>

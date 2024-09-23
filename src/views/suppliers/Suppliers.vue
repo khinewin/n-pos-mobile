@@ -287,7 +287,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
             });                              
         } ,
         async fetchSuppliers(){ 
-            const query_url=query(collection(db, "suppliers"), where("is_deleted", "==", false), orderBy("created_at", "desc"));           
+            const query_url=query(collection(db, "suppliers"), orderBy("created_at", "desc"));           
                 onSnapshot(query_url, async(snapShot) =>{                  
                     const suppliers=lib.suppliers(snapShot);   
                     this.suppliersData=suppliers;

@@ -28,7 +28,7 @@
                         </div>
                     </div> 
                     <div class="col-sm-6 col-md-3">
-                        <div class="">Location : {{this.location}} </div>
+                        <div class="d-none">Location : {{this.location}} </div>
                     </div>                                       
                     <div class="col-sm-6 col-md-3">
                         <div  class="" v-if="displayDate">Date : {{showTime(displayDate)}}</div>

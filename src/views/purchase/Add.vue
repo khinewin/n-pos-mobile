@@ -29,7 +29,7 @@
                                         <tr>
                                             <td class="text-end fw-bold">Location :</td>
                                             <td class="">
-                                                <select class="form-control-plaintext p-0  border-bottom" v-model="location">
+                                                <select disabled class="form-control-plaintext p-0  border-bottom" v-model="location">
                                                     <option value="Main">Main</option>
                                                     <option value="Mart">Mart</option>
                                                 </select>
@@ -70,7 +70,7 @@
                                         Code
                                     </td>
                                     <td class="col-2 change-cursor description"  data-bs-toggle="modal" data-bs-target="#searchCode" style="cursor: context-menu;" ><i class="fa-solid fa-circle-plus"></i> Product Name (cltr+i)</td>
-                                    <td class="col-1 table-info">Exp. Date</td>     
+                                    <!--<td class="col-1 table-info">Exp. Date</td>-->     
                                     <td class="col-1">Packing Size</td>                              
                                     <td class="col-1 table-primary" colspan="1">Qty</td>
                                     <td class="col-2 table-info" colspan="2">Unit Price</td>     
@@ -86,10 +86,10 @@
                                         </div>                                    
                                     </td>
                                     <td class="">{{st.item_name}}</td>
-                                    <td class="p-0 position-relative table-info">
+                                    <!--<td class="p-0 position-relative table-info">
                                         <a v-if="st.tmp_exp_date" class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeExpDate(st)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                         <flat-pickr class="form-control-plaintext  text-center py-0" v-model="st.tmp_exp_date" @change="setExpDate(st.id)"  :config="config" />
-                                    </td>
+                                    </td>-->
                                     <td class="">
                                         {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                     </td>
@@ -214,7 +214,7 @@ export default {
             code_no:"",
             products:[],
 
-            location: "Main",
+            location: "Mart",
 
         
             isLoading:false,

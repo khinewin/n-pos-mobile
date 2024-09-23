@@ -22,7 +22,7 @@
                         <div v-if="supplier" class="" v-is="supplier_name">Supplier : {{supplier_name}} ({{supplier_company}}), </div>
                     </div>
                     <div class="col-sm-6 col-lg-4">
-                        <div>Location : {{this.location}}</div>
+                        <div class="d-none">Location : {{this.location}}</div>
                     </div>
                     <div class="col-sm-6 col-lg-4">
                         <div v-if="displayFromDate || displayToDate">Date : From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</div>

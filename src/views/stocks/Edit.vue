@@ -34,7 +34,7 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4 fw-bold">Voucher no. :</td>
+                                            <td class="text-end col-4 fw-bold">Voucher No. :</td>
                                             <td class="col-8">
                                                 <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext p-0  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
                                             </td>
@@ -56,11 +56,11 @@
                                     <td class="col-1">Code</td>
                                     <td class="col-2 change-cursor description"  data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Product Name (ctrl+i)</td>
                                     <td class="col-1">Packing size</td>
-                                    <td class="col-1 table-info">Main Inv Bal</td>     
+                                    <!--<td class="col-1 table-info">Main Inv Bal</td>-->     
                                     <td class="col-1 table-info">Mart Inv Bal</td>   
                                     <td class="col-1 table-primary">Pur price</td>
-                                    <td class="col-1 table-primary">Retail price</td>
-                                    <td class="col-1 table-primary">Wholesale price</td>                                  
+                                    <td class="col-1 table-primary">Sale price</td>
+                                    <!--<td class="col-1 table-primary">Wholesale price</td>-->                                  
                                 </tr>
                                 <tr class="" v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id" @mouseenter="setEdit(i)" >
                                     <td class="text-center">
@@ -72,9 +72,9 @@
                                     <td class="">
                                         {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                     </td>
-                                    <td class=" text-end table-info change-cursor" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                    <!--<td class=" text-end table-info change-cursor" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.main_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
-                                    </td> 
+                                    </td>--> 
                                     <td class=" text-end table-info change-cursor" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td> 
@@ -86,10 +86,10 @@
                                         <span v-if="st.packing_size.largest_unit">{{st.retail_price.largest_unit}}' {{st.packing_size.largest_unit}} </span>
                                         <span v-else>{{st.retail_price.medium_unit}}' {{st.packing_size.medium_unit}}</span>
                                     </td>
-                                    <td class="text-end table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setPricesModal">
+                                    <!--<td class="text-end table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setPricesModal">
                                         <span v-if="st.packing_size.largest_unit">{{st.whole_sale_price.largest_unit}}' {{st.packing_size.largest_unit}} </span>
                                         <span v-else>{{st.whole_sale_price.medium_unit}}' {{st.packing_size.medium_unit}}</span>
-                                    </td>                                                                                    
+                                    </td>-->                                                                                    
                                 </tr>                                                                                                                
                             </tbody>
                         </table>  

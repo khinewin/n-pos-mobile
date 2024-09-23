@@ -7,7 +7,7 @@
                 <div class="card border-0">
                     <div class="card-body p-2">                                             
                         <div class="row g-2">
-                            <div class="col-lg-3 ">
+                            <div class="col-lg-4 ">
                                 <div class="row g-2">
                                     <div class="col-sm-6 col-lg-12">
                                         <div class="card  shadow-sm">
@@ -66,7 +66,7 @@
                                   
                                                       
                             </div>
-                            <div class="col-lg-9">
+                            <div class="col-lg-8">
                                 <div class="card shadow-sm">
                                     <div class="card-body p-2 vh-95 overflow-y-auto">
                                         <table class="table table-bordered mb-0 table-hover text-nowrap text-break">
@@ -76,7 +76,7 @@
                                                     <td class="col-2">Product Name</td>
                                                     <td class="col-1">Packing size</td>
                                                     <td class="col-1">Mart Inv Bal</td>
-                                                    <td class="col-1">Main Inv Bal</td>
+                                                    <!--<td class="col-1">Main Inv Bal</td>-->
                                                 </tr>                                      
                                                 <tr class="change-cursor" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)" >
                                                     <td class="text-center">{{p.code_no}}</td>
@@ -87,9 +87,9 @@
                                                     <td class="text-end col-1">
                                                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                             
                                                     </td>                                                  
-                                                    <td class="text-end col-1">
+                                                    <!--<td class="text-end col-1">
                                                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.main_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
-                                                    </td>
+                                                    </td>-->
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -226,7 +226,7 @@ export default {
         },
       
         async fetchProducts(){
-        const query_url = query(collection(db, "products"), where("is_deleted","==", false), orderBy("created_at", "desc"));
+        const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
         onSnapshot(query_url, async(snapShot) =>{                  
                     let products=lib.products(snapShot)      
                     products=products.filter((f)=>f.packing_size.smallest_unit && f.packing_size.medium_unit)

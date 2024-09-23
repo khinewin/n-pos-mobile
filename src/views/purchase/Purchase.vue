@@ -72,7 +72,7 @@
                             <tr class="text-center fw-bold table-secondary">
                                 <td class="col-1">Code</td>
                                 <td class="col-2">Product Name</td>
-                                <td class="col-1">Exp. Date</td>     
+                                <!--<td class="col-1">Exp. Date</td>-->     
                                 <td class="col-1">Packing Size</td>                              
                                 <td class="col-1" colspan="1">Qty</td>
                                 <td class="col-1">Unit Price</td> 
@@ -85,9 +85,9 @@
                             <tr class="" v-if="products.length > 0" v-for="st in products" :key="st.id">
                                 <td class="">{{st.code_no}}</td>
                                 <td class="">{{st.item_name}}</td>
-                                <td class="text-center">                                   
+                                <!--<td class="text-center">                                   
                                      <span v-if="st.exp_date">{{showTime(st.exp_date)}}</span>
-                                </td>
+                                </td>-->
                                 <td class="col-1">
                                     {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                  </td>
@@ -95,7 +95,7 @@
                                     {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.pur_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                 </td>
                                 <td class="text-center">
-                                    {{st.qty_pur_price}} * {{st.qty_pur_price_unit}}
+                                    {{st.qty_pur_price}}' {{st.qty_pur_price_unit}}
                                 </td>
                                 <td class="text-end">{{fM(st.amount)}}</td>
                                 <td class="text-center w-5">
@@ -123,7 +123,7 @@
                         <tr class="small">
                             <td  class="text-end pe-2 fw-bold">Paid</td>
                             <td class="text-end">{{fM(paid)}}</td>
-                            <td  class="text-end pe-2 fw-bold">Banalce</td>
+                            <td  class="text-end pe-2 fw-bold">Balance</td>
                             <td class="text-end">{{fM(balance)}}</td>
                         </tr>
                         <tr>

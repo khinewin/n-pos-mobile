@@ -8,17 +8,20 @@ import { getAnalytics } from "firebase/analytics";
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
  
-  apiKey: "AIzaSyClM5ruGIfHMj5wdclzC8zkZwh-LJbdCLw",
+  apiKey: "AIzaSyBkhkIJ0GkHANgBOcBtesbLNJDP-XGw7wU",
 
-  authDomain: "e-pos-eb265.firebaseapp.com",
+  authDomain: "ntgpos-47e62.firebaseapp.com",
 
-  projectId: "e-pos-eb265",
+  projectId: "ntgpos-47e62",
 
-  storageBucket: "e-pos-eb265.appspot.com",
+  storageBucket: "ntgpos-47e62.appspot.com",
 
-  messagingSenderId: "447119583594",
+  messagingSenderId: "547067398616",
 
-  appId: "1:447119583594:web:c51631daba522f45679d13"
+  appId: "1:547067398616:web:9f46e87570cbbae4a64aad",
+
+  //measurementId: "G-LM4GNPNZWX"
+
 
 };
 

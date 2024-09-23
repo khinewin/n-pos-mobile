@@ -132,14 +132,14 @@
                                             </div>
                                         </td>
                                     </tr>    
-                                    <tr class="">
+                                    <!--<tr class="">
                                         <td class="">Main Inv Bal</td>                                      
                                         <td class="text-center" :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]">
                                             <div  v-if="editItem.packing_size">
                                                 {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.main_qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            
                                             </div>
                                         </td>
-                                    </tr>            
+                                    </tr>-->            
                                     <tr class="fw-bold">
                                         <td></td>
                                         <td class="text-center " v-if="editItem.packing_size.largest_unit !=null">
@@ -153,7 +153,7 @@
                                         </td>
                                     </tr>                        
                                     <tr class="">
-                                        <td class="">Pur price</td>
+                                        <td class="">Pur Price</td>
                                         <td class="text-center" v-if="editItem.packing_size.largest_unit !=null">
                                             <span >
                                             <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calPurPrice('largest_unit')" type="number" v-model="editItem.pur_price.largest_unit" class="form-control-plaintext p-0 text-center">
@@ -171,7 +171,7 @@
                                         </td>                                        
                                     </tr>
                                     <tr class="">
-                                        <td class="">Retail price</td>
+                                        <td class="">Sale Price</td>
                                         <td class="text-center" v-if="editItem.packing_size.largest_unit !=null">
                                             <span >
                                             <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="editItem.retail_price.largest_unit" class="form-control-plaintext p-0 text-center">
@@ -188,7 +188,7 @@
                                             </span>
                                         </td>                                        
                                     </tr>
-                                    <tr class="">
+                                    <!--<tr class="">
                                         <td class="">Wholesale price</td>
                                         <td class="text-center" v-if="editItem.packing_size.largest_unit != null">
                                             <span >
@@ -205,7 +205,7 @@
                                                 <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.smallest_unit" @keyup="calWholesalePrice('smallest_unit')" type="number" v-model="editItem.whole_sale_price.smallest_unit" class="form-control-plaintext p-0 text-center">
                                             </span>
                                         </td>                                        
-                                    </tr>                                              
+                                    </tr>-->                                              
                                 </tbody>
                                 <tfoot>
                                     <tr>
@@ -540,7 +540,7 @@ export default {
             });                              
         } ,
         async fetchProducts(){                    
-            const query_url = query(collection(db, "products"), where("is_deleted", "==", false), orderBy("created_at", "desc"));
+            const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
             onSnapshot(query_url, async(snapShot) =>{
                 const products=ss.products(snapShot);   
                 this.productsData=products;

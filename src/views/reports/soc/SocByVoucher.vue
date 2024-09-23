@@ -69,7 +69,7 @@
                                                 {{calPackingSize(s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit, s.packing_size.medium_qty, s.packing_size.smallest_qty)}}
                                             </td>                                        
                                             <td class="text-center" >
-                                                {{calPackingQty(s.packing_size.medium_qty, s.packing_size.smallest_qty, s.sale_qty, s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit)}}                                            
+                                                {{s.sale_qty}}
                                             </td>                                            
                                             <td class="text-center">
                                                 {{s.qty_sale_price_unit}}' {{s.qty_sale_price}}

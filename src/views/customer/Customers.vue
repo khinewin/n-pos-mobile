@@ -323,7 +323,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
             });                              
         } ,
            async fetchCustomer(){                    
-               const query_url = query(collection(db, "customers"), where("is_deleted", "==", false ), orderBy("created_at", "desc"));
+               const query_url = query(collection(db, "customers"), orderBy("created_at", "desc"));
                onSnapshot(query_url, async(snapShot) =>{                    
                     const customers=ss.customers(snapShot);           
                     this.customersData=customers;

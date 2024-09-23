@@ -66,11 +66,11 @@
                                     <td class="col-1 ">Code</td>
                                     <td class="col-2">Product Name</td>
                                     <td class="col-1">Packing size</td>
-                                    <td class="col-1">Main Inv Bal</td>     
+                                    <!--<td class="col-1">Main Inv Bal</td>-->     
                                     <td class="col-1">Mart Inv Bal</td>   
                                     <td class="col-1">Pur price</td>
-                                    <td class="col-1">Retail price</td>
-                                    <td class="col-1">Wholesale price</td>      
+                                    <td class="col-1">Sale price</td>
+                                    <!--<td class="col-1">Wholesale price</td>-->      
                                 </tr>
                                 <tr class=""v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id">
                                     <td class="text-center">
@@ -80,9 +80,9 @@
                                     <td class="">
                                         {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
                                     </td>
-                                    <td class=" text-end">
+                                    <!--<td class=" text-end">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.main_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
-                                    </td> 
+                                    </td>--> 
                                     <td class=" text-end">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td> 
@@ -94,10 +94,10 @@
                                         <span v-if="st.packing_size.largest_unit">{{st.retail_price.largest_unit}}' {{st.packing_size.largest_unit}} </span>
                                         <span v-else>{{st.retail_price.medium_unit}}' {{st.packing_size.medium_unit}}</span>
                                     </td>
-                                    <td class="text-end">
+                                    <!--<td class="text-end">
                                         <span v-if="st.packing_size.largest_unit">{{st.whole_sale_price.largest_unit}}' {{st.packing_size.largest_unit}} </span>
                                         <span v-else>{{st.whole_sale_price.medium_unit}}' {{st.packing_size.medium_unit}}</span>
-                                    </td>                                          
+                                    </td>-->                                          
                                  
                                 </tr>
                                                                                                               

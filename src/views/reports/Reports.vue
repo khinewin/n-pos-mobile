@@ -26,7 +26,7 @@
                                        </div>
                                 </div>
                             </div>                                                    
-                            <div class="row g-2">
+                            <!--<div class="row g-2">
                                 <div class="col-6">
                                     <div class="form-floating mb-2">
                                         <select v-model="from_location" class="form-control-plaintext border-bottom" id="from_location" @change="handleFromLocation(from_location)">
@@ -45,7 +45,7 @@
                                         <label for="to_location">To Location</label>
                                     </div>    
                                 </div>
-                            </div> 
+                            </div>--> 
                             <!--<div class="row g-2">
                                 <div class="col-5">
                                     <div class="mb-2 input-group">
@@ -74,14 +74,14 @@
                                     </div>
                                 </div>
                                </div>-->
-                            <div class="form-floating mb-2">
+                            <!--<div class="form-floating mb-2">
                                 <select v-model="location" class="form-control-plaintext border-bottom">
                                     <option>All</option>
                                     <option>Main</option>
                                     <option>Mart</option>
                                 </select>
                                 <label for="location">Location</label>
-                            </div>    
+                            </div> -->   
                            <div class="row g-2">
                                 <div class="col-6">
                                     <div class="mb-2 input-group">
@@ -176,11 +176,11 @@
                                             <ReportList @report="reportPurchase" title="Purchase" :arr="purchase" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <!--<tr>
                                         <td>
                                             <ReportList @report="reportTransfers" title="Transfers" :arr="transfers" />
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                     <tr>
                                         <td>
                                             <ReportList @report="reportAdjustments" title="Adjustments" :arr="adjustments" />
@@ -191,7 +191,7 @@
                                             <ReportList @report="reportSoc" title="SOC" :arr="soc" />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <!--<tr>
                                         <td>
                                             <ReportList @report="reportReturnIn" title="Return In" :arr="returnIn" />
                                         </td>
@@ -200,7 +200,7 @@
                                         <td>
                                             <ReportList @report="reportReturnOut" title="Return Out" :arr="returnOut" />
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                 </tbody>
                             </table>   
                         </div>                                          
@@ -302,7 +302,7 @@ export default {
                 {code: "by_voucher", name: "by voucher", active: true},
                 {code: "by_supplier", name:"by supplier", active: true},
                 {code: "by_supplier_date", name: "by supplier and date", active: true},
-                {code: "by_exp_date", name: "by expire date", active: true}
+               // {code: "by_exp_date", name: "by expire date", active: true}
             ],
             soc:[
                 {code : "by_customer", name: "by customer", active: true},

@@ -28,7 +28,7 @@
                                 <table class="table  table-borderless mb-0">
                                     <tbody class="small">
                                         <tr>
-                                            <td class="text-end col-4 p-0 fw-bold">Voucher no. :</td>
+                                            <td class="text-end col-4 p-0 fw-bold">Voucher No. :</td>
                                             <td class="col-8 p-0 ps-2">
                                                 {{stock.voucher_no}}
                                             </td>                                                             
@@ -50,11 +50,11 @@
                                     <td class="col-1">Code</td>
                                     <td  class="col-2">Product Name</td>
                                     <td class="col-1">Packing Size</td>
-                                    <td class="col-1 " v-if="location=='Main' || location=='All'">Main Inv Bal</td>         
-                                    <td class="col-1" v-if="location=='Shop' || location=='All'">Shop Inv Bal</td>                          
+                                    <!--<td class="col-1 " v-if="location=='Main' || location=='All'">Main Inv Bal</td>-->         
+                                    <td class="col-1" v-if="location=='Mart' || location=='All'">Mart Inv Bal</td>                          
                                     <td class="col-1">Pur Price</td>
-                                    <td class="col-1">Retail Price</td>
-                                    <td class="col-1">Wholesale Price</td>  
+                                    <td class="col-1">Sale Price</td>
+                                    <!--<td class="col-1">Wholesale Price</td>-->  
                                 </tr>
                                 <tr class=""v-if="stock.products.length > 0" v-for="(p, i) in stock.products" :key="p.id">
                                     <td class="text-center">                                       
@@ -64,10 +64,10 @@
                                     <td class="">
                                         {{calPackingSize(p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit, p.packing_size.medium_qty, p.packing_size.smallest_qty)}}
                                     </td>
-                                    <td class="text-end"  v-if="location =='All' || location=='Main'">
+                                    <!--<td class="text-end"  v-if="location =='All' || location=='Main'">
                                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.main_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
-                                    </td>
-                                    <td class="text-end" v-if="location =='All' || location=='Pharmacy'">
+                                    </td>-->
+                                    <td class="text-end" v-if="location =='All' || location=='Mart'">
                                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                            
                                     </td>
                                     <td class="text-end" >
@@ -76,14 +76,14 @@
                                     <td class="text-end">
                                              {{displayPrice(p.retail_price.largest_unit, p.retail_price.medium_unit, p.retail_price.smallest_unit)}}
                                     </td>
-                                    <td class="text-end">
+                                    <!--<td class="text-end">
                                             {{displayPrice(p.whole_sale_price.largest_unit, p.whole_sale_price.medium_unit, p.whole_sale_price.smallest_unit)}}
-                                    </td>                                   
+                                    </td>-->                                   
                                 </tr>    
                                 <tr>
-                                    <td :colspan="[location=='All' ? 6 : 5]" class="text-end fw-bold pe-2">Total Amount (Ks)</td>
+                                    <td :colspan="[location=='All' ? 5 : 4]" class="text-end fw-bold pe-2">Total Amount (Ks)</td>
                                     <td class="text-end ">{{fM(stock.retail_amount)}}</td>
-                                    <td class="text-end ">{{fM(stock.whole_sale_amount)}}</td>
+                                    <!--<td class="text-end ">{{fM(stock.whole_sale_amount)}}</td>-->
                                 </tr>                                                                                     
                             </tbody>
                         </table>     

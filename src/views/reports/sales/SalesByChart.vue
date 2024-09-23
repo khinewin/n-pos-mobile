@@ -296,7 +296,7 @@ export default {
                    let data={item_name:"", sale_qty: 0}
                     res[1].map((ren)=>{
                             data.item_name=ren.item_name;
-                            data.sale_qty += ren.packing_size.largest_unit ?  ren.sale_qty / (ren.packing_size.medium_qty * ren.packing_size.smallest_qty) : ren.sale_qty / ren.packing_size.smallest_qty;
+                            data.sale_qty += ren.sale_qty;// ren.packing_size.largest_unit ?  ren.sale_qty / (ren.packing_size.medium_qty * ren.packing_size.smallest_qty) : ren.sale_qty / ren.packing_size.smallest_qty;
                     })
                     result.push(data)
             })

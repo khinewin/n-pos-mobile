@@ -36,7 +36,7 @@
                                             </div>
                                             <div class="col-6 col-md-12">
                                                 <div class="form-floating ">
-                                                    <select class="form-control-plaintext border-bottom" @change="searchAdjustments" v-model="search_by_location" aria-placeholder="Location">
+                                                    <select disabled class="form-control-plaintext border-bottom" @change="searchAdjustments" v-model="search_by_location" aria-placeholder="Location">
                                                         <option value="">All</option>
                                                         <option>Main</option>
                                                         <option>Mart</option>

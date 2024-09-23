@@ -23,7 +23,7 @@
                                         <tr>
                                             <td class="text-end col-4 fw-bold">Location :</td>
                                             <td class="col-8">
-                                                <select v-model="location" class="form-control-plaintext py-0  border-bottom" :disabled="storeItems.length > 0">
+                                                <select disabled v-model="location" class="form-control-plaintext py-0  border-bottom" >
                                                     <option>Main</option>
                                                     <option>Mart</option>
                                                 </select>

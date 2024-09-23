@@ -7,7 +7,7 @@
                 <div class="card border-0">
                     <div class="card-body p-2">                                             
                         <div class="row g-2">
-                            <div class="col-lg-3">
+                            <div class="col-lg-4">
                                 <div class="row g-2">
                                     <div class="col-sm-6 col-lg-12">
                                         <div class="card  shadow-sm" :class="{'border-danger border-3' : isError}">
@@ -65,7 +65,7 @@
                                   
                                                            
                             </div>
-                            <div class="col-lg-9">
+                            <div class="col-lg-8">
                                 <div class="card shadow-sm">
                                     <div class="card-body p-2 vh-95 overflow-y-auto">
                                         <table class="table table-bordered mb-0 table-hover">
@@ -75,8 +75,8 @@
                                                     <td class="col-2">Product Name</td>
                                                     <td class="col-1">Packing size</td>
                                                     <td class="col-1">Mart Inv Bal</td>
-                                                    <td class="col-1" >Retail price</td>
-                                                    <td class="col-1">Wholesale price</td>
+                                                    <td class="col-1" >Sale Price</td>
+                                                    <!--<td class="col-1">Wholesale price</td>-->
 
                                                 </tr>                                      
                                                 <tr class="change-cursor" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"  >
@@ -93,11 +93,11 @@
                                                         <span v-if="p.retail_price.medium_unit">{{p.retail_price.medium_unit}} * </span>
                                                         <span v-if="p.retail_price.smallest_unit">{{p.retail_price.smallest_unit}} </span>
                                                     </td>
-                                                    <td class="text-end " >
+                                                    <!--<td class="text-end " >
                                                         <span v-if="p.whole_sale_price.largest_unit">{{p.whole_sale_price.largest_unit}} * </span>
                                                         <span v-if="p.whole_sale_price.medium_unit">{{p.whole_sale_price.medium_unit}} * </span>
                                                         <span v-if="p.whole_sale_price.smallest_unit">{{p.whole_sale_price.smallest_unit}} </span>
-                                                    </td>
+                                                    </td>-->
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -238,7 +238,7 @@ export default {
         },
       
         async fetchProducts(){
-        const query_url = query(collection(db, "products"), where("is_deleted", "==", false), orderBy("created_at", "desc"));
+        const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
         onSnapshot(query_url, async(snapShot) =>{                  
                     let products=lib.products(snapShot)       
                     products=products.filter((f)=>f.packing_size.smallest_unit && f.packing_size.medium_unit)
