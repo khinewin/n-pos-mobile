@@ -12,7 +12,7 @@
                 </div>-->
             
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print (cltr+p)</button>
+                    <button :disabled="saleItems.length <=0 || saleMode=='Sale / Edit'" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print (cltr+p)</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">                     
                         <button v-if="saleMode =='Sale / Edit'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length<=0" ><i class="fa-solid fa-hard-drive"></i> Save (cltr+s)
@@ -75,53 +75,61 @@
                                   </table>
                                 </div>
                             </div>                               
-                              <div class="vh-50 overflow-y-auto">
-                                <table class="table table-bordered table-hover mb-0 inside-table">
+                              <div class="vh-50 overflow-y-auto dataContainer">
+                                <table class="table table-bordered table-hover mb-0 ">
                                     <tbody class="small fw-bold table-group-divider">
                                         <tr class="table-secondary">
-                                            <td class="col-1 text-center">
-                                                <input :disabled="saleMode=='Sale / History'" @paste="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext p-0  text-center" placeholder="Scan code here">
+                                            <td v-if="saleMode=='Sale / Edit'" class="col-0">
+                                                <a  class="text-danger" href="#!" @click="removeSaleItems" ><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                             </td>
-                                            <td id="description" class="col-3 text-center" style="cursor: context-menu;">
-                                                 Product Name
+                                            <td class=" text-center col-1">
+                                                <input :disabled="saleMode=='Sale / History'" @keypress.enter="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control py-0  text-center " placeholder="Barcode">
+                                            </td>
+                                            <td class="col-3 text-center change-cursor description" :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#searchCode']" style="cursor: context-menu;">
+                                                <span v-if="saleMode=='Sale / Edit'"><i class="fa-solid fa-circle-plus"></i></span> Product Name <span v-if="saleMode=='Sale / Edit'">(cltr+i)</span>
                                             </td>  
-                                            <td class="col-1  text-center">Packing Size</td>                                                                                    
-                                            <td class="col-1 text-center  table-primary">Qty</td>
-                                            <td class="col-2 text-center  table-info" colspan="2">Unit Price</td>
+                                            <!--<td class="col-1  text-center">Packing Size</td>-->                                                                                
+                                            <td class="col-2 text-center  table-primary">Qty</td>
+                                            <td class="col-2 text-center  table-info">Unit Price</td>
                                             <td class="col-1 text-center ">Amount</td>
                                             <td class="col-2 text-center  table-warning" colspan="2">Discount</td>
-                                            <td class="col-1 text-center ">Total Amt</td>
+                                            <td class="col-1 text-center ">Net Amt</td>
                                         </tr>    
                                     </tbody>                                  
                                     <tbody class="text-nowrap text-break">                                                                         
-                                        <tr class="" v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @click="setEdit(s)">
-                                            <td class="position-relative text-center">                                             
+                                        <tr  v-if="saleItems.length > 0" v-for="(s, i) in saleItems.filter((f)=>!f.is_remove)" :key="s.id" @mouseenter="setEdit(s)"  >
+                                            <td v-if="saleMode=='Sale / Edit'" >
+                                                    <input type="checkbox" v-model="s.is_check" class="form-check-input">
+                                            </td>
+                                            <td class="text-center position-relative ">                                                
                                                 {{s.code_no}}
                                             </td>
                                             <td class="">{{s.item_name}}</td>   
-                                            <td class="">
+                                            <!--<td class=" ">
                                                 {{calPackingSize(s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit, s.packing_size.medium_qty, s.packing_size.smallest_qty)}}
-                                            </td>                                        
-                                            <td class=" text-end table-primary " id="setQty" >
-                                                <input type="number" class="form-control-plaintext py-0 text-center" @keyup="setEdit(s)"  @keypress.enter="calEdit" v-model="s.sale_qty" @change="calEdit">
-
+                                            </td>-->                                        
+                                            <td class=" text-end table-primary d-flex justify-content-between">
+                                                <button class="btn btn-sm btn-primary " :disabled="saleMode=='Sale / History'"  @click="decreaseQty(s, s.sale_unit, s.barcode)"><i class="fa-solid fa-minus"></i></button>
+                                                <div>
+                                                    <input :disabled="saleMode=='Sale / History'" type="number" class="form-control-plaintext py-0 text-center" @keyup="setEdit(s)"  @keypress.enter="calEdit(s)" v-model="s.sale_qty" @change="calEdit(s)">
+                                                </div>
+                                                <button :disabled="saleMode=='Sale / History'"  class="btn btn-sm btn-primary" @click="increaseQty(s)"><i class="fa-solid fa-plus"></i></button>   
                                             </td>                                            
-                                            <td class=" table-info col-1">
-                                                <input disabled  type="number"  v-model="s.qty_sale_price" class="form-control-plaintext py-0  text-center" placeholder="Price">                                        
+                                            <td class=" table-info">
+                                                <div class="d-flex">
+                                                    <input disabled  type="number"  v-model="s.qty_sale_price" class="form-control-plaintext py-0  text-center w-75" placeholder="Price"> 
+                                                    <div class="w-25">{{s.qty_sale_price_unit}}</div>
+                                                </div>                                       
                                             </td>
-                                            <td class=" table-info col-0">
-                                                <select disabled @change="calEdit" class="form-control-plaintext py-0 text-center change-cursor" v-model="s.qty_sale_price_unit">
-                                                    <option   v-for="pu in onlyString(s.packing_size)">{{pu}}</option>
-                                                </select>
-                                            </td>
+                                           
                                             <td class=" text-end">{{s.amount}}</td>
                                             <td class=" text-center table-warning change-cursor" id="setDiscount" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
                                                 <span v-if="s.dis_qty">{{s.dis_qty}}{{s.dis_qty_unit}}</span>
-                                                <span v-if="s.dis_amount">{{s.dis_amount}}$</span>
+                                                <span v-if="s.dis_amount">Ks {{s.dis_amount}}</span>
                                                 <span v-if="s.dis_percent">{{s.dis_percent}}%</span>      
                                             </td>
                                             <td class=" text-end table-warning change-cursor" data-bs-toggle="modal" data-bs-target="#setDiscountModal">{{s.discount}}</td>
-                                            <td class="text-end">{{s.final_amount}}</td>
+                                            <td class="  text-end">{{s.final_amount}}</td>
                                         </tr> 
                                     </tbody>
                                 </table>
@@ -129,27 +137,26 @@
                                 <table class="table table-bordered mb-0 table-hover">
                                     <tbody class="table-group-divider">
                                         <tr>
-                                            <td  class="text-end pe-2 fw-bold col-3">Total Amount</td>
-                                            <td class="text-end col-3">{{total_amount}}</td>                                        
-                                            <td  class="text-end col-3 pe-2 fw-bold">Net Amount</td>
-                                            <td class="text-end col-3">{{net_amount}}</td>
+                                            <td  class="text-end pe-2 fw-bold col-2">Total Amount</td>
+                                            <td class="text-end col-2">{{total_amount}}</td>     
+                                            <td  class="text-end col-2 pe-2 fw-bold " >Extra Discount</td>
+                                            <td class="text-end col-2 ">
+                                                <input @click="setInput" @mouseleave="setInput"  type="number"   @change="calTotal" @keyup="calTotal" v-model="extra_discount" class="form-control-plaintext py-0  text-end m-0">
+                                            </td>                                   
+                                            <td  class="text-end col-2 pe-2 fw-bold">Net Amount</td>
+                                            <td class="text-end col-2">{{net_amount}}</td>
                                         </tr>                 
                                         <tr>
-                                            <td  class="text-end pe-2 fw-bold " >Extra Discount</td>
-                                            <td class="text-end ">
-                                                <input @click="setInput" @mouseleave="setInput"  type="number"   @change="calTotal" @keyup="calTotal" v-model="extra_discount" class="form-control-plaintext py-0  text-end m-0">
-                                            </td>    
+                                               
+                                            <td  class="text-end pe-2 fw-bold">Paid</td>
+                                            <td class="text-end">
+                                                <input @click="setInput" @mouseleave="setInput"  @keypress.enter="saveSale" @change="calPaid" @keyup="calPaid" type="number" v-model="paid" class="form-control-plaintext py-0 text-end m-0">
+                                            </td>   
                                             <td  class="text-end pe-2 fw-bold">Change</td>
                                             <td class="text-end">
                                                 {{change}}
                                             </td>                                    
-                                          
-                                        </tr>
-                                        <tr>
-                                            <td  class="text-end pe-2 fw-bold">Paid</td>
-                                            <td class="text-end">
-                                                <input @click="setInput" @mouseleave="setInput"  @keypress.enter="saveSale" @change="calPaid" @keyup="calPaid" type="number" v-model="paid" class="form-control-plaintext py-0 text-end m-0">
-                                            </td>                               
+                                                            
                                             <td  class="text-end pe-2 fw-bold">Credit</td>
                                             <td class="text-end">
                                                 {{credit}}
@@ -157,7 +164,7 @@
                                         </tr>
                                         <tr>
                                             <td  class="text-end pe-2 fw-bold">Remark</td>
-                                            <td class="text-end" colspan="3">
+                                            <td class="text-end" colspan="5">
                                                 <input :disabled="saleMode=='Sale / History'" @keypress.enter="saveSale" type="text" v-model="remark" class="form-control-plaintext py-0">
                                             </td>                                                                         
                                         </tr>
@@ -189,7 +196,6 @@
                     saleMode: this.saleMode,   
             }  " />
         </div>       
-        <setQtyModal @setQty="setSaleQty" :ei="editItem" />
         <setDiscountModal @saveDiscount="saveDiscount" :ei="editItem" />
 
     </div>
@@ -323,29 +329,44 @@ export default {
             }
            return hc.handleCtrl(event);
         },
-        changeSaleType(){
-          this.saleItems= this.saleItems.map((s)=>{
-                const arr=Object.entries(s.packing_size)
-                 const unit=arr.filter((ft)=>{
-                            return ft[1]==s.qty_sale_price_unit;
-                     }) 
-                const sale_unit=unit[0][0] 
-                let qty_sale_price=0;
-                if(sale_unit=="largest_unit"){
-                    qty_sale_price=this.sale_type=="Retail" ? s.retail_price.largest_unit : s.whole_sale_price.largest_unit
-                }else if(sale_unit=="medium_unit"){
-                    qty_sale_price=this.sale_type=="Retail" ? s.retail_price.medium_unit : s.whole_sale_price.medium_unit
-                }else if(sale_unit){
-                    qty_sale_price=this.sale_type=="Retail" ? s.retail_price.smallest_unit : s.whole_sale_price.smallest_unit
+        increaseQty(p){
+        const checkQty=this.checkQty(p);
+        if(!checkQty) return false;
+         let sale_qty=1;         
+          let saleItems= this.saleItems.map((f)=>{
+                if(f.id ===p.id){
+                    return {...f, 
+                        sale_qty : f.sale_qty + sale_qty,
+                         amount:  f.amount + f.qty_sale_price,
+                         final_amount: f.final_amount + f.qty_sale_price,
+                        }
                 }
-               return {...s, qty_sale_price: qty_sale_price}
+                return {
+                    ...f
+                }               
             })
-            this.saleItems.map((s)=>{
-                this.setEdit(s)
-                this.calEdit();
-            })
+            this.saleItems=saleItems;
             this.calTotal();
         },
+        decreaseQty(p){     
+         if(p.sale_qty <=1)return false;      
+         let sale_qty=1;         
+          let saleItems= this.saleItems.map((f)=>{
+                if(f.id ===p.id){
+                    return {...f, 
+                        sale_qty : f.sale_qty - sale_qty,
+                         amount:  f.amount - f.qty_sale_price,
+                         final_amount: f.final_amount - f.qty_sale_price,
+                        }
+                }
+                return {
+                    ...f
+                }               
+            })
+            this.saleItems=saleItems;
+            this.calTotal();
+        },
+        
         setCodeOnPaste(){
             setTimeout(()=>{                
             const item=this.products.filter((f)=>f.code_no==this.code_no);
@@ -407,75 +428,43 @@ export default {
             }) && this.calTotal();
         },
        
-        setSaleQty(){           
-            const isCheck=this.checkEditQty();
-            const e=this.editItem;
-                let sale_qty=0;
-                sale_qty += e.input_l_qty ? e.input_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
-                sale_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty: 0;
-                sale_qty += e.input_s_qty ? e.input_s_qty : 0;                        
-                
-
-               return this.saleItems.map((f)=>{   
-                    if(f.id===e.id){
-                        f.sale_qty=sale_qty,
-                        f.input_l_qty =e.input_l_qty ? e.input_l_qty : 0,
-                        f.input_m_qty= e.input_m_qty ? e.input_m_qty : 0
-                        f.input_s_qty= e.input_s_qty  ? e.input_s_qty  : 0;
-                        f.qty_sale_price_unit=e.input_l_qty ? e.packing_size.largest_unit : e.input_m_qty ? e.packing_size.medium_unit : e.packing_size.smallest_unit ;
-                    }
-               }) &&
-                this.calEdit();
-        },
-     
         setEdit(item){
-            this.editItem={...item,               
-                input_l_qty: item.input_l_qty ? item.input_l_qty : "",
-                input_m_qty: item.input_m_qty ? item.input_m_qty : "",
-                input_s_qty: item.input_s_qty  ? item.input_s_qty  : ""
-            };
+            this.editItem={...item}
         },
-        calEdit(i){
-            const oei=this.editItem;
-            this.saleItems.map((f)=>{
-                if(f.id===oei.id){
-                      
-                       const arr=Object.entries(f.packing_size)
-                        const units=arr.filter((ft)=>{
-                            return ft[1]==f.qty_sale_price_unit;
-                        })  
-                       const sale_unit=units[0][0]     
-                       let amount=0;
-                       let qty_sale_price=0;
-                       if(sale_unit=="largest_unit"){
-                            qty_sale_price=this.sale_type=='retail' ? f.retail_price.largest_unit : f.whole_sale_price.largest_unit
-                         }else if(sale_unit=="medium_unit"){
-                            qty_sale_price=this.sale_type=='retail' ? f.retail_price.medium_unit : f.whole_sale_price.medium_unit
-                        }else if(sale_unit=="smallest_unit"){
-                            qty_sale_price=this.sale_type=='retail' ? f.retail_price.smallest_unit : f.whole_sale_price.smallest_unit
-                        }
-                       f.qty_sale_price=f.sale_qty <=0 ? 0 :qty_sale_price;
-
-                       if(sale_unit=="largest_unit"){
-                           amount=Math.floor((f.qty_sale_price / (f.packing_size.medium_qty * f.packing_size.smallest_qty)) * f.sale_qty)
-                       }else if(sale_unit=="medium_unit"){
-                            amount=Math.floor((f.qty_sale_price / f.packing_size.smallest_qty) * f.sale_qty)
-                       }else if(sale_unit=="smallest_unit"){
-                            amount=Math.floor(f.qty_sale_price  * f.sale_qty)
-                       }    
-                        f.amount=amount;
-                        f.final_amount=f.discount ? amount - f.discount : amount;                  
-                   
-                }
-            }) && this.calTotal();
-           
+        calEdit(p){
+            if(p.sale_qty <1){
+                p.sale_qty=1;
+            }
+            if(p.sale_qty >= p.qty){
+                p.sale_qty=p.qty;
+                this.msg.info="Maximum Inventary Balance"
+                this.msg.type="error"
+            }
+            
+            let sale_qty=p.sale_qty;         
+            let saleItems= this.saleItems.map((f)=>{
+                    if(f.id ===p.id){
+                        return {...f, 
+                            sale_qty : sale_qty,
+                            amount:  f.sale_qty * f.qty_sale_price,
+                            final_amount:f.discount ? (f.sale_qty *  f.qty_sale_price) - f.discount : f.sale_qty * f.qty_sale_price,
+                            }
+                    }
+                    return {
+                        ...f
+                    }               
+                })
+            this.saleItems=saleItems;
+            this.calTotal();
         },
         
         calTotal(){
             let total_amount=0;
             
             this.saleItems.map((m)=>{
+               if(!m.is_remove){
                 total_amount += m.final_amount ? m.final_amount : 0;
+               }
             })
 
             this.total_amount=total_amount;
@@ -548,6 +537,9 @@ export default {
                                 this.msg.info="The voucher has been cancelled." 
                                 this.isLoading=false;
                                 this.clearSaleItem();
+                                setTimeout(()=>{
+                                    this.goSale();
+                                },2000)
                             }
                     });                                              
             });                              
@@ -593,10 +585,16 @@ export default {
                     this.isLoading=false;
                 }                
         },
-      
+        goSale(){
+            this.$router.push({name: "Sale"});
+        },
       
         updateStoreItem(){
-            const updateStore=this.saleItems.filter((f)=>f.sale_qty != 0)
+            const updateStore=this.saleItems.filter((f)=>{
+                if(!f.is_remove){
+                    return f;
+                }
+            })
             this.saleItems=updateStore;
         },
         updateProducts(){
@@ -606,9 +604,16 @@ export default {
                     const sale_qty=p.sale_qty;     
                     const old_sale_qty=p.old_sale_qty;          
                     const updateDocument=doc(db, "products", id)
+                        
+                    if(p.is_remove){
+                        await updateDoc(updateDocument, {                      
+                            qty : increment(old_sale_qty)
+                        }) 
+                    }else{
                         await updateDoc(updateDocument, {                      
                         qty : sale_qty < old_sale_qty ? increment(old_sale_qty - sale_qty) : increment(- (sale_qty - old_sale_qty)),
-                    })                                      
+                     }) 
+                    }                                     
                 })               
             }            
         },
@@ -630,50 +635,42 @@ export default {
                 this.v$.$reset()
 
         },
-        removeSaleItem(i){
-            this.saleItems.splice(i, 1)
-            this.calTotal();
+        removeSaleItems(){
+            this.saleItems=this.saleItems.map((f)=>{
+                if(f.is_check){
+                    return {...f, is_remove: true}
+                }else{
+                    return f;
+                }
+            })
+            this.calTotal()
         },
      
-        checkQty(p){
-            if(p.qty  <1 ){
+        checkQty(p){           
+            if(p.qty  <1 + p.sale_qty ){
                 this.msg.type="error";
-                this.msg.info="Insufficient inventory balance"
+                this.msg.info=`There is a maximum balance of "${p.item_name}"`
                 return false;
             }          
             return true;
         },
-        checkEditQty(){    
-            let isSufficient=true;
-            const e=this.editItem
-            let sale_qty=0;
-                sale_qty += e.input_l_qty ? e.input_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
-                sale_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty: 0;
-                sale_qty += e.input_s_qty ? e.input_s_qty : 0;
-
-                let bal_qty_largest_unit=e.packing_size.largest_unit ? Math.floor(e.qty / (e.packing_size.medium_qty * e.packing_size.smallest_qty)) : 0;
-                let bal_qty_medium_unit=e.packing_size.medium_unit ? Math.floor((e.qty % (e.packing_size.medium_qty * e.packing_size.smallest_qty)) / e.packing_size.smallest_qty): 0;
-                let bal_qty_smallest_unit=e.qty;
-                //console.log(e.input_l_qty)//has a trouble
-                    if(sale_qty > e.qty){
-                        this.msg.type="error";
-                        this.msg.info="Maximum  inventory balance"
-                        e.input_l_qty = bal_qty_largest_unit ? bal_qty_largest_unit : 0;
-                        e.input_m_qty = bal_qty_largest_unit ? 0 : bal_qty_medium_unit ? bal_qty_medium_unit : 0;
-                        e.input_s_qty = bal_qty_largest_unit || bal_qty_medium_unit ? 0 : bal_qty_smallest_unit ? bal_qty_smallest_unit : 0;
-                        isSufficient=false;                        
-                    }                                       
-            if(!isSufficient) return false;
-            return true;
-        },
+    
      
         setCode(p){
-            const checkQty=this.checkQty(p);
-            if(!checkQty) return false;
+           if(p.qty <=0){
+                this.msg.info= `"${p.item_name}" is out of stock`
+                this.msg.type="error";
+                return false;
+           }
            this.store_item ={
                 ...p,           
                 sale_type: this.sale_type,         
-                sale_qty: 0,
+                sale_qty: 1,
+                qty_sale_price_unit:p.packing_size.smallest_unit,
+                qty_sale_price: p.retail_price.smallest_unit,
+                amount: p.retail_price.smallest_unit,
+                final_amount: p.retail_price.smallest_unit,
+                old_sale_qty: 0
            }
            const s=this.saleItems;
             let temStore=[]
@@ -685,18 +682,31 @@ export default {
                 this.storingItem();
             }else{
                 this.updateStoringItem();
-            }          
+            }      
+           
         },
+        autoScroll(){            
+            const container = document.querySelector(".dataContainer");
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: "smooth" // Enables smooth scrolling
+            });
+        
+      },
         storingItem(){          
                 this.saleItems.push(this.store_item)
                 this.calTotal();        
+                setTimeout(()=>{
+                        this.autoScroll();
+                }, 100) 
         },
         updateStoringItem(){
           this.saleItems= this.saleItems.map((f)=>{
                 if(f.id ===this.store_item.id){
-                    return {...f, sale_qty : f.sale_qty + 1,sale_qty_s : f.sale_qty_s + 1,
-                         sale_amount : f.sale_price * (f.sale_qty + 1),
-                         pur_amount : f.retail_price * (f.sale_qty + 1),
+                    return {...f, 
+                        sale_qty : f.sale_qty + 1,
+                        amount: f.amount + f.qty_sale_price,
+                        final_amount: f.final_amount + f.qty_sale_price,
                         }
                 }else{
                     return {...f}
@@ -704,10 +714,6 @@ export default {
             })
             this.calTotal();
         },
-        /*calDiscount(){           
-            this.calTotal();
-            this.charges=this.total_amount - this.discount;
-        },*/
         calPaid(){
             this.change=this.paid - this.net_amount > 0 ? this.paid - this.net_amount : 0;
             this.credit=this.paid - this.net_amount < 0 ? Math.abs(this.paid - this.net_amount) : 0;

@@ -480,12 +480,7 @@ export default {
        
      
         setEdit(item){
-            this.editItem={...item,               
-                input_l_qty: item.input_l_qty ? item.input_l_qty : "",
-                input_m_qty: item.input_m_qty ? item.input_m_qty : "",
-                input_s_qty: item.input_s_qty  ? item.input_s_qty  : "",
-                sale_type: this.sale_type,
-            };
+            this.editItem={...item};
         },
         calEdit(p){    
             
