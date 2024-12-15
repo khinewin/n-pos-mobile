@@ -86,7 +86,7 @@
   }
 
   .table tbody td {
-    font-size: 13px;
+    font-size: 15px;
     padding-top: 2px;
     padding-bottom: 2px;
     padding-left: 2px;
@@ -210,9 +210,17 @@ min-height: 60vh !important;
     cursor:pointer  !important;
 }
 
-input[type="number"] {
-    direction: rtl; 
-  }
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* For Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
   .parent-rm:hover .child-rm{
       display: block;
       position: absolute;

@@ -8,16 +8,17 @@
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
                     </button>
-                </div>       
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn btn-sm packing-unit"><i class="fa-solid fa-boxes-packing"></i> Packing Units (ctrl+u)</button>
-                </div>                            
+                </div>      
+                                            
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCode">
                         <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                     </button>
-                </div>    
+                </div> 
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                    <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn btn-sm packing-unit"><i class="fa-solid fa-boxes-packing"></i> Packing Units (ctrl+u)</button>
+                </div>   
             </div>
         </div>
         <div class="container-fluid my-2">
@@ -26,27 +27,26 @@
                     <div class="card shadow">
                         <div class="card-body p-2">
                             <div class="row g-2">
-                                <div class="form-floating col-sm-6 col-lg-12">
+                                <div class="form-floating col-sm-3 col-lg-12">
                                     <input type="search" id="search_by_code" v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
                                     <label for="search_by_code" class="small">Code</label>
                                 </div>
-                                <div class="form-floating col-sm-6 col-lg-12">
-                                    <input type="search" id="search_by_description" v-model="search_by_description" @keyup="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
+                                <div class="form-floating col-sm-3 col-lg-12">
+                                    <input type="search" id="search_by_description" v-model="search_by_description" @input="inputSearchName" placeholder="Description" class="form-control-plaintext border-bottom">
                                     <label for="search_by_description" class="small">Product Name</label>
                                 </div>
-                            </div> 
-                             <div class="row  mt-2">
-                                    <div class="col-6 d-grid"><button class="btn btn-sm text-dark" @click="searchProducts"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
+                            
+                                    <div class="col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="searchProducts"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
                                     <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateProducts"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                     </button></div>-->
-                                    <div class="col-6 d-grid"><button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
+                                    <div class="col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
                              </div> 
                         </div>
                     </div>       
                                                                                                                 
                 </div>                        
-                <div class="col-lg-5">
+                <div class="col-md-7 col-lg-5">
                     <div class="card shadow vh-75">
                         <div class="card-body p-2">
                             <div>
@@ -64,28 +64,26 @@
                                             <td class="position-relative">
                                                 <!--<input class="position-absolute start-50 top-50 translate-middle" type="checkbox" @click="checkAll" v-model="is_deleted">-->
                                             </td>
-                                            <td>
-                                                <input placeholder="Code"  type="text" v-model="code_no" class="form-control-plaintext py-0  text-center">
+                                            <td class="p-0">
+                                                <input placeholder="Code"  type="text" v-model="code_no" class="form-control py-1  text-center">
                                             </td>
-                                            <td>
-                                                <input id="item_name" placeholder="Product Name" @keypress.enter="saveCode"   type="text" v-model="item_name" class="form-control-plaintext py-0">
-                                            </td>                                     
+                                            <td class="p-0">
+                                                <input  id="item_name" placeholder="Product Name" @keypress.enter="saveCode"   type="text" v-model="item_name" class="form-control py-1">                                            </td>                                     
                                         </tr>     
                                                                 
                                     <tr class="text-center"  v-if="products.length > 0"  v-for="(p, i) in products" :key="p.id"  :class="{'table-secondary' : editItem.id === p.id}">   
                                         <td class="">
                                             <input class=" form-check-input" type="checkbox" v-model="p.is_deleted">
                                         </td>                                 
-                                        <td :class="{'table-secondary': sort_item ==='code_no'}" class="p-0  position-relative">
-                                            <!---<a class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeProduct(i, p)"><i class="fa-solid fa-square-minus"></i></a>-->                                                                                       
+                                        <td :class="{'table-secondary': sort_item ==='code_no'}" class=" p-0">
                                             <span>
-                                                <input @click="setEdit(p)" @keyup="setEdit(p)" @keypress.enter="saveEdit" @paste="pasteEdit" type="text" class="form-control-plaintext py-0 text-center " v-model="p.code_no">
+                                                <input v-if="editItem.id==p.id" @click="setEdit(p)" @input="setEdit(p)" @keypress.enter="saveEdit" @paste="pasteEdit" type="text" class="form-control py-1 text-center " v-model="p.code_no">
+                                                <div v-else class="py-1" @click="setEdit(p)">{{p.code_no}}</div>
                                             </span>
                                         </td>
                                         <td :class="{'table-secondary': sort_item ==='item_name'}" class="p-0">
-                                            <span>
-                                                <input @click="setEdit(p)" @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext py-0" v-model="p.item_name">
-                                            </span>
+                                            <input v-if="editItem.id==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1" v-model="p.item_name">
+                                            <div v-else class="text-start py-1 px-1" @click="setEdit(p)">{{p.item_name}}</div>
                                         </td>                                       
                                     </tr>
                                 </tbody>
@@ -104,7 +102,7 @@
                      </div>                            
                     </div>
                 </div>
-                <div class="col-lg-4">
+                <div class="col-md-5 col-lg-4">
                     <div class="card shadow">
                         <div class="card-body p-2">
                             <table class="table table-bordered mb-0 table-hover" v-if="Object.keys(editItem).length >0" >
@@ -116,15 +114,15 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr class="table-primary packing-size"  data-bs-toggle="modal" data-bs-target="#selectPackingSizeModal">
-                                        <td class="col-1">Packing Size (ctrl+p) <span class="float-end"><i class="fa-solid fa-caret-right"></i></span></td>
+                                    <tr class="table-primary packing-size change-cursor"  data-bs-toggle="modal" data-bs-target="#selectPackingSizeModal">
+                                        <td class="col-1">Packing Size (ctrl+p) </td>
                                         <td :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]" class="text-center col-3">
                                             <div v-if="editItem.packing_size.smallest_unit && editItem.packing_size.medium_unit">
                                                     {{calPackingSize(editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit, editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty)}}
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr class="">
+                                    <tr class="change-cursor table-warning" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         <td class="">Mart Inv Bal</td>                                       
                                         <td class="text-center" :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]">
                                             <div  v-if="editItem.packing_size">
@@ -132,14 +130,7 @@
                                             </div>
                                         </td>
                                     </tr>    
-                                    <!--<tr class="">
-                                        <td class="">Main Inv Bal</td>                                      
-                                        <td class="text-center" :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]">
-                                            <div  v-if="editItem.packing_size">
-                                                {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.main_qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            
-                                            </div>
-                                        </td>
-                                    </tr>-->            
+                                   
                                     <tr class="fw-bold">
                                         <td></td>
                                         <td class="text-center " v-if="editItem.packing_size.largest_unit !=null">
@@ -188,24 +179,7 @@
                                             </span>
                                         </td>                                        
                                     </tr>
-                                    <!--<tr class="">
-                                        <td class="">Wholesale price</td>
-                                        <td class="text-center" v-if="editItem.packing_size.largest_unit != null">
-                                            <span >
-                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calWholesalePrice('largest_unit')" type="number" v-model="editItem.whole_sale_price.largest_unit" class="form-control-plaintext p-0 text-center">
-                                            </span>
-                                        </td>
-                                        <td class="text-center">
-                                            <span v-if="editItem.packing_size.medium_unit !=null">
-                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.medium_unit"  @keyup="calWholesalePrice('medium_unit')"  type="number" v-model="editItem.whole_sale_price.medium_unit" class="form-control-plaintext p-0 text-center">
-                                            </span>
-                                        </td>
-                                        <td class="text-center">
-                                            <span v-if="editItem.packing_size.smallest_unit !=null">
-                                                <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.smallest_unit" @keyup="calWholesalePrice('smallest_unit')" type="number" v-model="editItem.whole_sale_price.smallest_unit" class="form-control-plaintext p-0 text-center">
-                                            </span>
-                                        </td>                                        
-                                    </tr>-->                                              
+                                                                        
                                 </tbody>
                                 <tfoot>
                                     <tr>
@@ -229,6 +203,7 @@
                 </div>
             </div>
         </div>
+        <SetQty :ei="editItem" @saveQty="saveQty" />
         <PackingSizeModal />
         <SelectPackingSizeModal @setPackingSize="setPackingSize" :ei="editItem" />
 </div>   
@@ -246,10 +221,11 @@ import PackingSizeModal from "@/views/modals/product/PackingSize.vue";
 import SelectPackingSizeModal from "@/views/modals/product/SelectPackingSize.vue";
 import * as hp from "@/lib/helper"
 import * as cp from "@/lib/cal_price"
+import SetQty from '@/views/modals/stocks/SetQty.vue'
 
 export default {
     components: {
-            PageHeader, Footer,PackingSizeModal,SelectPackingSizeModal
+            PageHeader, Footer,PackingSizeModal,SelectPackingSizeModal, SetQty
     },
     setup () {
         return { v$: useVuelidate() }
@@ -292,7 +268,7 @@ export default {
     },
     mounted() {
         const code_no=document.getElementById("search_by_code");
-        code_no.focus();
+      //  code_no.focus();
         this.isLoading=true;
         this.fetchProducts();
         this.checkDatabase();
@@ -356,6 +332,17 @@ export default {
                pu.click();
             }          
          
+        },
+        saveQty(){
+            const e=this.editItem;
+            
+                let qty=0;
+                qty += e.l_qty ? e.l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
+                qty += e.m_qty ? e.m_qty * e.packing_size.smallest_qty: 0;
+                qty += e.s_qty ? e.s_qty : 0;               
+         
+               e.qty=qty;
+               this.saveEdit();
         },
         async deleteMultiple(){
             const is_has=this.products.filter((f)=>f.is_deleted)
@@ -477,7 +464,23 @@ export default {
            
         },
         setEdit(p){          
-             this.editItem=p ? {...p,  edit_user:  {uid:this.user.uid, type: "modified"}} : {};
+            let  l=0, m=0, s=0;
+
+            const item=p;
+            if(item.packing_size.largest_unit){              
+                l=Math.floor(item.qty / (item.packing_size.medium_qty * item.packing_size.smallest_qty));
+                m=Math.floor((item.qty % (item.packing_size.medium_qty * item.packing_size.smallest_qty)) / item.packing_size.smallest_qty);
+                s=Math.floor((item.qty % (item.packing_size.medium_qty * item.packing_size.smallest_qty)) % item.packing_size.smallest_qty);
+            }else{           
+                m=Math.floor(item.qty / item.packing_size.smallest_qty);
+                s=Math.floor(item.qty % item.packing_size.smallest_qty);
+            }
+            this.editItem=p ? {...item,            
+                l_qty: l ? l : 0, 
+                m_qty:m ? m :0,
+                s_qty: s ? s :0,     
+                edit_user:  {uid:this.user.uid, type: "modified"}
+                } : {};
         },
         clearSearch(){
             this.search_by_code="";
@@ -488,6 +491,10 @@ export default {
             setTimeout(()=>{
                 this.searchProducts();
             }, 200)
+        },
+        inputSearchName(){
+            this.search_by_description=event.target.value;
+            this.searchProducts();
         },
         searchProducts(){
             this.products=[];

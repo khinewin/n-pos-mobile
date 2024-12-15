@@ -8,8 +8,8 @@
                         <div class="mb-2"><i class="fa-solid fa-circle-check"></i> Sales Reports</div>
                         <div class="mb-2"><i class="fa-solid fa-circle-check"></i> Real-time Inventory</div> 
                         <div class="mb-2"><i class="fa-solid fa-circle-check"></i> Cloud-Based & Secure Data</div>                         
-                        <div class="mb-2"><i class="fa-solid fa-circle-check"></i> Can Be Used With Computers & Mobiles Devices</div>         
-                        <div class="mb-2"><i class="fa-solid fa-circle-check"></i> Easy of Use</div>                          
+                        <div class="mb-2"><i class="fa-solid fa-circle-check"></i> Work Everywhere, On Any Devices</div>         
+                        <div class="mb-2"><i class="fa-solid fa-circle-check"></i> Sales Better, Faster, Smarter with N-POS</div>                          
                  
                 </div>
             </div>

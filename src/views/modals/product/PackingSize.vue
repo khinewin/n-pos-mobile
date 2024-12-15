@@ -7,26 +7,32 @@
                <div class="card">
                    <div class="card-body p-2"> 
                     <div class="row justify-content-end mb-2">
-                        <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateData"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
+                        <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="savePackingSize"><span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
+                        </button>
+                    </div>
+                        <div class="col-4 d-grid"><button :disabled="!editItem.id" class="btn btn-sm text-dark" @click="saveEdit"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
-                        </button></div>-->
-                        <div class="col-4 d-grid"><button class="btn btn-sm text-dark close-p-z" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button></div>
+                        </button>
+                    </div>
+                        <div class="col-4 d-grid"><button class="btn btn-sm text-dark close-p-z" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button></div>
                  </div>
                    <div class="row g-2">
                     <div class="col-12 vh-75 overflow-y-auto">
                         <table class="table table-bordered mb-0 table-hover">
-                            <tbody class="small">                                     
+                            <tbody class="">                                     
                                 <tr class="">
-                                    <td class=""><input id="packing_name" placeholder="Packing name" type="text" @keypress.enter="savePackingSize" v-model="packing_name" class="form-control-plaintext py-0 text-center"></td>
-                                    <td class=""><input placeholder="Packing unit" type="text" @keypress.enter="savePackingSize" v-model="packing_unit" class="form-control-plaintext py-0 text-center"></td>
+                                    <!--<td class=""><input id="packing_name" placeholder="Packing name" type="text" @keypress.enter="savePackingSize" v-model="packing_name" class="form-control-plaintext py-0 text-center"></td>-->
+                                    <td><input placeholder="Packing unit" type="text" @keypress.enter="savePackingSize" v-model="packing_unit" class="form-control py-1 text-center"></td>
+                                    <td></td>
                                 </tr>                                                                                       
-                                <tr  class="" v-if="packingSizes.length > 0"  v-for="p in packingSizes" :key="p.id" @mouseenter="setEdit(p)"  style="cursor:context-menu">
-                                    <td class=" position-relative">
-                                        <a href="#!" class='text-danger position-absolute start-0 top-50 translate-middle ps-2' @click="removePackingSize(p)"><i class="fa-solid fa-square-minus"></i></a>
-                                        <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext py-0 text-center" v-model="p.packing_name">
-                                        </td>
-                                    <td class="text-center ">
-                                        <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext py-0 text-center" v-model="p.packing_unit">
+                                <tr  class="" v-if="packingSizes.length > 0"  v-for="p in packingSizes" :key="p.id" :class="{'table-primary' : p.id==editItem.id}" >                                   
+                                    <td class="text-center col-12">
+                                        <input v-if="editItem.id == p.id"  @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1 text-center" v-model="p.packing_unit">
+                                        <div v-else @click="setEdit(p)" class="py-1">{{p.packing_unit}}</div>
+                                    </td>
+                                    <td class="d-flex justify-content-around col-0">
+                                        <a href="#!" class="btn btn-sm btn-danger" @click="removePackingSize(p)">Delete</a>
                                     </td>
                                 </tr>
                             </tbody>
@@ -64,9 +70,10 @@ export default {
        return{
             packingSizes:[],
             packing_unit:"",
-            packing_name:"",
+           // packing_name:"",
            isUpdating:false,
            isLoading:false,       
+           isSaving:false,
            editItem:{},
            msg :{
                 type: "",
@@ -80,9 +87,7 @@ export default {
     this.checkDatabase(); 
     const myModalEl = document.getElementById('packingSizeModal')
        myModalEl.addEventListener('show.bs.modal', event => {    
-            setTimeout(()=>{
-                hp.setAutoFocus("packing_name")
-            }, 300)            
+                  
        })   
             
    },
@@ -95,6 +100,8 @@ export default {
   
    methods:{
         async removePackingSize(p){
+            const cf=confirm(`Are you sure, you want to delete packing unit "${p.packing_unit}" ? `)
+            if(!cf) return false;
             const document=doc(db, "packingSizes", p.id)     
             await deleteDoc(document) //if no items delete document;
         },
@@ -102,23 +109,49 @@ export default {
             this.editItem={...p, edit_user : {uid: this.user.uid, type: "modified"}};
         },
         async saveEdit(){
+            let result=this.packingSizes.filter((f)=>f.id != this.editItem.id && f.packing_unit.toLowerCase().includes(this.editItem.packing_unit) )
+            if(result.length > 0){
+                this.msg.info="This packing unit already exists"
+                this.msg.type="error";
+                this.packingSizes=this.packingSizes.map((m)=>{
+                    if(m.id==this.editItem.id){
+                        return {...m, packing_unit: ""}
+                    }
+                    return m;
+                })
+                this.setMsg();
+                return false;
+            }
+            this.isUpdating=true;
             const data=doc(db, "packingSizes", this.editItem.id)
             await updateDoc(data, this.editItem)
         },
+        setMsg(){
+            this.$emit("setMsg", this.msg.info, this.msg.type)
+        },
         async savePackingSize(){          
-            if(!this.packing_unit || !this.packing_name) return false;
+            if(!this.packing_unit) return false;
+
+            let isTaken=this.packingSizes.filter((f)=>f.packing_unit.toLowerCase() == this.packing_unit.toLowerCase())
+            if(isTaken.length > 0){
+                this.msg.info="This packing unit  already exists"
+                this.msg.type="error"
+                this.setMsg();
+                this.packing_unit="";
+                return false;
+            }
+
             this.isSaving=true;
             const created_at=Timestamp.fromDate(new Date());
             const dataCollection=collection(db, "packingSizes", )
             const data={
                 user: {uid:this.user.uid, displayName:this.user.displayName},
                 packing_unit: this.packing_unit,         
-                packing_name: this.packing_name,      
                 created_at: created_at,
                 edit_user: {uid:this.user.uid, type:"added"},
 
             }
-            const result=await addDoc(dataCollection, data);
+        await addDoc(dataCollection, data);
            
         },
         message(type){
@@ -135,14 +168,24 @@ export default {
                             if(change.type==="added" && res.edit_user.uid==user.uid && dc.length===1){
                                     this.message("added")
                                     this.packing_unit="";          
-                                    this.packing_name=""; 
-                                    hp.setAutoFocus("packing_name")
+                                    this.isSaving=false;
+                                    this.msg.info="The packing unit has been saved"
+                                    this.msg.type="success"
+                                    this.setMsg();
                             }           
                             if(change.type==="modified" && res.edit_user.type=="modified" && res.edit_user.uid==user.uid){
                                     this.message("modified")
+                                    this.isUpdating=false;
+                                    this.editItem={}
+                                    this.msg.info="This packing unit has been updated"
+                                    this.msg.type="success"
+                                    this.setMsg();
                             }  
                             if(change.type==="removed" && res.edit_user.type=="removed" && res.edit_user.uid==user.uid){
                                     this.message("removed")
+                                    this.msg.info="The packing unit has been deleted"
+                                    this.msg.type="success"
+                                    this.setMsg();
                             }             
                     });                 
             });                              
