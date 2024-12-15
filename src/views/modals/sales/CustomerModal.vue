@@ -11,34 +11,33 @@
                        <div class="card shadow-sm">
                         <div class="card-body p-2 small">
                             <div class="row g-2">
-                                <div class="col-6  col-sm-4 col-lg-12">
+                                <!--<div class="col-6  col-sm-4 col-lg-12">
                                     <div class="form-floating">
                                         <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchCustomer" placeholder="Code" class="form-control-plaintext border-bottom">
                                         <label for="search_by_code" class="">Code</label>
                                     </div>
-                                </div>
-                                <div class="col-6 col-sm-4 col-lg-12">
+                                </div>-->
+                                <div class="col-6 col-sm-3 col-lg-12">
                                     <div class="form-floating">
                                         <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchCustomer" placeholder="Description" class="form-control-plaintext border-bottom">
                                         <label for="search_by_name" class="">Name</label>
                                     </div> 
                                 </div>
-                                <div class="col-6 col-sm-4 col-lg-12">
+                                <div class="col-6 col-sm-3 col-lg-12">
                                     <div class="form-floating">
                                         <input type="search" id="search_by_address" v-model="search_by_address" @keyup="searchCustomer" placeholder="Address" class="form-control-plaintext border-bottom">
                                          <label for="search_by_address" class="">Address</label>
                                 </div>
                                 </div> 
-                            </div>
-                             <div class="row mt-2">
-                                <div class="col-6 d-grid"><button class="btn btn-sm text-dark clear-search-customer" @click="clearSearch">
+                           
+                                <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark clear-search-customer" @click="clearSearch">
                                     <i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
                                 </div>
                                 <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateCustomer">
                                     <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
                                     <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                 </button></div>-->
-                                <div class="col-6 d-grid"><button class="btn btn-sm text-dark close-customer" data-bs-dismiss="modal">
+                                <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark close-customer" data-bs-dismiss="modal">
                                     <i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                                 </div>     
                              </div> 
@@ -51,14 +50,14 @@
                                <table class="table table-bordered table-hover mb-0">
                                    <tbody class="small">
                                        <tr class="text-center table-secondary fw-bold" >
-                                           <td class="col-1" @click="sortCustomers('code')"><i class="fa-solid fa-sort"></i> Code</td>
-                                           <td @click="sortCustomers('name')" class="col-2"><i class="fa-solid fa-sort"></i> Name</td>
+                                           <!--<td class="col-1" @click="sortCustomers('code')"><i class="fa-solid fa-sort"></i> Code</td>-->
+                                           <td @click="sortCustomers('name')" class="col-1"><i class="fa-solid fa-sort"></i> Name</td>
                                            <td class="col-1" @click="sortCustomers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
-                                           <td class="col-4" @click="sortCustomers('address')"><i class="fa-solid fa-sort"></i> Address</td>
+                                           <td class="col-1" @click="sortCustomers('address')"><i class="fa-solid fa-sort"></i> Address</td>
                                            <td class="col-1" @click="sortCustomers('created_at')"><i class="fa-solid fa-sort"></i> Member date</td>
                                        </tr>
                                      <tr @click="setCustomer(default_customer)" data-bs-dismiss="modal" class="change-cursor">
-                                        <td class="text-center">{{default_customer.code}}</td>
+                                        <!--<td class="text-center">{{default_customer.code}}</td>-->
                                         <td>{{default_customer.name}}</td>
                                         <td class="text-center">{{default_customer.phone}}</td>
                                         <td>{{default_customer.address}}</td>
@@ -66,9 +65,9 @@
                                      </tr>
                                        
                                        <tr class="change-cursor" data-bs-dismiss="modal" @click="setCustomer(p)" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id" >                                         
-                                           <td :class="{'table-secondary': sort_item ==='code'}" class="text-center">
+                                           <!--<td :class="{'table-secondary': sort_item ==='code'}" class="text-center">
                                                 {{p.code}}
-                                            </td>
+                                            </td>-->
                                            <td :class="{'table-secondary': sort_item ==='name'}">
                                                 {{p.name}}
                                            </td>

@@ -73,14 +73,15 @@
                     <tr>
                         <td colspan=""  class="ps-2">Total amount :</td>
                         <td class="text-end">{{fM(data.total_amount)}}</td>                   
-                        <td colspan="" class="ps-2 ">Net amount :</td>
-                        <td class="text-end">{{fM(data.net_amount)}}</td>
-                    </tr>
-                    <tr>
                         <td colspan="" class="ps-2">Extra discount :</td>
                         <td class="text-end">
                             {{fM(data.extra_discount)}}
-                        </td>                                        
+                        </td>  
+                    </tr>
+                    <tr>
+                        <td colspan="" class="ps-2 ">Net amount :</td>
+                        <td class="text-end">{{fM(data.net_amount)}}</td>
+                                                            
                         <td colspan="" class="ps-2">Paid (Ks) :</td>
                         <td class="text-end">
                             {{fM(data.paid)}}

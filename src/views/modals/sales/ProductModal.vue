@@ -45,15 +45,15 @@
                                     </div>
                                     <div class="col-sm-6 col-lg-12">
                                         <div class="card shadow-sm" >
-                                            <div class="card-body p-2 max-vh-65 overflow-y-auto">
+                                            <div class="card-body p-2 vh-30 overflow-y-auto dataContainer">
                                                 <table class="table table-bordered table-hover mb-0">
                                                     <tbody>      
                                                         <tr class="text-center fw-bold table-secondary">
-                                                            <td>Code</td>
-                                                            <td>Product Name</td>
+                                                            <td class="col-1">No.</td>
+                                                            <td class="col-11">Product Name</td>
                                                         </tr>                                         
                                                         <tr v-if="saleItems.length>0" v-for="(s,i) in saleItems" :key="s.id" >
-                                                            <td class="text-center col-1">{{s.code_no}}</td>        
+                                                            <td class="text-center">{{i+1}}</td>
                                                             <td class="col-5">{{s.item_name}}</td>                                            
                                                         </tr>
                                                     </tbody>
@@ -143,17 +143,27 @@ export default {
     },   
     mounted() {
         const myModalEl = document.getElementById('searchCode')
-        myModalEl.addEventListener('show.bs.modal', event => {
+        /* myModalEl.addEventListener('show.bs.modal', event => {
                 const search_by_code=document.getElementById("search_by_code");
                 setTimeout(()=>{
                     search_by_code.focus();
                 }, 500)              
-        })
+        })*/
         this.isLoading=true; 
         this.fetchProducts(); 
     },
 
     watch:{
+        saleItems:{
+            handler(val){
+              if(val.length){
+                    setTimeout(()=>{
+                        this.autoScroll();
+                    }, 100)
+              }
+            },deep:true
+        
+        },
         isError:{
             handler(val){
                 if(val){
@@ -182,6 +192,13 @@ export default {
         updateProducts(){
                 this.isUpdating=true;
                 this.fetchProducts();
+        },
+        autoScroll(){            
+            const container = document.querySelector(".dataContainer");
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: "smooth" // Enables smooth scrolling
+            });
         },
         setCode(p){
             const items=this.productsData.filter((f)=>f.code_no==p.code_no);

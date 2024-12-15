@@ -11,12 +11,7 @@
                                 <div class="card shadow-sm">
                                     <div class="card-body p-2">
                                         <div class="row g-1 small">
-                                           <div class="col-6 col-md-3 col-lg-12">
-                                            <div class="form-floating">
-                                                <input type="search" id="search_by_voucher_no" @paste="searchSales" v-model="search_by_voucher_no" @keypress.enter="searchSales" placeholder="Voucher no." class="form-control-plaintext border-bottom">
-                                                <label for="search_by_voucher_no" class="">Voucher No.</label>
-                                            </div>
-                                           </div>
+                                          
                                            
                                            <div class="col-6 col-md-3 col-lg-12">
                                             <div class="input-group mb-2">
@@ -38,7 +33,13 @@
                                            </div>   
                                            <div class="col-6 col-md-3 col-lg-12">
                                             <div class="form-floating">
-                                                <input type="search" id="search_by_customer" v-model="search_by_customer" @keyup="searchSales" placeholder="Customer name" class="form-control-plaintext border-bottom">
+                                                <input type="search" id="search_by_voucher_no" @paste="searchSales" v-model="search_by_voucher_no" @keypress.enter="searchSales" placeholder="Voucher no." class="form-control-plaintext border-bottom">
+                                                <label for="search_by_voucher_no" class="">Voucher No.</label>
+                                            </div>
+                                           </div>
+                                           <div class="col-6 col-md-3 col-lg-12">
+                                            <div class="form-floating">
+                                                <input type="search" id="search_by_customer" v-model="search_by_customer" @input="inputSearchCustomer" placeholder="Customer name" class="form-control-plaintext border-bottom">
                                                 <label for="search_by_customer" class="">Customer</label>
                                             </div>
                                            </div>                                   
@@ -66,10 +67,10 @@
                                     <table class="table table-bordered table-hover m-0">
                                         <tbody>
                                             <tr class="table-secondary text-center fw-bold">
-                                                <td>Voucher no.</td>
+                                                <td>Voucher No.</td>
                                                 <td class="">Name</td>
                                                 <td>Phone</td>
-                                                <td>Sale date</td>
+                                                <td>Sale Date</td>
                                                 <td class="">User</td>                                    
                                             </tr>                                
                                             <tr class="change-cursor" v-if="sales.length > 0" v-for="s in sales" :key="s.id" @click="setCode(s)" data-bs-dismiss="modal">
@@ -167,6 +168,10 @@ export default {
            this.search_by_customer="";
             this.setDate();
            this.searchSales();
+       },
+       inputSearchCustomer(){
+            this.search_by_customer=event.target.value;
+            this.searchSales();
        },
        searchSales(){                     
          this.fetchSales();        

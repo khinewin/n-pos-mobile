@@ -17,7 +17,7 @@
                             </button>
                         </div>
                         <div class="col-4">
-                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
+                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                         </div>
                     </div>
                     <div v-if="ei">
