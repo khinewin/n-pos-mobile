@@ -1,8 +1,8 @@
 <template lang="">
     <div class="">    
-        <span v-if="msgType" class="position-fixed end-0 top-0  z-3 alert alert-secondary" role="alert" :class="[msgType=='success' ? 'text-success' : 'text-danger']">
-            <span v-if="msgType=='error'"><i class="fa-solid fa-triangle-exclamation"></i> </span>
-            <span v-if="msgType=='success'"><i class="fa-solid fa-check"></i> </span>
+        <span v-if="msgType" class="position-fixed end-0 top-0  z-3 text-white rounded py-2 px-3 my-2 mx-2" role="alert" :class="[msgType=='success' ? 'bg-success' : 'bg-danger']">
+            <span v-if="msgType=='error'"><i class="fa-solid fa-circle-exclamation"></i></span>
+            <span v-if="msgType=='success'"><i class="fa-solid fa-circle-check"></i></span>
            <span class="ms-2"> {{msgInfo}}</span>
         </span>
         <span v-if="isOffline" class="position-fixed start-0 top-0  z-3 alert alert-secondary text-danger" role="alert">

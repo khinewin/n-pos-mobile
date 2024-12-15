@@ -24,7 +24,7 @@
                     <button class="btn btn-sm open"  data-bs-toggle="modal" data-bs-target="#salesModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print (ctrl+p)</button>
+                    <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="print"><i class="fa-solid fa-print" ></i> Print (ctrl+p)</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                         <button v-if="saleMode=='Sale / New' || saleMode=='Sale / History'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length <=0 || saleMode=='Sale / History' " >
@@ -124,7 +124,7 @@
                                             <td class=" text-end table-primary d-flex justify-content-between">
                                                 <button class="btn btn-sm btn-primary " :disabled="saleMode=='Sale / History'"  @click="decreaseQty(s, s.sale_unit, s.barcode)"><i class="fa-solid fa-minus"></i></button>
                                                 <div>
-                                                    <input type="number" class="form-control-plaintext py-0 text-center" @keyup="setEdit(s)"  @keypress.enter="calEdit(s)" v-model="s.sale_qty" @change="calEdit(s)">
+                                                    <input :disabled="saleMode=='Sale / History'" type="number" class="form-control-plaintext py-0 text-center" @keyup="setEdit(s)"  @keypress.enter="calEdit(s)" v-model="s.sale_qty" @change="calEdit(s)">
                                                 </div>
                                                 <button :disabled="saleMode=='Sale / History'"  class="btn btn-sm btn-primary" @click="increaseQty(s)"><i class="fa-solid fa-plus"></i></button>   
                                             </td>                                            
@@ -698,38 +698,18 @@ export default {
         checkQty(p){           
             if(p.qty  <1 + p.sale_qty ){
                 this.msg.type="error";
-                this.msg.info="Maximum inventory balance"
+                this.msg.info=`There is a maximum balance of "${p.item_name}"`
                 return false;
             }          
             return true;
         },
-        checkEditQty(){    
-            let isSufficient=true;
-            const e=this.editItem
-            let sale_qty=0;
-                sale_qty += e.input_l_qty ? e.input_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
-                sale_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty: 0;
-                sale_qty += e.input_s_qty ? e.input_s_qty : 0;
-
-                let bal_qty_largest_unit=e.packing_size.largest_unit ? Math.floor(e.qty / (e.packing_size.medium_qty * e.packing_size.smallest_qty)) : 0;
-                let bal_qty_medium_unit=e.packing_size.medium_unit ? Math.floor((e.qty % (e.packing_size.medium_qty * e.packing_size.smallest_qty)) / e.packing_size.smallest_qty): 0;
-                let bal_qty_smallest_unit=e.qty;
-                //console.log(e.input_l_qty)//has a trouble
-                    if(sale_qty > e.qty){
-                        this.msg.type="error";
-                        this.msg.info="Maximum  inventory balance"
-                        e.input_l_qty = bal_qty_largest_unit ? bal_qty_largest_unit : 0;
-                        e.input_m_qty = bal_qty_largest_unit ? 0 : bal_qty_medium_unit ? bal_qty_medium_unit : 0;
-                        e.input_s_qty = bal_qty_largest_unit || bal_qty_medium_unit ? 0 : bal_qty_smallest_unit ? bal_qty_smallest_unit : 0;
-                        isSufficient=false;                        
-                    }                                       
-            if(!isSufficient) return false;
-            return true;
-        },
      
         setCode(p){
-            const checkQty=this.checkQty(p);
-            if(!checkQty) return false;
+           if(p.qty <=0){
+                this.msg.info= `"${p.item_name}" is out of stock`
+                this.msg.type="error";
+                return false;
+           }
            this.store_item ={
                 ...p,           
                 sale_type: this.sale_type,         
