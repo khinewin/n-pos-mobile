@@ -2,7 +2,13 @@
     <div>           
            <PageHeader page-title="Suppliers" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info"/>
            <div class="container-fluid">
-               <div class="row  justify-content-end">   
+               <div class="row  justify-content-end">  
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                    <button type="button" class="btn btn-sm" :disabled="isUpdating" @click="saveEdit">
+                        <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
+                        <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
+                    </button>
+                </div>  
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
@@ -23,25 +29,24 @@
                       <div class="card shadow">
                         <div class="card-body p-2">
                             <div class="row g-2">
-                                <div class="form-floating col-sm-4 col-lg-12">
+                                <!--<div class="form-floating col-sm-4 col-lg-12">
                                     <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchSuppliers" placeholder="Code" class="form-control-plaintext border-bottom ">
                                     <label for="search_by_code" class="small">Code</label>
-                                </div>
-                                <div class="form-floating col-sm-4 col-lg-12">
-                                    <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchSuppliers" placeholder="Description" class="form-control-plaintext border-bottom ">
+                                </div>-->
+                                <div class="form-floating col-sm-3 col-lg-12">
+                                    <input type="search" id="search_by_name" v-model="search_by_name" @input="inputSearchName" placeholder="Description" class="form-control-plaintext border-bottom ">
                                     <label for="search_by_name" class="small">Name</label>
                                 </div> 
-                                <div class="form-floating col-sm-4 col-lg-12">
-                                    <input type="search" id="search_by_company" v-model="search_by_company" @keyup="searchSuppliers" placeholder="Company" class="form-control-plaintext border-bottom ">
+                                <div class="form-floating col-sm-3 col-lg-12">
+                                    <input type="search" id="search_by_company" v-model="search_by_company" @input="inputSearchCompany" placeholder="Company" class="form-control-plaintext border-bottom ">
                                     <label for="search_by_company" class="small">Company</label>
                                  </div> 
-                            </div>
-                             <div class="row mt-2">
-                                    <div class="col-6 d-grid"><button class="btn btn-sm text-dark" @click="searchSuppliers"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
+                           
+                                    <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="searchSuppliers"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
                                     <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                     </button></div>-->
-                                    <div class="col-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
+                                    <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
                              </div> 
                         </div>
                       </div>                                                                                                          
@@ -55,49 +60,51 @@
                                         <td class="col-0">
                                             <input type="checkbox" class="form-check-input" @click="checkAll" v-model="is_check_all">
                                         </td>
-                                           <td  @click="sortSuppliers('code')" class="col-2"><i class="fa-solid fa-sort"></i> Code</td>
-                                           <td @click="sortSuppliers('name')" class="col-2"><i class="fa-solid fa-sort"></i> Name</td>
+                                           <!--<td  @click="sortSuppliers('code')" class="col-2"><i class="fa-solid fa-sort"></i> Code</td>-->
+                                           <td @click="sortSuppliers('name')" class="col4-"><i class="fa-solid fa-sort"></i> Name</td>
                                            <td @click="sortSuppliers('phone')" class="col-2"><i class="fa-solid fa-sort"></i> Phone</td>
                                            <td @click="sortSuppliers('company')" class="col-4"><i class="fa-solid fa-sort"></i> Company</td>
                                            <td @click="sortSuppliers('created_at')" class="col-2"><i class="fa-solid fa-sort"></i> Date</td>
                                        </tr>
                                        <tr>
-                                        <td class="">
+                                        <td class="text-center">
                                             <input class="form-check-input" type="checkbox" @click="checkAll" v-model="is_deleted">
                                         </td>
-                                            <td class="">
+                                            <!--<td class="">
                                                 <input @keypress.enter="saveSupplier" type="text" v-model="code" class="form-control-plaintext py-0 text-center" id="code" placeholder="Code">                                                                                       
+                                            </td>-->
+                                            <td class="">
+                                                <input @keypress.enter="saveSupplier" type="text" v-model="name" class="form-control py-1 textc " id="name" placeholder="Name">                                               
                                             </td>
                                             <td class="">
-                                                <input @keypress.enter="saveSupplier" type="text" v-model="name" class="form-control-plaintext py-0 " id="name" placeholder="Name">                                               
+                                                <input @keypress.enter="saveSupplier" type="tel" v-model="phone"  class="form-control py-1  text-center" id="phone" placeholder="Phone">                                            
                                             </td>
                                             <td class="">
-                                                <input @keypress.enter="saveSupplier" type="tel" v-model="phone"  class="form-control-plaintext py-0  text-center" id="phone" placeholder="Phone">                                            
+                                                <input @keypress.enter="saveSupplier" type="text" v-model="company"   class="form-control py-1" id="company" placeholder="Company">                                              
                                             </td>
                                             <td class="">
-                                                <input @keypress.enter="saveSupplier" type="text" v-model="company"   class="form-control-plaintext py-0" id="company" placeholder="Company">                                              
-                                            </td>
-                                            <td class="">
-                                                <flat-pickr @change="saveSupplier" class="form-control-plaintext py-0  text-center" v-model="created_at"  :config="config" />
+                                                <flat-pickr @change="saveSupplier" class="form-control py-1  text-center" v-model="created_at"  :config="config" />
                                             </td>
                                         </tr>
                                        
-                                       <tr class="text-center" v-if="suppliers.length > 0"  v-for="(p, i) in suppliers" :key="p.id" @mouseenter="setEdit(p)" >                                           
+                                       <tr class="text-center" v-if="suppliers.length > 0"  v-for="(p, i) in suppliers" :key="p.id"  >                                           
                                         <td class="">
                                             <input class="form-check-input" type="checkbox" v-model="p.is_deleted">
                                         </td>
-                                           <td :class="{'table-secondary': sort_item ==='code'}" class="position-relative">
-                                                <!--<a class="text-danger position-absolute start-0 top-50 translate-middle ps-2" href="#!" @click="removeSupplier(i, p)"><i class="fa-solid fa-square-minus"></i></a>-->                                                                                        
+                                           <!--<td :class="{'table-secondary': sort_item ==='code'}" class="position-relative">
                                                 <span class="position-absolute start-50 top-50 translate-middle">{{p.code}}</span>
-                                            </td>
+                                            </td>-->
                                            <td :class="{'table-secondary': sort_item ==='name'}" class="">
-                                                <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext py-0 m-0" v-model="p.name">
+                                                <input v-if="editItem.id ==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1 m-0" v-model="p.name">
+                                                <div v-else class="pt-1 text-start" @click="setEdit(p)">{{p.name}}</div>
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='phone'}" class="">
-                                            <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center py-0  m-0" v-model="p.phone">
+                                            <input  v-if="editItem.id==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control text-center py-1  m-0" v-model="p.phone">
+                                            <div v-else class="pt-1" @click="setEdit(p)">{{p.phone}}</div>
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='company'}" class="">
-                                            <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext py-0  m-0" v-model="p.company">
+                                            <input v-if="editItem.id==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1  m-0" v-model="p.company">
+                                            <div v-else class="pt-1 text-start" @click="setEdit(p)">{{p.company}}</div>
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='created_at'}" class="position-relative">
                                                 <span class="position-absolute start-50 top-50 translate-middle">{{showTime(p.created_at)}}</span>
@@ -202,7 +209,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                        setTimeout(()=>{
                            this.msg.type="";
                            this.msg.info="";
-                       }, 3000)
+                       }, 2000)
                    }
                },deep:true
            }
@@ -217,6 +224,14 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.saveSupplier(); // Call your custom function
             }                 
+        },
+        inputSearchName(){
+            this.search_by_name=event.target.value;
+            this.searchSuppliers();
+        },
+        inputSearchCompany(){
+            this.search_by_company=event.target.value;
+            this.searchSuppliers();
         },
         async deleteMultiple(){
             const is_has=this.suppliers.filter((f)=>f.is_deleted)
@@ -301,6 +316,15 @@ import { required, email ,helpers} from '@vuelidate/validators'
          //   if(this.editItem.id) this.saveEdit();
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
+
+            let isTaken=this.suppliersData.filter((f)=>f.name.toLowerCase() == this.name.toLowerCase())
+            if(isTaken.length > 0){
+                this.msg.info="This supplier name already exists"
+                this.msg.type="error"
+                this.name="";               
+                return false;
+            }
+
             this.isSaving=true;
             const date=hp.insertDateNoTime(this.created_at)
             const created_at=Timestamp.fromDate(date);
@@ -322,7 +346,19 @@ import { required, email ,helpers} from '@vuelidate/validators'
                this.isUpdating=true;
                this.fetchSuppliers();
            },
-          async saveEdit(){             
+          async saveEdit(){    
+            let result=this.suppliersData.filter((f)=>f.id != this.editItem.id && f.name.toLowerCase().includes(this.editItem.name) )
+            if(result.length > 0){
+                this.msg.info="This supplier name already exists"
+                this.msg.type="error";
+                this.suppliers=this.suppliersData.map((m)=>{
+                    if(m.id==this.editItem.id){
+                        return {...m, name: ""}
+                    }
+                    return m;
+                })
+                return false;
+            }                      
                const updateDocument=doc(db, "suppliers", this.editItem.id)
                 await updateDoc(updateDocument,this.editItem)           
            },

@@ -6,7 +6,7 @@
                             <div class="small">Sales</div>
                             <div class="row">
                                 <div class="col-2 text-center h1">
-                                    <i class="fa-solid fa-cart-plus"></i>
+                                    <i class="fa-solid fa-chart-line"></i>
                                 </div>
                                 <div class="col-5">
                                     <div class="small fw-lighter mb-1 text-center">Today</div>
@@ -30,7 +30,7 @@
                             <div class="small">Sales</div>
                             <div class="row">
                                 <div class="col-2 text-center h1">
-                                    <i class="fa-solid fa-cart-plus"></i>
+                                    <i class="fa-solid fa-chart-line"></i>
                                 </div>
                                 <div class="col-5">
                                     <div class="small fw-lighter mb-1 text-center">This month</div>
