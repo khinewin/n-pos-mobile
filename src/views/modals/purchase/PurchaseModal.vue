@@ -11,13 +11,8 @@
                                 <div class="card shadow-sm">
                                     <div class="card-body p-2">
                                        <div class="row g-1 small">
-                                        <div class="col-6 col-sm-4 col-lg-12">
-                                            <div class="form-floating ">
-                                                <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchPurchase" placeholder="Voucher no." class="form-control-plaintext border-bottom">
-                                                <label for="search_by_voucher_no" class="">Voucher no.</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-6 col-sm-4 col-lg-12">
+                                      
+                                        <div class="col-6 col-sm-3 col-lg-12">
                                             <div class="input-group">
                                                 <div class="form-floating">
                                                     <flat-pickr @change="searchPurchase" class="form-control-plaintext border-bottom" v-model="search_by_from_pur_date" id="from_date" :config="config" />
@@ -26,7 +21,7 @@
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                             </div>
                                         </div>
-                                        <div class="col-6 col-sm-4 col-lg-12">
+                                        <div class="col-6 col-sm-3 col-lg-12">
                                             <div class="input-group">
                                                 <div class="form-floating">
                                                     <flat-pickr @change="searchPurchase" class="form-control-plaintext border-bottom" v-model="search_by_to_pur_date" id="to_date" :config="config" />
@@ -35,22 +30,19 @@
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                             </div>
                                         </div>
-                                        <div class="col-6 col-lg-12">
+                                        <div class="col-6 col-sm-3 col-lg-12">
                                             <div class="form-floating ">
-                                                <input type="search" v-model="search_by_supplier" @keyup="searchPurchase" placeholder="Supplier" class="form-control-plaintext border-bottom">
+                                                <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchPurchase" placeholder="Voucher no." class="form-control-plaintext border-bottom">
+                                                <label for="search_by_voucher_no" class="">Voucher no.</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-6 col-sm-3 col-lg-12">
+                                            <div class="form-floating ">
+                                                <input type="search" v-model="search_by_supplier" @input="inputSearchSupplier" placeholder="Supplier" class="form-control-plaintext border-bottom">
                                                 <label for="search_by_supplier" class="">Supplier</label>
                                             </div>
                                         </div>
-                                        <div class="col-6 col-lg-12">
-                                            <div class="form-floating ">
-                                                <select disabled @change="searchPurchase" class="form-control-plaintext border-bottom" v-model="search_by_location">
-                                                    <option value="">All</option>
-                                                    <option>Main</option>
-                                                    <option>Mart</option>
-                                                </select>
-                                                <label for="search_by_supplier" class="">Location</label>
-                                            </div>
-                                        </div>
+                                        
                                        </div>
                                 
                                 <div class="row mt-2">
@@ -172,6 +164,10 @@ export default {
        setCode(p){
            this.$emit("setCode", p)
            this.clearSearch();
+       },
+       inputSearchSupplier(){
+        this.search_by_supplier=event.target.value;
+        this.searchPurchase();
        },
        clearSearch(){
            this.search_by_voucher_no="N-";

@@ -46,15 +46,15 @@
                                     </div>
                                     <div class="col-sm-6 col-lg-12">
                                         <div class="card shadow-sm">
-                                            <div class="card-body p-2 max-vh-65 overflow-y-auto">
+                                            <div class="card-body px-2 pt-0 pb-2 vh-30 overflow-y-auto dataContainer">
                                                 <table class="table table-bordered mb-0 table-hover">
-                                                    <tbody>
-                                                        <tr class="table-secondary fw-bold text-center">
-                                                            <td>Code</td>
+                                                    <tbody class="">
+                                                        <tr class="table-secondary fw-bold text-center position-sticky top-0 z-3">
+                                                            <td>No.</td>
                                                             <td>Product Name</td>
                                                         </tr>
-                                                        <tr  v-if="storeItems.length >0"  v-for="s in storeItems" :key="s.id">
-                                                            <td class="col-1 text-center">{{s.code_no}}</td>
+                                                        <tr  v-if="storeItems.length >0"  v-for="(s,i) in storeItems" :key="s.id">
+                                                            <td class="col-1 text-center">{{i+1}}</td>
                                                             <td class="col-5">{{s.item_name}}</td>
                                                         </tr>
                                                     </tbody>
@@ -134,12 +134,12 @@ export default {
     },   
     mounted() {
         const myModalEl = document.getElementById('searchCode')
-        myModalEl.addEventListener('show.bs.modal', event => {
+      /*  myModalEl.addEventListener('show.bs.modal', event => {
                 const search_by_code=document.getElementById("search_by_code");
                 setTimeout(()=>{
                     search_by_code.focus();
                 }, 500)              
-        })
+        })*/
     },
     created(){
         if(this.user !==null){         
@@ -156,6 +156,16 @@ export default {
         }
     },
     watch:{       
+        storeItems:{
+            handler(val){
+              if(val.length){
+                    setTimeout(()=>{
+                        this.autoScroll();
+                    }, 100)
+              }
+            },deep:true
+        
+        },
         user(data){
                 if(data !==null){         
                     this.isLoading=true;          
@@ -175,6 +185,13 @@ export default {
       
     },
     methods:{
+        autoScroll(){            
+            const container = document.querySelector(".dataContainer");
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: "smooth" // Enables smooth scrolling
+            });
+        },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },

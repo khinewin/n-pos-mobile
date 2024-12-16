@@ -8,32 +8,31 @@
                    <div class="card  shadow-sm">
                      <div class="card-body p-2">
                         <div class="row g-2">
-                            <div class="col-6 col-sm-4 col-lg-12">
+                            <!--<div class="col-6 col-sm-4 col-lg-12">
                                 <div class="form-floating">
                                     <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchSuppliers" placeholder="Code" class="form-control-plaintext border-bottom">
                                     <label for="search_by_code" class="small">Code</label>
                                 </div>
-                            </div>
-                            <div class="col-6 col-sm-4 col-lg-12">
+                            </div>-->
+                            <div class="col-6 col-sm-3 col-lg-12">
                                 <div class="form-floating ">
                                     <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchSuppliers" placeholder="Description" class="form-control-plaintext border-bottom">
                                     <label for="search_by_name" class="small ">Name</label>
                                 </div> 
                             </div>
-                            <div class="col-sm-4 col-lg-12">
+                            <div class="col-sm-3 col-lg-12">
                                 <div class="form-floating ">
                                     <input type="search" id="search_by_company" v-model="search_by_company" @keyup="searchSuppliers" placeholder="Company" class="form-control-plaintext border-bottom">
                                     <label for="search_by_company" class="small">Company</label>
                                 </div> 
                             </div>
-                        </div>
-                          <div class="row mt-2">
-                            <div class="col-6 d-grid"><button class="btn btn-sm text-dark clear-search-supplier" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button></div>
+                       
+                            <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark clear-search-supplier" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button></div>
                             <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                 </button>
                             </div>-->
-                            <div class="col-6 d-grid">
+                            <div class="col-6 col-sm-3 col-lg-6 d-grid">
                                 <button class="btn btn-sm text-dark close-supplier" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                             </div>
                           </div> 

@@ -63,23 +63,22 @@
                             </div>
                         </div>
                        <div class="vh-50 overflow-y-auto">
-                        <table class="table table-bordered mb-0  table-hover inside-table">
+                        <table class="table table-bordered mb-0  table-hover ">
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary">
-                                    <td class="col-1">Code</td>
-                                    <td class="col-2" > Product Name</td>
+                                    <td class="col-0"></td>
+                                    <td class="col-3 change-cursor" data-bs-toggle="modal" data-bs-target="#searchCode"  ><i class="fa-solid fa-circle-plus"></i>  Product Name</td>
                                     <!--<td class="col-1 table-info">Exp. Date</td>-->     
-                                    <td class="col-1">Packing Size</td>                              
+                                    <td class="col-2">Packing Size</td>                              
                                     <td class="col-1 table-primary" colspan="1">Qty</td>
                                     <td class="col-2 table-info" colspan="2">Unit Price</td>     
                                     <td class="col-1">Amount</td>                               
-                                    <td class="col-1 table-warning" colspan="2">Discount</td>                                    
+                                    <td class="col-2table-warning" colspan="2">Discount</td>                                    
                                     <td class="col-1">Unit Cost</td>
                                 </tr>
-                                <tr class="small"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase" :key="st.id" @mouseenter="setEdit(i)"  >
-                                    <td class=" position-relative text-center">
-                                        <!--<a class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeStoreItem(i, st)"><i class="fa-solid fa-square-minus"></i></a>-->
-                                        {{st.code_no}}                                                                                         
+                                <tr class="small"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase.filter((f)=>!f.is_remove)" :key="st.id" @mouseenter="setEdit(i)"  >
+                                    <td class=" text-center">
+                                        <a class="text-danger " href="#!" @click="removeStoreItem(st)"><i class="fa-solid fa-square-minus"></i></a>                                                                                                                          
                                     </td>                                    
                                     <td class="">{{st.item_name}}</td>
                                     <!--<td class=" position-relative table-info" >
@@ -475,9 +474,11 @@ export default {
             let total_discount=0;
             
             this.storePurchase.map((m)=>{
-                total_amount += m.amount ? m.amount : 0;
-                total += m.unit_cost ? m.unit_cost : 0;
-                total_discount += m.discount ? m.discount : 0;
+                if(!m.is_remove){
+                    total_amount += m.amount ? m.amount : 0;
+                    total += m.unit_cost ? m.unit_cost : 0;
+                    total_discount += m.discount ? m.discount : 0;
+                }
             })
 
             this.total_amount=total_amount;
@@ -489,9 +490,16 @@ export default {
         },
       
 
-        async removeStoreItem(i, item){      
-            this.removeItems.push(item);
-            this.storePurchase.splice(i, 1)
+        async removeStoreItem(item){      
+            this.storePurchase=this.storePurchase.map((m)=>{
+                if(m.id==item.id){
+                    return {
+                        ...m, is_remove: true, pur_qty: 0
+                    }
+                }else{
+                    return m;
+                }
+            })
             this.calTotal();
         },
         storingPurchase(){           

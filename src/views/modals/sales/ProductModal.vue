@@ -45,10 +45,10 @@
                                     </div>
                                     <div class="col-sm-6 col-lg-12">
                                         <div class="card shadow-sm" >
-                                            <div class="card-body p-2 vh-30 overflow-y-auto dataContainer">
+                                            <div class="card-body px-2 pt-0 pb-2 vh-30 overflow-y-auto dataContainer">
                                                 <table class="table table-bordered table-hover mb-0">
                                                     <tbody>      
-                                                        <tr class="text-center fw-bold table-secondary">
+                                                        <tr class="text-center fw-bold table-secondary position-sticky top-0 z-3">
                                                             <td class="col-1">No.</td>
                                                             <td class="col-11">Product Name</td>
                                                         </tr>                                         
@@ -89,9 +89,9 @@
                                                         {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}                                             
                                                     </td>                                                  
                                                     <td class="text-end " >
-                                                        <span v-if="p.retail_price.largest_unit">{{p.retail_price.largest_unit}} * </span>
-                                                        <span v-if="p.retail_price.medium_unit">{{p.retail_price.medium_unit}} * </span>
-                                                        <span v-if="p.retail_price.smallest_unit">{{p.retail_price.smallest_unit}} </span>
+                                                        <!--<span v-if="p.retail_price.largest_unit">{{p.retail_price.largest_unit}} * </span>-->
+                                                        <!--<span v-if="p.retail_price.medium_unit">{{p.retail_price.medium_unit}} * </span>-->
+                                                        <span v-if="p.retail_price.smallest_unit">{{p.retail_price.smallest_unit}} - {{p.packing_size.smallest_unit}} </span>
                                                     </td>
                                                     <!--<td class="text-end " >
                                                         <span v-if="p.whole_sale_price.largest_unit">{{p.whole_sale_price.largest_unit}} * </span>

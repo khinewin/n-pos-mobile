@@ -63,27 +63,24 @@
                             </div>
                         </div>
                         <div class="vh-55 overflow-y-auto">
-                        <table class="table table-bordered mb-0  table-hover inside-table" :class="{'border-danger':v$.storePurchase.$errors.length > 0}" >
+                        <table class="table table-bordered mb-0  table-hover " :class="{'border-danger':v$.storePurchase.$errors.length > 0}" >
                             <tbody>
                                 <tr class="small text-center fw-bold table-secondary">
-                                    <td class="col-1"> 
-                                        Code
+                                    <td class="col-0"> 
                                     </td>
-                                    <td class="col-2 change-cursor description"  data-bs-toggle="modal" data-bs-target="#searchCode" style="cursor: context-menu;" ><i class="fa-solid fa-circle-plus"></i> Product Name (cltr+i)</td>
+                                    <td class="col-3 change-cursor description change-cursor"  data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Product Name (cltr+i)</td>
                                     <!--<td class="col-1 table-info">Exp. Date</td>-->     
-                                    <td class="col-1">Packing Size</td>                              
+                                    <td class="col-2">Packing Size</td>                              
                                     <td class="col-1 table-primary" colspan="1">Qty</td>
                                     <td class="col-2 table-info" colspan="2">Unit Price</td>     
                                     <td class="col-1">Amount</td>                               
-                                    <td class="col-1 table-warning" colspan="2">Discount</td>                                    
+                                    <td class="col-2 table-warning" colspan="2">Discount</td>                                    
                                     <td class="col-1">Unit Cost</td>
                                 </tr>
                                 <tr class="small"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase" :key="st.id" @mouseenter="setEdit(i)"  >
                                     <td class=" text-center">
-                                        <div class="position-relative">
-                                            <a class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
-                                            {{st.code_no}}                                           
-                                        </div>                                    
+                                        <a class="text-danger " href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                        
+                                  
                                     </td>
                                     <td class="">{{st.item_name}}</td>
                                     <!--<td class="p-0 position-relative table-info">
@@ -265,6 +262,9 @@ export default {
     methods:{
         setVoucherNo(){
             return hp.setVoucherNo();
+        },
+        goBack(){
+            this.$router.push("/purchase");
         },
 
         handleCtrl(event) {           
@@ -464,6 +464,15 @@ export default {
                                     this.msg.info=hp.message(change.type, "purchase") 
                                     this.clearPurchaseItem(); 
                                 }
+                            }
+                            if(change.type==="removed"){
+                                this.msg.type="success";
+                                this.msg.info="The voucher has been cancelled." 
+                                this.isLoading=false;
+                                this.clearPurchaseItem();
+                                setTimeout(()=>{
+                                    this.goBack();
+                                },2000)
                             }
                     });                                              
             });                              

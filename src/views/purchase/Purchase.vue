@@ -67,23 +67,25 @@
                     </div>
                 </div>  
                 <div class="vh-55 overflow-y-auto">               
-                   <table class="table table-bordered mb-0 table-hover inside-table">
+                   <table class="table table-bordered mb-0 table-hover">
                         <tbody class="table-group-divider">
                             <tr class="text-center fw-bold table-secondary">
-                                <td class="col-1">Code</td>
-                                <td class="col-2">Product Name</td>
+                                <!--<td class="col-1">Code</td>-->
+                                <td class="col-0">No.</td>
+                                <td class="col-3">Product Name</td>
                                 <!--<td class="col-1">Exp. Date</td>-->     
-                                <td class="col-1">Packing Size</td>                              
+                                <td class="col-2">Packing Size</td>                              
                                 <td class="col-1" colspan="1">Qty</td>
-                                <td class="col-1">Unit Price</td> 
+                                <td class="col-2">Unit Price</td> 
                                 <td class="col-1">Amount</td>                                   
-                                <td class="col-1" colspan="2">Discount</td>                                    
+                                <td class="col-2" colspan="2">Discount</td>                                    
                                 <td class="col-1">Unit Cost</td>
                             </tr>
                             </tbody>
                             <tbody class="table-group-divider">
-                            <tr class="" v-if="products.length > 0" v-for="st in products" :key="st.id">
-                                <td class="">{{st.code_no}}</td>
+                            <tr class="" v-if="products.length > 0" v-for="(st, i) in products" :key="st.id">
+                                <!--<td class="">{{st.code_no}}</td>-->
+                                <td>{{i+1}}</td>
                                 <td class="">{{st.item_name}}</td>
                                 <!--<td class="text-center">                                   
                                      <span v-if="st.exp_date">{{showTime(st.exp_date)}}</span>

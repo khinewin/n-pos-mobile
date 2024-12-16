@@ -17,14 +17,14 @@
                             </button>
                         </div>
                         <div class="col-4">
-                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
+                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                         </div>
                     </div>
                     <div v-if="ei">
                         <table class="table table-bordered mb-0" v-if="Object.keys(ei).length">
                             <tbody>
                                 <tr>
-                                    <td colspan="2" class="text-center p-2" >{{ei.item_name}}</td>
+                                    <td colspan="2" class="text-center pt-2" ><div class="h6">{{ei.item_name}}</div></td>
                                 </tr>
                                 <tr v-if="ei.packing_size.largest_unit">
                                     <td class="p-0 col-10">
