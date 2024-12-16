@@ -30,7 +30,7 @@
                         {{displayPrice(p.pur_price.largest_unit, p.pur_price.medium_unit, p.pur_price.smallest_unit)}}
                     </td>
                     <td class="text-end"  v-if="sale_price" >
-                            {{displayPrice(p.retail_price.largest_unit, p.retail_price.medium_unit, p.retail_price.smallest_unit)}}
+                            {{p.retail_price.smallest_unit}}-{{p.packing_size.smallest_unit}}
                     </td>
                     <!--<td class="text-end"  v-if="sale_price" >
                             {{displayPrice(p.whole_sale_price.largest_unit, p.whole_sale_price.medium_unit, p.whole_sale_price.smallest_unit)}}

@@ -36,7 +36,7 @@
                             <span class="fw-bold">Customer : </span><span>{{customer.name}}</span>
                         </div>
                         <div class="col-6 col-sm-4 col-md-3">
-                            <span class="fw-bold">Code : </span><span>{{customer.code}}</span>
+                            <span class="fw-bold">Address : </span><span>{{customer.address}}</span>
                         </div>                                           
                     </div>
                 <div class="row g-2">
@@ -46,11 +46,11 @@
                                     <table class="table table-hover table-bordered mb-0">
                                         <tbody>
                                             <tr class="text-center table-secondary fw-bold">
-                                                <td class="text-center col-1"><input type="checkbox" v-model="check_all" @click="handleCheckAll"></td>
-                                                <td class="col-2">Voucher No.</td>
-                                                <td  class="col-2">Date</td>
-                                                <td  class="col-2">Amount</td>
-                                                <td  class="col-2">Credit</td>
+                                                <td class="text-center col-0"><input type="checkbox" v-model="check_all" @click="handleCheckAll"></td>
+                                                <td class="col-3">Voucher No.</td>
+                                                <td  class="col-3">Date</td>
+                                                <td  class="col-3">Amount</td>
+                                                <td  class="col-3">Credit</td>
                                             </tr>
                                         </tbody>
                                         <tbody v-for="s in saleItems" :key="s.id" class="table-group-divider">
@@ -160,7 +160,7 @@ export default {
     data(){
         return{    
            
-            display_item: 1,
+            display_item: 10,
             isLoading:false,
             customer:{},
             saleItems:[],

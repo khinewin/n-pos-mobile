@@ -21,7 +21,7 @@
                                                     </div>
                                                     <div class="col-md-6 col-lg-12">
                                                         <div class="form-floating">
-                                                            <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Product Name" class="form-control-plaintext border-bottom">
+                                                            <input type="search" v-model="search_by_item_name" @input="inputSearchName" placeholder="Product Name" class="form-control-plaintext border-bottom">
                                                             <label for="search_by_item_name" class="">Product Name</label>
                                                         </div> 
                                                     </div>
@@ -40,8 +40,20 @@
                                                         <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
                                                     </div>
                                                 </div>                                          
-                                            </div>
+                                            </div>                                           
                                         </div> 
+                                        <div class="card mt-1">
+                                            <div class="card-body p-2">
+                                                <div  class="row g-2 mx-2 mb-1">
+                                                    <div class="col-2 change-cursor">
+                                                        <span class="badge bg-secondary" @click="insertAllItem" ><i class="fa-solid fa-check-double"></i></span>
+                                                    </div>
+                                                    <div class="col-2 change-cursor" v-for="(c, i) in chunkData">
+                                                        <span class="badge bg-secondary" @click="setChunkCode(c)">{{c.length}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-sm-6 col-lg-12">
                                         <div class="card shadow-sm" >
@@ -49,12 +61,12 @@
                                                 <table class="table table-bordered table-hover mb-0">
                                                     <tbody>
                                                         <tr class="text-center fw-bold table-secondary">
-                                                            <td>Code</td>
+                                                            <td>No.</td>
                                                             <td>Product Name</td>
                                                         </tr>
-                                                        <tr v-if="stockItems.length>0" v-for="item in stockItems" :key="item.id">
-                                                                <td class="col-1">{{item.code_no}}</td>
-                                                                <td class="col-4">{{item.item_name}}</td>
+                                                        <tr v-if="stockItems.length>0" v-for="(item, i) in stockItems" :key="item.id">
+                                                                <td class="col-2 text-center">{{i+1}}</td>
+                                                                <td class="col-10">{{item.item_name}}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -127,23 +139,21 @@ props:['stockItems'],
             search_by_item_name:"",
             isUpdating:false,
             isLoading:false,
+            chunkData:[]
         }
     },   
     mounted() {
         const myModalEl = document.getElementById('searchCode')
-        myModalEl.addEventListener('show.bs.modal', event => {
+      /*  myModalEl.addEventListener('show.bs.modal', event => {
                 const search_by_code=document.getElementById("search_by_code");
                 setTimeout(()=>{
                     search_by_code.focus();
                 }, 500)              
-        })
+        })*/
+        this.isLoading=true; 
+        this.fetchProducts();      
     },
-    created(){
-        if(this.user !==null){         
-                this.isLoading=true; 
-                this.fetchProducts();                 
-        }
-    },   
+   
     computed:{
         user(){
             return this.$store.getters.user;
@@ -182,11 +192,18 @@ props:['stockItems'],
                 this.isUpdating=true;
                 this.fetchProducts();
         },
+        setChunkCode(items){
+            items.map((m, i)=>{
+               setTimeout(()=>{
+                    this.setCode(m)
+               },100 * i)
+            })
+        },
         insertAllItem(){
-            this.productsData.map((p)=>{
+            this.productsData.map((p, i)=>{
                 setTimeout(()=>{    
                     this.setCode(p)
-                }, 100)
+                }, 100 * i)
             })
         },
         setCode(p){
@@ -210,6 +227,10 @@ props:['stockItems'],
                 this.setCode(item[0])
                 this.search_by_code="";
             }
+       },
+       inputSearchName(){
+            this.search_by_item_name=event.target.value;
+            this.searchProducts();
        },
         searchProducts(){
             if(this.search_by_code){
@@ -237,6 +258,13 @@ props:['stockItems'],
                     this.searchProducts();
                     this.isLoading=false;
                     this.isUpdating=false;
+
+                    let chunk=3;
+                    let chunkData=[]
+                    for(let i=0; i<products.length; i+= chunk){
+                        chunkData.push(products.slice(i, i+chunk))
+                    }   
+                    this.chunkData=chunkData;
             });              
        } ,
        showTime(t){

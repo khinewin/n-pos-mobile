@@ -50,16 +50,16 @@
                             </div>
                         </div>
                         <div class="vh-65 overflow-y-auto">
-                        <table class="table table-bordered  mb-0 table-hover inside-table">
+                        <table class="table table-bordered  mb-0 table-hover">
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary">
                                     <td class="col-1">Code</td>
                                     <td class="col-2 change-cursor description"  data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Product Name (ctrl+i)</td>
-                                    <td class="col-1">Packing size</td>
+                                    <td class="col-1">Packing Size</td>
                                     <!--<td class="col-1 table-info">Main Inv Bal</td>-->     
                                     <td class="col-1 table-info">Mart Inv Bal</td>   
-                                    <td class="col-1 table-primary">Pur price</td>
-                                    <td class="col-1 table-primary">Sale price</td>
+                                    <td class="col-1 table-primary">Pur Price</td>
+                                    <td class="col-1 table-primary">Sale Price</td>
                                     <!--<td class="col-1 table-primary">Wholesale price</td>-->                                  
                                 </tr>
                                 <tr class="" v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id" @mouseenter="setEdit(i)" >

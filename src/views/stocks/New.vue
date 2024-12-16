@@ -49,23 +49,22 @@
                             </div>
                         </div>    
                         <div class="vh-65 overflow-y-auto">                   
-                        <table class="table table-bordered  mb-0 table-hover inside-table">
+                        <table class="table table-bordered  mb-0 table-hover">
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary">
-                                    <td class="col-1">Code</td>
-                                    <td class="col-2 change-cursor description" data-bs-toggle="modal"  data-bs-target="#searchCode" style="cursor: context-menu;"><i class="fa-solid fa-circle-plus"></i> Product Name (ctrl+i)</td>
-                                    <td class="col-1">Packing size</td>
+                                    <td class="col-0"></td>
+                                    <td class="col-4 change-cursor description" data-bs-toggle="modal"  data-bs-target="#searchCode" style="cursor: context-menu;"><i class="fa-solid fa-circle-plus"></i> Product Name (ctrl+i)</td>
+                                    <td class="col-2">Packing Size</td>
                                     <!--<td class="col-1 table-info">Main Inv Bal</td>-->     
-                                    <td class="col-1 table-info">Mart Inv Bal</td>   
-                                    <td class="col-1 table-primary">Pur price</td>
-                                    <td class="col-1 table-primary">Sale price</td>
+                                    <td class="col-2 table-info">Mart Inv Bal</td>   
+                                    <td class="col-2 table-primary">Pur Price</td>
+                                    <td class="col-2 table-primary">Sale Price</td>
                                     <!--<td class="col-1 table-primary">Wholesale price</td>-->                                  
                                 </tr>
                                 <tr class="" v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id" @mouseenter="setEdit(i)" >
                                     <td class="text-center">
-                                        <div class="position-relative">
-                                            {{st.code_no}}                                           
-                                            <a class="text-danger position-absolute top-50 start-0 translate-middle p-2" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
+                                        <div class="">
+                                            <a class="text-danger" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                         </div>                                    
                                     </td>
                                     <td class="">{{st.item_name}}</td>

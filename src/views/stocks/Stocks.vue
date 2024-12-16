@@ -60,16 +60,16 @@
                             </div>
                         </div>
                         <div class="vh-65 overflow-y-auto">
-                        <table class="table table-bordered mb-0  table-hover inside-table">
+                        <table class="table table-bordered mb-0  table-hover">
                             <tbody>
                                 <tr class=" fw-bold table-secondary text-center">
                                     <td class="col-1 ">Code</td>
                                     <td class="col-2">Product Name</td>
-                                    <td class="col-1">Packing size</td>
+                                    <td class="col-1">Packing Size</td>
                                     <!--<td class="col-1">Main Inv Bal</td>-->     
                                     <td class="col-1">Mart Inv Bal</td>   
-                                    <td class="col-1">Pur price</td>
-                                    <td class="col-1">Sale price</td>
+                                    <td class="col-1">Pur Price</td>
+                                    <td class="col-1">Sale Price</td>
                                     <!--<td class="col-1">Wholesale price</td>-->      
                                 </tr>
                                 <tr class=""v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id">
