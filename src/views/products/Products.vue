@@ -381,9 +381,21 @@ export default {
                 this.saveEdit();
             },300)
         },
-        async saveEdit(){           
+        async saveEdit(){    
+            let result=this.productsData.filter((f)=>f.id != this.editItem.id && f.item_name.toLowerCase().includes(this.editItem.item_name) )
+            if(result.length > 0){
+                this.msg.info="This item name already exists"
+                this.msg.type="error";
+                this.products=this.productsData.map((m)=>{
+                    if(m.id==this.editItem.id){
+                        return {...m, item_name: ""}
+                    }
+                    return m;
+                })
+                return false;
+            }       
             const updateDocument=doc(db, "products", this.editItem.id)
-                await updateDoc(updateDocument, this.editItem)  
+            await updateDoc(updateDocument, this.editItem)  
         },
         setPackingSize(p){
             this.editItem.packing_size=p;
@@ -402,6 +414,13 @@ export default {
 
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
+            let isTaken=this.productsData.filter((f)=>f.item_name.toLowerCase() == this.item_name.toLowerCase())
+            if(isTaken.length > 0){
+                this.msg.info="This item name already exists"
+                this.msg.type="error"
+                this.item_name="";
+                return false;
+            }
             this.isSaving=true;
             const save_time=Timestamp.fromDate(new Date());
             const dataCollection=collection(db, "products", )

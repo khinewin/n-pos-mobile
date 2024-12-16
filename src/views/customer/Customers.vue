@@ -4,6 +4,12 @@
            <div class="container-fluid">
                <div class="row  justify-content-end">  
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                    <button type="button" class="btn btn-sm" :disabled="isUpdating" @click="saveEdit">
+                        <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
+                        <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
+                    </button>
+                </div>  
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
@@ -23,26 +29,25 @@
                        <div class="card shadow ">
                             <div class="card-body p-2">
                                 <div class="row g-2">
-                                    <div class="form-floating col-sm-4 col-lg-12 ">
+                                    <!--<div class="form-floating col-sm-4 col-lg-12 ">
                                         <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchCustomer" placeholder="Code" class="form-control-plaintext border-bottom ">
                                         <label for="search_by_code" class="small ">Code</label>
-                                    </div>
-                                    <div class="form-floating col-sm-4 col-lg-12 ">
-                                        <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchCustomer" placeholder="Description" class="form-control-plaintext border-bottom ">
+                                    </div>-->
+                                    <div class="form-floating col-sm-3 col-lg-12 ">
+                                        <input type="search" id="search_by_name" v-model="search_by_name" @input="inputSearchName" placeholder="Description" class="form-control-plaintext border-bottom ">
                                         <label for="search_by_name" class="small ">Name</label>
                                     </div> 
-                                    <div class="form-floating col-sm-4 col-lg-12 ">
-                                        <input type="search" id="search_by_address" v-model="search_by_address" @keyup="searchCustomer" placeholder="Address" class="form-control-plaintext border-bottom ">
+                                    <div class="form-floating col-sm-3 col-lg-12 ">
+                                        <input type="search" id="search_by_address" v-model="search_by_address" @keyup="inputSearchAddress" placeholder="Address" class="form-control-plaintext border-bottom ">
                                         <label for="search_by_address" class="small ">Address</label>
                                     </div> 
-                                </div>
-                                 <div class="row mt-2">
-                                        <div class="col-6 d-grid"><button class="btn btn-sm text-dark" @click="searchCustomer"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
+                               
+                                        <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="searchCustomer"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
                                         <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateCustomer">
                                              <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
                                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                         </button></div>-->
-                                        <div class="col-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
+                                        <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
                                  </div>
                             </div>
                        </div>                                                                                                           
@@ -56,8 +61,8 @@
                                         <td class="col-0">
                                             <input type="checkbox" class="form-check-input" @click="checkAll" v-model="is_check_all">
                                         </td>
-                                           <td @click="sortCustomers('code')" class="col-2"><i class="fa-solid fa-sort"></i> Code</td>
-                                           <td @click="sortCustomers('name')" class="col-2"><i class="fa-solid fa-sort"></i> Name</td>
+                                           <!--<td @click="sortCustomers('code')" class="col-2"><i class="fa-solid fa-sort"></i> Code</td>-->
+                                           <td @click="sortCustomers('name')" class="col-4"><i class="fa-solid fa-sort"></i> Name</td>
                                            <td @click="sortCustomers('phone')" class="col-2"><i class="fa-solid fa-sort"></i> Phone</td>
                                            <td @click="sortCustomers('address')" class="col-4"><i class="fa-solid fa-sort"></i> Address</td>
                                            <td @click="sortCustomers('created_at')" class="col-2"><i class="fa-solid fa-sort"></i> Member date</td>
@@ -66,41 +71,43 @@
                                         <td class="">
                                             <input class="form-check-input" type="checkbox" @click="checkAll" v-model="is_deleted">
                                         </td>
-                                            <td class="">
+                                           <!--<td class="">
                                                 <input @keyperss.enter="saveCustomer"  type="text" v-model="code" class="form-control-plaintext py-0 text-center" id="code" placeholder="Code">                                                                                       
+                                            </td>-->
+                                            <td class="">
+                                                <input  @keyperss.enter="saveCustomer" type="text" v-model="name"  class="form-control py-1 " id="name" placeholder="Name">                                               
                                             </td>
                                             <td class="">
-                                                <input  @keyperss.enter="saveCustomer" type="text" v-model="name"  class="form-control-plaintext py-0 " id="name" placeholder="Name">                                               
+                                                <input @keypress.enter="saveCustomer" type="tel" v-model="phone"    class="form-control py-1 text-center" id="phone" placeholder="Phone">                                            
                                             </td>
                                             <td class="">
-                                                <input @keypress.enter="saveCustomer" type="tel" v-model="phone"    class="form-control-plaintext py-0 text-center" id="phone" placeholder="Phone">                                            
+                                                <input @keypress.enter="saveCustomer" type="text" v-model="address"   class="form-control py-1" id="address" placeholder="Address">                                              
                                             </td>
                                             <td class="">
-                                                <input @keypress.enter="saveCustomer" type="text" v-model="address"   class="form-control-plaintext py-0" id="address" placeholder="Address">                                              
-                                            </td>
-                                            <td class="">
-                                                <flat-pickr @change="saveCustomer" class="form-control-plaintext py-0  text-center" v-model="created_at"  :config="config" />
+                                                <flat-pickr @change="saveCustomer" class="form-control py-1  text-center" v-model="created_at"  :config="config" />
                                             </td>
                                         </tr>
                                        
-                                       <tr class="text-center" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id" @click="setEdit(p)" >                                            
+                                       <tr class="" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id">                                            
                                         <td class="">
                                             <input class="form-check-input" type="checkbox" v-model="p.is_deleted">
                                         </td>
-                                           <td :class="{'table-secondary': sort_item ==='code'}" class=" position-relative">
-                                            <!--<a class="text-danger position-absolute start-0 top-50 translate-middle ps-2" href="#!" @click="removeCustomer(i, p)"><i class="fa-solid fa-square-minus"></i></a>-->                                                                                        
+                                           <!--<td :class="{'table-secondary': sort_item ==='code'}" class=" position-relative">
                                                 {{p.code}}
-                                            </td>
+                                            </td>-->
                                            <td :class="{'table-secondary': sort_item ==='name'}" class="">
-                                                <input @keyup="setEdit(p)"  @keypress.enter="saveEdit" type="text" class="form-control-plaintext  py-0 " v-model="p.name">
+                                                <input v-if="editItem.id==p.id" @input="setEdit(p)"  @keypress.enter="saveEdit" type="text" class="form-control  py-1 " v-model="p.name">
+                                                <div v-else @click="setEdit(p)">{{p.name}}</div>
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='phone'}" class="">
-                                            <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext text-center py-0" v-model="p.phone">
+                                                <input v-if="editItem.id==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control text-center py-1" v-model="p.phone">
+                                                <div v-else @click="setEdit(p)" class="text-center">{{p.phone}}</div>
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='address'}" class="">
-                                            <input @keyup="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control-plaintext py-0" v-model="p.address">
+                                                <input v-if="editItem.id==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1" v-model="p.address">
+                                                <div v-else @click="setEdit(p)">{{p.address}}</div>
                                            </td>
-                                           <td :class="{'table-secondary': sort_item ==='created_at'}" >{{showTime(p.created_at)}}</td>
+                                           <td :class="{'table-secondary': sort_item ==='created_at'}" class="text-center">{{showTime(p.created_at)}}</td>
                                        </tr>
                                    </tbody>
                                </table>
@@ -179,7 +186,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
        },
        mounted() {
         const name=document.getElementById("name");
-        name.focus();
+     //   name.focus();
         this.created_at=hp.setToday();
 
         this.checkDatabase();
@@ -206,7 +213,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                        setTimeout(()=>{
                            this.msg.type="";
                            this.msg.info="";
-                       }, 3000)
+                       }, 2000)
                    }
                },deep:true
            }
@@ -221,6 +228,14 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.saveCustomer(); // Call your custom function
             }                 
+        },
+        inputSearchName(){
+            this.search_by_name=event.target.value;
+            this.searchCustomer();
+        },
+        inputSearchAddress(){
+            this.search_by_address=event.target.value;
+            this.searchCustomer();
         },
         async deleteMultiple(){
             const is_has=this.customers.filter((f)=>f.is_deleted)
@@ -254,6 +269,14 @@ import { required, email ,helpers} from '@vuelidate/validators'
          //   if(this.editItem.id) this.saveEdit();
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
+            let isTaken=this.customersData.filter((f)=>f.name.toLowerCase() == this.name.toLowerCase())
+            if(isTaken.length > 0){
+                this.msg.info="This customer name already exists"
+                this.msg.type="error"
+                this.name="";
+               
+                return false;
+            }
             this.isSaving=true;
 
             const date=hp.insertDateNoTime(this.created_at)
@@ -278,7 +301,19 @@ import { required, email ,helpers} from '@vuelidate/validators'
                this.isUpdating=true;
                this.fetchCustomer();
         },
-          async saveEdit(){               
+          async saveEdit(){         
+            let result=this.customersData.filter((f)=>f.id != this.editItem.id && f.name.toLowerCase().includes(this.editItem.name) )
+            if(result.length > 0){
+                this.msg.info="This customer name already exists"
+                this.msg.type="error";
+                this.customers=this.customersData.map((m)=>{
+                    if(m.id==this.editItem.id){
+                        return {...m, name: ""}
+                    }
+                    return m;
+                })
+                return false;
+            }           
                const updateDocument=doc(db, "customers", this.editItem.id)
                 await updateDoc(updateDocument,this.editItem)  
            },
