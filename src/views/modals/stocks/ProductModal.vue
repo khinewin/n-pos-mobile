@@ -57,7 +57,7 @@
                                     </div>
                                     <div class="col-sm-6 col-lg-12">
                                         <div class="card shadow-sm" >
-                                            <div class="card-body p-2 max-vh-65 overflow-y-auto">
+                                            <div class="card-body p-2 vh-30 overflow-y-auto">
                                                 <table class="table table-bordered table-hover mb-0">
                                                     <tbody>
                                                         <tr class="text-center fw-bold table-secondary">
