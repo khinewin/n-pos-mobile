@@ -7,10 +7,12 @@
                <div class="card">
                    <div class="card-body p-2"> 
                     <div class="row justify-content-end mb-2">
-                        <div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="savePackingSize"><span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
-                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
-                        </button>
-                    </div>
+                        <div class="col-4 d-grid">
+                            <button class="btn btn-sm text-dark" @click="savePackingSize">
+                                <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
+                            </button>
+                        </div>
                         <div class="col-4 d-grid"><button :disabled="!editItem.id" class="btn btn-sm text-dark" @click="saveEdit"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                         </button>
@@ -24,7 +26,11 @@
                                 <tr class="">
                                     <!--<td class=""><input id="packing_name" placeholder="Packing name" type="text" @keypress.enter="savePackingSize" v-model="packing_name" class="form-control-plaintext py-0 text-center"></td>-->
                                     <td><input placeholder="Packing unit" type="text" @keypress.enter="savePackingSize" v-model="packing_unit" class="form-control py-1 text-center"></td>
-                                    <td></td>
+                                    <td class="d-grid">
+                                        <button class="btn btn-sm btn-secondary" @click="savePackingSize">
+                                            <span v-if="!isSaving">Save</span>
+                                        </button>
+                                    </td>
                                 </tr>                                                                                       
                                 <tr  class="" v-if="packingSizes.length > 0"  v-for="p in packingSizes" :key="p.id" :class="{'table-primary' : p.id==editItem.id}" >                                   
                                     <td class="text-center col-12">
@@ -83,7 +89,7 @@ export default {
    },   
    mounted() {
     this.isLoading=true; 
-    this.fetchpackingSizes();   
+  //  this.fetchpackingSizes();   
     this.checkDatabase(); 
     const myModalEl = document.getElementById('packingSizeModal')
        myModalEl.addEventListener('show.bs.modal', event => {    
@@ -161,6 +167,12 @@ export default {
         async checkDatabase(){ 
             const query_url=query(collection(db, "packingSizes"), orderBy("created_at", "desc"));           
                 onSnapshot(query_url, async(snapShot) =>{
+                    //show data
+                    const pz=ss.packingSizes(snapShot)          
+                    this.packingSizes=pz;
+                    this.isLoading=false;
+                    this.isUpdating=false;
+                    //
                     const dc=snapShot._snapshot.docChanges;
                     const user=this.user;
                     snapShot.docChanges().forEach((change) => {                       

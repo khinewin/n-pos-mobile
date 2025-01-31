@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
 import {Timestamp} from 'firebase/firestore'
+import { products } from '@/lib/snapshot/products';
 
 
  const store= createStore({
@@ -27,6 +28,7 @@ import {Timestamp} from 'firebase/firestore'
     disableMobile: true,
     wrap: true, // set wrap to true only when using 'input-group'
   },  
+    products:[],
   },
 
   getters: {
@@ -34,18 +36,25 @@ import {Timestamp} from 'firebase/firestore'
     general_supplier:state=>state.general_supplier,
     default_customer:state=>state.default_customer,
     flat_pickr_config:state=>state.flat_pickr_config,
+    products:state=>state.products,
   },
 
   mutations: {
         SET_AUTH_USER(state, payload){
             state.user=payload;           
         },    
+        SET_PRODUCTS(state, payload){
+          state.products=payload;
+        },
       
   },
 
   actions: {
         setAuthUser(context, payload){
             context.commit("SET_AUTH_USER", payload)
+        },
+        setProducts(context, payload){
+          context.commit("SET_PRODUCTS", payload)
         },
      
   },

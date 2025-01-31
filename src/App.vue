@@ -11,7 +11,9 @@ import { RouterLink, RouterView } from 'vue-router'
 <script>
 import db from "@/firebase/firestore"
 import { getAuth,onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
-import { disableNetwork, enableNetwork, onSnapshot, collection, getDocs,query, limit} from "firebase/firestore";
+import {Timestamp,onSnapshot, collection, addDoc, query, where, setDoc, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore'
+import * as ss from "@/lib/snapshot/products"
+
 export default {
     components:{
         //ProductModal, PurchaseModal, SupplierModal, SalesModal, StocksModal,
@@ -20,18 +22,20 @@ export default {
         return{
         }
     },
-    
+    created() {
+        this.fetchProducts()
+    },
   
     methods:{   
-        
-        checkLogin() {
-            const auth = getAuth();
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    this.$store.dispatch("setAuthUser", user);
-                }
-            });
-        },
+       
+        async fetchProducts(){                    
+            const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
+            onSnapshot(query_url, async(snapShot) =>{
+                const products=ss.products(snapShot);   
+                this.$store.dispatch("setProducts", products);
+            })
+           
+       } ,
     }
 }
 </script>

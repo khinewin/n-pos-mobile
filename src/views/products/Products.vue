@@ -4,11 +4,16 @@
         <div class="container-fluid">
             <div class="row  justify-content-end">   
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                    <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveEdit">
+                        <span><i class="fa-solid fa-retweet"></i> Update </span>
+                    </button>
+                </div> 
+                <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
                     </button>
-                </div>      
+                </div>-->      
                                             
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCode">
@@ -32,7 +37,7 @@
                                     <label for="search_by_code" class="small">Code</label>
                                 </div>
                                 <div class="form-floating col-sm-3 col-lg-12">
-                                    <input type="search" id="search_by_description" v-model="search_by_description" @input="inputSearchName" placeholder="Description" class="form-control-plaintext border-bottom">
+                                    <input type="search" id="search_by_description" v-model="search_by_description" @keypress.enter="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
                                     <label for="search_by_description" class="small">Product Name</label>
                                 </div>
                             
@@ -47,33 +52,42 @@
                                                                                                                 
                 </div>                        
                 <div class="col-md-7 col-lg-5">
-                    <div class="card shadow vh-75">
+                    <div class="card shadow vh-75 overflow-y-auto">
                         <div class="card-body p-2">
                             <div>
 
                                 <table class="table table-bordered mb-0">
+                                    <tbody>
+                                        <tr class="table-secondary position-sticky top-0">
+                                            <td class="position-relative col-0">
+                                                <!--<div class="form-check form-switch">
+                                                    <input @click="checkAll"  v-model="is_check_all" class="form-check-input " type="checkbox" role="switch" >
+                                                  </div>
+                                                <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" @click="checkAll" v-model="is_deleted">-->
+                                            </td>
+                                            <td class="p-0 col-3">
+                                                <input placeholder="Code"  type="text" v-model="code_no" class="form-control py-1  text-center">
+                                            </td>
+                                            <td class="p-0 col-9">
+                                                <input  id="item_name" placeholder="Product Name" @keypress.enter="saveCode"   type="text" v-model="item_name" class="form-control py-1">                                            </td>                                     
+                                        </tr>    
+                                    </tbody>
                                     <tbody> 
-                                        <tr class="text-center table-secondary" style="cursor: context-menu;">
+                                        <!--<tr class="text-center table-secondary" style="cursor: context-menu;">
                                             <td class="co-0">
                                                 <input  type="checkbox" @click="checkAll" v-model="is_check_all" class="form-check-input">
                                             </td>
                                             <td class="col-3">Code</td>
                                             <td class="col-9">Product Name</td>
-                                        </tr>                                                                    
-                                        <tr>
-                                            <td class="position-relative">
-                                                <!--<input class="position-absolute start-50 top-50 translate-middle" type="checkbox" @click="checkAll" v-model="is_deleted">-->
-                                            </td>
-                                            <td class="p-0">
-                                                <input placeholder="Code"  type="text" v-model="code_no" class="form-control py-1  text-center">
-                                            </td>
-                                            <td class="p-0">
-                                                <input  id="item_name" placeholder="Product Name" @keypress.enter="saveCode"   type="text" v-model="item_name" class="form-control py-1">                                            </td>                                     
-                                        </tr>     
+                                        </tr>-->                                                                    
+                                        
                                                                 
                                     <tr class="text-center"  v-if="products.length > 0"  v-for="(p, i) in products" :key="p.id"  :class="{'table-secondary' : editItem.id === p.id}">   
                                         <td class="">
-                                            <input class=" form-check-input" type="checkbox" v-model="p.is_deleted">
+                                            <!--<div class="form-check form-switch">
+                                                <input class=" form-check-input" type="checkbox" v-model="p.is_deleted">
+                                            </div>-->
+                                            <button :disabled="p.user.uid != user.uid" class="btn btn-sm text-danger d-block" @click="removeProduct(p)"><i class="fa-solid fa-trash"></i></button>
                                         </td>                                 
                                         <td :class="{'table-secondary': sort_item ==='code_no'}" class=" p-0">
                                             <span>
@@ -191,7 +205,7 @@
                                         </td>
                                         <td colspan="3" class="p-0 text-end">
                                             <button class="btn btn-sm" @click="savePrice">                     
-                                            <span v-if="!isSavePrice"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+shift+s)</span>
+                                            <span v-if="!isSavePrice"><i class="fa-solid fa-hard-drive"></i> Save Price (ctrl+shift+s)</span>
                                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSavePrice"></span>
                                              </button>
                                         </td>
@@ -260,7 +274,7 @@ export default {
             is_deleted:false,
             is_check_all: false,
             isDeleting:false,
-            deviceId:"",
+           // deviceId:"",
         }
     },
     created() {     
@@ -269,33 +283,67 @@ export default {
     mounted() {
         const code_no=document.getElementById("search_by_code");
       //  code_no.focus();
-        this.isLoading=true;
-        this.fetchProducts();
-        this.checkDatabase();
+      //  this.isLoading=true;
+       // this.fetchProducts();
+       // this.checkDatabase();
+       if(this.storeProducts.length){
+            this.isLoading=false;
+            this.productsData=this.storeProducts;
+            if(this.search_by_code || this.search_by_description){
+                this.searchProducts();
+            }else{
+                this.products=this.productsData.slice(0, 15);
+                if(Object.keys(this.editItem).length ===0 && this.products.length > 0){
+                     this.setEdit(this.products[0])
+                }
+            }
+          
+        }
         window.addEventListener('keydown', this.handleCtrl);
-     
+        
     },
  
     computed:{
         user(){
             return this.$store.getters.user;
+        },
+        storeProducts(){
+            return this.$store.getters.products;
         }
     },
     watch:{
-       
+        storeProducts:{
+            handler(val){
+               if(val){
+                    this.isLoading=false;
+                    this.productsData=val;
+                    if(this.search_by_code || this.search_by_description){
+                        this.searchProducts();
+                    }else{
+                        this.products=this.productsData.slice(0, 15);
+                        if(Object.keys(this.editItem).length ===0 && this.products.length > 0){
+                        this.setEdit(this.products[0])
+                    }
+                    }
+                   // this.products=this.productsData.slice(0, 15);
+                   
+               }
+            }, deep: true
+       },
         msg:{
             handler(val){
                 if(val.type){
                     setTimeout(()=>{
                         this.msg.type="";
                         this.msg.info="";
-                    }, 3000)
+                    }, 2000)
                 }
             },deep:true
         }
     },
 
     methods:{        
+        
         handleCtrl(event) {
             if (event.ctrlKey && event.key === 'h') {
                 event.preventDefault(); // Prevent the default browser save dialog
@@ -347,21 +395,41 @@ export default {
         async deleteMultiple(){
             const is_has=this.products.filter((f)=>f.is_deleted)
             if(is_has.length <=0) return false;
-            const cf=confirm(`Are you sure you want to delete the product code ?`)
+            let msg=""
+            if(is_has.length > 1){
+                msg=`"${is_has[0].item_name}" and  "${is_has.length - 1}  more"`
+            }else{
+                msg=`"${is_has[0].item_name}"`
+            }
+            const cf=confirm(`Are you sure,  you want to delete product code ${msg}`)
             if(!cf) return false;
             this.isDeleting=true;
-            this.products.filter(async (s)=>{
+            setTimeout(()=>{
+                this.msg.info="The product code has been deleted"
+                this.msg.type="success"
+            }, 200)
+
+           this.products.filter(async (s)=>{
                 if(s.is_deleted){
-                    const updateDocument=doc(db, "products", s.id)
+                    this.removeProduct(s.id)
+                    this.isDeleting=false;
+                  /*  const updateDocument=doc(db, "products", s.id)
                     await updateDoc(updateDocument, {is_deleted: true, edit_user: {uid: this.user.uid, type: 'removed'}})  
-                }
+                    */
+                } 
             })
         },
-        async removeProduct(id){          
-            const document=doc(db, "products", id)     
-            setTimeout(async()=>{
-                await deleteDoc(document)  
-            }, 1000)    
+        async removeProduct(p){   
+            const cf=confirm(`Are you sure,  you want to delete product code ${p.item_name}`)
+            if(!cf) return false;
+            this.isDeleting=true;       
+            const document=doc(db, "products", p.id)     
+            this.msg.info="The selected product code has been deleted"
+            this.msg.type="success"
+            
+           // setTimeout(async()=>{
+             await deleteDoc(document)  
+            //}, 200)    
         },
         checkAll(){
             setTimeout(()=>{
@@ -382,7 +450,7 @@ export default {
             },300)
         },
         async saveEdit(){    
-            let result=this.productsData.filter((f)=>f.id != this.editItem.id && f.item_name.toLowerCase().includes(this.editItem.item_name) )
+           /* let result=this.productsData.filter((f)=>f.id != this.editItem.id && f.item_name.toLowerCase().includes(this.editItem.item_name) )
             if(result.length > 0){
                 this.msg.info="This item name already exists"
                 this.msg.type="error";
@@ -393,7 +461,12 @@ export default {
                     return m;
                 })
                 return false;
-            }       
+            }   */    
+            if(!this.editItem.item_name) return false;
+           // setTimeout(()=>{
+                this.msg.info="The product code has been updated"
+                this.msg.type="success"
+          //  }, 200)
             const updateDocument=doc(db, "products", this.editItem.id)
             await updateDoc(updateDocument, this.editItem)  
         },
@@ -402,6 +475,10 @@ export default {
            this.savePackingSize();
         } ,
         async savePackingSize(){
+          //  setTimeout(()=>{
+                this.msg.info="The product packing size has been saved"
+                this.msg.type="success"
+          //  }, 200)
             const updateDocument=doc(db, "products", this.editItem.id)
                 await updateDoc(updateDocument, {
                     packing_size : this.editItem.packing_size,        
@@ -414,8 +491,8 @@ export default {
 
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
-            let isTaken=this.productsData.filter((f)=>f.item_name.toLowerCase() == this.item_name.toLowerCase())
-            if(isTaken.length > 0){
+            let isTaken=this.productsData.some((f)=>f.item_name.toLowerCase() == this.item_name.toLowerCase())
+            if(isTaken){
                 this.msg.info="This item name already exists"
                 this.msg.type="error"
                 this.item_name="";
@@ -440,6 +517,12 @@ export default {
                 edit_user: {uid: this.user.uid, type: 'added'},
                 auto_cal: true,
             }
+         //   setTimeout(()=>{
+                this.isSaving=false;
+                this.msg.info="The product code has been created"
+                this.msg.type="success"
+                this.resetInput();
+           // }, 300) 
             const result=await addDoc(dataCollection, data);                    
         },
         resetInput(){            
@@ -454,6 +537,10 @@ export default {
         },
        async savePrice(){
             const updateDocument=doc(db, "products", this.editItem.id)
+              //  setTimeout(()=>{
+                    this.msg.info="The product price has been saved"
+                    this.msg.type="success"
+              //  }, 200)
                 await updateDoc(updateDocument, {
                     pur_price: this.editItem.pur_price,
                     retail_price: this.editItem.retail_price,
@@ -473,15 +560,7 @@ export default {
             return cp.calPurPrice(unit, this.editItem);
         },
        
-        checkEdit(){
-            if(this.editItem.id){
-                const items=this.products.filter((f)=>f.id==this.editItem.id)
-                this.setEdit(items[0])
-            }else{
-                this.setEdit(this.products[0])
-            }
-           
-        },
+      
         setEdit(p){          
             let  l=0, m=0, s=0;
 
@@ -515,23 +594,33 @@ export default {
             this.search_by_description=event.target.value;
             this.searchProducts();
         },
+        checkEdit(){
+             if(this.products.length && Object.keys(this.editItem).length <=0){
+                  this.setEdit(this.products[0])                    
+             }         
+        },
         searchProducts(){
             this.products=[];
             if(this.search_by_code){
                 this.products=this.productsData.filter((f)=>f.code_no===Number(this.search_by_code))
+                if(this.products.length){
+                    this.setEdit(this.products[0])
+                }
             }else 
             if(this.search_by_description){
                 this.products=this.productsData.filter((f)=>{
-                    return f.item_name.toLowerCase().includes(this.search_by_description.toLowerCase())
+                    return f.item_name.toLowerCase().includes(this.search_by_description.toLowerCase())                    
                 })
+                if(this.products.length){
+                    this.setEdit(this.products[0])
+                }
             }else{
-                this.products= this.productsData.filter((p, i)=>{
-                           if(i < 20){
-                               return p;
-                           }
-                       }) 
+                this.products=this.productsData.slice(0, 15);
+                if(this.products.length && Object.keys(this.editItem).length <=0){
+                  this.setEdit(this.products[0])                    
+             }  
             }
-            this.checkEdit();
+          //  this.checkEdit();
                       
         },
         message(type){
@@ -539,22 +628,28 @@ export default {
                 this.msg.type="success"                                                         
         }, 
         async checkDatabase(){ 
-            const query_url=query(collection(db, "products"), orderBy("created_at", "desc"));           
+            const code_no=Object.keys(this.editItem).length ? this.editItem.code_no : "";
+            console.log(code_no)
+            const query_url=query(collection(db, "products"), where("code_no", "==",  code_no));              
                 onSnapshot(query_url, async(snapShot) =>{
                     const dc=snapShot._snapshot.docChanges;
                     const user=this.user;
                     snapShot.docChanges().forEach((change) => {     
                         const res=change.doc.data();   
                             if(change.type==="added" && res.edit_user.uid==user.uid && dc.length===1){
-                                    this.message("added")
+                                    this.msg.info="The new product code has been created"
+                                    this.msg.type="success"
                                     this.resetInput();    
-                                    hp.setAutoFocus("item_name")     
+                                  //  hp.setAutoFocus("item_name")     
                             }           
                             if(change.type==="modified" && res.edit_user.type=="modified" && res.edit_user.uid==user.uid){
-                                    this.message("modified")
+                                    this.msg.info="The product code has been updated"
+                                    this.msg.type="success"
+                                   
                             }  
-                            if(change.type==="modified" && res.edit_user.type=="removed" && res.edit_user.uid==user.uid){
-                                    this.message("removed")    
+                            if(change.type==="removed"){
+                                    this.msg.info="The selected product code has been deleted"
+                                    this.msg.type="success"
                                     this.isDeleting=false;
                                     this.is_check_all=false;
                                     this.removeProduct(change.doc.id)

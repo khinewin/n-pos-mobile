@@ -137,7 +137,7 @@ const restorePackingSizes=async(d)=>{
     created_at: Timestamp.fromDate(new Date(d.created_at)),           
     packing_unit : d.packing_unit,
     user : d.user,
-    packing_name: d.packing_name,    
+   // packing_name: d.packing_name,    
 }  
 const saveDocument=doc(db, "packingSizes", d.id)
 await setDoc(saveDocument, voucher)   
