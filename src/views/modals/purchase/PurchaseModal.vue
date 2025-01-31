@@ -68,9 +68,9 @@
                                     <table class="table table-bordered table-hover m-0">
                                         <tbody class="">
                                             <tr class="table-secondary text-center fw-bold">
-                                                <td class="col-1">Voucher no.</td>
-                                                <td class="col-1">Pur date</td>                                    
-                                                <td class="col-4">Supplier</td>
+                                                <td class="col-1">Voucher No.</td>
+                                                <td class="col-1">Pur Date</td>                                    
+                                                <td class="col-2">Supplier</td>
                                                 <td class="col-1">Location</td>
                                                 <td class="col-1">User</td>
 
@@ -154,8 +154,8 @@ export default {
  
    methods:{
     setDate(){
-        this.search_by_from_pur_date=hp.setSearchFromDate();
-        this.search_by_to_pur_date=hp.setSearchToDate();
+        this.search_by_from_pur_date=hp.setToday();
+        this.search_by_to_pur_date=hp.setToday();
     },
        updatePurchases(){
                this.isUpdating=true;

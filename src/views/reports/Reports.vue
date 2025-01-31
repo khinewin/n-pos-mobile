@@ -225,6 +225,7 @@ import ProductModal from "@/views/modals/reports/ProductModal.vue"
 import ReportList from "@/views/reports/ReportList.vue"
 import FlatPickr from 'vue-flatpickr-component';
 import * as hc from "@/lib/handleCtrl"
+import * as hp from "@/lib/helper"
 
 export default {
     components: {
@@ -334,8 +335,8 @@ export default {
         const firstDay = new Date(date.getFullYear(), date.getMonth(),1);
         const lastDay = new Date(date.getFullYear(), date.getMonth() + 1,0)
 
-       this.from_date=firstDay
-       this.to_date=lastDay      
+       this.from_date=hp.setToday();
+       this.to_date=hp.setToday();
 
        window.addEventListener('keydown', this.handleCtrl);
     },
@@ -343,11 +344,7 @@ export default {
          window.removeEventListener('keydown', this.handleCtrl);
      },
    watch:{
-    user(data){
-               if(data !==null){             
-                //   this.fetchSales();           
-           }
-       },
+   
     msg:{
             handler(val){
                 if(val.type){

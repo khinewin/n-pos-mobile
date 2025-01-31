@@ -21,14 +21,17 @@
                                                     </div>
                                                     <div class="col-md-6 col-lg-12">
                                                         <div class="form-floating">
-                                                            <input type="search" v-model="search_by_item_name" @keyup="searchProducts" placeholder="Product Name" class="form-control-plaintext border-bottom">
+                                                            <input type="search" v-model="search_by_item_name" @keypress.enter="searchProducts" placeholder="Product Name" class="form-control-plaintext border-bottom">
                                                             <label for="search_by_item_name" class="">Product Name</label>
                                                         </div> 
                                                     </div>
                                                 </div>
                                                 <div class="row mt-2">
-                                                    <div class="col-6 d-grid">
-                                                        <button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
+                                                    <div class="col-4 d-grid">
+                                                        <button class="btn btn-sm text-dark clear-search-product" @click="searchProducts"><i class="fa-solid fa-search"></i> Search</button>
+                                                    </div>
+                                                    <div class="col-4 d-grid">
+                                                        <button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
                                                     </div>
                                                     <!--<div class="col-4 d-grid">
                                                         <button class="btn btn-sm text-dark" @click="updateProducts">
@@ -36,8 +39,8 @@
                                                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                                         </button>
                                                     </div>-->
-                                                    <div class="col-6 d-grid">
-                                                        <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
+                                                    <div class="col-4 d-grid">
+                                                        <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                                                     </div>
                                                 </div>   
                                                 
@@ -133,20 +136,22 @@ export default {
         }
     },   
     mounted() {
-        const myModalEl = document.getElementById('searchCode')
+      //  const myModalEl = document.getElementById('searchCode')
       /*  myModalEl.addEventListener('show.bs.modal', event => {
                 const search_by_code=document.getElementById("search_by_code");
                 setTimeout(()=>{
                     search_by_code.focus();
                 }, 500)              
         })*/
+        this.isLoading=true; 
+      //  this.fetchProducts(); 
+      if(this.storeProducts.length){
+            this.productsData=this.storeProducts;
+            this.products=this.productsData.slice(0, 20);
+            this.isLoading=false;
+       }
     },
-    created(){
-        if(this.user !==null){         
-                this.isLoading=true; 
-                this.fetchProducts();                 
-        }
-    },   
+  
     computed:{
         user(){
             return this.$store.getters.user;
@@ -166,21 +171,15 @@ export default {
             },deep:true
         
         },
-        user(data){
-                if(data !==null){         
-                    this.isLoading=true;          
-                    this.fetchProducts();           
-            }
-        },
-        storePurchase :{
-            handler(newVal){
-                if(Object.keys(newVal).length <=0){
-                    setTimeout(()=>{
-                        this.fetchProducts();
-                    }, 300)
-                }
-            },
-            deep: true,
+   
+        storeProducts:{
+            handler(val){
+               if(val){
+                    this.productsData=val
+                   this.products=this.productsData.slice(0, 20);
+                   this.isLoading=false;
+               }
+            }, deep: true
        },
       
     },
@@ -234,11 +233,7 @@ export default {
                         return f.item_name.toLowerCase().includes(this.search_by_item_name.toLowerCase())
                 })
             }else{
-                this.products= this.productsData.filter((p, i)=>{
-                    if(i < 20){
-                        return p;
-                     }
-                 })                                                         
+                this.products= this.productsData.slice(0, 20);                                            
             }
         },
       

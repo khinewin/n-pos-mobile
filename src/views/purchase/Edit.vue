@@ -65,9 +65,9 @@
                        <div class="vh-50 overflow-y-auto">
                         <table class="table table-bordered mb-0  table-hover ">
                             <tbody>
-                                <tr class="text-center fw-bold table-secondary">
-                                    <td class="col-0"></td>
-                                    <td class="col-3 change-cursor" data-bs-toggle="modal" data-bs-target="#searchCode"  ><i class="fa-solid fa-circle-plus"></i>  Product Name</td>
+                                <tr class="text-center fw-bold table-secondary change-cursor"  data-bs-toggle="modal" data-bs-target="#searchCode" >
+                                    <td class="col-0" colspan="2">No.</td>
+                                    <td class="col-3 change-cursor" ><i class="fa-solid fa-circle-plus"></i>  Product Name</td>
                                     <!--<td class="col-1 table-info">Exp. Date</td>-->     
                                     <td class="col-2">Packing Size</td>                              
                                     <td class="col-1 table-primary" colspan="1">Qty</td>
@@ -78,8 +78,9 @@
                                 </tr>
                                 <tr class="small"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase.filter((f)=>!f.is_remove)" :key="st.id" @mouseenter="setEdit(i)"  >
                                     <td class=" text-center">
-                                        <a class="text-danger " href="#!" @click="removeStoreItem(st)"><i class="fa-solid fa-square-minus"></i></a>                                                                                                                          
-                                    </td>                                    
+                                        <a class="text-danger d-block " href="#!" @click="removeStoreItem(st)"><i class="fa-solid fa-square-minus"></i></a>                                                                                                                          
+                                    </td>                 
+                                    <td class="text-center">{{i+1}}</td>                   
                                     <td class="">{{st.item_name}}</td>
                                     <!--<td class=" position-relative table-info" >
                                         <a v-if="st.tmp_exp_date" class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeExpDate(st)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
@@ -520,7 +521,7 @@ export default {
         },
 
         async checkDatabase(){ 
-            const query_url=query(collection(db, "purchases"));           
+            const query_url=query(collection(db, "purchases"), where("voucher_no", "==", this.voucher_no));           
                 onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {    
                             if(change.type==="modified"){

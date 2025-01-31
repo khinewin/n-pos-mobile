@@ -51,7 +51,7 @@
                                             <td class="text-end fw-bold">Supplier :</td>
                                             <td class="row g-2">
                                                 <div class="col-6">
-                                                    <input type="text" :class="{'border-0 border-bottom border-danger' : v$.supplier.name.$errors.length > 0}" @click="changeSupplier" v-model="supplier.name"  class="form-control-plaintext p-0  border-bottom">                                                
+                                                    <input type="text" :class="{'border-0 border-bottom border-danger' : v$.supplier.name.$errors.length > 0}"  v-model="supplier.name"  class="form-control-plaintext p-0  border-bottom">                                                
                                                 </div>
                                                 <div class="col-6 border-bottom text-center">
                                                     <span class="d-block text-primary supplier change-cursor" data-bs-toggle="modal" data-bs-target="#searchSupplier" ><i class="fa-solid fa-pen"></i> (ctrl+shift+s)</span>
@@ -65,10 +65,11 @@
                         <div class="vh-55 overflow-y-auto">
                         <table class="table table-bordered mb-0  table-hover " :class="{'border-danger':v$.storePurchase.$errors.length > 0}" >
                             <tbody>
-                                <tr class="small text-center fw-bold table-secondary">
-                                    <td class="col-0"> 
+                                <tr class="small text-center fw-bold table-secondary change-cursor" data-bs-toggle="modal" data-bs-target="#searchCode" >
+                                    <td class="col-0" colspan="2"> 
+                                        No.
                                     </td>
-                                    <td class="col-3 change-cursor description change-cursor"  data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Product Name (cltr+i)</td>
+                                    <td class="col-3 change-cursor description change-cursor"  ><i class="fa-solid fa-circle-plus"></i> Product Name (cltr+i)</td>
                                     <!--<td class="col-1 table-info">Exp. Date</td>-->     
                                     <td class="col-2">Packing Size</td>                              
                                     <td class="col-1 table-primary" colspan="1">Qty</td>
@@ -79,9 +80,10 @@
                                 </tr>
                                 <tr class="small"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase" :key="st.id" @mouseenter="setEdit(i)"  >
                                     <td class=" text-center">
-                                        <a class="text-danger " href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                        
+                                        <a class="text-danger " href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                       
                                   
                                     </td>
+                                    <td>{{i+1}}</td>
                                     <td class="">{{st.item_name}}</td>
                                     <!--<td class="p-0 position-relative table-info">
                                         <a v-if="st.tmp_exp_date" class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeExpDate(st)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
@@ -157,7 +159,7 @@
  import PageHeader from "@/views/partials/PageHeader.vue"
  import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {Timestamp,onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, query, increment, orderBy} from 'firebase/firestore'
+import {Timestamp,onSnapshot, collection, addDoc, getDocs, doc, setDoc, limit,where, updateDoc, query, increment, orderBy} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/purchase/ProductModal.vue'
 import SupplierModal from '@/views/modals/purchase/SupplierModal.vue'
@@ -453,7 +455,7 @@ export default {
             }           
         },
         async checkDatabase(){ 
-            const query_url=query(collection(db, "purchases"));           
+            const query_url=query(collection(db, "purchases"), orderBy("pur_date", "desc"), limit(1));           
                 onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {    
                             if(change.type==="added"){

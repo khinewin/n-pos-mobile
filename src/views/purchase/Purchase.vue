@@ -85,7 +85,7 @@
                             <tbody class="table-group-divider">
                             <tr class="" v-if="products.length > 0" v-for="(st, i) in products" :key="st.id">
                                 <!--<td class="">{{st.code_no}}</td>-->
-                                <td>{{i+1}}</td>
+                                <td class="text-center">{{i+1}}</td>
                                 <td class="">{{st.item_name}}</td>
                                 <!--<td class="text-center">                                   
                                      <span v-if="st.exp_date">{{showTime(st.exp_date)}}</span>
