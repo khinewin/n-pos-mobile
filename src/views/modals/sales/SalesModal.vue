@@ -152,8 +152,8 @@ export default {
  
    methods:{
         setDate(){
-            this.search_by_from_sale_date=hp.setSearchFromDate();
-            this.search_by_to_sale_date=hp.setSearchToDate();
+            this.search_by_from_sale_date=hp.setToday();
+            this.search_by_to_sale_date=hp.setToday();
         },
        updateSales(){
                this.isUpdating=true;

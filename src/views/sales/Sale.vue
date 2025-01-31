@@ -53,9 +53,9 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-end fw-bold">Sale Date :</td>
+                                                <td class="text-end fw-bold change-cursor" @click="setBarcodeFocus">Barcode :</td>
                                                 <td class="">
-                                                    <flat-pickr class="form-control-plaintext py-0  border-bottom" v-model="sale_date" id="sale_date" :config="config" />
+                                                    <input :disabled="saleMode=='Sale / History'" @keypress.enter="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext py-0   " placeholder="Barcode">
                                                 </td>
                                             </tr> 
                                                                                    
@@ -70,7 +70,7 @@
                                                 <td class="col-8">
                                                     <div class="row g-2">
                                                         <div class="col-6">
-                                                            <input type="text" @click="changeCustomer" v-model="customer.name" class="form-control-plaintext py-0 border-bottom" id="customer_name" placeholder="Name">                                                
+                                                            <input type="text" v-model="customer.name" class="form-control-plaintext py-0 border-bottom" id="customer_name" placeholder="Name">                                                
                                                         </div>
                                                         <div class="col-6 border-bottom text-center">
                                                             <span class="d-block text-primary customer change-cursor" :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#customerModal']" ><i class="fa-solid fa-pen"></i> (ctrl+shift+c)</span>
@@ -79,11 +79,11 @@
                                                 </td>
                                             </tr>      
                                             <tr>
-                                                <td class="text-end fw-bold" >Cashier :</td>
+                                                <td class="text-end fw-bold">Sale Date :</td>
                                                 <td class="">
-                                                    {{sale_user.uid ? sale_user.displayName : user.displayName}}
+                                                    <flat-pickr class="form-control-plaintext py-0  border-bottom" v-model="sale_date" id="sale_date" :config="config" />
                                                 </td>
-                                            </tr>                                               
+                                            </tr>                                             
                                         </tbody>
                                   </table>
                                 </div>
@@ -91,14 +91,12 @@
                               <div class="vh-50 overflow-y-scroll dataContainer">
                                 <table class="table table-bordered table-hover mb-0">
                                     <tbody class="small fw-bold table-group-divider position-sticky top-0 z-3">
-                                        <tr class="table-secondary">
-                                            <td v-if="saleMode=='Sale / New'" class="col-0">
-                                                <a  class="text-danger" href="#!" @click="removeSaleItems" ><i class="fa-solid fa-square-minus"></i></a>                                                                                         
+                                        <tr class="table-secondary change-cursor"  :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#searchCode']" >
+                                         
+                                            <td class=" text-center col-0" colspan="2">
+                                                No.
                                             </td>
-                                            <td class=" text-center col-1">
-                                                <input :disabled="saleMode=='Sale / History'" @keypress.enter="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control py-0  text-center " placeholder="Barcode">
-                                            </td>
-                                            <td class="col-3 text-center change-cursor description" :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#searchCode']" style="cursor: context-menu;">
+                                            <td class="col-3 text-center  description">
                                                 <span v-if="saleMode=='Sale / New'"><i class="fa-solid fa-circle-plus"></i></span> Product Name <span v-if="saleMode=='Sale / New'">(cltr+i)</span>
                                             </td>  
                                             <!--<td class="col-1  text-center">Packing Size</td>-->                                                                                
@@ -111,11 +109,11 @@
                                     </tbody>                                  
                                     <tbody class="text-nowrap text-break">                                                                         
                                         <tr  v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(s)"  >
-                                            <td v-if="saleMode=='Sale / New'" >
-                                                    <input type="checkbox" v-model="s.is_check" class="form-check-input">
+                                            <td class="text-center d-grid">
+                                                    <button type="button" @click="removeSaleItem(i)" class="btn btn-sm text-danger" :disabled="saleMode=='Sale / History'"><i class="fa-solid fa-square-minus"></i></button>
                                             </td>
                                             <td class="text-center position-relative ">                                                
-                                                {{s.code_no}}
+                                                {{i+1}}
                                             </td>
                                             <td class="">{{s.item_name}}</td>   
                                             <!--<td class=" ">
@@ -219,7 +217,7 @@
  import PageHeader from "@/views/partials/PageHeader.vue"
  import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {disableNetwork, Timestamp, collection, addDoc, doc, increment,  updateDoc, onSnapshot, query, where, orderBy, getDocs} from 'firebase/firestore'
+import {disableNetwork, Timestamp, collection, addDoc, doc, increment, limit,  updateDoc, onSnapshot, query, where, orderBy, getDocs} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 //import Products from "@/views/sales/Products.vue"
 import SalesModal from "@/views/modals/sales/SalesModal.vue"
@@ -294,7 +292,7 @@ export default {
         this.sale_date=hp.setToday()
         this.print_date=hp.setToday();
         this.setCustomer(this.default_customer)
-        this.fetchProducts();
+      //  this.fetchProducts();
        
       // await disableNetwork(db)
      this.checkDatabase();
@@ -304,12 +302,22 @@ export default {
         if(!isMobile){
             this.setBarcodeFocus();
         }
+        if(this.storeProducts.length){
+            this.products=this.storeProducts;
+        }
     },
     beforeUnmount() {
          window.removeEventListener('keydown', this.handleCtrl);
      },
   
     watch:{
+        storeProducts:{
+            handler(val){
+               if(val){
+                   this.products=val;
+               }
+            }, deep: true
+       },
         msg:{
             handler(val){
                 if(val.type){
@@ -330,6 +338,9 @@ export default {
         },
         config(){
             return this.$store.getters.flat_pickr_config;
+        },
+        storeProducts(){
+            return this.$store.getters.products;
         }
     },
     methods:{
@@ -569,7 +580,7 @@ export default {
             this.customer.phone=s.customer.phone;
         },
         async checkDatabase(){ 
-            const query_url=query(collection(db, "sales"));           
+            const query_url=query(collection(db, "sales"), orderBy("sale_date", "desc"), limit(1));           
                 onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {        
                             if(change.type==="added"){
@@ -681,14 +692,14 @@ export default {
                 this.v$.$reset()
 
         },
-      /*  removeSaleItem(i){
+        removeSaleItem(i){
             this.saleItems.splice(i, 1)
             this.calTotal();
-        },*/
-        removeSaleItems(){
+        },
+       /* removeSaleItems(){
             this.saleItems=this.saleItems.filter((f)=>!f.is_check)
             this.calTotal()
-        },
+        },*/
      
         checkQty(p){           
             if(p.qty  <1 + p.sale_qty ){
