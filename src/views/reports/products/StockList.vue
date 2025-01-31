@@ -62,23 +62,44 @@
             sortBy:"asc"
         }
     },
-    created() {     
+    /*created() {     
         if(this.user !==null){
             this.isLoading=true;
             this.fetchProducts();
         }
+    },*/
+    mounted() {
+        this.isLoading=true;
+        if(this.storeProducts.length){
+            if(this.code_no){
+                this.reports=this.storeProducts.filter((f)=>f.code_no==this.code_no);
+            }else{
+                this.reports=this.storeProducts.slice(0, 20);
+            }
+            this.isLoading=false;
+        }
     },
     watch:{
-        user(data){
-                if(data !==null){
-                    this.isLoading=true;
-                    this.fetchProducts();
-                }
-            }
-        },
+        storeProducts:{
+            handler(val){
+               if(val){
+                    if(this.code_no){
+                        this.reports=val.filter((f)=>f.code_no==this.code_no);
+                    }else{
+                        this.reports=val.slice(0, 20);
+                    }
+                   this.isLoading=false;
+                   this.filterProduct();
+               }
+            }, deep: true
+       },
+    },
     computed:{
         user(){
             return this.$store.getters.user;
+        },
+        storeProducts(){
+            return this.$store.getters.products;
         }
     },
     methods: {
