@@ -531,10 +531,7 @@ export default {
             this.v$.$reset()
             this.isSaving=false;
         },
-        updateProducts(){
-            this.isUpdating=true;
-            this.fetchProducts();
-        },
+       
        async savePrice(){
             const updateDocument=doc(db, "products", this.editItem.id)
               //  setTimeout(()=>{

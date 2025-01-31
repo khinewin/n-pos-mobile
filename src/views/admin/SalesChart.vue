@@ -2,7 +2,7 @@
     <div>
         <div class="card shadow">
             <div class="card-body">
-                <div class="card-text">Sales amount by month</div>
+                <div class="card-text">Sales Amount By Month</div>
                 <div class="row">
                     <div class="col-12">
                         <div v-if="isLoading">
@@ -23,7 +23,9 @@
                             @ready="onChartReady"
                         />
                         </div>
-                        <div class="my-5 text-center" v-if="monthlySales.length <=1 && isLoading==false">No data.</div>
+                        <div class="my-5 text-center" v-if="monthlySales.length <=1 && isLoading==false">
+                            <span @click="fetchSalesMonthly" class="change-cursor"><i class="fa-solid fa-rotate-right"></i></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -52,8 +54,8 @@ export default {
         }
     },
     mounted() {
-        this.isLoading=true;
-         this.fetchSalesMonthly();
+       // this.isLoading=true;
+       //  this.fetchSalesMonthly();
             
     },
    
@@ -87,6 +89,7 @@ export default {
            // this.isLoading=false;
         },
         async fetchSalesMonthly(){
+            this.isLoading=true;
             const currentDate = new Date();
             const theFirst = new Date(currentDate.getFullYear(), 0, 1);
             const theLast = new Date(currentDate.getFullYear(), 11, 31);

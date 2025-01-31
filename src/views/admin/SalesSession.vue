@@ -11,13 +11,15 @@
                                 <div class="col-5">
                                     <div class="small fw-lighter mb-1 text-center">Today</div>
                                     <div class="card-text text-center small">                                     
-                                        {{fM(sales_today)}}
+                                        <span v-if="salesYearlyData.length"> {{fM(sales_today)}}</span>
+                                        <span v-else @click="fetchSalesYearly" class="change-cursor"><i class="fa-solid fa-rotate-right"></i></span>
                                     </div>
                                 </div>
                                 <div class="col-5">
                                     <div class="small fw-lighter mb-1 text-center">This week</div>
                                     <div class="card-text text-center small">     
-                                        {{fM(sales_this_week)}}                                
+                                        <span v-if="salesYearlyData.length">{{fM(sales_this_week)}} </span>
+                                        <span v-else @click="fetchSalesYearly" class="change-cursor"><i class="fa-solid fa-rotate-right"></i></span>                       
                                     </div>
                                 </div>
                             </div>
@@ -35,13 +37,15 @@
                                 <div class="col-5">
                                     <div class="small fw-lighter mb-1 text-center">This month</div>
                                     <div class="card-text text-center small">                                     
-                                        {{fM(sales_this_month)}}
-                                    </div>
+                                        <span v-if="salesYearlyData.length"> {{fM(sales_this_month)}}</span>
+                                        <span v-else @click="fetchSalesYearly" class="change-cursor"><i class="fa-solid fa-rotate-right"></i></span>
+                                     </div>
                                 </div>
                                 <div class="col-5">
                                     <div class="small fw-lighter mb-1 text-center">This year</div>
                                     <div class="card-text text-center small">     
-                                        {{fM(sales_this_year)}}                                
+                                        <span v-if="salesYearlyData.length">{{fM(sales_this_year)}}</span> 
+                                        <span v-else @click="fetchSalesYearly" class="change-cursor"><i class="fa-solid fa-rotate-right"></i></span>                           
                                     </div>
                                 </div>
                             </div>
@@ -76,8 +80,8 @@
             }
         },
         mounted() {
-            this.isLoading=true;
-            this.fetchSalesYearly();
+            //this.isLoading=true;
+           // this.fetchSalesYearly();
         },
      
       
@@ -149,6 +153,7 @@
                 })
             },
            async fetchSalesYearly(){
+                this.isLoading=true;
                 const currentDate = new Date();
                 const theFirst = new Date(currentDate.getFullYear(), 0, 1);
                 const theLast = new Date(currentDate.getFullYear(), 11, 31);
