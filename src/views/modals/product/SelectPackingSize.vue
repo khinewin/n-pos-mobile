@@ -106,28 +106,29 @@ export default {
             this.medium_unit=this.ei.packing_size.medium_unit;
             this.largest_unit=this.ei.packing_size.largest_unit;
        })   
+
+       if(this.packingSizes.length==0){
+        this.packingSizes=this.storePackingSizes
+    }
    },
-   created(){
-       if(this.user !==null){         
-              this.isLoading=true; 
-              this.fetchpackingSizes();                
-       }
-   },   
+
+ 
    computed:{
        user(){
            return this.$store.getters.user;
        },    
-      product(){
-        return this.$store.getters.product;
-      }
+         storePackingSizes(){
+              return this.$store.getters.packingSizes;
+         },
    },
    watch:{       
-       user(data){
-               if(data !==null){         
-                this.isLoading=true;          
-                this.fetchpackingSizes();           
-           }
-       },    
+      storePackingSizes:{
+            handler:function(val){
+                if(val.length){
+                    this.packingSizes=val;
+                }
+            },deep:true
+      }
         
    },
    methods:{
@@ -153,20 +154,9 @@ export default {
                 this.smallest_unit="";
             }
         },
-       updateData(){
-               this.isUpdating=true;
-               this.fetchpackingSizes();
-       },
+     
       
-       async fetchpackingSizes(){
-       const query_url = query(collection(db, "packingSizes"), orderBy("created_at", "desc"));
-        onSnapshot(query_url, (snapShot)=>{
-            const pz=ss.packingSizes(snapShot)  
-            this.packingSizes=pz;
-            this.isLoading=false;
-            this.isUpdating=false;
-        })
-      } ,
+     
       showTime(t){
            return hp.showTime(t)
        },

@@ -91,7 +91,7 @@
                                         </td>                                 
                                         <td :class="{'table-secondary': sort_item ==='code_no'}" class=" p-0">
                                             <span>
-                                                <input v-if="editItem.id==p.id" @click="setEdit(p)" @input="setEdit(p)" @keypress.enter="saveEdit" @paste="pasteEdit" type="text" class="form-control py-1 text-center " v-model="p.code_no">
+                                                <input v-if="editItem.id==p.id"  @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1 text-center " v-model="p.code_no">
                                                 <div v-else class="py-1" @click="setEdit(p)">{{p.code_no}}</div>
                                             </span>
                                         </td>
@@ -218,7 +218,7 @@
             </div>
         </div>
         <SetQty :ei="editItem" @saveQty="saveQty" />
-        <PackingSizeModal />
+        <PackingSizeModal @setMsg="setMsg" />
         <SelectPackingSizeModal @setPackingSize="setPackingSize" :ei="editItem" />
 </div>   
  
@@ -341,7 +341,10 @@ export default {
     },
 
     methods:{        
-        
+        setMsg(info, type){
+            this.msg.type=type;
+            this.msg.info=info
+        },
         handleCtrl(event) {
             if (event.ctrlKey && event.key === 'h') {
                 event.preventDefault(); // Prevent the default browser save dialog
@@ -424,7 +427,7 @@ export default {
             const document=doc(db, "products", p.id)     
           //  this.msg.info="The selected product code has been deleted"
            // this.msg.type="success"
-            this.checkDatabaseRemoved(p.code_no)
+            this.checkDatabaseRemoved(p.id)
            // setTimeout(async()=>{
              await deleteDoc(document)  
             //}, 200)    
@@ -460,12 +463,12 @@ export default {
                 })
                 return false;
             }   */    
-            if(!this.editItem.item_name) return false;
+            if(!this.editItem.item_name || !this.editItem.code_no) return false;
            // setTimeout(()=>{
               //  this.msg.info="The product code has been updated"
               //  this.msg.type="success"
           //  }, 200)
-            this.checkDatabaseEdit(this.editItem.code_no)
+            this.checkDatabaseEdit(this.editItem.id)
             const updateDocument=doc(db, "products", this.editItem.id)
             await updateDoc(updateDocument, this.editItem)  
         },
@@ -479,7 +482,7 @@ export default {
              //   this.msg.type="success"
           //  }, 200)
             const updateDocument=doc(db, "products", this.editItem.id)
-            this.checkDatabaseEdit(this.editItem.code_no)
+            this.checkDatabaseEdit(this.editItem.id)
             await updateDoc(updateDocument, {
                     packing_size : this.editItem.packing_size,        
                     edit_user : this.editItem.edit_user          
@@ -536,7 +539,7 @@ export default {
        async savePrice(){
             const updateDocument=doc(db, "products", this.editItem.id)
            
-              this.checkDatabaseEdit(this.editItem.code_no)
+              this.checkDatabaseEdit(this.editItem.id)
                 await updateDoc(updateDocument, {
                     pur_price: this.editItem.pur_price,
                     retail_price: this.editItem.retail_price,
@@ -569,7 +572,8 @@ export default {
                 m=Math.floor(item.qty / item.packing_size.smallest_qty);
                 s=Math.floor(item.qty % item.packing_size.smallest_qty);
             }
-            this.editItem=p ? {...item,            
+            this.editItem=p ? {...item,         
+                code_no:Number(p.code_no),
                 l_qty: l ? l : 0, 
                 m_qty:m ? m :0,
                 s_qty: s ? s :0,     
@@ -590,15 +594,11 @@ export default {
             this.search_by_description=event.target.value;
             this.searchProducts();
         },
-        checkEdit(){
-             if(this.products.length && Object.keys(this.editItem).length <=0){
-                  this.setEdit(this.products[0])                    
-             }         
-        },
+      
         searchProducts(){
             this.products=[];
             if(this.search_by_code){
-                this.products=this.productsData.filter((f)=>f.code_no===Number(this.search_by_code))
+                this.products=this.productsData.filter((f)=>f.code_no.toLowerCase().includes(this.search_by_code.toLowerCase()))
                 if(this.products.length){
                     this.setEdit(this.products[0])
                 }
@@ -638,23 +638,35 @@ export default {
                     });                 
             });  
         } ,
-        async checkDatabaseEdit(code_no){ 
-            const query_url=query(collection(db, "products"), where("code_no", "==",  code_no));              
+        async checkDatabaseEdit(id){ 
+            const query_url=doc(db, "products", id);              
               const unsub= onSnapshot(query_url, async(snapShot) =>{
-                    const dc=snapShot._snapshot.docChanges;
+                   const res=snapShot.data();
                     const user=this.user;
-                    snapShot.docChanges().forEach((change) => {   
-                        const res=change.doc.data();   
-                        if(change.type==="modified" && res.edit_user.uid==user.uid){
-                                    this.msg.info="The product code has been updated"
-                                    this.msg.type="success"      
-                                    unsub();                             
-                            }         
-                          
-                    });                 
+                    if(res.edit_user.uid==user.uid){
+                            this.msg.info="The product code has been updated"
+                            this.msg.type="success"      
+                            unsub();                             
+                    }               
             }); 
         } ,
-        async checkDatabaseRemoved(code_no){ 
+        async checkDatabaseRemoved(id){ 
+            const query_url=doc(db, "products", id);              
+              const unsub= onSnapshot(query_url, async(snapShot) =>{
+                   const res=snapShot.data();
+                    const user=this.user;
+                    if(res.edit_user.uid==user.uid){
+                            this.msg.info="The selected product code has been deleted"
+                            this.msg.type="success"      
+                            this.isDeleting=false; 
+                            if(this.editItem.id==res.id){
+                                 this.setEdit(this.products[0]) 
+                             }
+                            unsub();                             
+                    }               
+            }); 
+        } ,
+        /*async checkDatabaseRemoved(code_no){ 
             const query_url=query(collection(db, "products"), where("code_no", "==",  code_no));              
               const unsub=  onSnapshot(query_url, async(snapShot) =>{
                     const dc=snapShot._snapshot.docChanges;
@@ -665,12 +677,15 @@ export default {
                                     this.msg.info="The selected product code has been deleted"
                                     this.msg.type="success"
                                     this.isDeleting=false; 
+                                    if(this.editItem.id==res.id){
+                                       this.setEdit(this.products[0]) 
+                                    }
                                     unsub();                              
                             }         
                           
                     });                 
             });   
-        } ,
+        } ,*/
 
        
     }

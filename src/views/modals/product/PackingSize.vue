@@ -64,7 +64,7 @@
      <!--end modal-->
 </template>
 <script>
-import {Timestamp, collection, onSnapshot, addDoc, getDocs, doc, deleteDoc, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
+import {Timestamp, collection, onSnapshot, addDoc,limit, getDocs, doc, deleteDoc, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as ss from "@/lib/snapshot/packingSizes"
 import * as hp  from "@/lib/helper"
@@ -87,21 +87,32 @@ export default {
            }
        }
    },   
+  
    mounted() {
-    this.isLoading=true; 
-  //  this.fetchpackingSizes();   
-    this.checkDatabase(); 
-    const myModalEl = document.getElementById('packingSizeModal')
-       myModalEl.addEventListener('show.bs.modal', event => {    
-                  
-       })   
-            
+    this.isLoading=true;     
+    // this.checkDatabase();
+    if(this.packingSizes.length==0){
+        this.packingSizes=this.storePackingSizes
+    }
+   },
+
+   watch:{
+       storePackingSizes:{
+        handler(val){
+                if(val.length){
+                    this.packingSizes=val
+                }
+            },deep:true
+       }
    },
  
    computed:{
        user(){
            return this.$store.getters.user;
        },     
+       storePackingSizes(){
+           return this.$store.getters.packingSizes;
+       }
    },
   
    methods:{
@@ -109,14 +120,15 @@ export default {
             const cf=confirm(`Are you sure, you want to delete packing unit "${p.packing_unit}" ? `)
             if(!cf) return false;
             const document=doc(db, "packingSizes", p.id)     
+            this.checkDatabaseRemoved(p.id)
             await deleteDoc(document) //if no items delete document;
         },
         setEdit(p){
             this.editItem={...p, edit_user : {uid: this.user.uid, type: "modified"}};
         },
         async saveEdit(){
-            let result=this.packingSizes.filter((f)=>f.id != this.editItem.id && f.packing_unit.toLowerCase().includes(this.editItem.packing_unit) )
-            if(result.length > 0){
+            let result=this.packingSizes.some((f)=>f.id != this.editItem.id && f.packing_unit.toLowerCase().includes(this.editItem.packing_unit) )
+            if(result){
                 this.msg.info="This packing unit already exists"
                 this.msg.type="error";
                 this.packingSizes=this.packingSizes.map((m)=>{
@@ -130,6 +142,7 @@ export default {
             }
             this.isUpdating=true;
             const data=doc(db, "packingSizes", this.editItem.id)
+            this.checkDatabaseEdit(this.editItem.id)
             await updateDoc(data, this.editItem)
         },
         setMsg(){
@@ -157,65 +170,63 @@ export default {
                 edit_user: {uid:this.user.uid, type:"added"},
 
             }
-        await addDoc(dataCollection, data);
+            this.checkDatabaseAdded();
+            await addDoc(dataCollection, data);
            
         },
-        message(type){
-                this.msg.info=hp.message(type, "packing size")
-                this.msg.type="success"                                                         
-        }, 
-        async checkDatabase(){ 
-            const query_url=query(collection(db, "packingSizes"), orderBy("created_at", "desc"));           
-                onSnapshot(query_url, async(snapShot) =>{
-                    //show data
-                    const pz=ss.packingSizes(snapShot)          
-                    this.packingSizes=pz;
-                    this.isLoading=false;
-                    this.isUpdating=false;
-                    //
+     
+
+        async checkDatabaseAdded(){ 
+            const query_url=query(collection(db, "packingSizes"), orderBy("created_at", "desc"), limit(1));              
+               const unsub=onSnapshot(query_url, async(snapShot) =>{
                     const dc=snapShot._snapshot.docChanges;
                     const user=this.user;
-                    snapShot.docChanges().forEach((change) => {                       
+                    snapShot.docChanges().forEach((change) => {   
                         const res=change.doc.data();   
-                            if(change.type==="added" && res.edit_user.uid==user.uid && dc.length===1){
-                                    this.message("added")
+                            if(change.type==="added" && res.edit_user.uid==user.uid){
+                                    this.msg.info="The new packing unit has been created"
+                                    this.msg.type="success"
                                     this.packing_unit="";          
                                     this.isSaving=false;
-                                    this.msg.info="The packing unit has been saved"
-                                    this.msg.type="success"
                                     this.setMsg();
+                                    unsub();
                             }           
-                            if(change.type==="modified" && res.edit_user.type=="modified" && res.edit_user.uid==user.uid){
-                                    this.message("modified")
-                                    this.isUpdating=false;
-                                    this.editItem={}
-                                    this.msg.info="This packing unit has been updated"
-                                    this.msg.type="success"
-                                    this.setMsg();
-                            }  
-                            if(change.type==="removed" && res.edit_user.type=="removed" && res.edit_user.uid==user.uid){
-                                    this.message("removed")
-                                    this.msg.info="The packing unit has been deleted"
-                                    this.msg.type="success"
-                                    this.setMsg();
-                            }             
+                          
                     });                 
-            });                              
+            });  
         } ,
-       updateData(){
-               this.isUpdating=true;
-               this.fetchpackingSizes();
-       },
-      
-       async fetchpackingSizes(){
-       const query_url = query(collection(db, "packingSizes"), orderBy("created_at", "desc"));
-       onSnapshot(query_url, (snapShot)=>{
-            const pz=ss.packingSizes(snapShot)          
-            this.packingSizes=pz;
-            this.isLoading=false;
-            this.isUpdating=false;
-       })
-      } ,
+        async checkDatabaseEdit(id){ 
+            const query_url=doc(db, "packingSizes", id);              
+              const unsub= onSnapshot(query_url, async(snapShot) =>{
+                   const res=snapShot.data();
+                    const user=this.user;
+                    if(res.edit_user.uid==user.uid){
+                            this.isUpdating=false;
+                            this.editItem={}
+                            this.msg.info="This selected packing unit has been updated"
+                            this.msg.type="success"
+                             this.setMsg();  
+                            unsub();                             
+                    }               
+            }); 
+        } ,
+        async checkDatabaseRemoved(id){ 
+            const query_url=doc(db, "packingSizes", id);              
+              const unsub= onSnapshot(query_url, async(snapShot) =>{
+                   const res=snapShot.data();
+                    const user=this.user;
+                    if(res.edit_user.uid==user.uid){
+                            this.isUpdating=false;
+                            this.editItem={}
+                            this.msg.info="This selected packing unit has been deleted"
+                            this.msg.type="success"
+                            this.setMsg();  
+                            unsub();                             
+                    }               
+            }); 
+        
+        } ,
+     
       showTime(t){
            return hp.showTime(t)
        },
