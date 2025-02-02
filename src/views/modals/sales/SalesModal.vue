@@ -16,7 +16,7 @@
                                            <div class="col-6 col-md-3 col-lg-12">
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
-                                                    <flat-pickr @change="searchSales" class="form-control-plaintext border-bottom" v-model="search_by_from_sale_date" id="from_date" :config="config" />
+                                                    <flat-pickr @change="fetchSales" class="form-control-plaintext border-bottom" v-model="search_by_from_sale_date" id="from_date" :config="config" />
                                                     <label for="from_date">From Date</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
@@ -25,7 +25,7 @@
                                            <div class="col-6 col-md-3 col-lg-12">
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
-                                                    <flat-pickr @change="searchSales" class="form-control-plaintext border-bottom" v-model="search_by_to_sale_date" id="to_date" :config="config" />
+                                                    <flat-pickr @change="fetchSales" class="form-control-plaintext border-bottom" v-model="search_by_to_sale_date" id="to_date" :config="config" />
                                                     <label for="to_date">To Date</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
@@ -39,14 +39,17 @@
                                            </div>
                                            <div class="col-6 col-md-3 col-lg-12">
                                             <div class="form-floating">
-                                                <input type="search" id="search_by_customer" v-model="search_by_customer" @input="inputSearchCustomer" placeholder="Customer name" class="form-control-plaintext border-bottom">
+                                                <input type="search" id="search_by_customer" v-model="search_by_customer" @keypress.enter="searchSales" placeholder="Customer name" class="form-control-plaintext border-bottom">
                                                 <label for="search_by_customer" class="">Customer</label>
                                             </div>
                                            </div>                                   
                                     </div>
                                     <div class="row mt-2">
-                                            <div class="col-6 d-grid">
-                                                <button class="btn btn-sm  text-dark clear-search-sale" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
+                                        <div class="col-4 d-grid">
+                                            <button class="btn btn-sm text-dark clear-search-product" @click="searchSales"><i class="fa-solid fa-search"></i> Search</button>
+                                        </div>
+                                            <div class="col-4 d-grid">
+                                                <button class="btn btn-sm  text-dark clear-search-sale" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
                                             </div>
                                             <!--<div class="col-4 d-grid">
                                                 <button class="btn btn-sm text-dark" @click="updateSales">
@@ -54,8 +57,8 @@
                                                     <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                                 </button>
                                             </div>-->
-                                            <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark close-sale" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
+                                            <div class="col-4 d-grid">
+                                                <button class="btn btn-sm text-dark close-sale" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close</button>
                                             </div>
                                     </div>
                                     </div>
@@ -167,17 +170,16 @@ export default {
            this.search_by_voucher_no="N-";
            this.search_by_customer="";
             this.setDate();
-           this.searchSales();
+            this.searchSales();
+         //  this.searchSales();
        },
        inputSearchCustomer(){
             this.search_by_customer=event.target.value;
             this.searchSales();
        },
-       searchSales(){                     
-         this.fetchSales();        
-       },    
+         
 
-    displaySales(){     
+    searchSales(){     
         if(this.search_by_customer){
             this.sales=this.salesData.filter((f)=>f.customer.name.toLowerCase().includes(this.search_by_customer.toLowerCase()))
        }else
@@ -199,7 +201,7 @@ export default {
                     this.salesData=sales;
                     this.isLoading=false;
                     this.isUpdating=false;
-                    this.displaySales();
+                    this.sales=this.salesData;
             });        
       } ,
       showTime(t){
