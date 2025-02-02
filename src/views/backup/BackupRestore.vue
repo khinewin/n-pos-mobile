@@ -52,8 +52,44 @@
                         </div>
                         <div class="row mt-2 justify-content-center mb-4">
                             <div class="col-12">
-                                <div class="row g-2">                                   
-                                        <div class="col-6 col-sm-4 d-grid">
+                                <div class="row g-2">    
+                                    <div class="col-6 col-sm-4 d-grid position-relative">
+                                        <button :disabled="products.length <=0" @click="exportProducts" class="btn py-4 btn-primary">Product Code
+                                             ({{products.length}})                                                
+                                            </button>
+                                            <button type="button" v-if="products.length <= 0"  @click="fetchProducts"  class="btn position-absolute top-50 start-50 translate-middle"><i class="fa-solid fa-rotate-right"></i></button>
+                                    </div>
+                                    <div class="col-6 col-sm-4 d-grid position-relative">
+                                        <button :disabled="sales.length <=0" @click="exportSales" class="btn py-4 btn-success">Sales ({{sales.length}})</button>
+                                        <button type="button" v-if="sales.length <= 0"  @click="fetchSales"  class="btn position-absolute top-50 start-50 translate-middle"><i class="fa-solid fa-rotate-right"></i></button>
+                                    </div>
+                                    <div class="col-6 col-sm-4 d-grid position-relative">
+                                        <button :disabled="purchases.length <=0" @click="exportPurchases" class="btn py-4 btn-dark">Purchases ({{purchases.length}})</button>
+                                        <button type="button" v-if="purchases.length <= 0"  @click="fetchPurchase"  class="btn position-absolute top-50 start-50 translate-middle"><i class="fa-solid fa-rotate-right"></i></button>
+                                    </div>
+                                    <div class="col-6 col-sm-4 d-grid position-relative">
+                                        <button :disabled="stocks.length <=0" @click="exportStocks" class="btn py-4 btn-secondary">Stocks ({{stocks.length}})</button>
+                                        <button type="button" v-if="stocks.length <= 0"  @click="fetchStocks"  class="btn position-absolute top-50 start-50 translate-middle"><i class="fa-solid fa-rotate-right"></i></button>
+                                    </div>
+                                  
+                                    <div class="col-6 col-sm-4 d-grid position-relative">
+                                        <button :disabled="adjustments.length <=0" @click="exportAdjustments" class="btn py-4 btn-success">Adjustments ({{adjustments.length}})</button>
+                                        <button type="button" v-if="adjustments.length <= 0"  @click="fetchAdjustments"  class="btn position-absolute top-50 start-50 translate-middle"><i class="fa-solid fa-rotate-right"></i></button>
+                                    </div>
+                                    <div class="col-6 col-sm-4 d-grid position-relative">
+                                        <button :disabled="suppliers.length <=0" @click="exportSuppliers" class="btn py-4 btn-success">Suppliers ({{suppliers.length}})</button>
+                                        <button type="button" v-if="suppliers.length <= 0"  @click="fetchSuppliers"  class="btn position-absolute top-50 start-50 translate-middle"><i class="fa-solid fa-rotate-right"></i></button>
+                                    </div>
+                                    <div class="col-6 col-sm-4 d-grid position-relative">
+                                        <button :disabled="customers.length <=0" @click="exportCustomers" class="btn py-4 btn-secondary">Customers ({{customers.length}})</button>
+                                        <button type="button" v-if="customers.length <= 0"  @click="fetchCustomers"  class="btn position-absolute top-50 start-50 translate-middle"><i class="fa-solid fa-rotate-right"></i></button>
+                                    </div>
+                                    <div class="col-6 col-sm-4 d-grid position-relative">
+                                        <button :disabled="packingSizes.length <=0" @click="exportPackingSizes" class="btn py-4 btn-primary">Packing Size ({{packingSizes.length}})</button>
+                                        <button type="button" v-if="packingSizes.length <= 0"  @click="fetchPackingSizes"  class="btn position-absolute top-50 start-50 translate-middle"><i class="fa-solid fa-rotate-right"></i></button>
+                                    </div>
+                                                               
+                                        <!--<div class="col-6 col-sm-4 d-grid">
                                             <button :disabled="products.length <=0" @click="exportProducts" class="btn py-4 btn-outline-primary">Product Code ({{products.length}})</button>
                                         </div>
                                         <div class="col-6 col-sm-4 d-grid">
@@ -64,11 +100,11 @@
                                         </div>
                                         <div class="col-6 col-sm-4 d-grid">
                                             <button :disabled="stocks.length <=0" @click="exportStocks" class="btn py-4 btn-outline-secondary">Stocks ({{stocks.length}})</button>
-                                        </div>
+                                        </div>-->
                                         <!--<div class="col-6 col-sm-4 d-grid">
                                             <button :disabled="transfers.length <=0" @click="exportTransfers" class="btn py-4 btn-outline-primary">Transfers ({{transfers.length}})</button>
                                         </div>-->
-                                        <div class="col-6 col-sm-4 d-grid">
+                                        <!--<div class="col-6 col-sm-4 d-grid">
                                             <button :disabled="adjustments.length <=0" @click="exportAdjustments" class="btn py-4 btn-outline-success">Adjustments ({{adjustments.length}})</button>
                                         </div>
                                         <div class="col-6 col-sm-4 d-grid">
@@ -79,7 +115,7 @@
                                         </div>
                                         <div class="col-6 col-sm-4 d-grid">
                                             <button :disabled="packingSizes.length <=0" @click="exportPackingSizes" class="btn py-4 btn-outline-primary">Packing Size ({{packingSizes.length}})</button>
-                                        </div>
+                                        </div>-->
                                         <!--<div class="col-6 col-sm-4 d-grid">
                                             <button :disabled="returnIn.length <=0" @click="exportReturnIn" class="btn py-4 btn-outline-primary">Return In ({{returnIn.length}})</button>
                                         </div>
@@ -93,37 +129,37 @@
                             <div class="h5  mb-2 change-cursor" @click="showDelete=!showDelete">Delete</div>
                             <div class="row g-2" v-if="showDelete">                                   
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="products.length <=0" @click="deleteProducts" class="btn py-4 btn-outline-danger">Product Code ({{products.length}})</button>
+                                    <button :disabled="products.length <=0" @click="deleteProducts" class="btn py-4 btn-danger">Product Code ({{products.length}})</button>
                                 </div>
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="sales.length <=0" @click="deleteSales" class="btn py-4 btn-outline-danger">Sales ({{sales.length}})</button>
+                                    <button :disabled="sales.length <=0" @click="deleteSales" class="btn py-4 btn-danger">Sales ({{sales.length}})</button>
                                 </div>
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="purchases.length <=0" @click="deletePurchases" class="btn py-4 btn-outline-danger">Purchases ({{purchases.length}})</button>
+                                    <button :disabled="purchases.length <=0" @click="deletePurchases" class="btn py-4 btn-danger">Purchases ({{purchases.length}})</button>
                                 </div>
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="stocks.length <=0" @click="deleteStocks" class="btn py-4 btn-outline-danger">Stocks ({{stocks.length}})</button>
+                                    <button :disabled="stocks.length <=0" @click="deleteStocks" class="btn py-4 btn-danger">Stocks ({{stocks.length}})</button>
                                 </div>
                                 <!--<div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="transfers.length <=0" @click="deleteTransfers" class="btn py-4 btn-outline-danger">Transfers ({{transfers.length}})</button>
+                                    <button :disabled="transfers.length <=0" @click="deleteTransfers" class="btn py-4 btn-danger">Transfers ({{transfers.length}})</button>
                                 </div>-->
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="adjustments.length <=0" @click="deleteAdjustments" class="btn py-4 btn-outline-danger">Adjustments ({{adjustments.length}})</button>
+                                    <button :disabled="adjustments.length <=0" @click="deleteAdjustments" class="btn py-4 btn-danger">Adjustments ({{adjustments.length}})</button>
                                 </div>
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="suppliers.length <=0" @click="deleteSuppliers" class="btn py-4 btn-outline-danger">Suppliers ({{suppliers.length}})</button>
+                                    <button :disabled="suppliers.length <=0" @click="deleteSuppliers" class="btn py-4 btn-danger">Suppliers ({{suppliers.length}})</button>
                                 </div>
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="customers.length <=0" @click="deleteCustomers" class="btn py-4 btn-outline-danger">Customers ({{customers.length}})</button>
+                                    <button :disabled="customers.length <=0" @click="deleteCustomers" class="btn py-4 btn-danger">Customers ({{customers.length}})</button>
                                 </div>
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="packingSizes.length <=0" @click="deletePackingSizes" class="btn py-4 btn-outline-danger">Packing Size ({{packingSizes.length}})</button>
+                                    <button :disabled="packingSizes.length <=0" @click="deletePackingSizes" class="btn py-4 btn-danger">Packing Size ({{packingSizes.length}})</button>
                                 </div>
                                 <!--<div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="returnIn.length <=0" @click="deleteReturnIn" class="btn py-4 btn-outline-danger">Return In ({{returnIn.length}})</button>
+                                    <button :disabled="returnIn.length <=0" @click="deleteReturnIn" class="btn py-4 btn-danger">Return In ({{returnIn.length}})</button>
                                 </div>
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="returnOut.length <=0" @click="deleteReturnOut" class="btn py-4 btn-outline-danger">Return Out ({{returnOut.length}})</button>
+                                    <button :disabled="returnOut.length <=0" @click="deleteReturnOut" class="btn py-4 btn-danger">Return Out ({{returnOut.length}})</button>
                                 </div>-->
                         </div>
                         </div>
@@ -216,9 +252,12 @@ export default {
             },deep:true
         }
     },
-    mounted(){
+    created() {
         this.from_date=hp.setSearchFromDate();
         this.to_date=hp.setToday();
+    },
+    mounted(){
+       /*
         this.fetchSales();
         this.fetchPurchase();
         this.fetchProducts();
@@ -230,6 +269,7 @@ export default {
         this.fetchPackingSizes();
       //  this.fetchReturnIn();
         //this.fetchReturnOut();
+        */
     },
     
     methods:{
