@@ -15,7 +15,7 @@
                                         <div class="col-6 col-sm-3 col-lg-12">
                                             <div class="input-group">
                                                 <div class="form-floating">
-                                                    <flat-pickr @change="searchPurchase" class="form-control-plaintext border-bottom" v-model="search_by_from_pur_date" id="from_date" :config="config" />
+                                                    <flat-pickr @change="fetchPurchase" class="form-control-plaintext border-bottom" v-model="search_by_from_pur_date" id="from_date" :config="config" />
                                                     <label for="from_date">From date</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
@@ -24,7 +24,7 @@
                                         <div class="col-6 col-sm-3 col-lg-12">
                                             <div class="input-group">
                                                 <div class="form-floating">
-                                                    <flat-pickr @change="searchPurchase" class="form-control-plaintext border-bottom" v-model="search_by_to_pur_date" id="to_date" :config="config" />
+                                                    <flat-pickr @change="fetchPurchase" class="form-control-plaintext border-bottom" v-model="search_by_to_pur_date" id="to_date" :config="config" />
                                                     <label for="to_date">To date</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
@@ -33,12 +33,12 @@
                                         <div class="col-6 col-sm-3 col-lg-12">
                                             <div class="form-floating ">
                                                 <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchPurchase" placeholder="Voucher no." class="form-control-plaintext border-bottom">
-                                                <label for="search_by_voucher_no" class="">Voucher no.</label>
+                                                <label for="search_by_voucher_no" class="">Voucher No.</label>
                                             </div>
                                         </div>
                                         <div class="col-6 col-sm-3 col-lg-12">
                                             <div class="form-floating ">
-                                                <input type="search" v-model="search_by_supplier" @input="inputSearchSupplier" placeholder="Supplier" class="form-control-plaintext border-bottom">
+                                                <input type="search" v-model="search_by_supplier" @keypress.enter="searchPurchase" placeholder="Supplier" class="form-control-plaintext border-bottom">
                                                 <label for="search_by_supplier" class="">Supplier</label>
                                             </div>
                                         </div>
@@ -46,8 +46,11 @@
                                        </div>
                                 
                                 <div class="row mt-2">
-                                        <div class="col-6 d-grid">
-                                            <button class="btn btn-sm text-dark clear-search-purchase" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
+                                    <div class="col-4 d-grid">
+                                        <button class="btn btn-sm text-dark clear-search-product" @click="searchPurchase"><i class="fa-solid fa-search"></i> Search</button>
+                                    </div>
+                                        <div class="col-4 d-grid">
+                                            <button class="btn btn-sm text-dark clear-search-purchase" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
                                         </div>
                                         <!--<div class="col-4 d-grid">
                                             <button class="btn btn-sm text-dark" @click="updatePurchases">
@@ -55,8 +58,8 @@
                                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                             </button>
                                         </div>-->
-                                        <div class="col-6 d-grid">
-                                            <button class="btn btn-sm text-dark close-purchase" data-bs-dismiss="modal" aria-label="Close" ><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
+                                        <div class="col-4 d-grid">
+                                            <button class="btn btn-sm text-dark close-purchase" data-bs-dismiss="modal" aria-label="Close" ><i class="fa-solid fa-circle-xmark"></i> Close </button>
                                         </div>
                                 </div>
                                 </div>
@@ -172,15 +175,13 @@ export default {
        clearSearch(){
            this.search_by_voucher_no="N-";
            this.search_by_supplier="";
-           this.search_by_from_pur_date=hp.setSearchFromDate();
-           this.search_by_to_pur_date=hp.setSearchToDate();
+           this.search_by_from_pur_date=hp.setToday();
+           this.search_by_to_pur_date=hp.setToday();
            this.search_by_location="";
            this.searchPurchase();
        },
-       searchPurchase(){
-            this.fetchPurchase();
-       },
-       displayPurchase(){   
+      
+       searchPurchase(){   
              if(this.search_by_supplier && this.search_by_location){
                this.purchases=this.purchasesData.filter((f)=>{
                        return f.location==this.search_by_location && (f.supplier.name.toLowerCase().includes(this.search_by_supplier.toLowerCase()) || f.supplier.company.toLowerCase().includes(this.search_by_supplier.toLowerCase()))
@@ -203,11 +204,7 @@ export default {
                        return f.location == this.search_by_location;
                })
            }else{
-                   this.purchases= this.purchasesData.filter((p, i)=>{
-                           if(i < 20){
-                               return p;
-                           }
-                 })                                     
+                   this.purchases= this.purchasesData                     
            }
        },
      
@@ -222,8 +219,7 @@ export default {
             const pur=ss.purchases(snapShot);      
             this.purchasesData=pur;
             this.isLoading=false;
-            this.displayPurchase(); 
-            
+            this.purchases=this.purchasesData            
         })
       
       } ,
