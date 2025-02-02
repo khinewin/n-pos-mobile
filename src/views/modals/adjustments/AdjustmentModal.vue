@@ -126,14 +126,17 @@ export default {
           
        }
    },
-  
+   created() {
+     this.setDate();
+
+   },
    mounted() {    
-    this.setDate();
        const myModalEl = document.getElementById('adjustmentModal')
        myModalEl.addEventListener('show.bs.modal', event => {
-                
+               if(this.adjustmentsData.length ===0){
+                  this.fetchAdjustments();                
+               }
        })       
-       this.fetchAdjustments();                 
         
    },
   
@@ -149,8 +152,10 @@ export default {
   
    methods:{
     setDate(){
-            this.search_by_from_date=hp.setSearchFromDate();
-            this.search_by_to_date=hp.setSearchToDate();
+          //  this.search_by_from_date=hp.setSearchFromDate();
+          //  this.search_by_to_date=hp.setSearchToDate();
+          this.search_by_from_date=hp.setToday();
+          this.search_by_to_date=hp.setToday();
         },
     removeAfterAt(email) {
         const parts = email.split('@');
