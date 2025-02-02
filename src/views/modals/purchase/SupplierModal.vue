@@ -16,24 +16,26 @@
                             </div>-->
                             <div class="col-6 col-sm-3 col-lg-12">
                                 <div class="form-floating ">
-                                    <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchSuppliers" placeholder="Description" class="form-control-plaintext border-bottom">
+                                    <input type="search" id="search_by_name" v-model="search_by_name" @keypress.enter="searchSuppliers" placeholder="Name" class="form-control-plaintext border-bottom">
                                     <label for="search_by_name" class="small ">Name</label>
                                 </div> 
                             </div>
                             <div class="col-sm-3 col-lg-12">
                                 <div class="form-floating ">
-                                    <input type="search" id="search_by_company" v-model="search_by_company" @keyup="searchSuppliers" placeholder="Company" class="form-control-plaintext border-bottom">
+                                    <input type="search" id="search_by_company" v-model="search_by_company" @keypress.enter="searchSuppliers" placeholder="Company" class="form-control-plaintext border-bottom">
                                     <label for="search_by_company" class="small">Company</label>
                                 </div> 
                             </div>
-                       
-                            <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark clear-search-supplier" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button></div>
+                            <div class="col-4 col-sm-3 col-lg-4 d-grid">
+                                <button class="btn btn-sm text-dark clear-search-product" @click="searchSuppliers"><i class="fa-solid fa-search"></i> Search</button>
+                            </div>
+                            <div class="col-4 col-sm-3 col-lg-4 d-grid"><button class="btn btn-sm text-dark clear-search-supplier" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
                             <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                 </button>
                             </div>-->
-                            <div class="col-6 col-sm-3 col-lg-6 d-grid">
-                                <button class="btn btn-sm text-dark close-supplier" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
+                            <div class="col-4 col-sm-3 col-lg-4 d-grid">
+                                <button class="btn btn-sm text-dark close-supplier" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close </button>
                             </div>
                           </div> 
                      </div>
@@ -120,16 +122,25 @@
                 msg : {
                     type :"",
                     info :"",
-                }
+                },
+                unsubSuppliers:null
             }
         },
-        created() {     
-            if(this.user !==null){
-                this.isLoading=true;
-                this.fetchSuppliers();
+       
+        mounted() {
+            this.isLoading=true;       
+            const myModalEl = document.getElementById('searchSupplier')
+            myModalEl.addEventListener('show.bs.modal', event => {
+                if(this.suppliersData.length===0){
+                        this.fetchSuppliers();
+                }            
+            })
+        },
+        unmounted() {
+            if(this.unsubSuppliers){
+                this.unsubSuppliers();
             }
         },
-      
         computed:{
             user(){
                 return this.$store.getters.user;
@@ -139,12 +150,7 @@
             }
         },
         watch:{
-            user(data){
-                if(data !==null){
-                    this.isLoading=true;
-                    this.fetchSuppliers();
-                }
-            },
+         
             msg:{
                 handler(val){
                     if(val.type){
@@ -173,7 +179,7 @@
             searchSuppliers(){
                 this.suppliers=[];
                 if(this.search_by_code){
-                    this.suppliers=this.suppliersData.filter((f)=>f.code===Number(this.search_by_code))
+                    this.suppliers=this.suppliersData.filter((f)=>f.code==this.search_by_code)
                 }else 
                 if(this.search_by_name){
                     this.suppliers=this.suppliersData.filter((f)=>{
@@ -185,19 +191,15 @@
                         return f.company.toLowerCase().includes(this.search_by_company.toLowerCase())
                     })
                 }else{
-                    this.suppliers= this.suppliersData.filter((p, i)=>{
-                               if(i < 20){
-                                   return p;
-                               }
-                           }) 
+                    this.suppliers= this.suppliersData.slice(0, 20)
                 }
             },
             async fetchSuppliers(){ 
             const query_url=query(collection(db, "suppliers"),orderBy("created_at", "desc"));           
-                onSnapshot(query_url, async(snapShot) =>{                  
+            this.unsubSuppliers= onSnapshot(query_url, async(snapShot) =>{                  
                     const suppliers=ss.suppliers(snapShot);   
                     this.suppliersData=suppliers;
-                    this.searchSuppliers();
+                    this.suppliers=this.suppliersData.slice(0, 20);
                     this.isLoading=false;
                     this.isUpdating=false;
             });                              

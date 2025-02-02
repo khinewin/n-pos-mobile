@@ -136,29 +136,22 @@ export default {
         }
     },   
     mounted() {
-      //  const myModalEl = document.getElementById('searchCode')
-      /*  myModalEl.addEventListener('show.bs.modal', event => {
-                const search_by_code=document.getElementById("search_by_code");
-                setTimeout(()=>{
-                    search_by_code.focus();
-                }, 500)              
-        })*/
         this.isLoading=true; 
-      //  this.fetchProducts(); 
-      if(this.storeProducts.length){
-            this.productsData=this.storeProducts;
-            this.products=this.productsData.slice(0, 20);
-            this.isLoading=false;
-       }
+
+        const myModalEl = document.getElementById('searchCode')
+        myModalEl.addEventListener('show.bs.modal', event => {
+                if(this.productsData.length===0){
+                    this.fetchProducts();
+                }                           
+        })
+    
     },
   
     computed:{
         user(){
             return this.$store.getters.user;
         },
-        storeProducts(){
-            return this.$store.getters.products;
-        }
+     
     },
     watch:{       
         storeItems:{
@@ -170,17 +163,7 @@ export default {
               }
             },deep:true
         
-        },
-   
-        storeProducts:{
-            handler(val){
-               if(val){
-                    this.productsData=val
-                   this.products=this.productsData.slice(0, 20);
-                   this.isLoading=false;
-               }
-            }, deep: true
-       },
+        },      
       
     },
     methods:{
@@ -241,9 +224,8 @@ export default {
         const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
         onSnapshot(query_url, async(snapShot) =>{                  
                     let products=lib.products(snapShot)      
-                    products=products.filter((f)=>f.packing_size.smallest_unit && f.packing_size.medium_unit)
                     this.productsData=products;
-                    this.searchProducts();
+                    this.products=this.productsData.slice(0, 20)
                     this.isLoading=false;
                     this.isUpdating=false;
             });        

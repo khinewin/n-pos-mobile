@@ -49,7 +49,7 @@
     </div>
 </template>
 <script>
-    import {Timestamp, onSnapshot, collection, addDoc, query, where, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore'
+    import {Timestamp, onSnapshot, collection, addDoc, query, limit, where, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore'
     import db from '@/firebase/firestore'
     import * as lib from "@/lib/snapshot/products"
     import * as hp from '@/lib/helper'
@@ -70,37 +70,16 @@
     },*/
     mounted() {
         this.isLoading=true;
-        if(this.storeProducts.length){
-            if(this.code_no){
-                this.reports=this.storeProducts.filter((f)=>f.code_no==this.code_no);
-            }else{
-                this.reports=this.storeProducts.slice(0, 20);
-            }
-            this.isLoading=false;
-        }
+        this.fetchProducts();
     },
     watch:{
-        storeProducts:{
-            handler(val){
-               if(val){
-                    if(this.code_no){
-                        this.reports=val.filter((f)=>f.code_no==this.code_no);
-                    }else{
-                        this.reports=val.slice(0, 20);
-                    }
-                   this.isLoading=false;
-                   this.filterProduct();
-               }
-            }, deep: true
-       },
+     
     },
     computed:{
         user(){
             return this.$store.getters.user;
         },
-        storeProducts(){
-            return this.$store.getters.products;
-        }
+       
     },
     methods: {
         displayPrice(l_unit, m_unit, s_unit){
@@ -166,7 +145,7 @@
             if(this.code_no){
                 query_url = query(collection(db, "products"), where("code_no", "==", Number(this.code_no)), orderBy("created_at", "desc"));
             }else{
-                 query_url = query(collection(db, "products"), where("is_deleted", "==", false), orderBy("created_at", "desc"));
+                 query_url = query(collection(db, "products"), where("is_deleted", "==", false), orderBy("created_at", "desc"), limit(15));
             }
            onSnapshot(query_url, (snapShot)=>{
             const products=lib.products(snapShot)

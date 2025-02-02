@@ -13,7 +13,7 @@
                                         <div class="row g-1">
                                             <div class="col-6 col-lg-12">
                                                 <div class="form-floating">
-                                                    <input type="text" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
+                                                    <input type="text" id="search_by_code"  v-model="search_by_code"  @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
                                                     <label for="search_by_code" class="">Code</label>
                                                 </div>
                                             </div>
@@ -95,7 +95,7 @@
       <!--end modal-->
 </template>
 <script>
-import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
+import {Timestamp, collection, addDoc, getDocs, doc, onSnapshot, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as lib from "@/lib/snapshot/products"
 import * as hp  from "@/lib/helper"
@@ -109,49 +109,33 @@ export default {
             search_by_item_name:"",
             isUpdating:false,
             isLoading:false,
+            unsubProducts:null,
         }
     },   
     mounted() {
-      /*  const myModalEl = document.getElementById('searchCode')
-        myModalEl.addEventListener('show.bs.modal', event => {
-                const search_by_code=document.getElementById("search_by_code");
-                setTimeout(()=>{
-                    search_by_code.focus();
-                }, 500)              
-        })*/
         this.isLoading=true; 
-      //  this.fetchProducts(); 
-      if(this.storeProducts.length){
-            this.productsData=this.storeProducts;
-            this.products=this.productsData.slice(0, 20);
-            this.isLoading=false;
-       }
+        const myModalEl = document.getElementById('searchCode')
+        myModalEl.addEventListener('show.bs.modal', event => {
+                if(this.productsData.length===0){
+                    this.fetchProducts();
+                }  
+        })      
+     
     },
-   /* created(){
-        if(this.user !==null){         
-                this.isLoading=true; 
-                this.fetchProducts();                 
+    unmounted() {
+        if(this.unsubProducts){
+            this.unsubProducts();
         }
-    },   */
+    },
+  
     computed:{
         user(){
             return this.$store.getters.user;
         },
-        storeProducts(){
-            return this.$store.getters.products;
-        }
+    
     },
     watch:{       
-       
-        storeProducts:{
-            handler(val){
-               if(val){
-                    this.productsData=val
-                   this.products=this.productsData.slice(0, 20);
-                   this.isLoading=false;
-               }
-            }, deep: true
-       },
+     
       
     },
     methods:{
@@ -190,7 +174,7 @@ export default {
         searchProducts(){
             if(this.search_by_code){
                 this.products=this.productsData.filter((f)=>{
-                        return f.code_no===this.search_by_code;
+                        return f.code_no==this.search_by_code;
                 })
             }else if(this.search_by_item_name){
                 this.products=this.productsData.filter((f)=>{
@@ -203,12 +187,13 @@ export default {
       
         async fetchProducts(){
         const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
-        const snapShot=await getDocs(query_url)
-        const products=lib.products(snapShot)       
-        this.productsData=products;
-        this.isLoading=false;
-        this.isUpdating=false;
-        this.searchProducts();
+       this.unsubProducts= onSnapshot(query_url, async(snapShot) =>{                  
+                    let products=lib.products(snapShot)       
+                    this.productsData=products;
+                    this.products=this.productsData.slice(0, 15)
+                    this.isLoading=false;
+            });        
+       
        } ,
        showTime(t){
             return hp.showTime(t)

@@ -5,7 +5,8 @@
             <div class="row  justify-content-end">   
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveEdit">
-                        <span><i class="fa-solid fa-retweet"></i> Update </span>
+                        <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
+                        <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                     </button>
                 </div> 
                 <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
@@ -218,8 +219,8 @@
             </div>
         </div>
         <SetQty :ei="editItem" @saveQty="saveQty" />
-        <PackingSizeModal @setMsg="setMsg" />
-        <SelectPackingSizeModal @setPackingSize="setPackingSize" :ei="editItem" />
+        <PackingSizeModal @setMsg="setMsg" :packingSizes="packingSizes" />
+        <SelectPackingSizeModal @setPackingSize="setPackingSize" :ei="editItem" :packingSizes="packingSizes" />
 </div>   
  
 </template>
@@ -236,6 +237,7 @@ import SelectPackingSizeModal from "@/views/modals/product/SelectPackingSize.vue
 import * as hp from "@/lib/helper"
 import * as cp from "@/lib/cal_price"
 import SetQty from '@/views/modals/stocks/SetQty.vue'
+import * as pz from "@/lib/snapshot/packingSizes"
 
 export default {
     components: {
@@ -260,6 +262,7 @@ export default {
             search_by_code:"",
             search_by_description:"",
             productsData:[],
+            packingSizes:[],
             editItem:{},
             isUpdating:false,
             isSaving:false,
@@ -275,6 +278,8 @@ export default {
             is_check_all: false,
             isDeleting:false,
            // deviceId:"",
+           unsubProducts:null,
+           unsubPackingSizes:null
         }
     },
     created() {     
@@ -284,50 +289,28 @@ export default {
         const code_no=document.getElementById("search_by_code");
       //  code_no.focus();
         this.isLoading=true;
-       if(this.storeProducts.length){
-            this.isLoading=false;
-            this.productsData=this.storeProducts;
-            if(this.search_by_code || this.search_by_description){
-                this.searchProducts();
-            }else{
-                this.products=this.productsData.slice(0, 15);
-                if(Object.keys(this.editItem).length ===0 && this.products.length > 0){
-                     this.setEdit(this.products[0])
-                }
-            }
-          
-        }
+     
         window.addEventListener('keydown', this.handleCtrl);
-        
+       this.checkDatabase();
+       this.fetchPackingSizes();
+    },
+    unmounted() {
+        if(this.unsubProducts){
+            this.unsubProducts=null
+        }
+        if(this.unsubPackingSizes){
+            this.unsubPackingSizes=null;
+        }
     },
  
     computed:{
         user(){
             return this.$store.getters.user;
         },
-        storeProducts(){
-            return this.$store.getters.products;
-        }
+      
     },
     watch:{
-        storeProducts:{
-            handler(val){
-               if(val){
-                    this.isLoading=false;
-                    this.productsData=val;
-                    if(this.search_by_code || this.search_by_description){
-                        this.searchProducts();
-                    }else{
-                        this.products=this.productsData.slice(0, 15);
-                        if(Object.keys(this.editItem).length ===0 && this.products.length > 0){
-                        this.setEdit(this.products[0])
-                    }
-                    }
-                   // this.products=this.productsData.slice(0, 15);
-                   
-               }
-            }, deep: true
-       },
+       
         msg:{
             handler(val){
                 if(val.type){
@@ -424,13 +407,8 @@ export default {
             const cf=confirm(`Are you sure,  you want to delete product code ${p.item_name}`)
             if(!cf) return false;
             this.isDeleting=true;       
-            const document=doc(db, "products", p.id)     
-          //  this.msg.info="The selected product code has been deleted"
-           // this.msg.type="success"
-            this.checkDatabaseRemoved(p.id)
-           // setTimeout(async()=>{
+            const document=doc(db, "products", p.id)            
              await deleteDoc(document)  
-            //}, 200)    
         },
         checkAll(){
             setTimeout(()=>{
@@ -463,12 +441,9 @@ export default {
                 })
                 return false;
             }   */    
+
             if(!this.editItem.item_name || !this.editItem.code_no) return false;
-           // setTimeout(()=>{
-              //  this.msg.info="The product code has been updated"
-              //  this.msg.type="success"
-          //  }, 200)
-            this.checkDatabaseEdit(this.editItem.id)
+            this.isUpdating=true;
             const updateDocument=doc(db, "products", this.editItem.id)
             await updateDoc(updateDocument, this.editItem)  
         },
@@ -476,13 +451,8 @@ export default {
             this.editItem.packing_size=p;
            this.savePackingSize();
         } ,
-        async savePackingSize(){
-          //  setTimeout(()=>{
-             //   this.msg.info="The product packing size has been saved"
-             //   this.msg.type="success"
-          //  }, 200)
+        async savePackingSize(){       
             const updateDocument=doc(db, "products", this.editItem.id)
-            this.checkDatabaseEdit(this.editItem.id)
             await updateDoc(updateDocument, {
                     packing_size : this.editItem.packing_size,        
                     edit_user : this.editItem.edit_user          
@@ -490,8 +460,6 @@ export default {
         },
       
         async saveCode(){
-          //  if(Object.keys(this.editItem).length) this.saveEdit();
-
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
             let isTaken=this.productsData.some((f)=>f.item_name.toLowerCase() == this.item_name.toLowerCase())
@@ -520,13 +488,7 @@ export default {
                 edit_user: {uid: this.user.uid, type: 'added'},
                 auto_cal: true,
             }
-         //   setTimeout(()=>{
-             /*   this.isSaving=false;
-                this.msg.info="The product code has been created"
-                this.msg.type="success"
-                this.resetInput(); */
-           // }, 300) 
-           this.checkDatabaseAdded(this.code_no);
+        
             await addDoc(dataCollection, data);                    
         },
         resetInput(){            
@@ -539,7 +501,6 @@ export default {
        async savePrice(){
             const updateDocument=doc(db, "products", this.editItem.id)
            
-              this.checkDatabaseEdit(this.editItem.id)
                 await updateDoc(updateDocument, {
                     pur_price: this.editItem.pur_price,
                     retail_price: this.editItem.retail_price,
@@ -595,10 +556,10 @@ export default {
             this.searchProducts();
         },
       
-        searchProducts(){
+       searchProducts(){
             this.products=[];
             if(this.search_by_code){
-                this.products=this.productsData.filter((f)=>f.code_no.toLowerCase().includes(this.search_by_code.toLowerCase()))
+                this.products=this.productsData.filter((f)=>f.code_no==this.search_by_code)
                 if(this.products.length){
                     this.setEdit(this.products[0])
                 }
@@ -618,75 +579,61 @@ export default {
             }
                       
         },
-        async checkDatabaseAdded(code_no){ 
-            const query_url=query(collection(db, "products"), where("code_no", "==",  code_no));              
-               const unsub=onSnapshot(query_url, async(snapShot) =>{
-                    const dc=snapShot._snapshot.docChanges;
-                    const user=this.user;
-                    snapShot.docChanges().forEach((change) => {   
-                        const res=change.doc.data();   
-                        const id=change.doc.id
-                        const data={...res, id}
-                            if(change.type==="added" && res.edit_user.uid==user.uid){
+        async fetchPackingSizes(){
+        const query_url = query(collection(db, "packingSizes"), orderBy("created_at", "desc"));
+        this.unsubPackingSizes=onSnapshot(query_url, (snapShot)=>{
+                const pSIzes=pz.packingSizes(snapShot)      
+                this.packingSizes=pSIzes;    
+        })
+       },
+        async checkDatabase(){
+            const query_url=query(collection(db, "products"), orderBy("created_at", "desc"));           
+             this.unsubProducts= onSnapshot(query_url, async(snapShot) =>{                    
+                    //update  docs
+                                const products=ss.products(snapShot);   
+                                this.productsData=products;
+                                this.products=this.productsData.slice(0, 15);
+                                this.setEdit(this.products[0])
+                                this.isLoading=false;
+                                this.isUpdating=false;      
+
+                        const dc=snapShot._snapshot.docChanges;
+                         const user=this.user;
+                        //get only update doc for message
+                        snapShot.docChanges().forEach((change) => {     
+                            const res=change.doc.data();   
+                            const edit_user=res.edit_user !=null ? res.edit_user : "";
+                            if(change.type==="added" &&   edit_user.uid==user.uid &&  dc.length ===1){                               
                                     this.msg.info="The new product code has been created"
                                     this.msg.type="success"
                                     this.resetInput();    
-                                    this.setEdit(data);
-                                    unsub();
-                            }           
-                          
-                    });                 
-            });  
-        } ,
-        async checkDatabaseEdit(id){ 
-            const query_url=doc(db, "products", id);              
-              const unsub= onSnapshot(query_url, async(snapShot) =>{
-                   const res=snapShot.data();
-                    const user=this.user;
-                    if(res.edit_user.uid==user.uid){
-                            this.msg.info="The product code has been updated"
-                            this.msg.type="success"      
-                            unsub();                             
-                    }               
-            }); 
-        } ,
-        async checkDatabaseRemoved(id){ 
-            const query_url=doc(db, "products", id);              
-              const unsub= onSnapshot(query_url, async(snapShot) =>{
-                   const res=snapShot.data();
-                    const user=this.user;
-                    if(res.edit_user.uid==user.uid){
-                            this.msg.info="The selected product code has been deleted"
-                            this.msg.type="success"      
-                            this.isDeleting=false; 
-                            if(this.editItem.id==res.id){
-                                 this.setEdit(this.products[0]) 
-                             }
-                            unsub();                             
-                    }               
-            }); 
-        } ,
-        /*async checkDatabaseRemoved(code_no){ 
-            const query_url=query(collection(db, "products"), where("code_no", "==",  code_no));              
-              const unsub=  onSnapshot(query_url, async(snapShot) =>{
-                    const dc=snapShot._snapshot.docChanges;
-                    const user=this.user;
-                    snapShot.docChanges().forEach((change) => {   
-                        const res=change.doc.data();   
-                        if(change.type==="removed"){
-                                    this.msg.info="The selected product code has been deleted"
+                                    //  hp.setAutoFocus("item_name")     
+                                    this.setEdit(this.products[0])
+                            }
+                            if(change.type==="modified" && edit_user.type=="modified" && edit_user.uid==user.uid){
+                                    this.msg.info="The selected product code has been updated"
                                     this.msg.type="success"
-                                    this.isDeleting=false; 
-                                    if(this.editItem.id==res.id){
-                                       this.setEdit(this.products[0]) 
+                                    this.isUpdating=false;
+                                  //  const items=this.products.filter((f)=>f.id==this.editItem.id)
+                                    this.setEdit(res)
+                            }  
+                            if(change.type==="removed" && this.isDeleting){
+                                    this.isDeleting=false;
+                                     this.msg.info="The selected product code has been deleted"
+                                    this.msg.type="success"
+                                    this.editItem=this.products[0];
+                            }else if(change.type==="removed"){                                  
+                                    if(change.doc.id==this.editItem.id){                                       
+                                        this.editItem=this.products[0];
                                     }
-                                    unsub();                              
-                            }         
-                          
-                    });                 
-            });   
-        } ,*/
-
+                            }
+                      
+                        })
+                   
+                 });       
+        },
+  
+      
        
     }
 }

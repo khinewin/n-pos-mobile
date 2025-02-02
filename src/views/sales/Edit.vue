@@ -214,6 +214,7 @@ import setQtyModal from "@/views/modals/setQtyModal.vue";
 import setDiscountModal from "@/views/modals/setDiscountModal.vue";
 import FlatPickr from 'vue-flatpickr-component';
 import * as hc from "@/lib/handleCtrl"
+import * as pd from "@/lib/snapshot/products"
 
 export default {
     components: {
@@ -379,8 +380,16 @@ export default {
             this.saleItems=saleItems;
             this.calTotal();
         },
-        
-        setCodeOnPaste(){
+        async setCodeOnPaste(){
+            const query_url = query(collection(db, "products"), where("code_no", "==", Number(this.code_no)));
+           const unsub= onSnapshot(query_url, async(snapShot) =>{
+                    const products=pd.products(snapShot)     
+                    this.setCode(products[0])
+                    this.code_no="";
+                    unsub();
+            });              
+       } ,
+      /*  setCodeOnPaste(){
             setTimeout(()=>{                
             const item=this.products.filter((f)=>f.code_no==this.code_no);
             if(item.length){
@@ -388,7 +397,7 @@ export default {
                 this.code_no="";
             }
             },200)
-        },
+        },*/
         async fetchSale(){
             const query_url = query(collection(db, "sales"), where("voucher_no", "==",this.voucher_no));
             onSnapshot(query_url, async(snapShot) =>{

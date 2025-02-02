@@ -201,7 +201,7 @@ export default {
                 wrap: true, // set wrap to true only when using 'input-group'
                // altFormat: 'M j, Y',
             },  
-            timer: 200,
+            timer: 10,
         }
     },
     watch:{

@@ -15,7 +15,7 @@
                                                 <div class="row g-1">
                                                     <div class="col-md-6 col-lg-12">
                                                         <div class="form-floating">
-                                                            <input type="text" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
+                                                            <input type="text" id="search_by_code"  v-model="search_by_code"  @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
                                                             <label for="search_by_code" class="">Code</label>
                                                         </div>
                                                     </div>
@@ -145,20 +145,15 @@ export default {
         }
     },   
     mounted() {
+        this.isLoading=true;        
+
         const myModalEl = document.getElementById('searchCode')
-        /* myModalEl.addEventListener('show.bs.modal', event => {
-                const search_by_code=document.getElementById("search_by_code");
-                setTimeout(()=>{
-                    search_by_code.focus();
-                }, 500)              
-        })*/
-        this.isLoading=true; 
-      //  this.fetchProducts(); 
-      if(this.storeProducts.length){
-            this.productsData=this.storeProducts;
-            this.products=this.productsData.slice(0, 20);
-            this.isLoading=false;
-       }
+         myModalEl.addEventListener('show.bs.modal', event => {
+              if(this.productsData.length===0){
+                    this.fetchProducts();
+              }            
+        })
+     
     },
 
     watch:{
@@ -181,24 +176,14 @@ export default {
                 }
             },deep:true
         },
-        storeProducts:{
-            handler(val){
-               if(val){
-                    this.productsData=val
-                   this.products=this.productsData.slice(0, 20);
-                   this.isLoading=false;
-               }
-            }, deep: true
-       },
+      
     },
     
     computed:{
         user(){
             return this.$store.getters.user;
         },      
-        storeProducts(){
-            return this.$store.getters.products;
-        }
+       
         
     },
   
@@ -257,6 +242,7 @@ export default {
             
        },
         searchProducts(){
+            this.products=[]
             if(this.search_by_code){
                 this.products=this.productsData.filter((f)=>{
                         return f.code_no==this.search_by_code;
@@ -266,7 +252,7 @@ export default {
                         return f.item_name.toLowerCase().includes(this.search_by_item_name.toLowerCase())
                 })
             }else{
-                this.products= this.productsData.slice(0, 20);                                         
+                this.products= this.productsData.slice(0, 15);                                         
             }
         },
       
@@ -274,11 +260,9 @@ export default {
         const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
         onSnapshot(query_url, async(snapShot) =>{                  
                     let products=lib.products(snapShot)       
-                    products=products.filter((f)=>f.packing_size.smallest_unit && f.packing_size.medium_unit)
                     this.productsData=products;
-                    this.searchProducts();
+                    this.products=this.productsData.slice(0, 15)
                     this.isLoading=false;
-                    this.isUpdating=false;
             });        
        
        } ,

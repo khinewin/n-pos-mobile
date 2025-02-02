@@ -81,10 +81,10 @@ import * as hp  from "@/lib/helper"
 import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
 export default {   
-    props:['ei'],
+    props:['ei', 'packingSizes'],
    data(){
        return{
-           packingSizes:[],
+      //     packingSizes:[],
            isUpdating:false,
            isLoading:false,
            isSaving:false,
@@ -107,9 +107,7 @@ export default {
             this.largest_unit=this.ei.packing_size.largest_unit;
        })   
 
-       if(this.packingSizes.length==0){
-        this.packingSizes=this.storePackingSizes
-    }
+     
    },
 
  
@@ -117,19 +115,10 @@ export default {
        user(){
            return this.$store.getters.user;
        },    
-         storePackingSizes(){
-              return this.$store.getters.packingSizes;
-         },
+       
    },
    watch:{       
-      storePackingSizes:{
-            handler:function(val){
-                if(val.length){
-                    this.packingSizes=val;
-                }
-            },deep:true
-      }
-        
+   
    },
    methods:{
         pressSetBtn(){

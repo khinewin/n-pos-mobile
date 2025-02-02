@@ -24,8 +24,8 @@ export default {
         }
     },
     created() {
-        this.fetchProducts()
-        this.fetchPackingSizes();
+       // this.fetchProducts()
+      //this.fetchPackingSizes();
     },
   
     methods:{   

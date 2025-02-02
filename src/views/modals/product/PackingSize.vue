@@ -71,10 +71,9 @@ import * as hp  from "@/lib/helper"
 import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
 export default {   
-  
+  props:['packingSizes'],
    data(){
        return{
-            packingSizes:[],
             packing_unit:"",
            // packing_name:"",
            isUpdating:false,
@@ -90,29 +89,18 @@ export default {
   
    mounted() {
     this.isLoading=true;     
-    // this.checkDatabase();
-    if(this.packingSizes.length==0){
-        this.packingSizes=this.storePackingSizes
-    }
+   
    },
 
    watch:{
-       storePackingSizes:{
-        handler(val){
-                if(val.length){
-                    this.packingSizes=val
-                }
-            },deep:true
-       }
+    
    },
  
    computed:{
        user(){
            return this.$store.getters.user;
        },     
-       storePackingSizes(){
-           return this.$store.getters.packingSizes;
-       }
+     
    },
   
    methods:{

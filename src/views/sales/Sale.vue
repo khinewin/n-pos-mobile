@@ -302,22 +302,14 @@ export default {
         if(!isMobile){
             this.setBarcodeFocus();
         }
-        if(this.storeProducts.length){
-            this.products=this.storeProducts;
-        }
+     
     },
     beforeUnmount() {
          window.removeEventListener('keydown', this.handleCtrl);
      },
   
     watch:{
-        storeProducts:{
-            handler(val){
-               if(val){
-                   this.products=val;
-               }
-            }, deep: true
-       },
+      
         msg:{
             handler(val){
                 if(val.type){
@@ -339,9 +331,7 @@ export default {
         config(){
             return this.$store.getters.flat_pickr_config;
         },
-        storeProducts(){
-            return this.$store.getters.products;
-        }
+       
     },
     methods:{
         setPos(){
@@ -428,7 +418,7 @@ export default {
             this.$router.push({name: "EditSale", params: {id:this.voucher_no}})
         },      
 
-        setCodeOnPaste(){
+     /*   setCodeOnPaste(){
             setTimeout(()=>{                
             const item=this.products.filter((f)=>f.code_no==this.code_no);
             if(item.length){
@@ -436,13 +426,14 @@ export default {
                 this.code_no="";
             }
             },200)
-        },
-        async fetchProducts(){
-            const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
-            onSnapshot(query_url, async(snapShot) =>{
-                    const isLocal=snapShot.metadata.fromCache;                  
-                    const products=ss.products(snapShot)       
-                    this.products=products;                  
+        }, */
+        async setCodeOnPaste(){
+            const query_url = query(collection(db, "products"), where("code_no", "==", Number(this.code_no)));
+           const unsub= onSnapshot(query_url, async(snapShot) =>{
+                    const products=ss.products(snapShot)     
+                    this.setCode(products[0])
+                    this.code_no="";
+                    unsub();
             });              
        } ,
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){

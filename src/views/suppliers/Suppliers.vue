@@ -9,12 +9,12 @@
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                     </button>
                 </div>  
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
                     </button>
-                </div>                           
+                </div>-->                           
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveSupplier">
                         <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
@@ -34,11 +34,11 @@
                                     <label for="search_by_code" class="small">Code</label>
                                 </div>-->
                                 <div class="form-floating col-sm-3 col-lg-12">
-                                    <input type="search" id="search_by_name" v-model="search_by_name" @input="inputSearchName" placeholder="Description" class="form-control-plaintext border-bottom ">
+                                    <input type="search" id="search_by_name" v-model="search_by_name" @keypress.enter="searchSuppliers" placeholder="Description" class="form-control-plaintext border-bottom ">
                                     <label for="search_by_name" class="small">Name</label>
                                 </div> 
                                 <div class="form-floating col-sm-3 col-lg-12">
-                                    <input type="search" id="search_by_company" v-model="search_by_company" @input="inputSearchCompany" placeholder="Company" class="form-control-plaintext border-bottom ">
+                                    <input type="search" id="search_by_company" v-model="search_by_company" @keypress.enter="searchSuppliers" placeholder="Company" class="form-control-plaintext border-bottom ">
                                     <label for="search_by_company" class="small">Company</label>
                                  </div> 
                            
@@ -58,7 +58,7 @@
                                    <tbody class="">
                                        <tr class="text-center table-secondary change-cursor">
                                         <td class="col-0">
-                                            <input type="checkbox" class="form-check-input" @click="checkAll" v-model="is_check_all">
+                                            <!--<input type="checkbox" class="form-check-input" @click="checkAll" v-model="is_check_all">-->
                                         </td>
                                            <!--<td  @click="sortSuppliers('code')" class="col-2"><i class="fa-solid fa-sort"></i> Code</td>-->
                                            <td @click="sortSuppliers('name')" class="col4-"><i class="fa-solid fa-sort"></i> Name</td>
@@ -68,7 +68,7 @@
                                        </tr>
                                        <tr>
                                         <td class="text-center">
-                                            <input class="form-check-input" type="checkbox" @click="checkAll" v-model="is_deleted">
+                                            <!--<input class="form-check-input" type="checkbox" @click="checkAll" v-model="is_deleted">-->
                                         </td>
                                             <!--<td class="">
                                                 <input @keypress.enter="saveSupplier" type="text" v-model="code" class="form-control-plaintext py-0 text-center" id="code" placeholder="Code">                                                                                       
@@ -88,8 +88,9 @@
                                         </tr>
                                        
                                        <tr class="text-center" v-if="suppliers.length > 0"  v-for="(p, i) in suppliers" :key="p.id"  >                                           
-                                        <td class="">
-                                            <input class="form-check-input" type="checkbox" v-model="p.is_deleted">
+                                        <td class="d-grid">
+                                            <!--<input class="form-check-input" type="checkbox" v-model="p.is_deleted">-->
+                                            <button :disabled="user.uid != p.user.uid" class="btn btn-sm text-danger" @click="removeSupplier(p)"><i class="fa-solid fa-trash"></i></button>
                                         </td>
                                            <!--<td :class="{'table-secondary': sort_item ==='code'}" class="position-relative">
                                                 <span class="position-absolute start-50 top-50 translate-middle">{{p.code}}</span>
@@ -185,7 +186,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
      
        async mounted() {
         this.isLoading=true;
-        this.fetchSuppliers();
+      //  this.fetchSuppliers();
         this.checkDatabase();
         this.created_at=hp.setToday();
         window.addEventListener('keydown', this.handleCtrl);
@@ -246,11 +247,12 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 }
             })
         },
-        async removeSupplier(id){                  
-            const document=doc(db, "suppliers", id)     
-            setTimeout(async()=>{
-                await deleteDoc(document) 
-            }, 1000)                          
+        async removeSupplier(s){     
+            const cf=confirm(`Are you sure, you want to delete the suppliers "${s.name}" ?`)
+            if(!cf) return false;
+            this.isDeleting=true;             
+            const document=doc(db, "suppliers", s.id)     
+            await deleteDoc(document) 
         },
      
         checkAll(){
@@ -278,24 +280,33 @@ import { required, email ,helpers} from '@vuelidate/validators'
         async checkDatabase(){ 
             const query_url=query(collection(db, "suppliers"),  orderBy("created_at", "desc"));           
                 onSnapshot(query_url, async(snapShot) =>{
+
+                    const suppliers=lib.suppliers(snapShot);  
+                    this.suppliersData=suppliers;
+                    this.suppliers=this.suppliersData.slice(0,20)                    
+                    this.isLoading=false;
+
                     const dc=snapShot._snapshot.docChanges;
                     const user=this.user;
                     snapShot.docChanges().forEach((change) => {                       
                         const res=change.doc.data();   
                             if(change.type==="added" && res.edit_user.uid==user.uid && dc.length===1){
-                                    this.message("added")
+                                    this.msg.info="The new supplier has been created"
+                                    this.msg.type="success"
                                     this.resetInput();    
-                                    hp.setAutoFocus("name")     
+                                   // hp.setAutoFocus("name")     
                             }           
                             if(change.type==="modified" && res.edit_user.type=="modified" && res.edit_user.uid==user.uid){
-                                    this.message("modified")
+                                    this.msg.info="The selected supplier has been updated"
+                                    this.msg.type="success"
                             }  
-                            if(change.type==="modified" && res.edit_user.type=="removed" && res.edit_user.uid==user.uid){
-                                    this.message("removed")
+                            if(change.type==="removed"  && res.edit_user.uid==user.uid){
+                                     this.msg.info="The selected supplier has been deleted"
+                                    this.msg.type="success"
                                     this.isDeleting=false;
-                                    this.is_check_all=false;
+                                  //  this.is_check_all=false;
                                    // console.log(change.doc.id)
-                                    this.removeSupplier(change.doc.id)
+                                   // this.removeSupplier(change.doc.id)
                             }             
                     });                 
                   //  const isLocal=snapShot.metadata.formCache;                              
@@ -306,7 +317,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 onSnapshot(query_url, async(snapShot) =>{                  
                     const suppliers=lib.suppliers(snapShot);   
                     this.suppliersData=suppliers;
-                    this.searchSuppliers();
+                    this.suppliers=this.suppliersData.slice(0,20)
                     this.isLoading=false;
                     this.isUpdating=false;
             });                              
@@ -317,8 +328,8 @@ import { required, email ,helpers} from '@vuelidate/validators'
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
 
-            let isTaken=this.suppliersData.filter((f)=>f.name.toLowerCase() == this.name.toLowerCase())
-            if(isTaken.length > 0){
+            let isTaken=this.suppliersData.some((f)=>f.name.toLowerCase() == this.name.toLowerCase())
+            if(isTaken){
                 this.msg.info="This supplier name already exists"
                 this.msg.type="error"
                 this.name="";               
@@ -340,15 +351,15 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 is_deleted: false,
                 edit_user: {uid: this.user.uid, type: 'added'}         
             }      
-            const docRef=await addDoc(dataCollection, data)                          
+            await addDoc(dataCollection, data)                          
         },
            updateSuppliers(){
                this.isUpdating=true;
                this.fetchSuppliers();
            },
           async saveEdit(){    
-            let result=this.suppliersData.filter((f)=>f.id != this.editItem.id && f.name.toLowerCase().includes(this.editItem.name) )
-            if(result.length > 0){
+            let result=this.suppliersData.some((f)=>f.id != this.editItem.id && f.name.toLowerCase().includes(this.editItem.name) )
+            if(result){
                 this.msg.info="This supplier name already exists"
                 this.msg.type="error";
                 this.suppliers=this.suppliersData.map((m)=>{
@@ -386,11 +397,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                        return f.company.toLowerCase().includes(this.search_by_company.toLowerCase())
                    })
                }else{
-                   this.suppliers= this.suppliersData.filter((p, i)=>{
-                              if(i < 20){
-                                  return p;
-                              }
-                    }) 
+                   this.suppliers= this.suppliersData.slice(0,20)
                }
            },                   
            

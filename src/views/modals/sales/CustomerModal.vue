@@ -19,26 +19,28 @@
                                 </div>-->
                                 <div class="col-6 col-sm-3 col-lg-12">
                                     <div class="form-floating">
-                                        <input type="search" id="search_by_name" v-model="search_by_name" @keyup="searchCustomer" placeholder="Description" class="form-control-plaintext border-bottom">
+                                        <input type="search" id="search_by_name" v-model="search_by_name" @keypress.enter="searchCustomer" placeholder="Description" class="form-control-plaintext border-bottom">
                                         <label for="search_by_name" class="">Name</label>
                                     </div> 
                                 </div>
                                 <div class="col-6 col-sm-3 col-lg-12">
                                     <div class="form-floating">
-                                        <input type="search" id="search_by_address" v-model="search_by_address" @keyup="searchCustomer" placeholder="Address" class="form-control-plaintext border-bottom">
+                                        <input type="search" id="search_by_address" v-model="search_by_address" @keypress.enter="searchCustomer" placeholder="Address" class="form-control-plaintext border-bottom">
                                          <label for="search_by_address" class="">Address</label>
                                 </div>
                                 </div> 
-                           
-                                <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark clear-search-customer" @click="clearSearch">
-                                    <i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
+                                <div class="col-4 col-sm-3 col-lg-4 d-grid">
+                                    <button class="btn btn-sm text-dark clear-search-product" @click="searchCustomer"><i class="fa-solid fa-search"></i> Search</button>
+                                </div>
+                                <div class="col-4 col-sm-3 col-lg-4 d-grid"><button class="btn btn-sm text-dark clear-search-customer" @click="clearSearch">
+                                    <i class="fa-solid fa-filter-circle-xmark"></i> Clear </button>
                                 </div>
                                 <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateCustomer">
                                     <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
                                     <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                 </button></div>-->
-                                <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark close-customer" data-bs-dismiss="modal">
-                                    <i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
+                                <div class="col-4 col-sm-3 col-lg-4 d-grid"><button class="btn btn-sm text-dark close-customer" data-bs-dismiss="modal">
+                                    <i class="fa-solid fa-circle-xmark"></i> Close </button>
                                 </div>     
                              </div> 
                         </div>
@@ -135,20 +137,28 @@ import { required, email ,helpers} from '@vuelidate/validators'
                msg : {
                    type :"",
                    info :"",
-               }
+               },
+               unsubCustomers:null
            }
        },
-       created() {     
-           if(this.user !==null){
-               this.isLoading=true;
-               this.fetchCustomer();
-           }
-       },
+     
        mounted() {
         //const name=document.getElementById("name");
         //name.focus();
         this.code= new Date().getTime()
         this.created_at=new Date().toISOString().substr(0, 10)
+        this.isLoading=true;       
+            const myModalEl = document.getElementById('customerModal')
+            myModalEl.addEventListener('show.bs.modal', event => {
+                if(this.customersData.length===0){
+                        this.fetchCustomer();
+                }            
+            })
+       },
+       unmounted() {
+            if(this.unsubCustomers){
+                this.unsubCustomers=null
+            }
        },
        computed:{
            user(){
@@ -159,19 +169,14 @@ import { required, email ,helpers} from '@vuelidate/validators'
            }
        },
        watch:{
-           user(data){
-               if(data !==null){
-                   this.isLoading=true;
-                   this.fetchCustomer();
-               }
-           },
+          
            msg:{
                handler(val){
                    if(val.type){
                        setTimeout(()=>{
                            this.msg.type="";
                            this.msg.info="";
-                       }, 5000)
+                       }, 2000)
                    }
                },deep:true
            }
@@ -193,7 +198,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
            searchCustomer(){
                this.customers=[];
                if(this.search_by_code){
-                   this.customers=this.customersData.filter((f)=>f.code===Number(this.search_by_code))
+                   this.customers=this.customersData.filter((f)=>f.code===this.search_by_code)
                }else 
                if(this.search_by_name){
                    this.customers=this.customersData.filter((f)=>{
@@ -205,11 +210,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                        return f.address.toLowerCase().includes(this.search_by_address.toLowerCase())
                    })
                }else{
-                   this.customers= this.customersData.filter((p, i)=>{
-                              if(i < 20){
-                                  return p;
-                              }
-                          }) 
+                   this.customers= this.customersData.slice(0, 20)
                }
            },
            sortCustomers(sort){   
@@ -274,16 +275,10 @@ import { required, email ,helpers} from '@vuelidate/validators'
            
            async fetchCustomer(){                    
                const query_url = query(collection(db, "customers"), orderBy("created_at", "desc"));
-               onSnapshot(query_url, async(snapShot) =>{
-                    const isLocal=snapShot.metadata.fromCache;
-                    if(isLocal){
-                       this.isOffline="You are now in offline mode."
-                    }else{
-                        this.isOffline=false;
-                    }
+              this.unsubCustomers= onSnapshot(query_url, async(snapShot) =>{                 
                     const customers=ss.customers(snapShot)       
                     this.customersData=customers;
-                    this.searchCustomer();
+                    this.customers=this.customersData.slice(0, 20)
                     this.isLoading=false;
                     this.isUpdating=false;
             });  

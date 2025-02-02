@@ -108,7 +108,7 @@
  import PageHeader from "@/views/partials/PageHeader.vue"
  import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query, increment} from 'firebase/firestore'
+import {Timestamp, onSnapshot, collection, addDoc, getDocs, limit, doc, setDoc, where, updateDoc, orderBy, query, increment} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import ProductModal from '@/views/modals/stocks/ProductModal.vue'
 import SetQty from '@/views/modals/stocks/SetQty.vue'
@@ -313,7 +313,7 @@ export default {
             }           
         },
         async checkDatabase(){ 
-            const query_url=query(collection(db, "stocks"));           
+            const query_url=query(collection(db, "stocks"), orderBy("created_at", "desc"), limit(1));           
                 onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {    
                             if(change.type==="added"){

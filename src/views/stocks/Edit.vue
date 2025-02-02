@@ -313,7 +313,7 @@ export default {
            
         },
         async checkDatabase(){ 
-            const query_url=query(collection(db, "stocks"));           
+            const query_url=query(collection(db, "stocks"), where("voucher_no", "==", this.voucher_no));           
                 onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {    
                             if(change.type==="modified"){

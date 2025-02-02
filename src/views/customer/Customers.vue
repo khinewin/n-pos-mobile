@@ -9,12 +9,12 @@
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                     </button>
                 </div>  
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                ,<!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
                     </button>
-                </div>                           
+                </div>-->                           
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCustomer">
                         <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
@@ -34,11 +34,11 @@
                                         <label for="search_by_code" class="small ">Code</label>
                                     </div>-->
                                     <div class="form-floating col-sm-3 col-lg-12 ">
-                                        <input type="search" id="search_by_name" v-model="search_by_name" @input="inputSearchName" placeholder="Description" class="form-control-plaintext border-bottom ">
+                                        <input type="search" id="search_by_name" v-model="search_by_name" @keypress.enter="searchCustomer" placeholder="Description" class="form-control-plaintext border-bottom ">
                                         <label for="search_by_name" class="small ">Name</label>
                                     </div> 
                                     <div class="form-floating col-sm-3 col-lg-12 ">
-                                        <input type="search" id="search_by_address" v-model="search_by_address" @keyup="inputSearchAddress" placeholder="Address" class="form-control-plaintext border-bottom ">
+                                        <input type="search" id="search_by_address" v-model="search_by_address" @keypress.enter="searchCustomer" placeholder="Address" class="form-control-plaintext border-bottom ">
                                         <label for="search_by_address" class="small ">Address</label>
                                     </div> 
                                
@@ -59,7 +59,7 @@
                                    <tbody class="small">
                                        <tr class="text-center table-secondary change-cursor">
                                         <td class="col-0">
-                                            <input type="checkbox" class="form-check-input" @click="checkAll" v-model="is_check_all">
+                                            <!--<input type="checkbox" class="form-check-input" @click="checkAll" v-model="is_check_all">-->
                                         </td>
                                            <!--<td @click="sortCustomers('code')" class="col-2"><i class="fa-solid fa-sort"></i> Code</td>-->
                                            <td @click="sortCustomers('name')" class="col-4"><i class="fa-solid fa-sort"></i> Name</td>
@@ -69,7 +69,7 @@
                                        </tr>
                                        <tr>
                                         <td class="">
-                                            <input class="form-check-input" type="checkbox" @click="checkAll" v-model="is_deleted">
+                                            <!--<input class="form-check-input" type="checkbox" @click="checkAll" v-model="is_deleted">-->
                                         </td>
                                            <!--<td class="">
                                                 <input @keyperss.enter="saveCustomer"  type="text" v-model="code" class="form-control-plaintext py-0 text-center" id="code" placeholder="Code">                                                                                       
@@ -89,8 +89,10 @@
                                         </tr>
                                        
                                        <tr class="" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id">                                            
-                                        <td class="">
-                                            <input class="form-check-input" type="checkbox" v-model="p.is_deleted">
+                                        <td class="d-grid">
+                                            <button :disabled="user.uid != p.user.uid" class="btn btn-sm text-danger" @click="removeCustomer(p)"><i class="fa-solid fa-trash"></i></button>
+
+                                            <!--<input class="form-check-input" type="checkbox" v-model="p.is_deleted">-->
                                         </td>
                                            <!--<td :class="{'table-secondary': sort_item ==='code'}" class=" position-relative">
                                                 {{p.code}}
@@ -191,7 +193,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
 
         this.checkDatabase();
         this.isLoading=true;
-        this.fetchCustomer();
+      //  this.fetchCustomer();
         window.addEventListener('keydown', this.handleCtrl);
 
        },
@@ -258,19 +260,20 @@ import { required, email ,helpers} from '@vuelidate/validators'
            },100)
         },
       
-        async removeCustomer(id){           
-            const document=doc(db, "customers", id)     
-           setTimeout(async()=>{
-                await deleteDoc(document) 
-           }, 1000)
+        async removeCustomer(c){   
+            const cf=confirm(`Are you sure, you want to delete the customers "${c.name}" ?`)
+            if(!cf) return false;
+            this.isDeleting=true;        
+            const document=doc(db, "customers", c.id)     
+            await deleteDoc(document) 
           
         },
         async saveCustomer(){
          //   if(this.editItem.id) this.saveEdit();
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
-            let isTaken=this.customersData.filter((f)=>f.name.toLowerCase() == this.name.toLowerCase())
-            if(isTaken.length > 0){
+            let isTaken=this.customersData.some((f)=>f.name.toLowerCase() == this.name.toLowerCase())
+            if(isTaken){
                 this.msg.info="This customer name already exists"
                 this.msg.type="error"
                 this.name="";
@@ -302,8 +305,8 @@ import { required, email ,helpers} from '@vuelidate/validators'
                this.fetchCustomer();
         },
           async saveEdit(){         
-            let result=this.customersData.filter((f)=>f.id != this.editItem.id && f.name.toLowerCase().includes(this.editItem.name) )
-            if(result.length > 0){
+            let result=this.customersData.some((f)=>f.id != this.editItem.id && f.name.toLowerCase().includes(this.editItem.name) )
+            if(result){
                 this.msg.info="This customer name already exists"
                 this.msg.type="error";
                 this.customers=this.customersData.map((m)=>{
@@ -335,26 +338,34 @@ import { required, email ,helpers} from '@vuelidate/validators'
            async checkDatabase(){ 
             const query_url=query(collection(db, "customers"),  orderBy("created_at", "desc"));           
                 onSnapshot(query_url, async(snapShot) =>{
+
+                    const customers=ss.customers(snapShot);           
+                    this.customersData=customers;
+                    this.customers=this.customersData.slice(0,20)                    
+                    this.isLoading=false;
+
                     const dc=snapShot._snapshot.docChanges;
                     const user=this.user;
                     snapShot.docChanges().forEach((change) => {                       
                         const res=change.doc.data();   
                             if(change.type==="added" && res.edit_user.uid==user.uid && dc.length===1){
-                                    this.message("added")
+                                    this.msg.info="The new customer has been created"
+                                    this.msg.type="success"
                                     this.resetInput();    
-                                    hp.setAutoFocus("name")     
+                                    //hp.setAutoFocus("name")     
                             }           
                             if(change.type==="modified" && res.edit_user.type=="modified" && res.edit_user.uid==user.uid){
-                                    this.message("modified")
+                                   this.msg.info="The selected customer has been updated"
+                                    this.msg.type="success"
                             }  
-                            if(change.type==="modified" && res.edit_user.type=="removed" && res.edit_user.uid==user.uid){
-                                    this.message("removed")
+                            if(change.type==="removed" && res.edit_user.uid==user.uid){
+                                   this.msg.info="The selected customer has been deleted"
+                                    this.msg.type="success"
                                     this.isDeleting=false;
-                                    this.is_check_all=false;
-                                    this.removeCustomer(change.doc.id)
+                                 //   this.is_check_all=false;
+                                  //  this.removeCustomer(change.doc.id)
                             }             
                     });                 
-                    const isLocal=snapShot.metadata.formCache;                              
             });                              
         } ,
            async fetchCustomer(){                    
@@ -383,11 +394,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                        return f.address.toLowerCase().includes(this.search_by_address.toLowerCase())
                    })
                }else{
-                   this.customers= this.customersData.filter((p, i)=>{
-                              if(i < 20){
-                                  return p;
-                              }
-                          }) 
+                   this.customers= this.customersData.slice(0,20)
                }
            },          
            resetInput(){
