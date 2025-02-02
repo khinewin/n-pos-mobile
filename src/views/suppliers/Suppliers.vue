@@ -4,7 +4,7 @@
            <div class="container-fluid">
                <div class="row  justify-content-end">  
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button type="button" class="btn btn-sm" :disabled="isUpdating" @click="saveEdit">
+                    <button type="button" class="btn btn-sm" :disabled="isUpdating || Object.keys(editItem).length===0" @click="saveEdit">
                         <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                     </button>
@@ -294,16 +294,22 @@ import { required, email ,helpers} from '@vuelidate/validators'
                                     this.msg.info="The new supplier has been created"
                                     this.msg.type="success"
                                     this.resetInput();    
+                                    this.editItem={}    
+
                                    // hp.setAutoFocus("name")     
                             }           
                             if(change.type==="modified" && res.edit_user.type=="modified" && res.edit_user.uid==user.uid){
                                     this.msg.info="The selected supplier has been updated"
                                     this.msg.type="success"
+                                    this.editItem={}    
+
                             }  
                             if(change.type==="removed"  && res.edit_user.uid==user.uid){
                                      this.msg.info="The selected supplier has been deleted"
                                     this.msg.type="success"
                                     this.isDeleting=false;
+                                    this.editItem={}    
+
                                   //  this.is_check_all=false;
                                    // console.log(change.doc.id)
                                    // this.removeSupplier(change.doc.id)
