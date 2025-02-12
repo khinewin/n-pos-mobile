@@ -544,12 +544,16 @@ export default {
            this.setCustomer(this.default_customer)
         },
         setCustomer(p){
+            this.customer={};
+            this.customer=p;
+            /*
             this.customer.id=p.id;
             this.customer.name=p.name;
             this.customer.code=p.code
             this.customer.phone=p.phone
             this.customer.address=p.address
             this.customer.created_at=p.created_at
+            */
         },
         setOldCode(s){
             this.id=s.id;

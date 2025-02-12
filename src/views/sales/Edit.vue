@@ -514,12 +514,16 @@ export default {
            this.setCustomer(this.default_customer)
         },
         setCustomer(p){
+            this.customer={}
+            this.customer=p;
+            /*
             this.customer.id=p.id;
             this.customer.name=p.name;
             this.customer.code=p.code
             this.customer.phone=p.phone
             this.customer.address=p.address
             this.customer.created_at=p.created_at
+            */
         },
         setOldCode(s){
          //   this.voucher_no=s.voucher_no,
@@ -587,7 +591,7 @@ export default {
                     voucher_no: this.voucher_no,
                    sale_date: Timestamp.fromDate(sale_date),
                     products : this.saleItems,
-                    user : {uid: this.user.uid, displayName: this.user.displayName},
+                  //  user : {uid: this.user.uid, displayName: this.user.displayName},
                     total_amount:this.total_amount,
                     extra_discount:this.extra_discount ? this.extra_discount : 0,
                     net_amount: this.net_amount ,
@@ -603,7 +607,7 @@ export default {
                 if(this.saleItems.length<=0){
                     await deleteDoc(saveDocument) 
                 }else{
-                    await setDoc(saveDocument, voucher)           
+                    await updateDoc(saveDocument, voucher)           
                     this.isLoading=false;
                 }                
         },

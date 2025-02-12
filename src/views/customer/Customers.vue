@@ -346,6 +346,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
 
                     const dc=snapShot._snapshot.docChanges;
                     const user=this.user;
+                    if(dc.length > 1) return false;
                     snapShot.docChanges().forEach((change) => {                       
                         const res=change.doc.data();   
                             if(change.type==="added" && res.edit_user.uid==user.uid && dc.length===1){

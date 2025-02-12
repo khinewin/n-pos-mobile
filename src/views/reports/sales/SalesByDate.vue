@@ -219,12 +219,17 @@ export default {
                 let pur_amount=0;
                 let profit_amount=0;
                 let extra_discount=0;
-                res2.map((res)=>{
-                    sale_amount += res.final_amount;
-                    pur_amount += res.pur_amount;
-                    profit_amount += res.final_amount - res.pur_amount;
-                    extra_discount += this.code_no ? 0 : res.extra_discount;
-                })
+              // res2.map((res)=>{
+                 //   sale_amount += res.final_amount;
+                 //   pur_amount += res.pur_amount;
+                 //   profit_amount += res.final_amount - res.pur_amount;
+                   // extra_discount += this.code_no ? 0 : res.extra_discount;
+             //   }) 
+               sale_amount=res2.reduce((accu, item)=>Number(accu) + Number(item.final_amount), 0)
+               pur_amount=res2.reduce((accu, item)=>Number(accu) + Number(item.pur_amount), 0)
+               profit_amount=sale_amount - pur_amount
+              extra_discount=res2.reduce((accu, item)=>{ return  this.code_no ? Number(accu) : Number(accu) + Number(item.extra_discount)}, 0)
+
                 total_profit += profit_amount;
                 total_pur_amount += pur_amount;
                 total_sale_amount += sale_amount;

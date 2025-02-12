@@ -599,6 +599,7 @@ export default {
 
                         const dc=snapShot._snapshot.docChanges;
                          const user=this.user;
+                         if(dc.length > 1) return false;
                         //get only update doc for message
                         snapShot.docChanges().forEach((change) => {     
                             const res=change.doc.data();   

@@ -138,6 +138,14 @@ import { required, email ,helpers} from '@vuelidate/validators'
                    type :"",
                    info :"",
                },
+               default_customer: {
+                    id: 123456789,
+                    code: 123456789,
+                    name:"Default Customer",
+                    phone:"09xxxxxxxxx",
+                    address :"",
+                    created_at : Timestamp.fromDate(new Date()),
+                },
                unsubCustomers:null
            }
        },
@@ -164,9 +172,9 @@ import { required, email ,helpers} from '@vuelidate/validators'
            user(){
                return this.$store.getters.user;
            },
-           default_customer(){
+           /*default_customer(){
                 return this.$store.getters.default_customer;
-           }
+           }*/
        },
        watch:{
           
