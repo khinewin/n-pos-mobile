@@ -600,8 +600,24 @@ export default {
                 this.msg.type="error"
                 return false
             }
+            if(this.customer.code == 123456789){
+                if(this.customer.name != "Default Customer"){
+                    this.msg.info="Please select customer name again"
+                    this.msg.type="error"
+                    return false
+                }
+            }
+            if(!this.customer.name || !this.customer.code){
+                    this.msg.info="Please select customer name again"
+                    this.msg.type="error"
+                    return false                
+            }
             const isNotReady= this.saleItems.filter((f)=>!f.final_amount)
-            if(isNotReady.length) return false;            
+            if(isNotReady.length) {
+                this.msg.info="Please check  item amount"
+                this.msg.type="error"
+                return false;
+            }           
 
               this.isLoading=true;
                 this.msg.type="";
