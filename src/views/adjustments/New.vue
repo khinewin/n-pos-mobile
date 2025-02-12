@@ -61,10 +61,10 @@
                         <div class="vh-65 overflow-y-auto">
                         <table class="table table-bordered  mb-0 table-hover inside-table">
                             <tbody>
-                                <tr class="text-center fw-bold table-secondary">
-                                    <td class="col-1">Code</td>
-                                    <td class="col-2 change-cursor description"  data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Product Name (ctrl+i)</td>
-                                    <td class="col-1">Packing size</td>
+                                <tr class="text-center fw-bold table-secondary change-cursor" data-bs-toggle="modal" data-bs-target="#searchCode" >
+                                    <td class="col-1" colspan="2">Code</td>
+                                    <td class="col-2 change-cursor description"  ><i class="fa-solid fa-circle-plus"></i> Product Name (ctrl+i)</td>
+                                    <!--<td class="col-1">Packing size</td>-->
                                     <td class="col-1">Before Adj</td>
                                     <td class="col-1">Adj type</td>
                                     <td class="col-1 table-primary">Qty</td>      
@@ -73,14 +73,16 @@
                                     <td class="col-2">Remark</td>                                                                                       
                                 </tr>
                                 <tr class="" v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id"  @mouseenter="setEdit(i)">
+                                    <td>
+                                        <a class="text-danger d-block" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                        
+                                    </td>
                                     <td class="text-center position-relative ">
                                             {{st.code_no}}                                           
-                                            <a class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeStoreItem(i)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                     </td>
                                     <td class="">{{st.item_name}}</td>
-                                    <td class="">
+                                    <!--<td class="">
                                         {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
-                                    </td>
+                                    </td>-->
                                     <td class=" text-center">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.before_adj_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                     </td>
@@ -309,12 +311,19 @@ export default {
        async saveAdjustment(){
           const validattion = await this.v$.$validate()
           if(!validattion) return false;
-            this.isLoading=true;
-            this.isSaving=true;
+        
             this.msg.type="";
             this.msg.info="";
             const created_at=hp.insertDate(this.created_at)
 
+            const emptyQty=this.storeItems.filter((f)=>f.adj_qty <1)
+            if(emptyQty.length){
+                this.msg.info="Please check adjustment quantity"
+                this.msg.type="error"
+                return false;
+            }
+            this.isLoading=true;
+            this.isSaving=true;
             const voucher={
                 voucher_no: this.voucher_no,
                 created_at: Timestamp.fromDate(created_at),    

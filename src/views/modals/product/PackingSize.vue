@@ -88,7 +88,6 @@ export default {
    },   
   
    mounted() {
-    this.isLoading=true;     
    
    },
 
