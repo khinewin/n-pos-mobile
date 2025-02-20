@@ -213,8 +213,13 @@ export default {
         },
       
         async fetchPurchase(){
-            const from_date=Timestamp.fromDate(new Date(this.fromDate))
-            const to_date=Timestamp.fromDate(new Date(this.toDate))
+            const date=new Date();         
+            let fDate=new Date(this.fromDate)
+            fDate.setHours("0", "0", "0")
+            const from_date=Timestamp.fromDate(fDate)
+            let tDate=new Date(this.toDate)
+            tDate.setHours("23", "59", "59")
+            const to_date=Timestamp.fromDate(tDate)
            // console.log(from_date, to_date)
            let query_url="";
            const loc=this.location=="All" ? null : this.location;

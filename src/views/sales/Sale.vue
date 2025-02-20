@@ -518,7 +518,7 @@ export default {
 
             this.total_amount=total_amount;
             this.net_amount=this.extra_discount ? this.total_amount - this.extra_discount : this.total_amount;
-            this.credit=this.paid ? Math.abs(this.net_amount) - this.paid :  0;
+            this.credit=this.paid ? Math.abs(this.net_amount) - this.paid :  this.net_amount;
         },
         setInput(e){
            if(e.target.value==0){

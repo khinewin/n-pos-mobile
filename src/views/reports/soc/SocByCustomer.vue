@@ -256,14 +256,18 @@ export default {
             let query_url=""
             if(this.customer_code){
                 query_url = query(collection(db, "sales"), 
-                where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), where("customer.code", "==", Number(this.customer_code)), orderBy("sale_date", "desc"));
+                where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), where("customer.code", "==", Number(this.customer_code)),
+                where("credit", ">", 0),
+                 orderBy("sale_date", "desc"));
             }else{
                  query_url = query(collection(db, "sales"), 
-                 where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date", "desc"));
+                 where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), 
+                 where("credit", ">", 0),
+                 orderBy("sale_date", "desc"));
             }
             onSnapshot(query_url, (snapShot)=>{
                 let saleItems=ss.sales(snapShot);   
-                saleItems=saleItems.filter((f)=>f.credit > 0)  
+             //   saleItems=saleItems.filter((f)=>f.credit > 0)  
                 this.salesData=saleItems;
                 this.displayReports();
                 this.isLoading=false;

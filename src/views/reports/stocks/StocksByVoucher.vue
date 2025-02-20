@@ -168,8 +168,14 @@ export default {
             return hp.showTime(t)
         },
         async fetchStocks(){
-            const from_date=Timestamp.fromDate(new Date(this.fromDate))
-            const to_date=Timestamp.fromDate(new Date(this.toDate))
+            const date=new Date();         
+            let fDate=new Date(this.fromDate)
+            fDate.setHours("0", "0", "0")
+            const from_date=Timestamp.fromDate(fDate)
+            let tDate=new Date(this.toDate)
+            tDate.setHours("23", "59", "59")
+            const to_date=Timestamp.fromDate(tDate)
+            
             let query_url="";
             if(this.voucher_no.length>2){
                 query_url = query(collection(db, "stocks"),  where("voucher_no", "==", this.voucher_no))

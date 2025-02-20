@@ -191,7 +191,6 @@ export default {
         this.voucher_no=new Date().getTime();
         this.paid_date=hp.setToday();
         window.addEventListener('keydown', this.handleCtrl);
-
     },
     beforeUnmount() {
          window.removeEventListener('keydown', this.handleCtrl);
@@ -236,16 +235,15 @@ export default {
          
         },
         async checkDatabase(){ 
-            const query_url=query(collection(db, "sales"), where("customer.id", "==", this.customer.id));           
+            const query_url=query(collection(db, "sales"), where("voucher_no", "==",this.paid_for));           
                 onSnapshot(query_url, async(snapShot) =>{
-                    snapShot.docChanges().forEach((change) => {        
+                    snapShot.docChanges().forEach((change) => {   
                             if(change.type==="modified"){
-                                if(change.doc.data().voucher_no==Number(this.paid_for)){
                                         this.msg.info="Making debt payment has been saved"
                                         this.msg.type="success"                                        
                                         this.paid_amount=0;
                                         this.paid_for="";
-                                }
+                                
                             }
                     });                                              
             });                              
@@ -291,7 +289,8 @@ export default {
             }
             const id=cData[0].id;
             const saveDocument=doc(db, "sales",id)
-            await updateDoc(saveDocument, data)                   
+            this.checkDatabase();
+            await updateDoc(saveDocument, data)       
         },
        
         filterData(){
@@ -336,7 +335,7 @@ export default {
        },
     
         fetchCreditSales(){
-            const   query_url = query(collection(db, "sales"), where("customer.id","==", this.customer.id), where("payment_type", "==", "Credit"), orderBy("sale_date", "asc"));          
+            const   query_url = query(collection(db, "sales"), where("customer.id","==", this.customer.id), where("credit", ">", 0), orderBy("sale_date", "asc"));          
             onSnapshot(query_url, async(snapShot) =>{
                     const items=ss.sales(snapShot)       
                     this.saleItemsData=items;    
@@ -368,7 +367,7 @@ export default {
             this.fetchCreditSales();
             this.paid_date=hp.setToday();
             this.clearPrintData();
-            this.checkDatabase();
+         //   this.checkDatabase();
        },   
        
    

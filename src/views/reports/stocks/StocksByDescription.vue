@@ -185,8 +185,14 @@ export default {
               this.reports=[...res2];        
         },      
         async fetchStocks(){
-            const from_date=Timestamp.fromDate(new Date(this.fromDate))
-            const to_date=Timestamp.fromDate(new Date(this.toDate))
+            const date=new Date();         
+            let fDate=new Date(this.fromDate)
+            fDate.setHours("0", "0", "0")
+            const from_date=Timestamp.fromDate(fDate)
+            let tDate=new Date(this.toDate)
+            tDate.setHours("23", "59", "59")
+            const to_date=Timestamp.fromDate(tDate)
+            
             const query_url = query(collection(db, "stocks"),
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
             onSnapshot(query_url, (snapShot)=>{
