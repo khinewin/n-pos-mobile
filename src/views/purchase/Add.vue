@@ -467,15 +467,7 @@ export default {
                                     this.clearPurchaseItem(); 
                                 }
                             }
-                            if(change.type==="removed"){
-                                this.msg.type="success";
-                                this.msg.info="The voucher has been cancelled." 
-                                this.isLoading=false;
-                                this.clearPurchaseItem();
-                                setTimeout(()=>{
-                                    this.goBack();
-                                },2000)
-                            }
+                         
                     });                                              
             });                              
         } ,
