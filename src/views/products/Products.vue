@@ -603,6 +603,7 @@ export default {
                         //get only update doc for message
                         snapShot.docChanges().forEach((change) => {     
                             const res=change.doc.data();   
+                            const id=change.doc.id;
                             const edit_user=res.edit_user !=null ? res.edit_user : "";
                             if(change.type==="added" &&   edit_user.uid==user.uid &&  dc.length ===1){                               
                                     this.msg.info="The new product code has been created"
@@ -616,7 +617,7 @@ export default {
                                     this.msg.type="success"
                                     this.isUpdating=false;
                                   //  const items=this.products.filter((f)=>f.id==this.editItem.id)
-                                    this.setEdit(res)
+                                    this.setEdit({...res, id})
                             }  
                             if(change.type==="removed" && this.isDeleting){
                                     this.isDeleting=false;

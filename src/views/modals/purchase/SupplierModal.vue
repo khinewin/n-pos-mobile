@@ -123,7 +123,15 @@
                     type :"",
                     info :"",
                 },
-                unsubSuppliers:null
+                unsubSuppliers:null,
+                general_supplier: {
+                    id: 123456789,
+                    code: 123456789,
+                    name:"General Supplier",
+                    phone:"09xxxxxxxxx",
+                    company :"",
+                    created_at : Timestamp.fromDate(new Date()),
+                },
             }
         },
        
@@ -145,9 +153,7 @@
             user(){
                 return this.$store.getters.user;
             },
-            general_supplier(){
-                return this.$store.getters.general_supplier;
-            }
+           
         },
         watch:{
          
