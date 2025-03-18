@@ -123,6 +123,8 @@ import {Timestamp, collection, addDoc, onSnapshot, getDocs, doc, setDoc, where, 
 import db from '@/firebase/firestore'
 import * as lib from "@/lib/snapshot/products"
 import * as hp  from "@/lib/helper"
+import * as search from '@/lib/search'
+
 export default {   
     props:['storeItems'],
     data(){
@@ -208,13 +210,9 @@ export default {
        },
         searchProducts(){
             if(this.search_by_code){
-                this.products=this.productsData.filter((f)=>{
-                        return f.code_no==this.search_by_code;
-                })
+                this.products=search.searchByCode(this.productsData, this.search_by_code);
             }else if(this.search_by_item_name){
-                this.products=this.productsData.filter((f)=>{
-                        return f.item_name.toLowerCase().includes(this.search_by_item_name.toLowerCase())
-                })
+                this.products=search.searchByDescription(this.productsData, this.search_by_item_name);
             }else{
                 this.products= this.productsData.slice(0, 20);                                            
             }

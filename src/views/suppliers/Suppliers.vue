@@ -137,8 +137,10 @@ import { required, email ,helpers} from '@vuelidate/validators'
    import {disableNetwork ,Timestamp, collection, addDoc, setDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy, onSnapshot } from 'firebase/firestore'
    import db from '@/firebase/firestore'
    import * as lib from '@/lib/snapshot/suppliers'
-   import * as hp from '@/lib//helper'
+   import * as hp from '@/lib/helper'
    import FlatPickr from 'vue-flatpickr-component';
+   import * as search from '@/lib/search'
+
 
    export default {
        components: {
@@ -396,14 +398,10 @@ import { required, email ,helpers} from '@vuelidate/validators'
                    this.suppliers=this.suppliersData.filter((f)=>f.code===Number(this.search_by_code))
                }else 
                if(this.search_by_name){
-                   this.suppliers=this.suppliersData.filter((f)=>{
-                       return f.name.toLowerCase().includes(this.search_by_name.toLowerCase())
-                   })
+                   this.suppliers=search.searchSupplierName(this.suppliersData, this.search_by_name);
                }else 
                if(this.search_by_company){
-                   this.suppliers=this.suppliersData.filter((f)=>{
-                       return f.company.toLowerCase().includes(this.search_by_company.toLowerCase())
-                   })
+                    this.suppliers=search.searchSupplierCompany(this.suppliersData, this.search_by_company);
                }else{
                    this.suppliers= this.suppliersData.slice(0,20)
                }

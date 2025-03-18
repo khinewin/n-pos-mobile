@@ -238,6 +238,8 @@ import * as hp from "@/lib/helper"
 import * as cp from "@/lib/cal_price"
 import SetQty from '@/views/modals/stocks/SetQty.vue'
 import * as pz from "@/lib/snapshot/packingSizes"
+import * as search from "@/lib/search"
+
 
 export default {
     components: {
@@ -558,16 +560,16 @@ export default {
       
        searchProducts(){
             this.products=[];
-            if(this.search_by_code){
-                this.products=this.productsData.filter((f)=>f.code_no==this.search_by_code)
+            if(this.search_by_code){               
+                const products=search.searchByCode(this.productsData,this.search_by_code);
+                this.products=products;
                 if(this.products.length){
                     this.setEdit(this.products[0])
                 }
             }else 
-            if(this.search_by_description){
-                this.products=this.productsData.filter((f)=>{
-                    return f.item_name.toLowerCase().includes(this.search_by_description.toLowerCase())                    
-                })
+            if(this.search_by_description){           
+               const products=search.searchByDescription(this.productsData, this.search_by_description)
+               this.products=products;     
                 if(this.products.length){
                     this.setEdit(this.products[0])
                 }

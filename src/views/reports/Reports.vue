@@ -86,7 +86,7 @@
                                 <div class="col-6">
                                     <div class="mb-2 input-group">
                                         <div class="form-floating ">
-                                            <input data-bs-toggle="modal" data-bs-target="#searchCode"  type="text" class="form-control-plaintext border-bottom" id="item_name" v-model="item_name" placeholder="Code">
+                                            <input data-bs-toggle="modal" readonly data-bs-target="#searchCode"  type="text" class="form-control-plaintext border-bottom" id="item_name" v-model="item_name" placeholder="Code">
                                             <label for="item_name">Code</label>
                                         </div> 
                                         <span class="input-group-text bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
@@ -106,7 +106,7 @@
                                 <div class="col-6">
                                     <div class="input-group">
                                         <div class="form-floating">
-                                            <input data-bs-toggle="modal" data-bs-target="#searchSupplier" type="text" class="form-control-plaintext border-bottom" id="supplier" v-model="supplier.name" placeholder="Supplier">
+                                            <input data-bs-toggle="modal" readonly data-bs-target="#searchSupplier" type="text" class="form-control-plaintext border-bottom" id="supplier" v-model="supplier.name" placeholder="Supplier">
                                             <label for="supplier">Supplier</label>
                                         </div> 
                                         <span class="input-group-text  bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>  
@@ -115,7 +115,7 @@
                                 <div class="col-6">
                                     <div class="input-group mb-2">
                                         <div class="form-floating">
-                                            <input data-bs-toggle="modal" data-bs-target="#customerModal" type="text" class="form-control-plaintext border-bottom" id="customer" v-model="customer.name" placeholder="Supplier">
+                                            <input data-bs-toggle="modal" readonly data-bs-target="#customerModal" type="text" class="form-control-plaintext border-bottom" id="customer" v-model="customer.name" placeholder="Supplier">
                                             <label for="supplier">Customer</label>
                                         </div> 
                                         <span class="input-group-text  bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>  

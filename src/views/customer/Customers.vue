@@ -139,6 +139,8 @@ import { required, email ,helpers} from '@vuelidate/validators'
    import * as hp from "@/lib/helper"
    import * as ss from "@/lib/snapshot/customers"
    import FlatPickr from 'vue-flatpickr-component';
+   import * as search from "@/lib/search"
+
 
    export default {
        components: {
@@ -392,14 +394,10 @@ import { required, email ,helpers} from '@vuelidate/validators'
                    this.customers=this.customersData.filter((f)=>f.code===Number(this.search_by_code))
                }else 
                if(this.search_by_name){
-                   this.customers=this.customersData.filter((f)=>{
-                       return f.name.toLowerCase().includes(this.search_by_name.toLowerCase())
-                   })
+                    this.customers=search.searchCustomerName(this.customersData, this.search_by_name)
                }else 
                if(this.search_by_address){
-                   this.customers=this.customersData.filter((f)=>{
-                       return f.address.toLowerCase().includes(this.search_by_address.toLowerCase())
-                   })
+                    this.customers=search.searchCustomerAddress(this.customersData, this.search_by_address)
                }else{
                    this.customers= this.customersData.slice(0,20)
                }
