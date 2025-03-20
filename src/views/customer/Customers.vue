@@ -53,20 +53,20 @@
                        </div>                                                                                                           
                    </div>                        
                    <div class="col-lg-9">
-                       <div class="card shadow vh-75">
-                           <div class="card-body p-2 table-responsive">
+                       <div class="card shadow vh-75 overflow-y-auto">
+                           <div class="card-body p-2">
                                <table class="table table-bordered table-hover mb-0">
-                                   <tbody class="small">
-                                       <tr class="text-center table-secondary change-cursor">
+                                   <tbody class="small sticky-top z-3 table-secondary">
+                                       <!--<tr class="text-center table-secondary change-cursor">
                                         <td class="col-0">
-                                            <!--<input type="checkbox" class="form-check-input" @click="checkAll" v-model="is_check_all">-->
+                                            <input type="checkbox" class="form-check-input" @click="checkAll" v-model="is_check_all">
                                         </td>
-                                           <!--<td @click="sortCustomers('code')" class="col-2"><i class="fa-solid fa-sort"></i> Code</td>-->
+                                           <td @click="sortCustomers('code')" class="col-2"><i class="fa-solid fa-sort"></i> Code</td>
                                            <td @click="sortCustomers('name')" class="col-4"><i class="fa-solid fa-sort"></i> Name</td>
                                            <td @click="sortCustomers('phone')" class="col-2"><i class="fa-solid fa-sort"></i> Phone</td>
                                            <td @click="sortCustomers('address')" class="col-4"><i class="fa-solid fa-sort"></i> Address</td>
                                            <td @click="sortCustomers('created_at')" class="col-2"><i class="fa-solid fa-sort"></i> Member date</td>
-                                       </tr>
+                                       </tr>-->
                                        <tr>
                                         <td class="">
                                             <!--<input class="form-check-input" type="checkbox" @click="checkAll" v-model="is_deleted">-->
@@ -87,8 +87,9 @@
                                                 <flat-pickr @change="saveCustomer" class="form-control py-1  text-center" v-model="created_at"  :config="config" />
                                             </td>
                                         </tr>
-                                       
-                                       <tr class="" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id">                                            
+                                       </tbody>
+                                       <tbody  v-if="customers.length > 0"  >
+                                       <tr class=""v-for="(p, i) in customers" :key="p.id">                                            
                                         <td class="d-grid">
                                             <button :disabled="user.uid != p.user.uid" class="btn btn-sm text-danger" @click="removeCustomer(p)"><i class="fa-solid fa-trash"></i></button>
 
@@ -183,6 +184,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                is_deleted:false,
                is_check_all: false,
                isDeleting:false,
+               limitData: 100,
            }
        },
        created() {     
@@ -343,7 +345,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
 
                     const customers=ss.customers(snapShot);           
                     this.customersData=customers;
-                    this.customers=this.customersData.slice(0,20)                    
+                    this.customers=this.customersData.slice(0,this.limitData)                    
                     this.isLoading=false;
 
                     const dc=snapShot._snapshot.docChanges;
@@ -399,7 +401,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                if(this.search_by_address){
                     this.customers=search.searchCustomerAddress(this.customersData, this.search_by_address)
                }else{
-                   this.customers= this.customersData.slice(0,20)
+                   this.customers= this.customersData.slice(0,this.limitData)
                }
            },          
            resetInput(){

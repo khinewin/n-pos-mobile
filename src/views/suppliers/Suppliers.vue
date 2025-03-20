@@ -52,20 +52,18 @@
                       </div>                                                                                                          
                    </div>                        
                    <div class="col-lg-9">
-                       <div class="card shadow vh-75">
-                           <div class="card-body p-2 table-responsive">
+                       <div class="card shadow vh-75 overflow-y-auto">
+                           <div class="card-body p-2">
                                <table class="table table-bordered table-hover mb-0">
-                                   <tbody class="">
-                                       <tr class="text-center table-secondary change-cursor">
+                                   <tbody class="table-secondary sticky-top z-3">
+                                       <!--<tr class="text-center table-secondary change-cursor">
                                         <td class="col-0">
-                                            <!--<input type="checkbox" class="form-check-input" @click="checkAll" v-model="is_check_all">-->
                                         </td>
-                                           <!--<td  @click="sortSuppliers('code')" class="col-2"><i class="fa-solid fa-sort"></i> Code</td>-->
                                            <td @click="sortSuppliers('name')" class="col4-"><i class="fa-solid fa-sort"></i> Name</td>
                                            <td @click="sortSuppliers('phone')" class="col-2"><i class="fa-solid fa-sort"></i> Phone</td>
                                            <td @click="sortSuppliers('company')" class="col-4"><i class="fa-solid fa-sort"></i> Company</td>
                                            <td @click="sortSuppliers('created_at')" class="col-2"><i class="fa-solid fa-sort"></i> Date</td>
-                                       </tr>
+                                       </tr>-->
                                        <tr>
                                         <td class="text-center">
                                             <!--<input class="form-check-input" type="checkbox" @click="checkAll" v-model="is_deleted">-->
@@ -86,8 +84,9 @@
                                                 <flat-pickr @change="saveSupplier" class="form-control py-1  text-center" v-model="created_at"  :config="config" />
                                             </td>
                                         </tr>
-                                       
-                                       <tr class="text-center" v-if="suppliers.length > 0"  v-for="(p, i) in suppliers" :key="p.id"  >                                           
+                                       </tbody>
+                                       <tbody v-if="suppliers.length > 0">
+                                       <tr class="text-center"   v-for="(p, i) in suppliers" :key="p.id"  >                                           
                                         <td class="d-grid">
                                             <!--<input class="form-check-input" type="checkbox" v-model="p.is_deleted">-->
                                             <button :disabled="user.uid != p.user.uid" class="btn btn-sm text-danger" @click="removeSupplier(p)"><i class="fa-solid fa-trash"></i></button>
@@ -183,6 +182,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                is_deleted:false,
                is_check_all: false,
                isDeleting:false,
+               limitData: 100,
            }
        },
      
@@ -285,7 +285,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
 
                     const suppliers=lib.suppliers(snapShot);  
                     this.suppliersData=suppliers;
-                    this.suppliers=this.suppliersData.slice(0,20)                    
+                    this.suppliers=this.suppliersData.slice(0,this.limitData)                    
                     this.isLoading=false;
 
                     const dc=snapShot._snapshot.docChanges;
@@ -327,7 +327,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 onSnapshot(query_url, async(snapShot) =>{                  
                     const suppliers=lib.suppliers(snapShot);   
                     this.suppliersData=suppliers;
-                    this.suppliers=this.suppliersData.slice(0,20)
+                    this.suppliers=this.suppliersData.slice(0, this.limitData)
                     this.isLoading=false;
                     this.isUpdating=false;
             });                              
@@ -403,7 +403,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                if(this.search_by_company){
                     this.suppliers=search.searchSupplierCompany(this.suppliersData, this.search_by_company);
                }else{
-                   this.suppliers= this.suppliersData.slice(0,20)
+                   this.suppliers= this.suppliersData.slice(0,this.limitData)
                }
            },                   
            
