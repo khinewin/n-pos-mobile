@@ -208,7 +208,9 @@ export default {
             tDate.setHours("23", "59", "59")
             const to_date=Timestamp.fromDate(tDate)
 
-           let query_url="";
+           let query_url=query(collection(db, "sales"), 
+           where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date", "desc"));
+
            if(this.voucher_no.length>2){
              query_url = query(collection(db, "sales"), 
             where("voucher_no", "==", this.voucher_no));
@@ -216,10 +218,7 @@ export default {
             if(this.customer_code){
                 query_url = query(collection(db, "sales"), 
                 where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), where("customer.code", "==", Number(this.customer_code)), orderBy("sale_date", "desc"));
-            }else{
-                query_url = query(collection(db, "sales"), 
-                where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date", "desc"));
-            }           
+            }        
             onSnapshot(query_url, (snapShot)=>{
                 const saleItems=ss.sales(snapShot);            
                 this.reports=saleItems;

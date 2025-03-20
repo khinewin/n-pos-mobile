@@ -295,7 +295,6 @@ export default {
       //  this.fetchProducts();
        
       // await disableNetwork(db)
-     this.checkDatabase();
      //set print date     
          window.addEventListener('keydown', this.handleCtrl);
          const isMobile = window.matchMedia("(max-width: 1199px)").matches;
@@ -575,7 +574,7 @@ export default {
             this.customer.phone=s.customer.phone;
         },
         async checkDatabase(){ 
-            const query_url=query(collection(db, "sales"), orderBy("sale_date", "desc"), limit(1));           
+            const query_url=query(collection(db, "sales"), where("voucher_no", "==", this.voucher_no));           
                 onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {        
                             if(change.type==="added"){
@@ -645,7 +644,8 @@ export default {
                     credit: this.credit,
                     remark: this.remark,
                     payment_type: this.credit > 0 ? "Credit" : "Paid"
-                }                           
+                }                 
+                this.checkDatabase();          
                 const saveDocument=collection(db, "sales")
                 await addDoc(saveDocument, voucher)           
                         

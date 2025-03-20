@@ -277,7 +277,6 @@ export default {
         //code_no.focus();
        }, 300)
       // await disableNetwork(db)
-     this.checkDatabase();
      //set print date     
      window.addEventListener('keydown', this.handleCtrl);
      if(this.storeProducts.length){
@@ -541,8 +540,8 @@ export default {
             this.sale_type=s.sale_type
             this.credit=s.credit
             this.remark=s.remark
-            this.customer.name=s.customer.name;
-            this.customer.phone=s.customer.phone;
+            this.customer=s.customer;
+          
         },
         async checkDatabase(){ 
             const query_url=query(collection(db, "sales"), where("voucher_no", "==",this.voucher_no));           
@@ -621,7 +620,8 @@ export default {
                     credit: this.credit,
                     remark: this.remark,
                     payment_type: this.credit > 0 ? "Credit" : "Paid"
-                }                           
+                }                
+                this.checkDatabase();           
                 const saveDocument=doc(db, "sales", this.id)
                 if(this.saleItems.length<=0){
                     await deleteDoc(saveDocument) 

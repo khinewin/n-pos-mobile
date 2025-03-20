@@ -59,11 +59,11 @@
                 </tr>
                 <tr>
                     <td class="text-end fw-bold rm-b-b   border-bottom pe-2" colspan="7">Grand Total Extra Discount (Ks)</td>
-                    <td class="text-end"> {{fM(total_discount)}}</td>
+                    <td class="text-end"> {{fM(total_extra_discount)}}</td>
                 </tr>
                 <tr>
                     <td class="text-end fw-bold pe-2" colspan="7">Grand Total Profit (Ks)</td>
-                    <td class="text-end"> {{fM(total_profit - total_discount)}}</td>
+                    <td class="text-end"> {{fM(total_profit)}}</td>
                 </tr>
             </tbody>
         </table>
@@ -86,11 +86,7 @@ export default {
     data(){
         return{                  
             reports:[],
-            salesData:[],
-            total_sale_amount:0,         
-            total_pur_amount:0,
-            total_profit:0,       
-            total_discount:0,
+            salesData:[],          
             isLoading:false,
          
             msg : {
@@ -123,9 +119,24 @@ export default {
         user(){
             return this.$store.getters.user;
         },
-        report_type(){
-            return this.$store.getters.reportType;
+      
+        total_sale_amount() {
+        return this.salesData.reduce((total, sale) => total + Number(sale.total_amount), 0);
         },
+        total_pur_amount() {
+                return this.salesData.reduce((total, sale) => {
+                sale.products.forEach(product => {
+                    total += Number(product.pur_price.smallest_unit) * product.sale_qty;
+                });
+                return total;
+                }, 0);
+        },
+         total_extra_discount() {
+            return this.salesData.reduce((total, sale) => total + Number(sale.extra_discount), 0);
+        },
+        total_profit() {
+            return (this.total_sale_amount - this.total_pur_amount) - this.total_extra_discount;
+         }
       
     },
     methods:{
@@ -151,8 +162,8 @@ export default {
         },      
         displayReports(){                 
             let sales=[]
-            this.salesData.map((res)=>{                                
-                    res.products.map((data)=>{
+            this.salesData.forEach((res)=>{                                
+                    res.products.forEach((data)=>{
                         let index = sales.findIndex((item) => item.voucher_no == res.voucher_no);
                         if(index === -1){
                              sales.push({...data, group_date : hp.showTime(res.sale_date), voucher_no: res.voucher_no, extra_discount: res.extra_discount})
@@ -162,7 +173,7 @@ export default {
                     })
             })
 
-            sales=sales.map((s)=>{
+           /* sales=sales.map((s)=>{
                 return {...s, 
                     group_price: s.packing_size.largest_unit ? 
                              `${s.retail_price.largest_unit},
@@ -172,17 +183,21 @@ export default {
                              ${s.pur_price.smallest_unit}
                              `
                 }
-            })
+            })*/
+            sales = sales.map((s) => {
+                const { retail_price, pur_price, packing_size } = s; // Destructure for clarity
+                const unitType = packing_size.largest_unit ? 'largest_unit' : 'smallest_unit'; // Determine unit type
+                const group_price = `${retail_price[unitType]}, ${pur_price[unitType]}`; // Use dynamic keys
+                return { ...s, group_price }; // Return new sale with added group_price
+            });
+
 
             if(this.code_no){
                 sales=sales.filter((f)=>f.code_no === Number(this.code_no))
             }
 
             const gbd=Object.entries(hp.gb_date(sales))        
-            let total_profit=0;
-            let total_pur_amount=0;
-            let total_sale_amount=0;
-            let total_discount=0
+          
            const gbc=gbd.map((ren)=>{
                 const res1=Object.entries(hp.gb_item_name_price(ren[1]))
                 const res2=res1.map((res)=>{
@@ -214,34 +229,18 @@ export default {
                     item.extra_discount += Number(ren.extra_discount);
                 })
                 return item;
-           }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)
-                let sale_amount=0;
-                let pur_amount=0;
-                let profit_amount=0;
-                let extra_discount=0;
-              // res2.map((res)=>{
-                 //   sale_amount += res.final_amount;
-                 //   pur_amount += res.pur_amount;
-                 //   profit_amount += res.final_amount - res.pur_amount;
-                   // extra_discount += this.code_no ? 0 : res.extra_discount;
-             //   }) 
-               sale_amount=res2.reduce((accu, item)=>Number(accu) + Number(item.final_amount), 0)
-               pur_amount=res2.reduce((accu, item)=>Number(accu) + Number(item.pur_amount), 0)
-               profit_amount=sale_amount - pur_amount
-              extra_discount=res2.reduce((accu, item)=>{ return  this.code_no ? Number(accu) : Number(accu) + Number(item.extra_discount)}, 0)
-
-                total_profit += profit_amount;
-                total_pur_amount += pur_amount;
-                total_sale_amount += sale_amount;
-                total_discount += extra_discount;
+           }).sort((a,b)=>a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1)              
+           
+              let sale_amount=res2.reduce((accu, item)=>Number(accu) + Number(item.final_amount), 0)
+              let pur_amount=res2.reduce((accu, item)=>Number(accu) + Number(item.pur_amount), 0)
+              let profit_amount=sale_amount - pur_amount
+              let extra_discount=res2.reduce((accu, item)=>{ return  this.code_no ? Number(accu) : Number(accu) + Number(item.extra_discount)}, 0)
+           
                 const res4={sale_amount, pur_amount, profit_amount, extra_discount}
                 const newData=[ren[0],  [...res2],res4]    
                 return newData;                             
            })           
-           this.total_profit=total_profit;
-           this.total_pur_amount=total_pur_amount;
-           this.total_sale_amount=total_sale_amount;
-           this.total_discount =total_discount;
+          
            this.reports=gbc;        
         },   
         async fetchSales(){           
@@ -252,14 +251,13 @@ export default {
             tDate.setHours("23", "59", "59")
             const to_date=Timestamp.fromDate(tDate)
 
-           let query_url=""
+           let query_url=query(collection(db, "sales"), 
+           where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date", "desc"));
+
            if(this.customer_code){
             query_url = query(collection(db, "sales"), 
             where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), where("customer.code", "==", Number(this.customer_code)), orderBy("sale_date", "desc"));
-           }else{
-             query_url = query(collection(db, "sales"), 
-            where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date", "desc"));
-            }
+           }
             onSnapshot(query_url, (snapShot)=>{
                 const saleItems=ss.sales(snapShot)           
                 this.salesData=saleItems;

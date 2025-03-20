@@ -13,8 +13,8 @@
                     <!--<td class="col-1" v-if="sale_price"  @click="sortProducts('whole_sale_price')"> Wholesale Price</td>-->
                 </tr>   
             </tbody>  
-            <tbody>                                                  
-                <tr class="" v-if="reports.length > 0"  v-for="(p, i) in reports" :key="p.id" >                                    
+            <tbody v-if="reports.length > 0" >                                                  
+                <tr class=""  v-for="(p, i) in reports" :key="p.id" >                                    
                     <td class="text-center">{{p.code_no}}</td>
                     <td >{{p.item_name}}</td>
                     <td class="">
@@ -39,6 +39,9 @@
                 </tr>
             </tbody>
         </table>
+        <div class="d-grid mt-2" v-if="reports.length > 0 && isLoading===false && !this.code_no">
+            <button class="btn btn-primary" :disabled="isEndPagination" @click="loadMore=true, fetchProducts()"> (Current : {{reports.length}}) Load More</button>
+        </div>
         <div v-if="isLoading">
                 <div class="d-flex justify-content-center my-5">
                     <div class="spinner-border text-primary"  role="status">
@@ -49,17 +52,23 @@
     </div>
 </template>
 <script>
-    import {Timestamp, onSnapshot, collection, addDoc, query, limit, where, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore'
+    import {Timestamp, onSnapshot, collection, addDoc, query, limit,startAfter, where, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore'
     import db from '@/firebase/firestore'
     import * as lib from "@/lib/snapshot/products"
     import * as hp from '@/lib/helper'
+    import {toRaw} from 'vue'
+
     export default {
     props: ['sale_price','pur_price', 'location', 'code_no', 'gt_equal', 'lt_equal', 'packing_unit'],
     data(){
         return {
             isLoading:false,
             reports :[],
-            sortBy:"asc"
+            sortBy:"asc",
+            perPage: 500,
+            loadMore: false,
+            lastDoc:null,
+            isEndPagination:false
         }
     },
     /*created() {     
@@ -69,7 +78,6 @@
         }
     },*/
     mounted() {
-        this.isLoading=true;
         this.fetchProducts();
     },
     watch:{
@@ -80,6 +88,9 @@
             return this.$store.getters.user;
         },
        
+    },
+    beforeDestroy() {
+      if (this.unsubscribe) this.unsubscribe();
     },
     methods: {
         displayPrice(l_unit, m_unit, s_unit){
@@ -141,18 +152,30 @@
             }
        },
         async fetchProducts(){   
-            let query_url="";           
+            if(this.isLoading) return;
+            this.isLoading=true
+            let query_url=query(collection(db, "products"),orderBy("created_at", "desc"), limit(this.perPage));           
             if(this.code_no){
-                query_url = query(collection(db, "products"), where("code_no", "==", Number(this.code_no)), orderBy("created_at", "desc"));
-            }else{
-                 query_url = query(collection(db, "products"), where("is_deleted", "==", false), orderBy("created_at", "desc"), limit(20));
+                query_url = query(collection(db, "products"), where("code_no", "==", Number(this.code_no)));
             }
-           onSnapshot(query_url, (snapShot)=>{
-            const products=lib.products(snapShot)
-                this.reports=products;
+            if (this.loadMore && this.lastDoc) {
+                const lastDoc=toRaw(this.lastDoc);
+               query_url = query(collection(db, "products"),orderBy("created_at", "desc"), startAfter(lastDoc), limit(this.perPage));
+            }
+            const snapshot = await getDocs(query_url);
+            if (!snapshot.empty) {
+                this.lastDoc = snapshot.docs[snapshot.docs.length - 1]; // Save last document for next batch
+                const newProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // 🛑 Prevent duplicate data when loading more
+                this.reports = this.loadMore ? [...this.reports, ...newProducts] : newProducts;
                 this.isLoading=false;
-                this.filterProduct();
-           })                                 
+            }else{
+                this.isEndPagination=true;
+                this.isLoading=false;
+            }
+          
+                                 
        } ,
        sortProducts(sort){   
             this.sort_item=sort;
