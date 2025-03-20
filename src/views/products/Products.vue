@@ -4,6 +4,9 @@
         <div class="container-fluid">
             <div class="row  justify-content-end">   
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                    <button class="btn btn-sm">Showing {{products.length}} of {{productsData.length}}</button>
+                </div> 
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveEdit">
                         <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
@@ -281,7 +284,8 @@ export default {
             isDeleting:false,
            // deviceId:"",
            unsubProducts:null,
-           unsubPackingSizes:null
+           unsubPackingSizes:null,
+           limitItem: 100,
         }
     },
     created() {     
@@ -574,7 +578,7 @@ export default {
                     this.setEdit(this.products[0])
                 }
             }else{
-                this.products=this.productsData.slice(0, 15);
+                this.products=this.productsData.slice(0, this.limitItem);
                 if(this.products.length && Object.keys(this.editItem).length <=0){
                   this.setEdit(this.products[0])                    
              }  
@@ -594,7 +598,7 @@ export default {
                     //update  docs
                                 const products=ss.products(snapShot);   
                                 this.productsData=products;
-                                this.products=this.productsData.slice(0, 15);
+                                this.products=this.productsData.slice(0, this.limitItem);
                                 this.setEdit(this.products[0])
                                 this.isLoading=false;
                                 this.isUpdating=false;      

@@ -71,16 +71,18 @@
                             </div>
                             <div class="col-lg-8">
                                 <div class="card shadow-sm">
-                                    <div class="card-body p-2 vh-95 overflow-y-auto">
+                                    <div class="card-body p-0 vh-100 overflow-y-auto">
                                         <table class="table table-bordered mb-0 table-hover text-nowrap text-break">
-                                            <tbody class="small">
-                                                <tr class="table-secondary text-center fw-bold">
+                                            <thead>
+                                                <tr class="table-secondary text-center fw-bold sticky-top z-3">
                                                     <td class="col-1">Code</td>
                                                     <td class="col-2">Product Name</td>
                                                     <td class="col-1">Packing size</td>
                                                     <td class="col-1">Mart Inv Bal</td>
                                                     <!--<td class="col-1">Main Inv Bal</td>-->
-                                                </tr>                                      
+                                                </tr>    
+                                                </thead>
+                                                <tbody class="small">                                  
                                                 <tr class="change-cursor" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)" >
                                                     <td class="text-center">{{p.code_no}}</td>
                                                     <td>{{p.item_name}}</td>
@@ -135,6 +137,7 @@ export default {
             search_by_item_name:"",
             isUpdating:false,
             isLoading:false,
+            limitData: 100,
         }
     },   
     mounted() {
@@ -214,7 +217,7 @@ export default {
             }else if(this.search_by_item_name){
                 this.products=search.searchByDescription(this.productsData, this.search_by_item_name);
             }else{
-                this.products= this.productsData.slice(0, 20);                                            
+                this.products= this.productsData.slice(0, this.limitData);                                            
             }
         },
       
@@ -223,7 +226,7 @@ export default {
         onSnapshot(query_url, async(snapShot) =>{                  
                     let products=lib.products(snapShot)      
                     this.productsData=products;
-                    this.products=this.productsData.slice(0, 20)
+                    this.products=this.productsData.slice(0, this.limitData)
                     this.isLoading=false;
                     this.isUpdating=false;
             });        

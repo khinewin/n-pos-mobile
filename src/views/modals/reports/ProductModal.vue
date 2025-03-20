@@ -45,17 +45,19 @@
                                 </div>                                
                             </div>
                             <div class="col-lg-9">
-                                <div class="card shadow-sm vh-95 overflow-y-auto">
-                                    <div class="card-body p-2">
+                                <div class="card  shadow-sm vh-100 overflow-y-auto">
+                                    <div class="card-body p-0">
                                         <table class="table table-bordered mb-0 table-hover">
-                                            <tbody class="small">
-                                                <tr class="table-secondary text-center fw-bold">
+                                            <thead>
+                                                <tr class="table-secondary text-center fw-bold sticky-top z-3">
                                                     <td class="col-1">Code</td>
                                                     <td class="col-2">Product Name</td>
                                                     <td class="col-1">Packing size</td>
                                                     <td class="col-1">Mart Inv Bal</td>
                                                     <!--<td class="col-1">Main Inv Bal</td>-->
-                                                </tr>                                      
+                                                </tr>
+                                                </thead>
+                                                <tbody class="small">                                      
                                                 <tr class="change-cursor" data-bs-dismiss="modal" v-if="products.length > 0"  v-for="p in products" :key="p.id" @click="setCode(p)"   style="cursor:context-menu">
                                                     <td class="text-center">{{p.code_no}}</td>
                                                     <td>{{p.item_name}}</td>
@@ -110,6 +112,7 @@ export default {
             isUpdating:false,
             isLoading:false,
             unsubProducts:null,
+            limitData: 100,
         }
     },   
     mounted() {
@@ -181,7 +184,7 @@ export default {
                         return f.item_name.toLowerCase().includes(this.search_by_item_name.toLowerCase())
                 })
             }else{
-                this.products= this.productsData.slice(0, 20);                             
+                this.products= this.productsData.slice(0, this.limitData);                             
             }
         },
       
@@ -190,7 +193,7 @@ export default {
        this.unsubProducts= onSnapshot(query_url, async(snapShot) =>{                  
                     let products=lib.products(snapShot)       
                     this.productsData=products;
-                    this.products=this.productsData.slice(0, 15)
+                    this.products=this.productsData.slice(0, this.limitData)
                     this.isLoading=false;
             });        
        
