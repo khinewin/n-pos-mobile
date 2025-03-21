@@ -65,7 +65,7 @@
             isLoading:false,
             reports :[],
             sortBy:"asc",
-            perPage: 500,
+            perPage: 100,
             loadMore: false,
             lastDoc:null,
             isEndPagination:false
@@ -166,10 +166,12 @@
             if (!snapshot.empty) {
                 this.lastDoc = snapshot.docs[snapshot.docs.length - 1]; // Save last document for next batch
                 const newProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
                 // 🛑 Prevent duplicate data when loading more
                 this.reports = this.loadMore ? [...this.reports, ...newProducts] : newProducts;
                 this.isLoading=false;
+                if(newProducts.length < this.perPage){
+                    this.isEndPagination=true;
+                }
             }else{
                 this.isEndPagination=true;
                 this.isLoading=false;

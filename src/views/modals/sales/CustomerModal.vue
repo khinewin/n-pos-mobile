@@ -48,16 +48,18 @@
                    </div>                        
                    <div class="col-lg-9">
                        <div class="card shadow-sm">
-                           <div class="card-body p-2 vh-95 overflow-y-auto">
+                           <div class="card-body p-0 vh-100 overflow-y-auto">
                                <table class="table table-bordered table-hover mb-0">
                                    <tbody class="small">
-                                       <tr class="text-center table-secondary fw-bold" >
+                                       <tr class="text-center table-secondary fw-bold sticky-top z-3" >
                                            <!--<td class="col-1" @click="sortCustomers('code')"><i class="fa-solid fa-sort"></i> Code</td>-->
                                            <td @click="sortCustomers('name')" class="col-1"><i class="fa-solid fa-sort"></i> Name</td>
                                            <td class="col-1" @click="sortCustomers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
                                            <td class="col-1" @click="sortCustomers('address')"><i class="fa-solid fa-sort"></i> Address</td>
                                            <td class="col-1" @click="sortCustomers('created_at')"><i class="fa-solid fa-sort"></i> Member date</td>
                                        </tr>
+                                   </tbody>
+                                   <tbody>
                                      <tr @click="setCustomer(default_customer)" data-bs-dismiss="modal" class="change-cursor">
                                         <!--<td class="text-center">{{default_customer.code}}</td>-->
                                         <td>{{default_customer.name}}</td>
@@ -148,7 +150,8 @@ import { required, email ,helpers} from '@vuelidate/validators'
                     address :"",
                     created_at : Timestamp.fromDate(new Date()),
                 },
-               unsubCustomers:null
+               unsubCustomers:null,
+               limitData: 50,
            }
        },
      
@@ -216,7 +219,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                if(this.search_by_address){
                 this.customers=search.searchCustomerAddress(this.customersData, this.search_by_address)
                }else{
-                   this.customers= this.customersData.slice(0, 20)
+                   this.customers= this.customersData.slice(0, this.limitData)
                }
            },
            sortCustomers(sort){   
@@ -284,7 +287,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
               this.unsubCustomers= onSnapshot(query_url, async(snapShot) =>{                 
                     const customers=ss.customers(snapShot)       
                     this.customersData=customers;
-                    this.customers=this.customersData.slice(0, 20)
+                    this.customers=this.customersData.slice(0, this.limitData)
                     this.isLoading=false;
                     this.isUpdating=false;
             });  

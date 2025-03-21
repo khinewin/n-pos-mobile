@@ -29,7 +29,8 @@ import { products } from '@/lib/snapshot/products';
     wrap: true, // set wrap to true only when using 'input-group'
   },  
     products:[],
-    packingSizes:[]
+    packingSizes:[],
+    printData:{}
   },
 
   getters: {
@@ -39,6 +40,7 @@ import { products } from '@/lib/snapshot/products';
     flat_pickr_config:state=>state.flat_pickr_config,
     products:state=>state.products,
     packingSizes:state=>state.packingSizes,
+    printData:state=>state.printData
   },
 
   mutations: {
@@ -50,6 +52,9 @@ import { products } from '@/lib/snapshot/products';
         },
         SET_PACKING_SIZES(state, payload){
           state.packingSizes=payload;
+        },
+        SET_PRINT_DATA(state, payload){
+          state.printData=payload;
         }
       
   },
@@ -63,6 +68,9 @@ import { products } from '@/lib/snapshot/products';
         },
         setPackingSizes(context, payload){
           context.commit("SET_PACKING_SIZES", payload)
+        },
+        setPrintData(context, payload){
+          context.commit("SET_PRINT_DATA", payload)
         }
      
   },

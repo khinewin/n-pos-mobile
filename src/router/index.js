@@ -10,6 +10,8 @@ import Stocks from '@/views/stocks/Stocks.vue'
 import NewStocks from '@/views/stocks/New.vue'
 import EditStocks from '@/views/stocks/Edit.vue'
 import Sale from '@/views/sales/Sale.vue'
+import MobileSale from '@/views/sales/MobileSale.vue'
+import MobilePrint from '@/views/sales/MobilePrint.vue'
 import Suppliers from '@/views/suppliers/Suppliers.vue'
 import PrintSale from '@/views/sales/Print.vue'
 import Reports from '@/views/reports/Reports.vue'
@@ -93,7 +95,18 @@ const router = createRouter({
       name: 'Sale',     
       component: Sale,
       meta : {title: "N-POS | Sale"}
-
+    },
+    {
+      path: '/mobile/sale',
+      name: 'MobileSale',     
+      component: MobileSale,
+      meta : {title: "N-POS | Sale"}
+    },
+    {
+      path: '/mobile/print',
+      name: 'MobilePrint',     
+      component: MobilePrint,
+      meta : {title: "N-POS | Print"}
     },
     {
       path: '/sale/:id/edit',
