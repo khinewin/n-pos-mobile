@@ -52,8 +52,8 @@
                         <div class="vh-65 overflow-y-auto">
                         <table class="table table-bordered  mb-0 table-hover">
                             <tbody>
-                                <tr class="text-center fw-bold table-secondary">
-                                    <td class="col-1">Code</td>
+                                <tr class="text-center fw-bold table-secondary sticky-top z-3">
+                                    <td class="col-1" colspan="2">Code</td>
                                     <td class="col-2 change-cursor description"  data-bs-toggle="modal" data-bs-target="#searchCode" ><i class="fa-solid fa-circle-plus"></i> Product Name (ctrl+i)</td>
                                     <td class="col-1">Packing Size</td>
                                     <!--<td class="col-1 table-info">Main Inv Bal</td>-->     
@@ -62,12 +62,13 @@
                                     <td class="col-1 table-primary">Sale Price</td>
                                     <!--<td class="col-1 table-primary">Wholesale price</td>-->                                  
                                 </tr>
-                                <tr class="" v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id" @mouseenter="setEdit(i)" >
+                                </tbody>
+                                <tbody>
+                                <tr class="" v-if="storeItems.length > 0" v-for="(st, i) in storeItems.filter((f)=>!f.is_remove)" :key="st.id" @mouseclick="setEdit(i)" >
                                     <td class="text-center">
-                                        <div class="position-relative">
-                                            {{st.code_no}}                                           
-                                        </div>                                    
+                                        <button type="button" @click="removeStockitems(st)" class="btn btn-sm text-danger" ><i class="fa-solid fa-square-minus"></i></button>
                                     </td>
+                                    <td class="text-center"> {{st.code_no}}</td>
                                     <td class="">{{st.item_name}}</td>
                                     <td class="">
                                         {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
@@ -153,7 +154,7 @@ export default {
     mounted() {
         this.voucher_no=this.$route.params.id;
         this.fetchStock();
-        this.checkDatabase();
+      //  this.checkDatabase();
         window.addEventListener('keydown', this.handleCtrl);
 
     },  
@@ -230,6 +231,15 @@ export default {
             }
         })
         },
+        removeStockitems(s){
+            this.storeItems=this.storeItems.map((f)=>{
+                if(f.id==s.id){
+                    return {...f, is_remove: true}
+                }else{
+                    return f;
+                }
+            })
+        },
         saveQty(){
             const e=this.editItem;
                 let main_qty=0;
@@ -293,9 +303,6 @@ export default {
         },
             
       
-        removeStoreItem(i){
-            this.storeItems.splice(i, 1)
-        },
         storingItem(){           
             this.storeItems.push(this.stock_item)   
          },
@@ -333,6 +340,7 @@ export default {
             this.isLoading=true;       
             
             this.updateProducts();
+            this.updateStoreItem();
             
             const created_at=hp.insertDate(this.created_at)
             const voucher={
@@ -342,9 +350,21 @@ export default {
                 user : {uid: this.user.uid, displayName:this.user.displayName},  
                 remark: this.remark,        
             }     
-            this.isLoading=false;
+            this.checkDatabase();
             const saveDocument=doc(db, "stocks", this.id)
-            await updateDoc(saveDocument, voucher)                     
+            if(this.storeItems.length <=0){
+                await deleteDoc(saveDocument);
+            }else{
+                await updateDoc(saveDocument, voucher)                    
+            }
+        },
+        updateStoreItem(){
+            const updateStore=this.storeItems.filter((f)=>{
+                if(!f.is_remove){
+                    return f;
+                }
+            })
+            this.storeItems=updateStore;
         },
         updateProducts(){
             this.storeItems.map(async (p)=>{

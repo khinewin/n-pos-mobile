@@ -172,7 +172,7 @@ export default {
     mounted() {         
         this.voucher_no=this.setVoucherNo();
         this.created_at=hp.setToday();
-        this.checkDatabase();
+        //this.checkDatabase();
         window.addEventListener('keydown', this.handleCtrl);
 
     },
@@ -313,7 +313,7 @@ export default {
             }           
         },
         async checkDatabase(){ 
-            const query_url=query(collection(db, "stocks"), orderBy("created_at", "desc"), limit(1));           
+            const query_url=query(collection(db, "stocks"), where("voucher_no", "==", this.voucher_no));           
                 onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {    
                             if(change.type==="added"){
@@ -345,6 +345,7 @@ export default {
                 user : {uid: this.user.uid, displayName: this.user.displayName},        
                 remark:this.remark,      
             }      
+            this.checkDatabase();
             const saveDocument=collection(db, "stocks")
             await addDoc(saveDocument, voucher)                                                  
         },

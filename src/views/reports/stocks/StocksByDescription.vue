@@ -36,12 +36,15 @@
                             {{displayPrice(p.whole_sale_price.largest_unit, p.whole_sale_price.medium_unit, p.whole_sale_price.smallest_unit)}}
                     </td>-->
                     </tr>
-                    <tr>
-                        <td :colspan="[location=='All' ? 5 : 4]" class="text-end fw-bold pe-2">Total Amount (Ks)</td>                        
-                        <td class="text-end">{{fM(total_retail_amount)}}</td>
-                        <!--<td class="text-end">{{fM(total_whole_sale_amount)}}</td>-->
-                    </tr>
+                   
                
+            </tbody>
+            <tbody class="table-group-divider" v-if="reports.length > 0">
+                <tr>
+                    <td :colspan="[location=='All' ? 5 : 4]" class="text-end fw-bold pe-2">Total Amount (Ks)</td>                        
+                    <td class="text-end">{{fM(total_retail_amount)}}</td>
+                    <!--<td class="text-end">{{fM(total_whole_sale_amount)}}</td>-->
+                </tr>
             </tbody>
         </table>
         <div v-if="isLoading">
