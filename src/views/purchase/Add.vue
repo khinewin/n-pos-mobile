@@ -251,7 +251,7 @@ export default {
     },
     mounted() {           
         this.voucher_no=this.setVoucherNo();
-        this.checkDatabase();      
+     //   this.checkDatabase();      
         this.pur_date=hp.setToday()
         window.addEventListener('keydown', this.handleCtrl);
         this.setSupplier(this.general_supplier)
@@ -455,7 +455,7 @@ export default {
             }           
         },
         async checkDatabase(){ 
-            const query_url=query(collection(db, "purchases"), orderBy("pur_date", "desc"), limit(1));           
+            const query_url=query(collection(db, "purchases"), where("voucher_no", "==", this.voucher_no));           
                 onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {    
                             if(change.type==="added"){
@@ -497,6 +497,7 @@ export default {
                 balance: this.balance,
                 remark: this.remark,
             }                 
+            this.checkDatabase();
             const saveDocument=collection(db, "purchases")
             await addDoc(saveDocument, voucher)
                                                
