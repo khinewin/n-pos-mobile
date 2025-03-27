@@ -19,6 +19,7 @@
     "bootstrap": "^5.3.3",
     "firebase": "^10.12.5",
     "flatpickr": "^4.6.13",
+    "html5-qrcode": "^2.3.8",
     "vue": "^3.4.29",
     "vue-flatpickr-component": "^11.0.5",
     "vue-google-charts": "^1.1.0",

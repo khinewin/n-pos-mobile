@@ -4,6 +4,12 @@
         <div class="container-fluid">
             <div class="row  justify-content-end">   
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                    <div class="form-check form-switch  d-flex justify-content-center">
+                        <input class="form-check-input" @change="setCamera" v-model="useCamera" type="checkbox" role="switch" id="useCamera">
+                        <label class="form-check-label ms-1" for="useCamera">Camera</label>
+                      </div>
+                </div>
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button class="btn btn-sm">Showing {{products.length}} of {{productsData.length}}</button>
                 </div> 
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
@@ -37,7 +43,7 @@
                         <div class="card-body p-2">
                             <div class="row g-2">
                                 <div class="form-floating col-sm-3 col-lg-12">
-                                    <input type="search" id="search_by_code" v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
+                                    <input type="search" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
                                     <label for="search_by_code" class="small">Code</label>
                                 </div>
                                 <div class="form-floating col-sm-3 col-lg-12">
@@ -52,7 +58,8 @@
                                     <div class="col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
                              </div> 
                         </div>
-                    </div>       
+                    </div>     
+                  
                                                                                                                 
                 </div>                        
                 <div class="col-md-7 col-lg-5">
@@ -69,8 +76,8 @@
                                                   </div>
                                                 <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" @click="checkAll" v-model="is_deleted">-->
                                             </td>
-                                            <td class="p-0 col-3">
-                                                <input placeholder="Code"  type="text" v-model="code_no" class="form-control py-1  text-center">
+                                            <td class="p-0 col-3" @click="initScanner(isNew=true)">
+                                                <input placeholder="Code" :readonly="useCamera"  type="text" v-model="code_no" class="form-control py-1  text-center">
                                             </td>
                                             <td class="p-0 col-9">
                                                 <input  id="item_name" placeholder="Product Name" @keypress.enter="saveCode"   type="text" v-model="item_name" class="form-control py-1">                                            </td>                                     
@@ -93,9 +100,9 @@
                                             </div>-->
                                             <button :disabled="p.user.uid != user.uid" class="btn btn-sm text-danger d-block" @click="removeProduct(p)"><i class="fa-solid fa-trash"></i></button>
                                         </td>                                 
-                                        <td :class="{'table-secondary': sort_item ==='code_no'}" class=" p-0">
+                                        <td :class="{'table-secondary': sort_item ==='code_no'}" class=" p-0" @click="initScanner(isNew=false)" >
                                             <span>
-                                                <input v-if="editItem.id==p.id"  @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1 text-center " v-model="p.code_no">
+                                                <input v-if="editItem.id==p.id"   :readonly="useCamera"  @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1 text-center " v-model="p.code_no">
                                                 <div v-else class="py-1" @click="setEdit(p)">{{p.code_no}}</div>
                                             </span>
                                         </td>
@@ -224,6 +231,16 @@
         <SetQty :ei="editItem" @saveQty="saveQty" />
         <PackingSizeModal @setMsg="setMsg" :packingSizes="packingSizes" />
         <SelectPackingSizeModal @setPackingSize="setPackingSize" :ei="editItem" :packingSizes="packingSizes" />
+          <!-- Barcode Modal -->
+          <div class="modal fade" id="barcodeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">                
+                <div class="modal-body">
+                    <div id="reader" class="img-fluid"></div>
+                </div>               
+            </div>
+            </div>
+        </div>
 </div>   
  
 </template>
@@ -231,7 +248,7 @@
 import PageHeader from "@/views/partials/PageHeader.vue"
 import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {Timestamp,onSnapshot, collection, addDoc, query, where, setDoc, getDocs, doc, updateDoc, orderBy, deleteDoc} from 'firebase/firestore'
+import {Timestamp,onSnapshot, collection, addDoc, query, where, setDoc, getDocs, doc, updateDoc, limit, orderBy, deleteDoc} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import Footer from '@/views/partials/Footer.vue'
 import * as ss from "@/lib/snapshot/products"
@@ -242,6 +259,7 @@ import * as cp from "@/lib/cal_price"
 import SetQty from '@/views/modals/stocks/SetQty.vue'
 import * as pz from "@/lib/snapshot/packingSizes"
 import * as search from "@/lib/search"
+import { Html5QrcodeScanner, Html5Qrcode } from "html5-qrcode";
 
 
 export default {
@@ -286,18 +304,22 @@ export default {
            unsubProducts:null,
            unsubPackingSizes:null,
            limitItem: 100,
+           useCamera: false,
+           scannerActive: false,
         }
     },
     created() {     
       
     },
     mounted() {
-        const code_no=document.getElementById("search_by_code");
-      //  code_no.focus();
+
+        let camera=localStorage.getItem("camera");
+        this.useCamera=camera=="false" ? false : true;
+       
         this.isLoading=true;
      
         window.addEventListener('keydown', this.handleCtrl);
-       this.checkDatabase();
+      this.checkDatabase();
        this.fetchPackingSizes();
     },
     unmounted() {
@@ -329,7 +351,47 @@ export default {
         }
     },
 
-    methods:{        
+    methods:{
+        setCamera(){           
+            localStorage.setItem("camera", this.useCamera)           
+           
+        },
+        initScanner(isNew, camera=true) {
+            if(!this.useCamera) return false;
+            if(this.scannerActive) return false;
+
+            const myModal = new bootstrap.Modal('#barcodeModal', {
+            keyboard: false
+            })
+            myModal.show();
+            
+           
+            const isMobile = window.matchMedia("(max-width: 1199px)").matches;
+            this.scannerActive=true;
+
+            const html5QrCode = new Html5Qrcode("reader");
+               
+                const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+                    /* handle success */
+                    this.scannerActive=false;
+                    if(isNew){
+                        this.code_no=decodedText
+                    }else{
+                        this.editItem.code_no=decodedText
+                        this.saveEdit();
+                    }                                       
+                    html5QrCode.stop();
+                    myModal.hide();
+                };
+                
+                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+                // If you want to prefer front camera
+                if(!isMobile){
+                    html5QrCode.start({ facingMode: "user" }, config, qrCodeSuccessCallback);
+                }else{
+                    html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+                }
+        },        
         setMsg(info, type){
             this.msg.type=type;
             this.msg.info=info
@@ -593,7 +655,7 @@ export default {
         })
        },
         async checkDatabase(){
-            const query_url=query(collection(db, "products"), orderBy("created_at", "desc"));           
+            const query_url=query(collection(db, "products"), orderBy("created_at", "desc"), limit(20));           
              this.unsubProducts= onSnapshot(query_url, async(snapShot) =>{                    
                     //update  docs
                                 const products=ss.products(snapShot);   

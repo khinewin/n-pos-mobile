@@ -1,14 +1,14 @@
 <template>
     <div class="">           
             <div class="row g-1 vh-100">                   
-                <div class="col-sm-6 bg-primary bg-gradient d-none d-sm-block"> 
+                <div class="col-md-6 bg-primary bg-gradient d-none d-sm-block"> 
                     <div class="row g-0 vh-100 justify-content-center">
                             <div class="col-sm-10 col-lg-8 align-self-center">
                                 <Welcome :isCheckAuth="isCheckAuth" />
                             </div>
                     </div>           
                 </div>                
-                <div class="col-sm-6  align-self-center container-fluid">
+                <div class="col-md-6  align-self-center container-fluid">
                         <div class="row justify-content-center">
                             <div class="col-sm-10 col-md-8">     
                                 <div class="text-center">
