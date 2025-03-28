@@ -129,37 +129,37 @@
                             <div class="h5  mb-2 change-cursor" @click="showDelete=!showDelete">Delete</div>
                             <div class="row g-2" v-if="showDelete">                                   
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="products.length <=0" @click="deleteProducts" class="btn py-4 btn-danger">Product Code ({{products.length}})</button>
+                                    <button :disabled="products.length <=0" @click="deleteProducts" class="btn py-4 btn-danger" >Product Code ({{products.length}})</button>
                                 </div>
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="sales.length <=0" @click="deleteSales" class="btn py-4 btn-danger">Sales ({{sales.length}})</button>
+                                    <button :disabled="sales.length <=0" @click="deleteSales" class="btn py-4 btn-danger" >Sales ({{sales.length}})</button>
                                 </div>
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="purchases.length <=0" @click="deletePurchases" class="btn py-4 btn-danger">Purchases ({{purchases.length}})</button>
+                                    <button :disabled="purchases.length <=0" @click="deletePurchases" class="btn py-4 btn-danger" >Purchases ({{purchases.length}})</button>
                                 </div>
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="stocks.length <=0" @click="deleteStocks" class="btn py-4 btn-danger">Stocks ({{stocks.length}})</button>
+                                    <button :disabled="stocks.length <=0" @click="deleteStocks" class="btn py-4 btn-danger" >Stocks ({{stocks.length}})</button>
                                 </div>
                                 <!--<div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="transfers.length <=0" @click="deleteTransfers" class="btn py-4 btn-danger">Transfers ({{transfers.length}})</button>
+                                    <button :disabled="transfers.length <=0" @click="deleteTransfers" class="btn py-4 btn-danger" >Transfers ({{transfers.length}})</button>
                                 </div>-->
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="adjustments.length <=0" @click="deleteAdjustments" class="btn py-4 btn-danger">Adjustments ({{adjustments.length}})</button>
+                                    <button :disabled="adjustments.length <=0" @click="deleteAdjustments" class="btn py-4 btn-danger" >Adjustments ({{adjustments.length}})</button>
                                 </div>
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="suppliers.length <=0" @click="deleteSuppliers" class="btn py-4 btn-danger">Suppliers ({{suppliers.length}})</button>
+                                    <button :disabled="suppliers.length <=0" @click="deleteSuppliers" class="btn py-4 btn-danger" >Suppliers ({{suppliers.length}})</button>
                                 </div>
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="customers.length <=0" @click="deleteCustomers" class="btn py-4 btn-danger">Customers ({{customers.length}})</button>
+                                    <button :disabled="customers.length <=0" @click="deleteCustomers" class="btn py-4 btn-danger" >Customers ({{customers.length}})</button>
                                 </div>
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="packingSizes.length <=0" @click="deletePackingSizes" class="btn py-4 btn-danger">Packing Size ({{packingSizes.length}})</button>
+                                    <button :disabled="packingSizes.length <=0" @click="deletePackingSizes" class="btn py-4 btn-danger" >Packing Size ({{packingSizes.length}})</button>
                                 </div>
                                 <!--<div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="returnIn.length <=0" @click="deleteReturnIn" class="btn py-4 btn-danger">Return In ({{returnIn.length}})</button>
+                                    <button :disabled="returnIn.length <=0" @click="deleteReturnIn" class="btn py-4 btn-danger" >Return In ({{returnIn.length}})</button>
                                 </div>
                                 <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="returnOut.length <=0" @click="deleteReturnOut" class="btn py-4 btn-danger">Return Out ({{returnOut.length}})</button>
+                                    <button :disabled="returnOut.length <=0" @click="deleteReturnOut" class="btn py-4 btn-danger" >Return Out ({{returnOut.length}})</button>
                                 </div>-->
                         </div>
                         </div>
@@ -243,7 +243,7 @@ export default {
     watch:{
         msg:{
             handler(val){
-                if(val.type){
+                if(val.type== "success"){
                     setTimeout(()=>{
                         this.msg.type="";
                         this.msg.info="";
@@ -273,39 +273,54 @@ export default {
     },
     
     methods:{
-
+        deleteData(data, collection){
+        data.map((d, i)=>{
+            setTimeout(async ()=>{
+                const document=doc(db, collection, d.id)     
+                await deleteDoc(document)     
+                this.msg.info=i+1==data.length?`${collection} data has been deleted on the server`:`Deleting ${collection} data (${data.length - 1 - i})...`
+                this.msg.type="error" 
+                if(i+1 == data.length){
+                   setTimeout(()=>{
+                    this.msg.info="";
+                    this.msg.type=""    
+                   }, 3000)
+                }
+            }, 100 * i)
+        })
+        },
         deleteProducts(){
-            ie.deleteData(this.products, "products")
+            this.deleteData(this.products, "products")
         },
         deleteSales(){
-            ie.deleteData(this.sales, "sales")
+            this.deleteData(this.sales, "sales")
         },
         deletePurchases(){
-            ie.deleteData(this.purchases, "purchases")
+            this.deleteData(this.purchases, "purchases")
         },
         deleteStocks(){
-            ie.deleteData(this.stocks, "stocks")
+            this.deleteData(this.stocks, "stocks")
         },
         deleteTransfers(){
-            ie.deleteData(this.transfers, "transfers")
+            this.deleteData(this.transfers, "transfers")
         },
         deleteAdjustments(){
-            ie.deleteData(this.adjustments, "adjustments")
+            this.deleteData(this.adjustments, "adjustments")
         },
         deletePackingSizes(){
-            ie.deleteData(this.packingSizes, "packingSizes")
+            this.deleteData(this.packingSizes, "packingSizes")
         },
         deleteSuppliers(){
-            ie.deleteData(this.suppliers, "suppliers")
+            this.deleteData(this.suppliers, "suppliers")
         },
         deleteCustomers(){
-            ie.deleteData(this.customers, "customers")
+            this.deleteData(this.customers, "customers")
         },
         deleteReturnIn(){
-            ie.deleteData(this.returnIn, "returnIn")
+            this.deleteData(this.returnIn, "returnIn")
         },
         deleteReturnOut(){
-            ie.deleteData(this.returnOut, "returnOut")
+            this.deleteData(this.returnOut, "returnOut")
         },
         
 
@@ -486,12 +501,13 @@ export default {
             const from_date=Timestamp.fromDate(hp.searchFromDate(this.from_date))
              const to_date=Timestamp.fromDate(hp.searchToDate(this.to_date))     
             const query_url = query(collection(db, "sales"), where("sale_date", ">=", from_date), where("sale_date", "<=", to_date));
-            onSnapshot(query_url, async(snapShot) =>{                                 
+           const unsub=onSnapshot(query_url, async(snapShot) =>{                                 
                         let sales=hp_sales.sales(snapShot)  
                         sales=sales.map((p)=>{
                             return {...p, sale_date: new Date(p.sale_date.toDate())}
                         })
                        this.sales=sales;
+                       unsub();
                 });              
      },
     
@@ -499,109 +515,119 @@ export default {
             const from_date=Timestamp.fromDate(hp.searchFromDate(this.from_date))
              const to_date=Timestamp.fromDate(hp.searchToDate(this.to_date))     
             const query_url = query(collection(db, "purchases"), where("pur_date", ">=", from_date), where("pur_date", "<=", to_date));
-            onSnapshot(query_url, async(snapShot) =>{                  
+            const unsub=onSnapshot(query_url, async(snapShot) =>{                  
                         let purchases=hp_purchases.purchases(snapShot)  
                         purchases=purchases.map((p)=>{
                             return {...p, pur_date: new Date(p.pur_date.toDate())}
                         })
                        this.purchases=purchases;
+                       unsub();
                 });              
         },
 
         fetchProducts(){       
             const query_url = query(collection(db, "products"));
-            onSnapshot(query_url, async(snapShot) =>{                  
+            const unsub= onSnapshot(query_url, async(snapShot) =>{                  
                         let products=hp_products.products(snapShot)  
                         products=products.map((p)=>{
                             return {...p, created_at: new Date(p.created_at.toDate())}
                         })
                        this.products=products;
+                       unsub();
                 });              
         },
         fetchStocks(){
             const from_date=Timestamp.fromDate(hp.searchFromDate(this.from_date))
              const to_date=Timestamp.fromDate(hp.searchToDate(this.to_date))     
             const query_url = query(collection(db, "stocks"), where("created_at", ">=", from_date), where("created_at", "<=", to_date));
-            onSnapshot(query_url, async(snapShot) =>{                  
+            const unsub=onSnapshot(query_url, async(snapShot) =>{                  
                         let stocks=hp_stocks.stocks(snapShot)  
                         stocks=stocks.map((p)=>{
                             return {...p, created_at: new Date(p.created_at.toDate())}
                         })
                        this.stocks=stocks;
+                       unsub();
                 });              
         },
         fetchTransfers(){
             const from_date=Timestamp.fromDate(hp.searchFromDate(this.from_date))
              const to_date=Timestamp.fromDate(hp.searchToDate(this.to_date))     
             const query_url = query(collection(db, "transfers"), where("created_at", ">=", from_date), where("created_at", "<=", to_date));
-            onSnapshot(query_url, async(snapShot) =>{                  
+            const unsub= onSnapshot(query_url, async(snapShot) =>{                  
                         let transfers=hp_transfers.transfers(snapShot)  
                         transfers=transfers.map((p)=>{
                             return {...p, created_at: new Date(p.created_at.toDate())}
                         })
                        this.transfers=transfers;
+                       unsub();
                 });              
         },
         fetchAdjustments(){
             const from_date=Timestamp.fromDate(hp.searchFromDate(this.from_date))
              const to_date=Timestamp.fromDate(hp.searchToDate(this.to_date))     
             const query_url = query(collection(db, "adjustments"), where("created_at", ">=", from_date), where("created_at", "<=", to_date));
-            onSnapshot(query_url, async(snapShot) =>{                  
+            const unsub=onSnapshot(query_url, async(snapShot) =>{                  
                         let adjustments=hp_adjustments.adjustments(snapShot)  
                         adjustments=adjustments.map((p)=>{
                             return {...p, created_at: new Date(p.created_at.toDate())}
                         })
                        this.adjustments=adjustments;
+                       unsub();
                 });              
         },
         fetchSuppliers(){           
             const query_url = query(collection(db, "suppliers"));
-            onSnapshot(query_url, async(snapShot) =>{                  
+            const unsub= onSnapshot(query_url, async(snapShot) =>{                  
                         let suppliers=hp_suppliers.suppliers(snapShot)  
                         suppliers=suppliers.map((p)=>{
                             return {...p, created_at: new Date(p.created_at.toDate())}
                         })
                        this.suppliers=suppliers;
+                       unsub();
                 });              
         },
         fetchCustomers(){           
             const query_url = query(collection(db, "customers"));
-            onSnapshot(query_url, async(snapShot) =>{                  
+            const unsub=onSnapshot(query_url, async(snapShot) =>{                  
                         let customers=hp_customers.customers(snapShot)  
                         customers=customers.map((p)=>{
                             return {...p, created_at: new Date(p.created_at.toDate())}
                         })
                        this.customers=customers;
+                       unsub();
                 });              
         },
         fetchPackingSizes(){           
             const query_url = query(collection(db, "packingSizes"));
-            onSnapshot(query_url, async(snapShot) =>{                  
+            const unsub=onSnapshot(query_url, async(snapShot) =>{                  
                         let packingSizes=hp_packingSizes.packingSizes(snapShot)  
                         packingSizes=packingSizes.map((p)=>{
                             return {...p, created_at: new Date(p.created_at.toDate())}
                         })
                        this.packingSizes=packingSizes;
+                       unsub();
                 });              
         },
         fetchReturnIn(){           
             const query_url = query(collection(db, "returnIn"));
-            onSnapshot(query_url, async(snapShot) =>{                  
+            const unsub=onSnapshot(query_url, async(snapShot) =>{                  
                         let returnIn=hp_rt_in.returnIn(snapShot)  
                         returnIn=returnIn.map((p)=>{
                             return {...p, rt_in_date: new Date(p.rt_in_date.toDate())}
                         })
                        this.returnIn=returnIn;
+                       unsub();
                 });              
         },
         fetchReturnOut(){           
             const query_url = query(collection(db, "returnOut"));
-            onSnapshot(query_url, async(snapShot) =>{                  
+            const unsub= onSnapshot(query_url, async(snapShot) =>{                  
                         let returnOut=hp_rt_out.returnOut(snapShot)  
                         returnOut=returnOut.map((p)=>{
                             return {...p, rt_out_date: new Date(p.rt_out_date.toDate())}
                         })
                        this.returnOut=returnOut;
+                       unsub();
                 });              
         },
 },        
