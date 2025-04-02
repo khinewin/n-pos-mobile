@@ -1,6 +1,6 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="Reports" page-code="reports" :msg-type="msg.type" :msg-info="msg.info" />        
+        <PageHeader :page-title="pageTitle" page-code="reports" :msg-type="msg.type" :msg-info="msg.info" />        
             <div class="container-fluid">
             <div class="row g-2">
                 <div class="col-sm-8">
@@ -11,7 +11,7 @@
                                    <div class="input-group mb-2">
                                     <div class="form-floating">
                                         <flat-pickr class="form-control-plaintext border-bottom" v-model="from_date" id="from_date" :config="config" />
-                                        <label for="from_date">From Date</label>
+                                        <label for="from_date">{{from_date_link}}</label>
                                     </div>
                                     <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                    </div>  
@@ -20,7 +20,7 @@
                                     <div class="input-group mb-2">
                                         <div class="form-floating">
                                             <flat-pickr class="form-control-plaintext border-bottom" v-model="to_date" id="to_date" :config="config" />
-                                            <label for="to_date">To Date</label>
+                                            <label for="to_date">{{to_date_link}}</label>
                                         </div>
                                         <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                        </div>
@@ -158,22 +158,22 @@
                                 <tbody>
                                     <tr>
                                         <td>
-                                            <ReportList @report="reportProducts" title="Product Code" :arr="products" />
+                                            <ReportList @report="reportProducts" :title="product_link" :arr="products" />
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <ReportList @report="reportStocks" title="Stocks" :arr="stocks" />
+                                            <ReportList @report="reportStocks" :title="stocks_link" :arr="stocks" />
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <ReportList @report="reportSales" title="Sales" :arr="sales" />
+                                            <ReportList @report="reportSales" :title="sale_link" :arr="sales" />
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <ReportList @report="reportPurchase" title="Purchase" :arr="purchase" />
+                                            <ReportList @report="reportPurchase" :title="pur_link" :arr="purchase" />
                                         </td>
                                     </tr>
                                     <!--<tr>
@@ -183,12 +183,12 @@
                                     </tr>-->
                                     <tr>
                                         <td>
-                                            <ReportList @report="reportAdjustments" title="Adjustments" :arr="adjustments" />
+                                            <ReportList @report="reportAdjustments" :title="adj_link" :arr="adjustments" />
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <ReportList @report="reportSoc" title="SOC" :arr="soc" />
+                                            <ReportList @report="reportSoc" :title="soc_link" :arr="soc" />
                                         </td>
                                     </tr>
                                     <!--<tr>
@@ -226,6 +226,7 @@ import ReportList from "@/views/reports/ReportList.vue"
 import FlatPickr from 'vue-flatpickr-component';
 import * as hc from "@/lib/handleCtrl"
 import * as hp from "@/lib/helper"
+import {lang} from '@/lib/language'
 
 export default {
     components: {
@@ -362,7 +363,62 @@ export default {
         },
         config(){
             return this.$store.getters.flat_pickr_config;
-        }
+        },
+        pageTitle(){
+            const sl=this.$store.getters.setLanguage;
+            let  pageTitle=sl=="mm" ?  `${lang.reports.mm}` : `${lang.reports.eng}`            
+            return pageTitle;
+        },
+        from_date_link(){
+            const sl=this.$store.getters.setLanguage;
+            let  data=sl=="mm" ?  `${lang.from_date.mm}` : `${lang.from_date.eng}`            
+            return data;
+        },
+        to_date_link(){
+            const sl=this.$store.getters.setLanguage;
+            let  data=sl=="mm" ?  `${lang.to_date.mm}` : `${lang.to_date.eng}`            
+            return data;
+        },
+        product_link(){
+            const sl=this.$store.getters.setLanguage;
+            let  data=sl=="mm" ?  `${lang.product_code.mm}` : `${lang.product_code.eng}`            
+            return data;
+        },
+        supplier_link(){
+            const sl=this.$store.getters.setLanguage;
+            let  data=sl=="mm" ?  `${lang.suppliers.mm}` : `${lang.suppliers.eng}`            
+            return data;
+        },
+        customer_link(){
+            const sl=this.$store.getters.setLanguage;
+            let  data=sl=="mm" ?  `${lang.customers.mm}` : `${lang.customers.eng}`            
+            return data;
+        },
+        soc_link(){
+            const sl=this.$store.getters.setLanguage;
+            let  data=sl=="mm" ?  `${lang.credits.mm}` : `${lang.credits.eng}`            
+            return data;
+        },
+        sale_link(){
+            const sl=this.$store.getters.setLanguage;
+            let  data=sl=="mm" ?  `${lang.sale.mm}` : `${lang.sale.eng}`            
+            return data;
+        },
+        pur_link(){
+            const sl=this.$store.getters.setLanguage;
+            let  data=sl=="mm" ?  `${lang.purchase.mm}` : `${lang.purchase.eng}`            
+            return data;
+        },
+        stocks_link(){
+            const sl=this.$store.getters.setLanguage;
+            let  data=sl=="mm" ?  `${lang.stocks.mm}` : `${lang.stocks.eng}`            
+            return data;
+        },
+        adj_link(){
+            const sl=this.$store.getters.setLanguage;
+            let  data=sl=="mm" ?  `${lang.adjustment.mm}` : `${lang.adjustment.eng}`            
+            return data;
+        },
         
     },
     methods:{

@@ -3,20 +3,20 @@
             <div class="col-sm-12 col-lg-6">
                 <div class="card shadow border-0 border-start border-5 border-warning">
                     <div class="card-body p-2">
-                            <div class="small">Purchase</div>
+                            <div class="small">{{pur_amount_link}}</div>
                             <div class="row">
                                 <div class="col-2 text-center h1">
                                     <i class="fa-solid fa-chart-pie"></i>
                                 </div>
                                 <div class="col-5">
-                                    <div class="small fw-lighter mb-1 text-center">Today</div>
+                                    <div class="small fw-lighter mb-1 text-center">{{today_link}}</div>
                                     <div class="card-text text-center small">                                     
                                         <span v-if="purchaseYearlyData.length">{{fM(purchase_today)}}</span>
                                         <span v-else @click="fetchPurchaseYearly" class="change-cursor"><i class="fa-solid fa-rotate-right"></i></span> 
                                     </div>
                                 </div>
                                 <div class="col-5">
-                                    <div class="small fw-lighter mb-1 text-center">This week</div>
+                                    <div class="small fw-lighter mb-1 text-center">{{this_week_link}}</div>
                                     <div class="card-text text-center small">     
                                         <span v-if="purchaseYearlyData.length">{{fM(purchase_this_week)}} </span>
                                         <span v-else @click="fetchPurchaseYearly" class="change-cursor"><i class="fa-solid fa-rotate-right"></i></span>                               
@@ -29,20 +29,20 @@
             <div class="col-sm-12 col-lg-6">
                 <div class="card shadow border-0 border-start border-5 border-danger">
                     <div class="card-body p-2">
-                            <div class="small">Purchase</div>
+                            <div class="small">{{pur_amount_link}}</div>
                             <div class="row">
                                 <div class="col-2 text-center h1">
                                     <i class="fa-solid fa-chart-pie"></i>
                                 </div>
                                 <div class="col-5">
-                                    <div class="small fw-lighter mb-1 text-center">This month</div>
+                                    <div class="small fw-lighter mb-1 text-center">{{this_month_link}}</div>
                                     <div class="card-text text-center small">                                     
                                         <span v-if="purchaseYearlyData.length">{{fM(purchase_this_month)}}</span>
                                         <span v-else @click="fetchPurchaseYearly" class="change-cursor"><i class="fa-solid fa-rotate-right"></i></span>
                                     </div>
                                 </div>
                                 <div class="col-5">
-                                    <div class="small fw-lighter mb-1 text-center">This year</div>
+                                    <div class="small fw-lighter mb-1 text-center">{{this_year_link}}</div>
                                     <div class="card-text text-center small">     
                                         <span v-if="purchaseYearlyData.length">{{fM(purchase_this_year)}}   </span>
                                         <span v-else @click="fetchPurchaseYearly" class="change-cursor"><i class="fa-solid fa-rotate-right"></i></span>                             
@@ -59,6 +59,8 @@
     import db from '@/firebase/firestore'
     import * as ss from "@/lib/snapshot/purchases"
     import * as hp from "@/lib/helper"
+    import {lang} from '@/lib/language'
+
     export default {
         components: {
             
@@ -76,7 +78,32 @@
         computed:{
             user(){
                 return this.$store.getters.user ? this.$store.getters.user : null;
-            }
+            },
+            pur_amount_link(){
+                const sl=this.$store.getters.setLanguage;
+                const data=sl=="mm" ? lang.pur_amount.mm : lang.pur_amount.eng ;
+                return data;
+             },
+             today_link(){
+                const sl=this.$store.getters.setLanguage;
+                const data=sl=="mm" ? lang.today.mm : lang.today.eng ;
+                return data;
+             },
+             this_week_link(){
+                const sl=this.$store.getters.setLanguage;
+                const data=sl=="mm" ? lang.this_week.mm : lang.this_week.eng ;
+                return data;
+             },
+             this_month_link(){
+                const sl=this.$store.getters.setLanguage;
+                const data=sl=="mm" ? lang.this_month.mm : lang.this_month.eng ;
+                return data;
+             },
+             this_year_link(){
+                const sl=this.$store.getters.setLanguage;
+                const data=sl=="mm" ? lang.this_year.mm : lang.this_year.eng ;
+                return data;
+             },
         },
         mounted() {
          //   this.fetchPurchaseYearly();

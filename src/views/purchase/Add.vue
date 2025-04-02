@@ -1,16 +1,16 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="Purchase  / New" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader :page-title="pageTitle" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                         <button type="button" @click="savePurchase" class="btn btn-sm" :disabled="isLoading">
-                            <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
+                            <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> {{save_link}}</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <router-link  :to="{name : 'Purchase'}" class="btn btn-sm close"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</router-link>
+                        <router-link  :to="{name : 'Purchase'}" class="btn btn-sm close"><i class="fa-solid fa-circle-xmark"></i> {{close_link}}</router-link>
                 </div>
             </div>
             <div class="card shadow">
@@ -169,6 +169,7 @@ import setQtyModal from "@/views/modals/setQtyModal.vue";
 import setDiscountModal from "@/views/modals/setDiscountModal.vue";
 import FlatPickr from 'vue-flatpickr-component';
 import * as hc from "@/lib/handleCtrl"
+import {lang} from '@/lib/language'
 
 export default {
     components: {
@@ -235,7 +236,22 @@ export default {
         },
         config(){
             return this.$store.getters.flat_pickr_config;
-        } 
+        } ,
+        pageTitle(){
+            const sl=this.$store.getters.setLanguage;
+            let  pageTitle=sl=="mm" ?  `${lang.purchase.mm} / ${lang.new.mm}` : `${lang.purchase.eng} / ${lang.new.eng}`            
+            return pageTitle;
+        },      
+        close_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.close_link.mm : lang.close_link.eng ;
+            return data;
+        },       
+        save_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.save_link.mm : lang.save_link.eng ;
+            return data;
+        },
     },
     watch:{
         msg:{

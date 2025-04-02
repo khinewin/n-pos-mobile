@@ -1,6 +1,6 @@
 <template lang="">        
-    <div>           
-        <PageHeader page-title="Dashboard" page-code="dashboard"/>
+    <div>             
+        <PageHeader :page-title="pageTitle" page-code="dashboard"/>
         <div class="container-fluid my-2 vh-80 overflow-y-auto">
             <div class="row mb-2">
                 <div class="col-12">
@@ -9,7 +9,7 @@
                                 <div class="row">
                                     <div class="col-3 text-center h1"><i class="fa-solid fa-user-check"></i></div>
                                     <div class="col-9">
-                                        <div class="small fw-lighter mb-2">Welcome</div>
+                                        <div class="small fw-lighter mb-2">{{getGreeting}}</div>
                                         <div class="card-text" v-if="user !==null">{{user.displayName}} ({{user.email}})</div>
                                     </div>
                                 </div>
@@ -27,34 +27,34 @@
             </div>
            <div class="row g-1 my-1 n-link">           
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm  " :to="{name : 'Sale'}" ><i class="fa-solid fa-cash-register text-success"></i> Sale</router-link>
+                <router-link class="btn btn-sm  " :to="{name : 'Sale'}" ><i class="fa-solid fa-cash-register text-success"></i>  {{sale_link}}</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Purchase'}"><i class="fa-solid fa-cart-shopping text-danger"></i> Purchase</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Purchase'}"><i class="fa-solid fa-cart-shopping text-danger"></i> {{purchase_link}}</router-link>
             </div>
             <div class=" col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Stocks'}"><i class="fa-solid fa-money-bill-trend-up text-primary"></i> Stocks</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Stocks'}"><i class="fa-solid fa-money-bill-trend-up text-primary"></i> {{stocks_link}}</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Products'}"><i class="fa-solid fa-list-check text-warning"></i> Product code</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Products'}"><i class="fa-solid fa-list-check text-warning"></i> {{product_link}}</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Suppliers'}"><i class="fa-solid fa-person-walking-luggage text-info"></i> Suppliers</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Suppliers'}"><i class="fa-solid fa-person-walking-luggage text-info"></i> {{suppliers_link}}</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Customers'}"><i class="fa-solid fa-users text-success"></i> Customers</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Customers'}"><i class="fa-solid fa-users text-success"></i> {{customers_link}}</router-link>
             </div>
             <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
                 <router-link class="btn btn-sm " :to="{name : 'Transfers'}"><i class="fa-solid fa-right-left text-danger"></i> Transfer</router-link>
             </div>-->  
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Adjustments'}"><i class="fa-solid fa-sliders text-primary"></i> Adjustment</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Adjustments'}"><i class="fa-solid fa-sliders text-primary"></i> {{adjustment_link}}</router-link>
             </div>           
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Soc'}"><i class="fa-solid fa-file-invoice-dollar text-warning"></i> SOC</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Soc'}"><i class="fa-solid fa-file-invoice-dollar text-warning"></i> {{soc_link}}</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2   d-grid">
-                <router-link :to="{name: 'Reports'}" class="btn btn-sm "><i class="fa-solid fa-chart-pie text-info"></i> Reports</router-link>
+                <router-link :to="{name: 'Reports'}" class="btn btn-sm "><i class="fa-solid fa-chart-pie text-info"></i> {{reports_link}}</router-link>
             </div>
             <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2   d-grid">
                 <router-link class="btn btn-sm" :to="{name : 'ReturnIn'}"><i class="fa-solid fa-file-import text-success"></i> Return In</router-link>
@@ -80,6 +80,7 @@ import SalesSession from "@/views/admin/SalesSession.vue"
 import PurchaseSession from "@/views/admin/PurchaseSession.vue"
 import SalesChart from "@/views/admin/SalesChart.vue"
 import PurchaseChart from "@/views/admin/PurchaseChart.vue"
+import {lang} from "@/lib/language"
 
  export default{
      components:{
@@ -88,8 +89,71 @@ import PurchaseChart from "@/views/admin/PurchaseChart.vue"
      computed:{
             user(){
                 return this.$store.getters.user ? this.$store.getters.user : null;
-            }
+            },
+            pageTitle(){
+            const sl=this.$store.getters.setLanguage;
+            let  pageTitle=sl=="mm" ?  `${lang.dashboard.mm}` : `${lang.dashboard.eng}`            
+            return pageTitle;
         },
+        
+        sale_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.sale.mm : lang.sale.eng ;
+            return data;
+        },
+        purchase_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.purchase.mm : lang.purchase.eng ;
+            return data;
+        },
+        stocks_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.stocks.mm : lang.stocks.eng ;
+            return data;
+        },
+        product_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.product_code.mm : lang.product_code.eng ;
+            return data;
+        },
+        suppliers_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.suppliers.mm : lang.suppliers.eng ;
+            return data;
+        },
+        customers_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.customers.mm : lang.customers.eng ;
+            return data;
+        },
+        adjustment_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.adjustment.mm : lang.adjustment.eng ;
+            return data;
+        },
+        soc_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.soc.mm : lang.soc.eng ;
+            return data;
+        },
+        reports_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.reports.mm : lang.reports.eng ;
+            return data;
+        },
+        getGreeting() {
+            const now = new Date();
+            const hours = now.getHours();
+            const sl=this.$store.getters.setLanguage;
+            if (hours < 12) {
+                return sl=="mm" ? "မင်္ဂလာနံနက်ခင်းပါ" :  "Good morning";
+            } else if (hours < 18) {
+                return sl=="mm" ? "မင်္ဂလာနေ့လည်ခင်းပါ" : "Good afternoon";
+            } else {
+                return sl=="mm" ? "မင်္ဂလာညနေခင်းပါ" : "Good evening";
+            }
+        }
+    },
 }
 </script>
 <style scoped>

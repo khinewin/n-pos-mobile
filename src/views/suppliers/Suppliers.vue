@@ -1,11 +1,11 @@
 <template lang="">       
     <div>           
-           <PageHeader page-title="Suppliers" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info"/>
+           <PageHeader :page-title="pageTitle" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info"/>
            <div class="container-fluid">
                <div class="row  justify-content-end">  
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isUpdating || Object.keys(editItem).length===0" @click="saveEdit">
-                        <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
+                        <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> {{update_link}}</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                     </button>
                 </div>  
@@ -17,7 +17,7 @@
                 </div>-->                           
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveSupplier">
-                        <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
+                        <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> {{save_link}}</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                     </button>
                 </div>   
@@ -35,18 +35,18 @@
                                 </div>-->
                                 <div class="form-floating col-sm-3 col-lg-12">
                                     <input type="search" id="search_by_name" v-model="search_by_name" @keypress.enter="searchSuppliers" placeholder="Description" class="form-control-plaintext border-bottom ">
-                                    <label for="search_by_name" class="small">Name</label>
+                                    <label for="search_by_name" class="small">{{name_link}}</label>
                                 </div> 
                                 <div class="form-floating col-sm-3 col-lg-12">
                                     <input type="search" id="search_by_company" v-model="search_by_company" @keypress.enter="searchSuppliers" placeholder="Company" class="form-control-plaintext border-bottom ">
-                                    <label for="search_by_company" class="small">Company</label>
+                                    <label for="search_by_company" class="small">{{company_link}}</label>
                                  </div> 
                            
-                                    <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="searchSuppliers"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
+                                    <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="searchSuppliers"><i class="fa-solid fa-magnifying-glass-arrow-right"></i>  {{search_link}}</button></div>
                                     <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                     </button></div>-->
-                                    <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
+                                    <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> {{clear_link}}</button></div>
                              </div> 
                         </div>
                       </div>                                                                                                          
@@ -72,13 +72,13 @@
                                                 <input @keypress.enter="saveSupplier" type="text" v-model="code" class="form-control-plaintext py-0 text-center" id="code" placeholder="Code">                                                                                       
                                             </td>-->
                                             <td class="">
-                                                <input @keypress.enter="saveSupplier" type="text" v-model="name" class="form-control py-1 textc " id="name" placeholder="Name">                                               
+                                                <input @keypress.enter="saveSupplier" type="text" v-model="name" class="form-control py-1 textc " id="name" :placeholder="name_link">                                               
                                             </td>
                                             <td class="">
-                                                <input @keypress.enter="saveSupplier" type="tel" v-model="phone"  class="form-control py-1  text-center" id="phone" placeholder="Phone">                                            
+                                                <input @keypress.enter="saveSupplier" type="tel" v-model="phone"  class="form-control py-1  text-center" id="phone" :placeholder="phone_link">                                            
                                             </td>
                                             <td class="">
-                                                <input @keypress.enter="saveSupplier" type="text" v-model="company"   class="form-control py-1" id="company" placeholder="Company">                                              
+                                                <input @keypress.enter="saveSupplier" type="text" v-model="company"   class="form-control py-1" id="company" :placeholder="company_link">                                              
                                             </td>
                                             <td class="">
                                                 <flat-pickr @change="saveSupplier" class="form-control py-1  text-center" v-model="created_at"  :config="config" />
@@ -139,6 +139,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
    import * as hp from '@/lib/helper'
    import FlatPickr from 'vue-flatpickr-component';
    import * as search from '@/lib/search'
+   import {lang} from "@/lib/language"
 
 
    export default {
@@ -203,7 +204,47 @@ import { required, email ,helpers} from '@vuelidate/validators'
            },
            config(){
             return this.$store.getters.flat_pickr_config;
-           }
+           },
+           pageTitle(){
+            const sl=this.$store.getters.setLanguage;
+            let  pageTitle=sl=="mm" ?  `${lang.suppliers.mm}` : `${lang.suppliers.eng}`            
+            return pageTitle;
+        },
+        name_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.name.mm : lang.name.eng ;
+            return data;
+        },
+        phone_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.phone.mm : lang.phone.eng ;
+            return data;
+        },
+        company_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.company.mm : lang.company.eng ;
+            return data;
+        },
+        save_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.save_link.mm : lang.save_link.eng ;
+            return data;
+        },
+        update_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.update_link.mm : lang.update_link.eng ;
+            return data;
+        },
+        search_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.search_link.mm : lang.search_link.eng ;
+            return data;
+        },
+        clear_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.clear_link.mm : lang.clear_link.eng ;
+            return data;
+        },
        },
        watch:{        
            msg:{

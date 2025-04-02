@@ -1,22 +1,22 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="Stocks / History" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader :page-title="pageTitle" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button @click="print" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-print"></i> Print (ctrl+p)</button>
+                    <button @click="print" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-print"></i> {{print_link}}</button>
                 </div>                
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <button @click="goEdit" class="btn btn-sm" :disabled="!voucher_no || stock_user.uid !== user.uid"><i class="fa-solid fa-pen-to-square"></i> Edit (ctrl+e)</button>
+                        <button @click="goEdit" class="btn btn-sm" :disabled="!voucher_no || stock_user.uid !== user.uid"><i class="fa-solid fa-pen-to-square"></i> {{edit_link}}</button>
                 </div>                
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#stocksModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
+                    <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#stocksModal"><i class="fa-solid fa-folder-tree"></i> {{open_link}}</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <router-link :to="{name : 'NewStocks'}" class="btn btn-sm new"><i class="fa-solid fa-square-plus"></i> New (ctrl+shift+n)</router-link>
+                    <router-link :to="{name : 'NewStocks'}" class="btn btn-sm new"><i class="fa-solid fa-square-plus"></i> {{new_link}}</router-link>
             </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <button @click="closeStocks" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
+                        <button @click="closeStocks" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-circle-xmark"></i> {{close_link}}</button>
                 </div>
             </div>
             <div class="card shadow" id="printMe">
@@ -124,6 +124,7 @@ import * as hp from "@/lib/helper.js"
 import * as ss from "@/lib/snapshot/stocks"
 import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
 import * as hc from "@/lib/handleCtrl"
+import {lang} from '@/lib/language'
 
 export default {
     components: {
@@ -160,7 +161,42 @@ export default {
     computed:{
         user(){
             return this.$store.getters.user;
-        },          
+        },     
+        pageTitle(){
+            const sl=this.$store.getters.setLanguage;
+            let  pageTitle=sl=="mm" ?  `${lang.stocks.mm} / ${lang.history.mm}` : `${lang.stocks.eng} / ${lang.history.eng}`            
+            return pageTitle;
+        },
+        edit_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.edit_link.mm : lang.edit_link.eng ;
+            return data;
+        },
+        open_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.open_link.mm : lang.open_link.eng ;
+            return data;
+        },
+        close_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.close_link.mm : lang.close_link.eng ;
+            return data;
+        },
+        print_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.print_link.mm : lang.print_link.eng ;
+            return data;
+        },
+        save_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.save_link.mm : lang.save_link.eng ;
+            return data;
+        },
+        new_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.new_link.mm : lang.new_link.eng ;
+            return data;
+        },     
     },
     mounted() {
         window.addEventListener('keydown', this.handlectrl);

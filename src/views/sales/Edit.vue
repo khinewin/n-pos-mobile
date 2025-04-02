@@ -1,6 +1,6 @@
 <template lang="">
     <div>           
-        <PageHeader :page-title="saleMode" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader :page-title="pageTitle" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                           
        
@@ -12,15 +12,15 @@
                 </div>-->
             
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button :disabled="saleItems.length <=0 || saleMode=='Sale / Edit'" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> Print (cltr+p)</button>
+                    <button :disabled="saleItems.length <=0 || saleMode=='Sale / Edit'" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> {{print_link}}</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">                     
-                        <button v-if="saleMode =='Sale / Edit'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length<=0" ><i class="fa-solid fa-hard-drive"></i> Save (cltr+s)
+                        <button v-if="saleMode =='Sale / Edit'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length<=0" ><i class="fa-solid fa-hard-drive"></i> {{save_link}}
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <router-link :to="{name: 'Sale'}" id="close" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> Close (cltr+q)</router-link>
+                    <router-link :to="{name: 'Sale'}" id="close" class="btn btn-sm"><i class="fa-solid fa-circle-xmark"></i> {{close_link}}</router-link>
                 </div>
             </div>
         </div>     
@@ -215,6 +215,7 @@ import setDiscountModal from "@/views/modals/setDiscountModal.vue";
 import FlatPickr from 'vue-flatpickr-component';
 import * as hc from "@/lib/handleCtrl"
 import * as pd from "@/lib/snapshot/products"
+import {lang} from "@/lib/language"
 
 export default {
     components: {
@@ -318,6 +319,27 @@ export default {
         },
         storeProducts(){
             return this.$store.getters.products;
+        },
+        pageTitle(){
+            const sl=this.$store.getters.setLanguage;
+            const pageTitle=sl=="mm" ?  `${lang.sale.mm} / ${lang.edit.mm}` : `${lang.sale.eng} / ${lang.edit.eng}`
+            return pageTitle;
+        },
+      
+        close_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.close_link.mm : lang.close_link.eng ;
+            return data;
+        },
+        print_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.print_link.mm : lang.print_link.eng ;
+            return data;
+        },
+        save_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.save_link.mm : lang.save_link.eng ;
+            return data;
         },
       
     },
@@ -631,7 +653,12 @@ export default {
                 }                
         },
         goSale(){
-            this.$router.push({name: "Sale"});
+            const isMobile = window.matchMedia("(max-width: 1199px)").matches;
+            if(isMobile){
+                this.$router.push({name: "MobileSale"});
+            }else{
+                this.$router.push({name: "Sale"});
+            }
         },
       
         updateStoreItem(){

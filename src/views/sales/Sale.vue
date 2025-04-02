@@ -1,12 +1,12 @@
 <template lang="">
     <div>           
-        <PageHeader :page-title="saleMode" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader :page-title="pageTitle" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">   
                 <div class="col-6 col-sm-4 col-md-3 col-lg-1   d-flex flex-column justify-content-center">
                     <div class="form-check form-switch  d-flex justify-content-center">
                         <input class="form-check-input" @change="setPos" v-model="print_on_save" type="checkbox" role="switch" id="flexSwitchCheckDisabled">
-                        <label class="form-check-label ms-1" for="flexSwitchCheckDisabled">POS</label>
+                        <label class="form-check-label ms-1" for="flexSwitchCheckDisabled" :class="[print_on_save ? 'text-success' : 'text-muted']"><i class="fa-solid fa-print"></i></label>
                       </div>
                 </div>                         
            
@@ -17,23 +17,23 @@
                     </select>
                 </div>-->    
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">    
-                    <button class="btn btn-sm" @click="goEdit" :disabled="!id || user.uid != sale_user.uid"><i class="fa-solid fa-pen-to-square"></i> Edit (ctrl+e)</button>
+                    <button class="btn btn-sm" @click="goEdit" :disabled="!id || user.uid != sale_user.uid"><i class="fa-solid fa-pen-to-square"></i> {{edit_link}}</button>
                 </div>
                 
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button class="btn btn-sm open"  data-bs-toggle="modal" data-bs-target="#salesModal"><i class="fa-solid fa-folder-tree"></i> Open (ctrl+o)</button>
+                    <button class="btn btn-sm open"  data-bs-toggle="modal" data-bs-target="#salesModal"><i class="fa-solid fa-folder-tree"></i> {{open_link}}</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="print"><i class="fa-solid fa-print" ></i> Print (ctrl+p)</button>
+                    <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="print"><i class="fa-solid fa-print" ></i> {{print_link}}</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                         <button v-if="saleMode=='Sale / New' || saleMode=='Sale / History'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length <=0 || saleMode=='Sale / History' " >
-                            <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
+                            <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> {{save_link}}</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>                      
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <button @click="clearSaleItem" class="btn btn-sm" :disabled="saleItems.length <=0"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</button>
+                        <button @click="clearSaleItem" class="btn btn-sm" :disabled="saleItems.length <=0"><i class="fa-solid fa-circle-xmark"></i> {{close_link}}</button>
                 </div>
             </div>
         </div>     
@@ -230,6 +230,7 @@ import setQtyModal from "@/views/modals/setQtyModal.vue";
 import setDiscountModal from "@/views/modals/setDiscountModal.vue";
 import FlatPickr from 'vue-flatpickr-component';
 import * as hc from "@/lib/handleCtrl"
+import {lang} from "@/lib/language"
 
 export default {
     components: {
@@ -330,6 +331,42 @@ export default {
         config(){
             return this.$store.getters.flat_pickr_config;
         },
+        pageTitle(){
+            const sl=this.$store.getters.setLanguage;
+            let pageTitle="";
+            if(this.saleMode=="Sale / New"){
+                 pageTitle=sl=="mm" ?  `${lang.sale.mm} / ${lang.new.mm}` : `${lang.sale.eng} / ${lang.new.eng}`
+            }else{
+                 pageTitle=sl=="mm" ?  `${lang.sale.mm} / ${lang.history.mm}` : `${lang.sale.eng} / ${lang.history.eng}`
+            }
+            return pageTitle;
+        },
+        edit_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.edit_link.mm : lang.edit_link.eng ;
+            return data;
+        },
+        open_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.open_link.mm : lang.open_link.eng ;
+            return data;
+        },
+        close_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.close_link.mm : lang.close_link.eng ;
+            return data;
+        },
+        print_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.print_link.mm : lang.print_link.eng ;
+            return data;
+        },
+        save_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.save_link.mm : lang.save_link.eng ;
+            return data;
+        },
+
        
     },
     methods:{
@@ -342,8 +379,12 @@ export default {
             code_no.focus();
         }, 100)
         },
+        getUsername(email) {
+            return email.split('@')[0]; // Split by '@' and take the first part
+        },
         setVoucherNo(){
-           return hp.setVoucherNo();
+            let user=this.getUsername(this.user.email);
+           return hp.setVoucherNo(user);
         },
         handleCtrl(event) {
             if (event.ctrlKey && event.key === 's') {

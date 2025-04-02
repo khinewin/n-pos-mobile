@@ -1,16 +1,16 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="Stocks / New" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader :page-title="pageTitle" page-code="addPurchase" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                         <button type="button" @click="saveStocks" class="btn btn-sm" :disabled="isLoading || storeItems.length <=0">
-                            <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
+                            <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> {{save_link}}</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                         </button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <router-link :to="{name : 'Stocks'}" class="btn btn-sm close"><i class="fa-solid fa-circle-xmark"></i> Close (ctrl+q)</router-link>
+                        <router-link :to="{name : 'Stocks'}" class="btn btn-sm close"><i class="fa-solid fa-circle-xmark"></i> {{close_link}}</router-link>
                 </div>
             </div>
             <div class="card shadow">
@@ -51,9 +51,9 @@
                         <div class="vh-65 overflow-y-auto">                   
                         <table class="table table-bordered  mb-0 table-hover">
                             <tbody>
-                                <tr class="text-center fw-bold table-secondary">
+                                <tr class="text-center fw-bold table-secondary change-cursor" data-bs-toggle="modal"  data-bs-target="#searchCode" >
                                     <td class="col-0"></td>
-                                    <td class="col-4 change-cursor description" data-bs-toggle="modal"  data-bs-target="#searchCode" style="cursor: context-menu;"><i class="fa-solid fa-circle-plus"></i> Product Name (ctrl+i)</td>
+                                    <td class="col-4 change-cursor description" ><i class="fa-solid fa-circle-plus"></i> Product Name (ctrl+i)</td>
                                     <td class="col-2">Packing Size</td>
                                     <!--<td class="col-1 table-info">Main Inv Bal</td>-->     
                                     <td class="col-2 table-info">Mart Inv Bal</td>   
@@ -119,6 +119,8 @@ import * as hc from "@/lib/handleCtrl"
 import * as ss from "@/lib/snapshot/products"
 import * as hp from "@/lib/helper"
 import * as cp from "@/lib/cal_price"
+import {lang} from "@/lib/language"
+
 export default {
     components: {
         PageHeader, ProductModal,SetQty,SetPrice, FlatPickr
@@ -165,7 +167,22 @@ export default {
         },    
         config(){
             return this.$store.getters.flat_pickr_config;
-        }
+        },
+        pageTitle(){
+            const sl=this.$store.getters.setLanguage;
+            let  pageTitle=sl=="mm" ?  `${lang.stocks.mm} / ${lang.new.mm}` : `${lang.stocks.eng} / ${lang.new.eng}`            
+            return pageTitle;
+        },      
+        close_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.close_link.mm : lang.close_link.eng ;
+            return data;
+        },       
+        save_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.save_link.mm : lang.save_link.eng ;
+            return data;
+        },
       
     },
   

@@ -16,22 +16,22 @@
                                                     <div class="col-md-6 col-lg-12">
                                                         <div class="form-floating">
                                                             <input type="text" id="search_by_code"  v-model="search_by_code"  @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
-                                                            <label for="search_by_code" class="">Code</label>
+                                                            <label for="search_by_code" class="">{{barcode_link}}</label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6 col-lg-12">
                                                         <div class="form-floating">
                                                             <input type="search" v-model="search_by_item_name" @keypress.enter="searchProducts" placeholder="Product Name" class="form-control-plaintext border-bottom">
-                                                            <label for="search_by_item_name" class="">Product Name</label>
+                                                            <label for="search_by_item_name" class="">{{item_name_link}}</label>
                                                         </div> 
                                                     </div>
                                                 </div>
                                                 <div class="row mt-2">
                                                     <div class="col-4 d-grid">
-                                                        <button class="btn btn-sm text-dark clear-search-product" @click="searchProducts"><i class="fa-solid fa-search"></i> Search</button>
+                                                        <button class="btn btn-sm text-dark clear-search-product" @click="searchProducts"><i class="fa-solid fa-search"></i> {{search_link}}</button>
                                                     </div>
                                                     <div class="col-4 d-grid">
-                                                        <button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear </button>
+                                                        <button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> {{clear_link}} </button>
                                                     </div>
                                                     <!--<div class="col-4 d-grid">
                                                         <button class="btn btn-sm text-dark" @click="updateProducts">
@@ -40,7 +40,7 @@
                                                         </button>
                                                     </div>-->
                                                     <div class="col-4 d-grid">
-                                                        <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close </button>
+                                                        <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> {{close_link}} </button>
                                                     </div>
                                                 </div>   
                                             </div>
@@ -52,8 +52,8 @@
                                                 <table class="table table-bordered table-hover mb-0">
                                                     <tbody>      
                                                         <tr class="text-center fw-bold table-secondary position-sticky top-0 z-3">
-                                                            <td class="col-1">No.</td>
-                                                            <td class="col-11">Product Name</td>
+                                                            <td class="col-1">{{no_link}}</td>
+                                                            <td class="col-11">{{item_name_link}}</td>
                                                         </tr>                                         
                                                         <tr v-if="saleItems.length>0" v-for="(s,i) in saleItems" :key="s.id" >
                                                             <td class="text-center">{{i+1}}</td>
@@ -74,11 +74,11 @@
                                         <table class="table table-bordered mb-0 table-hover">
                                                 <thead>
                                                 <tr class="table-secondary text-center fw-bold sticky-top z-3">
-                                                    <td class="col-1">Code</td>
-                                                    <td class="col-2">Product Name</td>
-                                                    <td class="col-1">Packing size</td>
-                                                    <td class="col-1">Mart Inv Bal</td>
-                                                    <td class="col-1" >Sale Price</td>
+                                                    <td class="col-1">{{barcode_link}}</td>
+                                                    <td class="col-2">{{item_name_link}}</td>
+                                                    <td class="col-1">{{packing_size_link}}</td>
+                                                    <td class="col-1">{{inv_bal_link}}</td>
+                                                    <td class="col-1" >{{sale_price_link}}</td>
                                                     <!--<td class="col-1">Wholesale price</td>-->
 
                                                 </tr>
@@ -134,6 +134,7 @@ import db from '@/firebase/firestore'
 import * as lib from "@/lib/snapshot/products"
 import * as hp  from "@/lib/helper"
 import * as search from "@/lib/search"
+import {lang} from '@/lib/language'
 
 export default {   
     props:['sale_type', 'saleItems'],
@@ -188,7 +189,51 @@ export default {
         user(){
             return this.$store.getters.user;
         },      
-       
+        barcode_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.barcode.mm : lang.barcode.eng ;
+            return data;
+        },
+        item_name_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.item_name.mm : lang.item_name.eng ;
+            return data;
+        },
+        sale_price_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.sale_price.mm : lang.sale_price.eng ;
+            return data;
+        },
+        inv_bal_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.inv_bal.mm : lang.inv_bal.eng ;
+            return data;
+        },
+        no_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.number.mm : lang.number.eng ;
+            return data;
+        },
+        search_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.search_link.mm : lang.search_link.eng ;
+            return data;
+        },
+        clear_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.clear_link.mm : lang.clear_link.eng ;
+            return data;
+        },
+        close_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.close_link.mm : lang.close_link.eng ;
+            return data;
+        },
+        packing_size_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.packing_size.mm : lang.packing_size.eng ;
+            return data;
+        },
         
     },
   

@@ -1,20 +1,20 @@
 <template lang="">       
  <div>           
-        <PageHeader page-title="Product Code" page-code="medicineCode" :msg-type="msg.type" :msg-info="msg.info"/>
+        <PageHeader :page-title="pageTitle" page-code="medicineCode" :msg-type="msg.type" :msg-info="msg.info"/>
         <div class="container-fluid">
             <div class="row  justify-content-end">   
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <div class="form-check form-switch  d-flex justify-content-center">
-                        <input class="form-check-input" @change="setCamera" v-model="useCamera" type="checkbox" role="switch" id="useCamera">
-                        <label class="form-check-label ms-1" for="useCamera">Camera</label>
+                        <!--<input class="form-check-input" @change="setCamera" v-model="useCamera" type="checkbox" role="switch" id="useCamera">-->
+                        <label class="form-check-label ms-1 change-cursor" for="useCamera" @click="setCamera" :class="[useCamera ? 'text-success' : 'text-muted']"> <i class="fa-solid fa-camera"></i></label>
                       </div>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button class="btn btn-sm">Showing {{products.length}} of {{productsData.length}}</button>
+                    <button class="btn btn-sm">{{display_link}} {{products.length}} of {{productsData.length}}</button>
                 </div> 
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveEdit">
-                        <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
+                        <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> {{update_link}} </span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                     </button>
                 </div> 
@@ -27,12 +27,12 @@
                                             
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCode">
-                        <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save (ctrl+s)</span>
+                        <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> {{save_link}}</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                     </button>
                 </div> 
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn btn-sm packing-unit"><i class="fa-solid fa-boxes-packing"></i> Packing Units (ctrl+u)</button>
+                    <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn btn-sm packing-unit"><i class="fa-solid fa-boxes-packing"></i> {{packing_units}}</button>
                 </div>   
             </div>
         </div>
@@ -44,18 +44,18 @@
                             <div class="row g-2">
                                 <div class="form-floating col-sm-3 col-lg-12">
                                     <input type="search" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
-                                    <label for="search_by_code" class="small">Code</label>
+                                    <label for="search_by_code" class="small">{{barcode}}</label>
                                 </div>
                                 <div class="form-floating col-sm-3 col-lg-12">
                                     <input type="search" id="search_by_description" v-model="search_by_description" @keypress.enter="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
-                                    <label for="search_by_description" class="small">Product Name</label>
+                                    <label for="search_by_description" class="small">{{product_name}}</label>
                                 </div>
                             
-                                    <div class="col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="searchProducts"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> Search</button></div>
+                                    <div class="col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="searchProducts"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> {{search_link}}</button></div>
                                     <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateProducts"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                     </button></div>-->
-                                    <div class="col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
+                                    <div class="col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> {{clear_link}}</button></div>
                              </div> 
                         </div>
                     </div>     
@@ -140,7 +140,7 @@
                                         </td>
                                     </tr>
                                     <tr class="table-primary packing-size change-cursor"  data-bs-toggle="modal" data-bs-target="#selectPackingSizeModal">
-                                        <td class="col-1">Packing Size (ctrl+p) </td>
+                                        <td class="col-1">{{packing_size}}</td>
                                         <td :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]" class="text-center col-3">
                                             <div v-if="editItem.packing_size.smallest_unit && editItem.packing_size.medium_unit">
                                                     {{calPackingSize(editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit, editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty)}}
@@ -148,7 +148,7 @@
                                         </td>
                                     </tr>
                                     <tr class="change-cursor table-warning" data-bs-toggle="modal" data-bs-target="#setQtyModal">
-                                        <td class="">Mart Inv Bal</td>                                       
+                                        <td class="">{{inv_bal}}</td>                                       
                                         <td class="text-center" :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]">
                                             <div  v-if="editItem.packing_size">
                                                 {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            
@@ -169,7 +169,7 @@
                                         </td>
                                     </tr>                        
                                     <tr class="">
-                                        <td class="">Pur Price</td>
+                                        <td class="">{{pur_price}}</td>
                                         <td class="text-center" v-if="editItem.packing_size.largest_unit !=null">
                                             <span >
                                             <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calPurPrice('largest_unit')" type="number" v-model="editItem.pur_price.largest_unit" class="form-control-plaintext p-0 text-center">
@@ -187,7 +187,7 @@
                                         </td>                                        
                                     </tr>
                                     <tr class="">
-                                        <td class="">Sale Price</td>
+                                        <td class="">{{sale_price}}</td>
                                         <td class="text-center" v-if="editItem.packing_size.largest_unit !=null">
                                             <span >
                                             <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="editItem.retail_price.largest_unit" class="form-control-plaintext p-0 text-center">
@@ -211,12 +211,12 @@
                                         <td class="small">
                                             <div class="form-check form-switch">
                                                 <input  v-model="editItem.auto_cal" class="form-check-input auto-cal" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
-                                                <label class="form-check-label" for="flexSwitchCheckChecked">Auto (ctrl+a)</label>
+                                                <label class="form-check-label" for="flexSwitchCheckChecked">Auto </label>
                                               </div>                                              
                                         </td>
                                         <td colspan="3" class="p-0 text-end">
                                             <button class="btn btn-sm" @click="savePrice">                     
-                                            <span v-if="!isSavePrice"><i class="fa-solid fa-hard-drive"></i> Save Price (ctrl+shift+s)</span>
+                                            <span v-if="!isSavePrice"><i class="fa-solid fa-hard-drive"></i> {{save_price}}</span>
                                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSavePrice"></span>
                                              </button>
                                         </td>
@@ -260,6 +260,7 @@ import SetQty from '@/views/modals/stocks/SetQty.vue'
 import * as pz from "@/lib/snapshot/packingSizes"
 import * as search from "@/lib/search"
 import { Html5QrcodeScanner, Html5Qrcode } from "html5-qrcode";
+import {lang} from "@/lib/language"
 
 
 export default {
@@ -335,6 +336,77 @@ export default {
         user(){
             return this.$store.getters.user;
         },
+        pageTitle(){
+            const sl=this.$store.getters.setLanguage;
+            let  pageTitle=sl=="mm" ?  `${lang.product_code.mm}` : `${lang.product_code.eng}`            
+            return pageTitle;
+        },
+        
+        save_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.save_link.mm : lang.save_link.eng ;
+            return data;
+        },
+        update_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.update_link.mm : lang.update_link.eng ;
+            return data;
+        },
+        search_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.search_link.mm : lang.search_link.eng ;
+            return data;
+        },
+        clear_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.clear_link.mm : lang.clear_link.eng ;
+            return data;
+        },
+        display_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.display_link.mm : lang.display_link.eng ;
+            return data;
+        },
+        barcode(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.barcode.mm : lang.barcode.eng ;
+            return data;
+        },
+        product_name(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.item_name.mm : lang.item_name.eng ;
+            return data;
+        },
+        pur_price(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.pur_price.mm : lang.pur_price.eng ;
+            return data;
+        },
+        sale_price(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.sale_price.mm : lang.sale_price.eng ;
+            return data;
+        },
+        packing_size(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.packing_size.mm : lang.packing_size.eng ;
+            return data;
+        },
+        packing_units(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.packing_units.mm : lang.packing_units.eng ;
+            return data;
+        },
+        inv_bal(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.inv_bal.mm : lang.inv_bal.eng ;
+            return data;
+        },
+        save_price(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.save_price.mm : lang.save_price.eng ;
+            return data;
+        },
       
     },
     watch:{
@@ -352,8 +424,10 @@ export default {
     },
 
     methods:{
-        setCamera(){           
-            localStorage.setItem("camera", this.useCamera)           
+        setCamera(){     
+            const c=this.useCamera ? false : true;      
+            localStorage.setItem("camera", c)    
+            this.useCamera=c;       
            
         },
         initScanner(isNew, camera=true) {

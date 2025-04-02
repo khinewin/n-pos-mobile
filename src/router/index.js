@@ -38,10 +38,16 @@ import Returnout from '@/views/returnout/Returnout.vue'
 import EditReturnOut from '@/views/returnout/Edit.vue'
 import ReportReturnIn from '@/views/reports/ReturnIn.vue'
 import ReportReturnOut from '@/views/reports/ReturnOut.vue'
+import Test from '@/views/Test.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),  
   routes: [
+    {
+      path: "/test",
+      name: "Test",
+      component:Test
+    },
     {
       path: '/',
       name: 'Welcome',

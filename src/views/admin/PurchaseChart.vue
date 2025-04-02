@@ -2,7 +2,7 @@
     <div>
         <div class="card shadow">
             <div class="card-body">
-                <div class="card-text">Purchase Amount By Month</div>
+                <div class="card-text">{{pur_amount_by_month}}</div>
                 <div class="row">
                     <div class="col-12">
                         <div v-if="isLoading">
@@ -38,6 +38,8 @@ import * as hp from "@/lib/helper"
 import * as ss from '@/lib/snapshot/purchases'
 import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
+import {lang} from '@/lib/language'
+
 export default {
     components:{
         GChart
@@ -64,6 +66,11 @@ export default {
         user(){
             return this.$store.getters.user;
         },
+        pur_amount_by_month(){
+                const sl=this.$store.getters.setLanguage;
+                const data=sl=="mm" ? lang.pur_amount_by_month.mm : lang.pur_amount_by_month.eng ;
+                return data;
+             },
     },
     methods:{
         onChartReady(){

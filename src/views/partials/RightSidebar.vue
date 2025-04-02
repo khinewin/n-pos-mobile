@@ -9,10 +9,10 @@
           <div class="offcanvas-body ">      
             <ul class="list-group small ">
               <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0" data-bs-dismiss="offcanvas" aria-label="Close">
-                <router-link class="nav-link py-2 px-3" :to="{name : 'Profile'}"><i class="fa-solid fa-id-card-clip"></i> Profile</router-link>
+                <router-link class="nav-link py-2 px-3" :to="{name : 'Profile'}"><i class="fa-solid fa-id-card-clip"></i> {{profile_link}}</router-link>
               </li>
               <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0" >
-                <a href="#!"  class="nav-link py-2 px-3" @click="showConfirm"><i class="fa-solid fa-right-from-bracket" ></i> Logout</a>
+                <a href="#!"  class="nav-link py-2 px-3" @click="showConfirm"><i class="fa-solid fa-right-from-bracket" ></i> {{logout_link}}</a>
               </li>                       
            </ul>
           </div>
@@ -40,6 +40,8 @@
 </template>
 <script>
   import { getAuth, signOut } from "firebase/auth";
+  import {lang} from "@/lib/language"
+
 export default {
   name : "RightSidebar",
   data(){
@@ -50,7 +52,17 @@ export default {
   computed:{
       user(){
           return this.$store.getters.user;
-      }
+      },
+      profile_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.profile.mm : lang.profile.eng ;
+            return data;
+        },
+        logout_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.logout.mm : lang.logout.eng ;
+            return data;
+        },
   },
   methods:{
     showConfirm(){    

@@ -1,6 +1,6 @@
 <template lang="">
     <div>
-        <PageHeader page-title="Backup / Restore" page-code="reports" :msg-type="msg.type" :msg-info="msg.info" />        
+        <PageHeader :page-title="pageTitle" page-code="reports" :msg-type="msg.type" :msg-info="msg.info" />        
         <div class="container-fluid">
         <div class="card">
         <div class="card-body">               
@@ -188,8 +188,7 @@ import * as hp_packingSizes from "@/lib/snapshot/packingSizes"
 import * as hp_rt_in from "@/lib/snapshot/returnIn"
 import * as hp_rt_out from "@/lib/snapshot/returnOut"
 
-
-
+import {lang} from "@/lib/language"
 import * as hp  from "@/lib/helper"
 import * as ie from "@/lib/import_export"
 import FlatPickr from 'vue-flatpickr-component';
@@ -239,6 +238,13 @@ export default {
             },  
             timer: 10,
         }
+    },
+    computed:{
+        pageTitle(){
+            const sl=this.$store.getters.setLanguage;
+            let  pageTitle=sl=="mm" ?  `${lang.backup_restore.mm}` : `${lang.backup_restore.eng}`            
+            return pageTitle;
+        },
     },
     watch:{
         msg:{

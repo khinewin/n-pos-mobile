@@ -30,7 +30,8 @@ import { products } from '@/lib/snapshot/products';
   },  
     products:[],
     packingSizes:[],
-    printData:{}
+    printData:{},
+    setLanguage: "mm"
   },
 
   getters: {
@@ -40,7 +41,8 @@ import { products } from '@/lib/snapshot/products';
     flat_pickr_config:state=>state.flat_pickr_config,
     products:state=>state.products,
     packingSizes:state=>state.packingSizes,
-    printData:state=>state.printData
+    printData:state=>state.printData,
+    setLanguage: state=>state.setLanguage
   },
 
   mutations: {

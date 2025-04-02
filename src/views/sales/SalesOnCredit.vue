@@ -1,21 +1,21 @@
 <template lang="">
     <div>           
-        <PageHeader page-title="SOC" :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader :page-title="pageTitle" :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                                     
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#customerModal"><i class="fa-solid fa-folder-tree"></i> Open (cltr+o)</button>
+                    <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#customerModal"><i class="fa-solid fa-folder-tree"></i> {{open_link}}</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button  class="btn btn-sm" :disabled="!customer.code"  @click="print"><i class="fa-solid fa-print" ></i> Print (cltr+p)</button>
+                    <button  class="btn btn-sm" :disabled="!customer.code"  @click="print"><i class="fa-solid fa-print" ></i> {{print_link}}</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <button type="button" @click="savePaid" class="btn btn-sm" v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> Save (cltr+s)
+                        <button type="button" @click="savePaid" class="btn btn-sm" v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> {{save_link}}
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <button @click="closePage" class="btn btn-sm close" :disabled="!customer.id"><i class="fa-solid fa-circle-xmark"></i> Close (cltr+q)</button>
+                        <button @click="closePage" class="btn btn-sm close" :disabled="!customer.id"><i class="fa-solid fa-circle-xmark"></i> {{close_link}}</button>
                 </div>
             </div>
         </div>     
@@ -152,6 +152,7 @@ import * as ss from "@/lib/snapshot/sales"
 import PrintSoc from "@/views/sales/PrintSoc.vue"
 import FlatPickr from 'vue-flatpickr-component';
 import * as hc from "@/lib/handleCtrl"
+import {lang} from "@/lib/language"
 
 export default {
     components: {
@@ -214,7 +215,32 @@ export default {
         },
         config(){
             return this.$store.getters.flat_pickr_config;
-        }
+        },
+        pageTitle(){
+            const sl=this.$store.getters.setLanguage;
+            let  pageTitle=sl=="mm" ?  `${lang.soc.mm} / ${lang.new.mm}` : `${lang.soc.eng} / ${lang.new.eng}`            
+            return pageTitle;
+        },      
+        close_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.close_link.mm : lang.close_link.eng ;
+            return data;
+        },       
+        open_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.open_link.mm : lang.open_link.eng ;
+            return data;
+        },
+        print_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.print_link.mm : lang.print_link.eng ;
+            return data;
+        },
+        save_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.save_link.mm : lang.save_link.eng ;
+            return data;
+        },
       
     },
     methods:{
