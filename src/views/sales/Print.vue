@@ -40,7 +40,7 @@
         </div>
         <div class="col-12 mt-1">
             <table class="table table-borderless  mb-0">
-                <tbody class="table-group-divider">
+                <thead class="table-group-divider">
                     <tr class="text-center fw-bold">
                         <td class="col-0 border-0 border-bottom border-2 border-dark">No.</td>
                         <td class="col-5 border-0  border-bottom border-2 border-dark">Product Name</td>
@@ -49,8 +49,8 @@
                         <td class="col-2 border-0  border-bottom border-2 border-dark">Discount</td>
                         <td class="col-2 border-0  border-bottom border-2 border-dark">Amount</td>
                     </tr>
-                </tbody>
-                <tbody class="table-group-divider">
+                </thead>
+                <tbody class="">
                     <tr cv-if="data.saleItems.length > 0" v-for="(s, i) in data.saleItems" :key="s.id" >   
                         <td class="text-center">{{i+1}}</td>                     
                         <td class="">{{s.item_name}}</td> 

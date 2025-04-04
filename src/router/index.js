@@ -44,6 +44,12 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),  
   routes: [
     {
+      path: '/mobile/print/:voucher_no',
+      name: 'MobilePrint',     
+      component: MobilePrint,
+      meta : {title: "N-POS | Print"}
+    },
+    {
       path: "/test",
       name: "Test",
       component:Test
@@ -108,12 +114,7 @@ const router = createRouter({
       component: MobileSale,
       meta : {title: "N-POS | Sale"}
     },
-    {
-      path: '/mobile/print',
-      name: 'MobilePrint',     
-      component: MobilePrint,
-      meta : {title: "N-POS | Print"}
-    },
+   
     {
       path: '/sale/:id/edit',
       name: 'EditSale',     

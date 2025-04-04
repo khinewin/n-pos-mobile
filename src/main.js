@@ -32,11 +32,13 @@ const options = {
       'scrollbars=yes'
     ],
     styles: [
-      'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+      '/bootstrap.min.css',
+      '/kidlat.css',
+      '/print.css',
     ],
     timeout: 1000, // default timeout before the print window appears
     autoClose: true, // if false, the window will not close after printing
-   // windowTitle: window.document.title, // override the window title
+    windowTitle: window.document.title, // override the window title
   }
 
 const app = createApp(App)

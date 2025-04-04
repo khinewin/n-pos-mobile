@@ -657,7 +657,8 @@ export default {
                     saleMode: this.saleMode,   
             } 
             this.$store.dispatch("setPrintData", data);
-            this.$router.push({name: "MobilePrint"})
+           // this.$router.push({name: "MobilePrint"})
+           this.$router.push({name: "MobilePrint", params: {voucher_no: this.voucher_no}, query: {print: true}})
         },
         printSale(){         
             if(this.print_on_save){

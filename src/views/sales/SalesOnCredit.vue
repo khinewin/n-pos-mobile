@@ -218,7 +218,7 @@ export default {
         },
         pageTitle(){
             const sl=this.$store.getters.setLanguage;
-            let  pageTitle=sl=="mm" ?  `${lang.soc.mm} / ${lang.new.mm}` : `${lang.soc.eng} / ${lang.new.eng}`            
+            let  pageTitle=sl=="mm" ?  `${lang.soc.mm}` : `${lang.soc.eng}`            
             return pageTitle;
         },      
         close_link(){
