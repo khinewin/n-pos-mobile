@@ -658,7 +658,9 @@ export default {
             } 
             this.$store.dispatch("setPrintData", data);
            // this.$router.push({name: "MobilePrint"})
-           this.$router.push({name: "MobilePrint", params: {voucher_no: this.voucher_no}, query: {print: true}})
+         //  this.$router.push({name: "MobilePrint", params: {voucher_no: this.voucher_no}, query: {print: true}})
+            let url=window.location.origin + "/mobile/print/" + this.voucher_no;
+            window.open(url, '_blank',   'width=' + window.innerWidth + ',height=' + window.innerHeight + ',top=0,left=0,scrollbars=yes,resizable=yes');
         },
         printSale(){         
             if(this.print_on_save){

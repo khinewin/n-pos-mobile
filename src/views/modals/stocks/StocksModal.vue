@@ -11,14 +11,14 @@
                                             <div class="col-12">
                                                 <div class="form-floating mb-2">
                                                     <input type="search" id="search_by_voucher_no" v-model="search_by_voucher_no" @keypress.enter="searchStocks" placeholder="Voucher no." class="form-control-plaintext border-bottom">
-                                                   <label for="search_by_voucher_no" class=" ">Voucher No.</label>
+                                                   <label for="search_by_voucher_no" class=" ">{{voucher_no_link}}</label>
                                                   </div>
                                             </div>
                                             <div class="col-12">
                                                 <div class="input-group mb-2">
                                                     <div class="form-floating">
                                                         <flat-pickr @change="searchStocks" class="form-control-plaintext border-bottom" v-model="search_by_from_date" id="from_date" :config="config" />
-                                                        <label for="from_date">From Date</label>
+                                                        <label for="from_date">{{from_date_link}}</label>
                                                     </div>
                                                     <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                                    </div>
@@ -27,7 +27,7 @@
                                                 <div class="input-group mb-2">
                                                     <div class="form-floating">
                                                         <flat-pickr @change="searchStocks" class="form-control-plaintext border-bottom" v-model="search_by_to_date" id="to_date" :config="config" />
-                                                        <label for="to_date">From Date</label>
+                                                        <label for="to_date">{{to_date_link}}</label>
                                                     </div>
                                                     <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                                    </div>
@@ -36,7 +36,7 @@
                                             
                                         <div class="row mt-2">
                                             <div class="col-6 d-grid">
-                                                <button class="btn btn-sm text-dark clear-search-stock" @click="clearSearch"> <i class="fa-solid fa-filter-circle-xmark"></i> Clear (ctrl+z)</button>
+                                                <button class="btn btn-sm text-dark clear-search-stock" @click="clearSearch"> <i class="fa-solid fa-filter-circle-xmark"></i> {{clear_link}}</button>
                                                 </div>
                                                 <!--<div class="col-4 d-grid">
                                                     <button class="btn btn-sm text-dark" @click="updatestocks">
@@ -45,7 +45,7 @@
                                                     </button>
                                                 </div>-->
                                                 <div class="col-6 d-grid">
-                                                    <button class="btn btn-sm text-dark close-stock" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
+                                                    <button class="btn btn-sm text-dark close-stock" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> {{close_link}}</button>
                                                 </div>
                                         </div>    
                                 </div>
@@ -92,6 +92,8 @@ import db from '@/firebase/firestore'
 import * as ss from "@/lib/snapshot/stocks"
 import FlatPickr from 'vue-flatpickr-component';
 import * as hp from '@/lib/helper'
+import {lang} from '@/lib/language'
+
 export default {
    props:['storestock'],
    components:{
@@ -129,6 +131,37 @@ export default {
        user(){
            return this.$store.getters.user;
        },       
+       search_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.search_link.mm : lang.search_link.eng ;
+            return data;
+        },
+        clear_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.clear_link.mm : lang.clear_link.eng ;
+            return data;
+        },
+        close_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.close_link.mm : lang.close_link.eng ;
+            return data;
+        },
+        from_date_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.from_date.mm : lang.from_date.eng ;
+            return data;
+        },
+        to_date_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.to_date.mm : lang.to_date.eng ;
+            return data;
+        },
+        voucher_no_link(){
+            const sl=this.$store.getters.setLanguage;
+            const data=sl=="mm" ? lang.voucher_no.mm : lang.voucher_no.eng ;
+            return data;
+        },
+      
    },
   
    methods:{

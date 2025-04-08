@@ -47,7 +47,7 @@
                                     <label for="search_by_code" class="small">{{barcode}}</label>
                                 </div>
                                 <div class="form-floating col-sm-3 col-lg-12">
-                                    <input type="search" id="search_by_description" v-model="search_by_description" @keypress.enter="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
+                                    <input type="search" id="search_by_description" v-model="search_by_description" @keypress.enter="testSearch" placeholder="Description" class="form-control-plaintext border-bottom">
                                     <label for="search_by_description" class="small">{{product_name}}</label>
                                 </div>
                             
@@ -600,7 +600,56 @@ export default {
                     edit_user : this.editItem.edit_user          
                  })  
         },
-      
+         generateKeywords(text) {
+            const words = text.toLowerCase().split(" ");
+            let tokens = new Set();
+            words.forEach((word) => {
+                // Store all substrings (3+ characters for better efficiency)
+                for (let i = 0; i < word.length; i++) {
+                for (let j = i + 2; j <= word.length; j++) { // At least 2-letter substrings
+                    tokens.add(word.substring(i, j));
+                }
+                }
+            });
+            return Array.from(tokens);
+         },
+         generateKeywordsNew(text) {
+        const words = text
+            .toLowerCase()
+            .replace(/[^\w\s]/g, " ") // Strip punctuation
+            .split(/\s+/)
+            .filter((word) => word.length > 0);
+        
+        const tokens = new Set();
+        const maxTokensPerDoc = 200; // Limit to keep docs under 1MB
+        
+        for (const word of words) {
+            const trimmedWord = word.slice(0, 15); // Cap word length at 15 chars
+            // Add full word if long enough
+            if (trimmedWord.length >= 3) tokens.add(trimmedWord);
+            
+            // Generate substrings (min 3 chars)
+            for (let i = 0; i < trimmedWord.length; i++) {
+            for (let j = i + 3; j <= trimmedWord.length; j++) {
+                tokens.add(trimmedWord.substring(i, j));
+                if (tokens.size >= maxTokensPerDoc) {
+                return Array.from(tokens); // Early exit
+                }
+            }
+            }
+        }
+        
+        return Array.from(tokens);
+        },
+         testSearch(){
+            const query_url = query(collection(db, "products"),  
+            where("keywords", "array-contains", this.search_by_description.toLowerCase()),  orderBy("created_at", "desc"));
+            const unsub=onSnapshot(query_url, (snapShot)=>{
+                const products=ss.products(snapShot);   
+                this.products=products;
+                 unsub()    
+        })
+         },
         async saveCode(){
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
@@ -618,6 +667,7 @@ export default {
             const data={
                 user: {uid:this.user.uid, displayName:this.user.displayName},
                 item_name: this.item_name, 
+                keywords: this.generateKeywords(this.item_name),
                 code_no : this.code_no,
                 qty : 0,
                 retail_price: {},

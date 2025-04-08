@@ -300,7 +300,7 @@ const router = createRouter({
 router.beforeEach((to, from, next)=>{
   document.title = to.meta.title;
   const isAuth=store.getters.user;
-  if (to.name !== 'Login' && !isAuth) next({ name: 'Login' })
+  if (to.name !== 'Login' && !isAuth &&  to.name !== 'MobilePrint') next({ name: 'Login' })
     else next()  
   //next();  
 })

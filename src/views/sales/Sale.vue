@@ -192,7 +192,7 @@
         <SalesModal @setCode="setOldCode" />
         <CustomerModal @setCustomer="setCustomer" />
         <!--Print item start-->
-        <div class="d-none" id="printMe" v-if="saleItems.length > 0" >
+        <div class="" id="printMe" v-if="saleItems.length > 0" >
                 <Print :data="{
                     voucher_no: this.voucher_no,
                     customer: this.customer,
@@ -222,7 +222,7 @@ import db from '@/firebase/firestore'
 //import Products from "@/views/sales/Products.vue"
 import SalesModal from "@/views/modals/sales/SalesModal.vue"
 import CustomerModal from "@/views/modals/sales/CustomerModal.vue"
-import Print from "@/views/sales/Print.vue"
+import Print from "@/views/sales/A4Print.vue"
 import ProductModal from "@/views/modals/sales/ProductModal.vue"
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/products"
@@ -570,6 +570,7 @@ export default {
         },
         async print () {
         // Pass the element id here
+        //window.print();
          await this.$htmlToPaper('printMe');
          if(this.saleMode=="Sale / New"){
             this.clearSaleItem();

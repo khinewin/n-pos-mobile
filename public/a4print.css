@@ -1,0 +1,60 @@
+
+@font-face {
+    font-family: "nts-regular";
+    src: url("/natosan/NotoSansMyanmar-Regular.ttf");
+  }
+  @font-face {
+    font-family: "nts-bold";
+    src: url("/natosan/NotoSansMyanmar-Bold.ttf");
+  }
+  @font-face {
+    font-family: "pds-regular";
+    src: url("/pyidaungsu/Pyidaungsu-Book-1.8.3_Regular.ttf");
+  }
+  @font-face {
+    font-family: "pds-bold";
+    src: url("/pyidaungsu/Pyidaungsu-Book-1.8.3_Bold.ttf");
+  }
+
+
+    
+  .footer-table{
+    margin-top: auto !important;
+  }
+  .a4-print-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.page-number{
+    margin-bottom: 1mm;
+    font-size: 12px;
+}
+
+.a4-page {
+  width: 210mm;
+  height: 297mm;
+  margin: 0 !important;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  page-break-after: always;
+}
+
+@media print {
+  @page{
+    size: A4 portrait !important;
+    margin: 0 !important;
+  }
+  body {
+    margin: 0 !important;
+  }
+  
+  .a4-page {
+    border: none !important;
+    margin:0 !important;
+    page-break-after: always !important;
+    padding: 10mm !important;
+  }
+}

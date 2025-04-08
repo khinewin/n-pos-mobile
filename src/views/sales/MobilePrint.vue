@@ -1,110 +1,81 @@
 <template lang="">    
-    <div class="container-fluid" id="invoice"  v-if="sales.length">
-        <div class="small-printer">
-        <SmallPrintHeader />
-        <div class="">   
-            <hr class="p-0 m-2">
-            <div class="">
-                <table class="table-borderless small">
-                    <tbody class="small">  
-                        <tr>
-                            <td class=" col-6 ps-4">ဘောင်ချာနံပါတ်<span class="">:</span></td>
-                            <td class="col-6" >
-                                {{sales[0].voucher_no}}
-                            </td>
+    <div  v-if="sales.length">
+        <div class="">       
+        <div class="">           
+            <div class="a5-print-container">           
+            <div class="a5-page" v-for="(pages, index) in paginatedItems">
+                <div class="page-number">
+                    Page {{ index + 1 }} of {{ paginatedItems.length }}
+                </div>
+                <div v-if="index===0">
+                    <SmallPrintHeader />
+                    <hr>
+                    <table class="table">
+                        <tbody class="small">  
+                            <tr>
+                                <td class="  ">ဘောင်ချာနံပါတ်<span class="">:</span></td>
+                                <td class="" >
+                                    {{sales[0].voucher_no}}
+                                </td>  
+                                <td class="">နေ့စွဲ<span class="">:</span></td>
+                                <td class="" >
+                                   <span >{{showTimeHour(sales[0].sale_date)}}</span>
+                                </td>                           
+                            </tr>
                            
-                        </tr>
-                        <tr>
-                            <td class="ps-4">နေ့စွဲ<span class="">:</span></td>
-                            <td class="" >
-                               <span >{{showTimeHour(sales[0].sale_date)}}</span>
-                            </td>
-                           
-                        </tr>   
-                        <tr>
-                            <td class="ps-4">အမည်<span class="">:</span></td>
-                            <td class="" >
-                                {{sales[0].customer.name}}
-                            </td>
-                        </tr>  
-                        <tr>
-                            <td class="ps-4">လိပ်စာ<span class="">:</span></td>
-                            <td class="" >
-                                {{sales[0].customer.address}}
-                            </td>
-                        </tr>                         
-                                                       
-                           
-                                                               
-                    </tbody>
-              </table>
-            </div>
-            <hr class="p-0 m-2">
-            <div class="">
-                <table class="table  table-borderless small print-body mb-0 ">
-                    <tbody class="fw-bold ">
+                            <tr>
+                                <td class="">အမည်<span class="">:</span></td>
+                                <td class="" >
+                                    {{sales[0].customer.name}}
+                                </td>
+                                <td class="">လိပ်စာ<span class="">:</span></td>
+                                <td class="" >
+                                    {{sales[0].customer.address}}
+                                </td>
+                            </tr>  
+                                                                                                                                                                                       
+                        </tbody>
+                  </table>
+                 </div>   
+                <table class="table table-bordered">
+                    <tbody class="fw-bold " v-if="pages.length > 0">
                         <tr class="text-center border-bottom-table small">
-                            <td class="ps-2">စဥ်</td>
-                            <td class="">အမျိုးအမည်</td>      
-                            <td class="">သင့်ငွေ</td>                  
+                            <td class="ps-2 col-1">စဥ် </td>
+                            <td class="col-9">အမျိုးအမည်</td>      
+                            <td class="col-2">သင့်ငွေ</td>                  
                         </tr>
                     </tbody>
-                    <tbody v-if="sales[0].products.length > 0" >
-                        <tr class="small" v-for="(s, i) in sales[0].products" :key="s.id" >   
-                            <td class="text-center ps-2">{{fmc(i+1)}}</td>                     
+                    <tbody v-if="pages.length > 0" >
+                        <tr class="small" v-for="(s, i) in pages" :key="s.id" >   
+                            <td class="text-center ps-2">{{index > 0 ? Number(index + "0") + i +1 : i +1}}</td>                     
                             <td class="">{{s.item_name}}, {{fmc(s.sale_qty)}} {{s.qty_sale_price_unit}}   </td>  
                             <td class="text-end">{{fmc(s.final_amount)}}</td>
-                        </tr>  
-                                      
-                        </tbody>
-                        <tbody class="text-end border-top-table small">
-                        <tr>
-                            <td colspan="2" class=" ">စုစုပေါင်း</td>
-                            <td class="">{{fmc(sales[0].total_amount)}}</td>
-                        </tr>                     
-                        <!--<tr>
-                            <td colspan="2" class="">Extra discount</td>
-                            <td class="">
-                                {{fM(sale.extra_discount)}}
-                            </td>
-                        </tr>-->
-                        <!--<tr>
-                            <td colspan="2" class="">Net amount</td>
-                            <td class="">{{fM(sale.net_amount)}}</td>
-                        </tr>-->
-                        <tr >
-                            <td colspan="2" class="">ပေးငွေ</td>
-                            <td class="">
-                                {{fmc(sales[0].paid)}}
-                            </td>
-                        </tr>
-                        <!--<tr>
-                            <td colspan="2" :class="{'border-bottom rm-b-b' : sale.credit}">Change</td>
-                            <td class="">
-                                {{fM(sale.change)}}
-                            </td>
-                        </tr> -->  
-                        <tr v-if="sales[0].credit">
-                            <td colspan="2" class="" >ကျန်ငွေ</td>
-                            <td class="">
-                                {{fmc(sales[0].credit)}}
-                            </td>
-                        </tr>                           
-                    </tbody>
+                        </tr>                                       
+                    </tbody>     
+                                 
               </table>
-              <table class="small-print-table-time table">
-                <tbody>
+              <table class="table  w-100"  v-if="index === paginatedItems.length - 1">
+                <tfoot class="text-end border-top-table small ">
                     <tr>
-                        <td class="text-end bg-info">Printed date : {{printDate}}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-center small">ဝယ်ယူအားပေးမှုကို အထူးကျေးဇူးတင်ရှိပါသည်။</td>
-                    </tr>
-                </tbody>
-               
-          </table>
-            </div>
-         
+                        <td colspan="2" class=" ">စုစုပေါင်း</td>
+                        <td class="">{{fmc(sales[0].total_amount)}}</td>
+                    </tr>                                         
+                    <tr >
+                        <td colspan="2" class="">ပေးငွေ</td>
+                        <td class="">
+                            {{fmc(sales[0].paid)}}
+                        </td>
+                    </tr>                     
+                    <tr v-if="sales[0].credit">
+                        <td colspan="2" class="" >ကျန်ငွေ</td>
+                        <td class="">
+                            {{fmc(sales[0].credit)}}
+                        </td>
+                    </tr>                           
+                </tfoot>   
+              </table>
+              </div>             
+            </div>         
             </div>      
         </div>
       </div>
@@ -128,8 +99,8 @@
                 largePrinter:false,
                 printDate: "",
                 voucher_no: this.$route.params.voucher_no,
-
-            }
+                itemsPerPage:25,
+            }   
         },
         mounted() {
             this.setPrintDate();
@@ -137,7 +108,31 @@
 
         },
         computed:{
-           
+            paginatedItems() {
+            const products = this.sales[0]?.products || [];
+            const pages = [];
+
+            const firstPageCount = 17;
+            const otherPageCount = this.itemsPerPage;
+
+            // First page
+            pages.push(products.slice(0, firstPageCount));
+
+            // Middle pages (if any)
+            for (let i = firstPageCount; i < products.length; i += otherPageCount) {
+                pages.push(products.slice(i, i + otherPageCount));
+            }
+
+            // Check last page item count
+            const lastPage = pages[pages.length - 1];
+            if (lastPage.length > 15) {
+                // Push an empty page for the footer if last page is too full
+                pages.push([]);
+            }
+
+            return pages;
+            }
+
         },
         methods:{
          
@@ -151,12 +146,8 @@
                // let printContent = document.getElementById("invoice").innerHTML;
               //  document.body.innerHTML = printContent;  // Show only the invoi
                 window.print();
-               
-                setTimeout(() => {
-                   // window.close();
-                   //  window.location.replace("/sale");
-                   this.$router.push({name: "Sale"});
-                }, 5000); // 10-second delay (ensures print completes)
+                window.close();
+
             },
              fmc(amount) {
                 const engNumbers = "0123456789";
@@ -193,10 +184,9 @@
              const unsub= onSnapshot(query_url, async(snapShot) =>{                
                         const sales=ss.sales(snapShot)       
                         this.sales=sales;
-
                         setTimeout(()=>{
-                            this.printAndClose();
-                        }, 2000)
+                           this.printAndClose();
+                        }, 100)
                        unsub();
                 });   
             }     
@@ -206,19 +196,43 @@
     
     }
     </script>
-    <style>
-      
-      
-          .border-bottom-table{
-            border-bottom: 1px solid #000 !important;
-          }
-          .border-top-table{
-            border-top: 1px solid #000 !important;
-          }
-          .print-body td{
-            font-size: 13px !important;
-          }
-        
-       
-                
+    <style>     
+
+  .footer-table{
+    margin-top: auto !important;
+  }
+  .a5-print-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.page-number{
+    margin-bottom: 2mm;
+    font-size: 12px;
+}
+
+.a5-page {
+    width: 148mm;
+  height: 210mm;
+  padding: 10mm;
+  padding-top: 5mm;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  margin-bottom: 10mm;
+  display: flex;
+  flex-direction: column;
+  page-break-after: always;
+}
+
+@media print {
+  body {
+    margin: 0;
+  }
+
+  .a5-page {
+    border: none;
+    margin: 0;
+    page-break-after: always;
+  }
+}
     </style>
