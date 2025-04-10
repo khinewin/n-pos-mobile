@@ -43,16 +43,18 @@
                 </div>                        
                 <div class="col-lg-9">
                     <div class="card shadow-sm">
-                        <div class="card-body p-2 table-responsive vh-95 overflow-y-auto">
+                        <div class="card-body p-2 pt-0  vh-100 overflow-y-auto">
                             <table class="table table-bordered table-hover mb-0">
-                                <tbody>
-                                    <tr class="text-center table-secondary fw-bold">
+                                <thead>
+                                    <tr class="text-center table-secondary fw-bold sticky-top z-3">
                                         <td class="col-1" @click="sortSuppliers('code')"><i class="fa-solid fa-sort"></i> Code</td>
                                         <td class="col-2" @click="sortSuppliers('name')"><i class="fa-solid fa-sort"></i> Name</td>
                                         <td class="col-1" @click="sortSuppliers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
                                         <td class="col-4" @click="sortSuppliers('company')"><i class="fa-solid fa-sort"></i> Company</td>
                                         <td class="col-1" @click="sortSuppliers('created_at')"><i class="fa-solid fa-sort"></i> Date</td>
                                     </tr>
+                                </thead>
+                                <tbody>                                    
                                    <tr @click="setCode(general_supplier)" data-bs-dismiss="modal" class="change-cursor">
                                         <td class="text-center">{{general_supplier.code}}</td>
                                         <td>{{general_supplier.name}}</td>
@@ -99,7 +101,7 @@
     import PageHeader from "@/views/partials/PageHeader.vue"
      import { useVuelidate  } from '@vuelidate/core'
     import { required, email ,helpers} from '@vuelidate/validators'
-    import {Timestamp, onSnapshot, collection, addDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
+    import {Timestamp, onSnapshot, collection, addDoc, query, where, limit, getDoc, getDocs, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
     import db from '@/firebase/firestore'
     import * as ss from '@/lib/snapshot/suppliers'
     import * as search from "@/lib/search"
@@ -183,28 +185,43 @@
                 this.search_by_company="";
                 this.searchSuppliers();
             },
-            searchSuppliers(){
-                this.suppliers=[];
-                if(this.search_by_code){
-                    this.suppliers=this.suppliersData.filter((f)=>f.code==this.search_by_code)
-                }else 
-                if(this.search_by_name){
-                    this.suppliers=search.searchSupplierName(this.suppliersData, this.search_by_name);
-                }else 
-                if(this.search_by_company){
-                    this.suppliers=search.searchSupplierCompany(this.suppliersData, this.search_by_company);
-                }else{
-                    this.suppliers= this.suppliersData.slice(0, 20)
+            async searchSuppliers() {
+            this.suppliers = [];
+            this.isLoading = true;
+            try {
+                if (this.search_by_name) {
+                    const query_url = query(
+                        collection(db, "suppliers"), where("name_keywords", "array-contains", this.search_by_name.toLowerCase()), orderBy("created_at", "desc"),
+                        limit(this.limitData)
+                    );
+                    const snapShot = await getDocs(query_url);
+                    const cus = ss.suppliers(snapShot);
+                    this.suppliers = cus;
+                   
+                } else if (this.search_by_company) {
+                    const query_url = query(
+                        collection(db, "suppliers"), where("company_keywords", "array-contains", this.search_by_company.toLowerCase()), orderBy("created_at", "desc"),
+                        limit(this.limitData)
+                    );
+                    const snapShot = await getDocs(query_url);
+                    const cus = ss.suppliers(snapShot);
+                    this.suppliers = cus;                   
+                } else {
+                    this.suppliers = this.suppliersData;                   
                 }
-            },
+            } catch (error) {
+                console.error("Error searching suppliers:", error);
+            } finally {
+                this.isLoading = false;
+            }
+        },      
             async fetchSuppliers(){ 
-            const query_url=query(collection(db, "suppliers"),orderBy("created_at", "desc"));           
+            const query_url=query(collection(db, "suppliers"),orderBy("created_at", "desc"), limit(this.limitData));           
             this.unsubSuppliers= onSnapshot(query_url, async(snapShot) =>{                  
                     const suppliers=ss.suppliers(snapShot);   
                     this.suppliersData=suppliers;
-                    this.suppliers=this.suppliersData.slice(0, 20);
+                    this.suppliers=suppliers;
                     this.isLoading=false;
-                    this.isUpdating=false;
             });                              
         } ,
            showTime(t){

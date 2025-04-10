@@ -231,9 +231,10 @@
         <setDiscountModal @saveDiscount="saveDiscount" :ei="editItem" />
         <!-- Barcode Modal -->
         <div class="modal fade" id="barcodeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-            <div class="modal-content">                
-                <div class="modal-body">
+            <div class="modal-dialog position-relative">
+            <div class="modal-content">   
+                <div class="modal-body ">
+                    <button class="btn btn-secondary btn-sm position-absolute end-0 top-0 z-3" data-bs-dismiss="modal" @click="stopScanner">Close</button>
                     <div id="reader" class="img-fluid"></div>
                 </div>               
             </div>
@@ -306,6 +307,7 @@ export default {
             },
             output: null,   
             scannerActive:false,     
+            html5QrCode:null,
              
         }
     },
@@ -411,31 +413,48 @@ export default {
             }, 100)
 
         },
+        stopScanner() {
+            this.scannerActive = false;
+
+            if (this.html5QrCode) {
+                this.html5QrCode.stop().then(() => {
+                    console.log("Scanner stopped.");
+                }).catch((err) => {
+                    console.error("Error stopping scanner:", err);
+                });
+            }
+        },
+
         initScanner(myModal) {
-            if(this.scannerActive) return false;
-            const isMobile = window.matchMedia("(max-width: 1199px)").matches;
-            this.scannerActive=true;
-            const html5QrCode = new Html5Qrcode("reader");
-                const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-                    /* handle success */
-                    this.scannerActive=false;
-                 
-                    this.code_no=decodedText
-                                                         
-                    html5QrCode.stop();
-                    this.setCodeOnPaste();
-                    myModal.hide();
-                    
-                };
-                
-                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-                // If you want to prefer front camera
-                if(!isMobile){
-                    html5QrCode.start({ facingMode: "user" }, config, qrCodeSuccessCallback);
-                }else{
-                    html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
-                }
-        },       
+        if (this.scannerActive) return false;
+
+        const isMobile = window.matchMedia("(max-width: 1199px)").matches;
+        this.scannerActive = true;
+
+        this.html5QrCode = new Html5Qrcode("reader"); // save instance to use later
+
+        const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+            this.scannerActive = false;
+            this.code_no = decodedText;
+
+            this.html5QrCode.stop().then(() => {
+            this.setCodeOnPaste();
+            myModal.hide();
+            }).catch(err => {
+            console.error("Error stopping scanner:", err);
+            });
+        };
+
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        const facing = isMobile ? "environment" : "user";
+
+        this.html5QrCode.start({ facingMode: facing }, config, qrCodeSuccessCallback)
+            .catch(err => {
+            console.error("Failed to start scanner:", err);
+            this.scannerActive = false;
+            });
+        },
+
         setPos(){
             localStorage.setItem("pos", this.print_on_save)
         },
@@ -540,8 +559,8 @@ export default {
                     if(products.length===0){
                         this.msg.info="Barcode not found.";
                         this.msg.type="error"
-                        return false;
                         this.code_no="";
+                        return false;
                     }
                     this.setCode(products[0])
                     this.code_no="";

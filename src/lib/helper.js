@@ -188,6 +188,20 @@ const  message=(type, name)=>{
     const voucher_no=`${user ? user : n}-${dmy}-${his}`
     return voucher_no;
   }
+ const generateKeywords=(text)=>{
+    const words = text.toLowerCase().split(" ");
+    let tokens = new Set();
+    words.forEach((word) => {
+        // Store all substrings (3+ characters for better efficiency)
+        for (let i = 0; i < word.length; i++) {
+        for (let j = i + 2; j <= word.length; j++) { // At least 2-letter substrings
+            tokens.add(word.substring(i, j));
+        }
+        }
+    });
+    return Array.from(tokens);
+ }
+ 
 
 const gb_date=groupBy(['group_date'])
 const gb_item_name=groupBy(['item_name'])
@@ -238,4 +252,5 @@ export   {
     formattedAmount,
     formattedAmountCurrency,
     setVoucherNo,
+    generateKeywords,
     };

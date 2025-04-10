@@ -135,7 +135,7 @@
    import PageHeader from "@/views/partials/PageHeader.vue"
     import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-   import {Timestamp, collection, addDoc, query, where, getDocs,onSnapshot, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
+   import {Timestamp, collection, addDoc, query, where, getDocs,onSnapshot, limit, doc, getDoc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
    import db from '@/firebase/firestore'
    import * as hp from "@/lib/helper"
    import * as ss from "@/lib/snapshot/customers"
@@ -195,10 +195,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
         const name=document.getElementById("name");
      //   name.focus();
         this.created_at=hp.setToday();
-
-        this.checkDatabase();
-        this.isLoading=true;
-      //  this.fetchCustomer();
+       this.fetchCustomer();
         window.addEventListener('keydown', this.handleCtrl);
 
        },
@@ -284,19 +281,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
             this.search_by_address=event.target.value;
             this.searchCustomer();
         },
-        async deleteMultiple(){
-            const is_has=this.customers.filter((f)=>f.is_deleted)
-            if(is_has.length <=0) return false;
-            const cf=confirm(`Are you sure you want to delete the customers ?`)
-            if(!cf) return false;
-            this.isDeleting=true;
-            this.customers.filter(async (s)=>{
-                if(s.is_deleted){
-                    const updateDocument=doc(db, "customers", s.id)
-                    await updateDoc(updateDocument, {is_deleted: true, edit_user: {uid: this.user.uid, type: 'removed'}})  
-                }
-            })
-        },
+      
         checkAll(){
            setTimeout(()=>{
             this.customers=this.customers.map((s)=>{
@@ -309,24 +294,29 @@ import { required, email ,helpers} from '@vuelidate/validators'
             const cf=confirm(`Are you sure, you want to delete the customers "${c.name}" ?`)
             if(!cf) return false;
             this.isDeleting=true;        
-            const document=doc(db, "customers", c.id)     
-            await deleteDoc(document) 
-          
+            const document=doc(db, "customers", c.id)   
+            this.isRemoved(c.code);  
+            await deleteDoc(document)           
         },
+       generateKeywords(data){
+            return hp.generateKeywords(data);
+       },
         async saveCustomer(){
          //   if(this.editItem.id) this.saveEdit();
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
-            let isTaken=this.customersData.some((f)=>f.name.toLowerCase() == this.name.toLowerCase())
-            if(isTaken){
+           
+            const coll = collection(db, "customers");
+            const q = query(coll, where("name_lower_case", "==", this.name.toLowerCase()));
+            const isTaken = await getDocs(q);           
+            if(!isTaken.empty){                
                 this.msg.info="This customer name already exists"
                 this.msg.type="error"
                 this.name="";
-               
-                return false;
+                return true;          
             }
-            this.isSaving=true;
 
+            this.isSaving=true;
             const date=hp.insertDateNoTime(this.created_at)
             this.code=this.code ? this.code : hp.g_code();
             const created_at=Timestamp.fromDate(date);
@@ -335,6 +325,9 @@ import { required, email ,helpers} from '@vuelidate/validators'
             const data={
                 user: {uid:this.user.uid, displayName:this.user.displayName},
                 name: this.name, 
+                name_lower_case:this.name.toLowerCase(),
+                name_keywords: this.generateKeywords(this.name),
+                address_keywords: this.generateKeywords(this.address),
                 code :  this.code,
                 phone: this.phone,
                 address: this.address,
@@ -342,6 +335,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 is_deleted: this.is_deleted,     
                 edit_user: {uid: this.user.uid, type: 'added'}
             }
+            this.isCreated(this.code);
             const result=await addDoc(dataCollection, data);         
            
         },
@@ -350,20 +344,28 @@ import { required, email ,helpers} from '@vuelidate/validators'
                this.fetchCustomer();
         },
           async saveEdit(){         
-            let result=this.customersData.some((f)=>f.id != this.editItem.id && f.name.toLowerCase().includes(this.editItem.name) )
-            if(result){
+            const coll = collection(db, "customers");
+            const q = query(coll, where("name_lower_case", "==", this.editItem.name.toLowerCase()));
+            const isTaken = await getDocs(q);
+            if(!isTaken.empty){
+                const docRef = doc(db, "customers", this.editItem.id);
+                const docSnapshot = await getDoc(docRef);
+                const docData = docSnapshot.data();
+                const index = this.customers.findIndex(cus => cus.code == docData.code);
+                this.customers[index].name=docData.name;
                 this.msg.info="This customer name already exists"
-                this.msg.type="error";
-                this.customers=this.customersData.map((m)=>{
-                    if(m.id==this.editItem.id){
-                        return {...m, name: ""}
-                    }
-                    return m;
-                })
+                this.msg.type="error"
                 return false;
-            }           
-               const updateDocument=doc(db, "customers", this.editItem.id)
-                await updateDoc(updateDocument,this.editItem)  
+            }
+            const updateDocument=doc(db, "customers", this.editItem.id)
+            const data={
+                ...this.editItem,
+                name_lower_case: this.editItem.name.toLowerCase(),
+                name_keywords: this.generateKeywords(this.editItem.name),
+                address_keywords: this.generateKeywords(this.editItem.address),
+            }
+            this.isUpdated(this.editItem.code);
+            await updateDoc(updateDocument,data)  
            },
            setEdit(p){
                this.editItem={...p, edit_user: {uid: this.user.uid, type: "modified"}}
@@ -379,72 +381,84 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 this.msg.info=hp.message(type, "customer")
                 this.msg.type="success"                                                         
         }, 
+        async isCreated(code){
+            const query_url=query(collection(db, "customers"), where("code","==", Number(code)));           
+           const unsub=onSnapshot(query_url, async(snapShot) =>{
+                snapShot.docChanges().forEach((change) => {   
+                    if(change.type != "added") return true;
+                    this.msg.info="The new customer has been created"
+                    this.msg.type="success"
+                    this.resetInput(); 
+                    unsub();
+                })
+            })
+        },
+        async isUpdated(code){
+            const query_url=query(collection(db, "customers"), where("code","==", Number(code)));           
+           const unsub=onSnapshot(query_url, async(snapShot) =>{
+                snapShot.docChanges().forEach((change) => {   
+                    if(change.type != "modified") return true;
+                    this.msg.info="The selected customer has been updated"
+                    this.msg.type="success"
+                    this.editItem={}
+                    unsub();
+                })
+            })
+        },
+        async isRemoved(code){
+            const query_url=query(collection(db, "customers"), where("code","==", Number(code)));           
+           const unsub=onSnapshot(query_url, async(snapShot) =>{
+                snapShot.docChanges().forEach((change) => {   
+                    if(change.type != "removed") return true;
+                    this.msg.info="The selected customer has been deleted"
+                    this.msg.type="success"
+                    this.editItem={}
+                    this.isDeleting=false;
+                    unsub();
+                })
+            })
+        },        
          
-           async checkDatabase(){ 
-            const query_url=query(collection(db, "customers"),  orderBy("created_at", "desc"));           
-                onSnapshot(query_url, async(snapShot) =>{
-
-                    const customers=ss.customers(snapShot);           
-                    this.customersData=customers;
-                    this.customers=this.customersData.slice(0,this.limitData)                    
-                    this.isLoading=false;
-
-                    const dc=snapShot._snapshot.docChanges;
-                    const user=this.user;
-                    if(dc.length > 1) return false;
-                    snapShot.docChanges().forEach((change) => {                       
-                        const res=change.doc.data();   
-                            if(change.type==="added" && res.edit_user.uid==user.uid && dc.length===1){
-                                    this.msg.info="The new customer has been created"
-                                    this.msg.type="success"
-                                    this.resetInput();    
-                                    this.editItem={}    
-
-                                    //hp.setAutoFocus("name")     
-                            }           
-                            if(change.type==="modified" && res.edit_user.type=="modified" && res.edit_user.uid==user.uid){
-                                   this.msg.info="The selected customer has been updated"
-                                    this.msg.type="success"
-                                    this.editItem={}    
-
-                            }  
-                            if(change.type==="removed" && res.edit_user.uid==user.uid){
-                                   this.msg.info="The selected customer has been deleted"
-                                    this.msg.type="success"
-                                    this.isDeleting=false;
-                                    this.editItem={}    
-
-                                 //   this.is_check_all=false;
-                                  //  this.removeCustomer(change.doc.id)
-                            }      
-                    });                 
-            });                              
-        } ,
-           async fetchCustomer(){                    
-               const query_url = query(collection(db, "customers"), orderBy("created_at", "desc"));
+        async fetchCustomer(){                    
+               const query_url = query(collection(db, "customers"), orderBy("created_at", "desc"), limit(this.limitData));
                onSnapshot(query_url, async(snapShot) =>{                    
                     const customers=ss.customers(snapShot);           
                     this.customersData=customers;
-                    this.searchCustomer();          
+                    this.customers=customers;
                     this.isLoading=false;
-                    this.isUpdating=false;           
             });     
               
           } ,
-          searchCustomer(){
-               this.customers=[];
-               if(this.search_by_code){
-                   this.customers=this.customersData.filter((f)=>f.code===Number(this.search_by_code))
-               }else 
-               if(this.search_by_name){
-                    this.customers=search.searchCustomerName(this.customersData, this.search_by_name)
-               }else 
-               if(this.search_by_address){
-                    this.customers=search.searchCustomerAddress(this.customersData, this.search_by_address)
-               }else{
-                   this.customers= this.customersData.slice(0,this.limitData)
-               }
-           },          
+          async searchCustomer() {
+            this.customers = [];
+            this.isLoading = true;
+            try {
+                if (this.search_by_name) {
+                    const query_url = query(
+                        collection(db, "customers"), where("name_keywords", "array-contains", this.search_by_name.toLowerCase()), orderBy("created_at", "desc"),
+                        limit(this.limitData)
+                    );
+                    const snapShot = await getDocs(query_url);
+                    const cus = ss.customers(snapShot);
+                    this.customers = cus;
+                   
+                } else if (this.search_by_address) {
+                    const query_url = query(
+                        collection(db, "customers"), where("address_keywords", "array-contains", this.search_by_address.toLowerCase()), orderBy("created_at", "desc"),
+                        limit(this.limitData)
+                    );
+                    const snapShot = await getDocs(query_url);
+                    const cus = ss.customers(snapShot);
+                    this.customers = cus;                   
+                } else {
+                    this.customers = this.customersData;                   
+                }
+            } catch (error) {
+                console.error("Error searching customers:", error);
+            } finally {
+                this.isLoading = false;
+            }
+        },         
            resetInput(){
             this.name="";
             this.phone="";
@@ -526,55 +540,3 @@ import { required, email ,helpers} from '@vuelidate/validators'
        
    </style>
    
-   <!--
-                                               <ul class="list-group list-group-flush">
-                                   <li class="list-group-item list-group-item-action bg-secondary-subtle">
-                                       <div class="row">
-                                           <div class="col-lg-3">
-                                                   <div class="small fw-lighter mt-3">Code</div>
-                                           </div>
-                                           <div class="col-lg-5">
-                                                   <div class="small fw-lighter mt-3">Description</div>
-                                           </div>
-                                           <div class="col-lg-1">
-                                                   <div class="small fw-lighter mt-3">phone</div>
-                                           </div>
-                                           <div class="col-lg-3 small fw-lighter text-center">
-                                                   <div>Prices</div>
-                                                   <div class="row">
-                                                       <div class="col-4">Purchase</div>
-                                                       <div class="col-4">Regular sale</div>
-                                                       <div class="col-4">Whole sale</div>
-                                                   </div>
-                                           </div>
-                                   </div>
-                                   </li>
-                                   <li class="list-group-item" v-if="isLoading">
-                                       <div class="d-flex justify-content-center my-5">
-                                           <div class="spinner-border text-primary"  role="status">
-                                             <span class="visually-hidden">Loading...</span>
-                                           </div>
-                                         </div>
-                                   </li>
-                                   <li v-if="customers.length > 0" class="list-group-item list-group-item-action" v-for="p in customers" :key="p.id" >
-                                           <div class="row">
-                                                   <div class="col-lg-3 small">
-                                                           <div>{{p.code}}</div>
-                                                   </div>
-                                                   <div class="col-lg-5 small">
-                                                           <div>{{p.name}}</div>
-                                                   </div>
-                                                   <div class="col-lg-1 small">
-                                                           <div>{{p.phone}}</div>
-                                                   </div>
-                                                   <div class="col-lg-3 small fw-lighter text-center">
-                                                       <div class="row">
-                                                           <div class="col-4">{{p.purchase_price}}</div>
-                                                           <div class="col-4">{{p.regular_sale_price}}</div>
-                                                           <div class="col-4">{{p.created_at}}</div>
-                                                       </div>
-                                               </div>
-                                           </div>
-                                   </li>
-                           </ul>
-                       -->

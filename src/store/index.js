@@ -31,7 +31,7 @@ import { products } from '@/lib/snapshot/products';
     products:[],
     packingSizes:[],
     printData:{},
-    setLanguage: "mm"
+    setLanguage: "eng"
   },
 
   getters: {

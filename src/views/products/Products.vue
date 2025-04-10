@@ -10,7 +10,7 @@
                       </div>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button class="btn btn-sm">{{display_link}} {{products.length}} of {{productsData.length}}</button>
+                    <button class="btn btn-sm">{{display_link}} {{products.length}} of {{productCount}}</button>
                 </div> 
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveEdit">
@@ -47,7 +47,7 @@
                                     <label for="search_by_code" class="small">{{barcode}}</label>
                                 </div>
                                 <div class="form-floating col-sm-3 col-lg-12">
-                                    <input type="search" id="search_by_description" v-model="search_by_description" @keypress.enter="testSearch" placeholder="Description" class="form-control-plaintext border-bottom">
+                                    <input type="search" id="search_by_description" v-model="search_by_description" @keypress.enter="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
                                     <label for="search_by_description" class="small">{{product_name}}</label>
                                 </div>
                             
@@ -233,9 +233,10 @@
         <SelectPackingSizeModal @setPackingSize="setPackingSize" :ei="editItem" :packingSizes="packingSizes" />
           <!-- Barcode Modal -->
           <div class="modal fade" id="barcodeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-            <div class="modal-content">                
-                <div class="modal-body">
+            <div class="modal-dialog position-relative">
+            <div class="modal-content">   
+                <div class="modal-body ">
+                    <button class="btn btn-secondary btn-sm position-absolute end-0 top-0 z-3" data-bs-dismiss="modal" @click="stopScanner">Close</button>
                     <div id="reader" class="img-fluid"></div>
                 </div>               
             </div>
@@ -248,7 +249,7 @@
 import PageHeader from "@/views/partials/PageHeader.vue"
 import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {Timestamp,onSnapshot, collection, addDoc, query, where, setDoc, getDocs, doc, updateDoc, limit, orderBy, deleteDoc} from 'firebase/firestore'
+import {Timestamp,onSnapshot, collection, addDoc, query, where, setDoc, getCountFromServer, getDocs, doc, getDoc, updateDoc, limit, orderBy, deleteDoc} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import Footer from '@/views/partials/Footer.vue'
 import * as ss from "@/lib/snapshot/products"
@@ -288,6 +289,7 @@ export default {
             productsData:[],
             packingSizes:[],
             editItem:{},
+            old_item_name:"",
             isUpdating:false,
             isSaving:false,
             isSavePrice:false,
@@ -307,6 +309,8 @@ export default {
            limitItem: 100,
            useCamera: false,
            scannerActive: false,
+           html5QrCode:null,
+           productCount: 0,
         }
     },
     created() {     
@@ -320,8 +324,9 @@ export default {
         this.isLoading=true;
      
         window.addEventListener('keydown', this.handleCtrl);
-      this.checkDatabase();
        this.fetchPackingSizes();
+       this.fetchProductCount();
+       this.fetchProducts();
     },
     unmounted() {
         if(this.unsubProducts){
@@ -430,42 +435,53 @@ export default {
             this.useCamera=c;       
            
         },
-        initScanner(isNew, camera=true) {
-            if(!this.useCamera) return false;
-            if(this.scannerActive) return false;
+        stopScanner() {
+            this.scannerActive = false;
+
+            if (this.html5QrCode) {
+                this.html5QrCode.stop().then(() => {
+                    console.log("Scanner stopped.");
+                }).catch((err) => {
+                    console.error("Error stopping scanner:", err);
+                });
+            }
+        },
+
+        initScanner(isNew, camera = true) {
+            if (!this.useCamera) return false;
+            if (this.scannerActive) return false;
 
             const myModal = new bootstrap.Modal('#barcodeModal', {
-            keyboard: false
-            })
+                keyboard: false
+            });
             myModal.show();
-            
-           
-            const isMobile = window.matchMedia("(max-width: 1199px)").matches;
-            this.scannerActive=true;
 
-            const html5QrCode = new Html5Qrcode("reader");
-               
-                const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-                    /* handle success */
-                    this.scannerActive=false;
-                    if(isNew){
-                        this.code_no=decodedText
-                    }else{
-                        this.editItem.code_no=decodedText
-                        this.saveEdit();
-                    }                                       
-                    html5QrCode.stop();
-                    myModal.hide();
-                };
-                
-                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-                // If you want to prefer front camera
-                if(!isMobile){
-                    html5QrCode.start({ facingMode: "user" }, config, qrCodeSuccessCallback);
-                }else{
-                    html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+            const isMobile = window.matchMedia("(max-width: 1199px)").matches;
+            this.scannerActive = true;
+
+            this.html5QrCode = new Html5Qrcode("reader"); // 👈 store instance
+
+            const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+                this.scannerActive = false;
+
+                if (isNew) {
+                    this.code_no = decodedText;
+                } else {
+                    this.editItem.code_no = decodedText;
+                    this.saveEdit();
                 }
-        },        
+
+                this.html5QrCode.stop().then(() => {
+                    myModal.hide();
+                });
+            };
+
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            const facing = isMobile ? "environment" : "user";
+            this.html5QrCode.start({ facingMode: facing }, config, qrCodeSuccessCallback);
+        },
+     
         setMsg(info, type){
             this.msg.type=type;
             this.msg.info=info
@@ -507,49 +523,24 @@ export default {
             }          
          
         },
-        saveQty(){
-            const e=this.editItem;
-            
+        async saveQty(){
+            const e=this.editItem;            
                 let qty=0;
                 qty += e.l_qty ? e.l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
                 qty += e.m_qty ? e.m_qty * e.packing_size.smallest_qty: 0;
-                qty += e.s_qty ? e.s_qty : 0;               
-         
+                qty += e.s_qty ? e.s_qty : 0;                       
                e.qty=qty;
-               this.saveEdit();
+               this.isUpdated(this.editItem.code_no);
+               const updateDocument=doc(db, "products", this.editItem.id)
+              await updateDoc(updateDocument, this.editItem)  
         },
-      /*  async deleteMultiple(){
-            const is_has=this.products.filter((f)=>f.is_deleted)
-            if(is_has.length <=0) return false;
-            let msg=""
-            if(is_has.length > 1){
-                msg=`"${is_has[0].item_name}" and  "${is_has.length - 1}  more"`
-            }else{
-                msg=`"${is_has[0].item_name}"`
-            }
-            const cf=confirm(`Are you sure,  you want to delete product code ${msg}`)
-            if(!cf) return false;
-            this.isDeleting=true;
-            setTimeout(()=>{
-                this.msg.info="The product code has been deleted"
-                this.msg.type="success"
-            }, 200)
-
-           this.products.filter(async (s)=>{
-                if(s.is_deleted){
-                    this.removeProduct(s.id)
-                    this.isDeleting=false;
-                    const updateDocument=doc(db, "products", s.id)
-                    await updateDoc(updateDocument, {is_deleted: true, edit_user: {uid: this.user.uid, type: 'removed'}})  
-                    
-                } 
-            })
-        }, */
+      
         async removeProduct(p){   
             const cf=confirm(`Are you sure,  you want to delete product code ${p.item_name}`)
             if(!cf) return false;
             this.isDeleting=true;       
-            const document=doc(db, "products", p.id)            
+            const document=doc(db, "products", p.id)      
+            this.isRemoved(p.code_no);      
              await deleteDoc(document)  
         },
         checkAll(){
@@ -570,35 +561,45 @@ export default {
                 this.saveEdit();
             },300)
         },
-        async saveEdit(){    
-           /* let result=this.productsData.filter((f)=>f.id != this.editItem.id && f.item_name.toLowerCase().includes(this.editItem.item_name) )
-            if(result.length > 0){
-                this.msg.info="This item name already exists"
-                this.msg.type="error";
-                this.products=this.productsData.map((m)=>{
-                    if(m.id==this.editItem.id){
-                        return {...m, item_name: ""}
-                    }
-                    return m;
-                })
-                return false;
-            }   */    
-
+        async saveEdit(){               
             if(!this.editItem.item_name || !this.editItem.code_no) return false;
+
+            const coll = collection(db, "products");
+            const q = query(coll, where("item_name_lower_case", "==", this.editItem.item_name.toLowerCase()));
+            const isTaken = await getDocs(q);
+            if(!isTaken.empty){
+                const docRef = doc(db, "products", this.editItem.id);
+                const docSnapshot = await getDoc(docRef);
+                const docData = docSnapshot.data();
+                const index = this.products.findIndex(product => product.id === docData.id);
+                this.products[index].item_name=docData.item_name;
+                this.editItem.item_name=docData.item_name;
+                this.msg.info="This item name already exists"
+                this.msg.type="error"
+                return false;
+            }
+            this.old_item_name="";
             this.isUpdating=true;
+            this.isUpdated(this.editItem.code_no);
+            const data={
+                ...this.editItem,
+                item_name_lower_case: this.editItem.item_name.toLowerCase(),
+                keywords: this.generateKeywords(this.editItem.item_name),
+             }
             const updateDocument=doc(db, "products", this.editItem.id)
-            await updateDoc(updateDocument, this.editItem)  
+            await updateDoc(updateDocument, data)  
         },
         setPackingSize(p){
             this.editItem.packing_size=p;
            this.savePackingSize();
         } ,
         async savePackingSize(){       
+            this.isUpdated(this.editItem.code_no);
             const updateDocument=doc(db, "products", this.editItem.id)
             await updateDoc(updateDocument, {
                     packing_size : this.editItem.packing_size,        
                     edit_user : this.editItem.edit_user          
-                 })  
+            })  
         },
          generateKeywords(text) {
             const words = text.toLowerCase().split(" ");
@@ -637,29 +638,25 @@ export default {
                 }
             }
             }
-        }
-        
+        }        
         return Array.from(tokens);
         },
-         testSearch(){
-            const query_url = query(collection(db, "products"),  
-            where("keywords", "array-contains", this.search_by_description.toLowerCase()),  orderBy("created_at", "desc"));
-            const unsub=onSnapshot(query_url, (snapShot)=>{
-                const products=ss.products(snapShot);   
-                this.products=products;
-                 unsub()    
-        })
-         },
+    
+      
         async saveCode(){
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
-            let isTaken=this.productsData.some((f)=>f.item_name.toLowerCase() == this.item_name.toLowerCase())
-            if(isTaken){
+
+            const coll = collection(db, "products");
+            const q = query(coll, where("item_name_lower_case", "==", this.item_name.toLowerCase()));
+            const isTaken = await getDocs(q);           
+            if(!isTaken.empty){                
                 this.msg.info="This item name already exists"
                 this.msg.type="error"
                 this.item_name="";
-                return false;
+                return true;          
             }
+
             this.isSaving=true;
             const save_time=Timestamp.fromDate(new Date());
             const dataCollection=collection(db, "products", )
@@ -667,6 +664,7 @@ export default {
             const data={
                 user: {uid:this.user.uid, displayName:this.user.displayName},
                 item_name: this.item_name, 
+                item_name_lower_case:this.item_name.toLowerCase(),
                 keywords: this.generateKeywords(this.item_name),
                 code_no : this.code_no,
                 qty : 0,
@@ -680,7 +678,7 @@ export default {
                 edit_user: {uid: this.user.uid, type: 'added'},
                 auto_cal: true,
             }
-        
+            this.isCreated(this.code_no);
             await addDoc(dataCollection, data);                    
         },
         resetInput(){            
@@ -691,8 +689,8 @@ export default {
         },
        
        async savePrice(){
-            const updateDocument=doc(db, "products", this.editItem.id)
-           
+            this.isUpdated(this.editItem.code_no);
+            const updateDocument=doc(db, "products", this.editItem.id)           
                 await updateDoc(updateDocument, {
                     pur_price: this.editItem.pur_price,
                     retail_price: this.editItem.retail_price,
@@ -713,7 +711,8 @@ export default {
         },
        
       
-        setEdit(p){          
+        setEdit(p){  
+         
             let  l=0, m=0, s=0;
 
             const item=p;
@@ -748,29 +747,42 @@ export default {
             this.searchProducts();
         },
       
-       searchProducts(){
-            this.products=[];
-            if(this.search_by_code){               
-                const products=search.searchByCode(this.productsData,this.search_by_code);
-                this.products=products;
-                if(this.products.length){
-                    this.setEdit(this.products[0])
+        async searchProducts() {
+            this.products = [];
+            this.isLoading = true;
+            try {
+                if (this.search_by_code) {
+                    const query_url = query(collection(db, "products"), where("code_no", "==", Number(this.search_by_code)));
+                    const snapShot = await getDocs(query_url);
+                    const products = ss.products(snapShot);
+                    this.products = products;
+                    if (products.length) {
+                        this.setEdit(products[0]);
+                    }
+                } else if (this.search_by_description) {
+                    const query_url = query(
+                        collection(db, "products"), where("keywords", "array-contains", this.search_by_description.toLowerCase()), orderBy("created_at", "desc"),
+                        limit(this.limitItem)
+                    );
+                    const snapShot = await getDocs(query_url);
+                    const products = ss.products(snapShot);
+                    this.products = products;
+                    if (products.length) {
+                        this.setEdit(products[0]);
+                    }
+                } else {
+                    this.products = this.productsData;
+                    if (this.products.length && Object.keys(this.editItem).length <= 0) {
+                        this.setEdit(this.products[0]);
+                    }
                 }
-            }else 
-            if(this.search_by_description){           
-               const products=search.searchByDescription(this.productsData, this.search_by_description)
-               this.products=products;     
-                if(this.products.length){
-                    this.setEdit(this.products[0])
-                }
-            }else{
-                this.products=this.productsData.slice(0, this.limitItem);
-                if(this.products.length && Object.keys(this.editItem).length <=0){
-                  this.setEdit(this.products[0])                    
-             }  
+            } catch (error) {
+                console.error("Error searching products:", error);
+            } finally {
+                this.isLoading = false;
             }
-                      
         },
+
         async fetchPackingSizes(){
         const query_url = query(collection(db, "packingSizes"), orderBy("created_at", "desc"));
         this.unsubPackingSizes=onSnapshot(query_url, (snapShot)=>{
@@ -778,31 +790,142 @@ export default {
                 this.packingSizes=pSIzes;    
         })
        },
-        async checkDatabase(){
-            const query_url=query(collection(db, "products"), orderBy("created_at", "desc"), limit(20));           
-             this.unsubProducts= onSnapshot(query_url, async(snapShot) =>{                    
-                    //update  docs
-                                const products=ss.products(snapShot);   
-                                this.productsData=products;
-                                this.products=this.productsData.slice(0, this.limitItem);
-                                this.setEdit(this.products[0])
-                                this.isLoading=false;
-                                this.isUpdating=false;      
+       async fetchProducts(){
+        const query_url=query(collection(db, "products"), orderBy("created_at", "desc"), limit(this.limitItem));           
+            onSnapshot(query_url, async(snapShot) =>{     
+                const products=ss.products(snapShot);   
+                this.productsData=products;
+                this.products=products;                
+                this.isLoading=false;
+                if(Object.keys(this.editItem).length ==0){
+                    this.setEdit(this.products[0]) 
+                }
+            });
+       },
+      async isCreated(code_no){
+        const query_url=query(collection(db, "products"),where("code_no", "==", code_no));           
+         const unsub=onSnapshot(query_url, async(snapShot) =>{   
+            snapShot.docChanges().forEach((change) => {     
+                if(change.type !="added") return false;
+                this.msg.info="The new product code has been created"
+                this.msg.type="success"
+                this.resetInput();    
+                this.setEdit(this.products[0])
+                setTimeout(()=>{
+                    this.fetchProductCount();
+                }, 200)     
+                unsub();                           
+            })
+        })
+      },
+      async isUpdated(code_no){
+        const query_url=query(collection(db, "products"),where("code_no", "==", code_no));           
+         const unsub=onSnapshot(query_url, async(snapShot) =>{   
+            snapShot.docChanges().forEach((change) => {   
+                if(change.type !="modified") return false;
+                const res=change.doc.data();   
+                const id=change.doc.id;
+                this.msg.info="The selected product code has been updated"  
+                this.msg.type="success"
+                 this.isUpdating=false;
+                this.editItem={...res, id}
+                unsub();                           
+            })
+        })
+      },
+      async isRemoved(code_no){
+        const query_url=query(collection(db, "products"),where("code_no", "==", code_no));           
+         const unsub=onSnapshot(query_url, async(snapShot) =>{   
+            snapShot.docChanges().forEach((change) => {   
+                if(change.type !="removed") return false;
+                this.isDeleting=false;
+                this.msg.info="The selected product code has been deleted"
+                this.msg.type="success"                
+                setTimeout(()=>{
+                    this.editItem=this.products[0];
+                    this.fetchProductCount();
+                }, 1000)
+                unsub();                           
+            })
+        })
+      },      
+  
+        async fetchProductCount() {
+            const coll = collection(db, "products");
+            const snapshot = await getCountFromServer(coll);
+            this.productCount = snapshot.data().count;       
+        },
+       
+    }
+}
+</script>
+<style>
+ 
+</style>
 
-                        const dc=snapShot._snapshot.docChanges;
+
+<!--
+    delay(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+        },
+
+    async updateAllProducts() {
+      this.msg.info = "Fetching products...";
+      this.msg.type="success";
+      try {
+        const querySnapshot = await getDocs(collection(db, "products"));
+        const docs = querySnapshot.docs;
+        const batchSize = 100;
+
+        for (let i = 0; i < docs.length; i += batchSize) {
+          const batchDocs = docs.slice(i, i + batchSize);
+
+          const updatePromises = batchDocs.map((document) => {
+            const data = document.data();
+            const oldItemName = data.item_name || null;
+
+            const docRef = doc(db, "products", document.id);
+
+            return updateDoc(docRef, {
+                item_name_lower_case:oldItemName.toLowerCase(),
+                keywords: this.generateKeywords(oldItemName),
+            });
+          });
+
+          await Promise.all(updatePromises);
+          this.msg.info = `✅ Updated ${i + batchDocs.length} of ${docs.length} products`;
+
+          await this.delay(5000); // pause between batches
+        }
+
+        this.msg.info = "🎉 All products updated!";
+      } catch (error) {
+        console.error("❌ Error updating products:", error);
+        this.msg.info = "❌ Error occurred!";
+      }
+    },
+
+
+
+     async checkDatabase(code_no){
+            const query_url=query(collection(db, "products"),where("code_no", "==", code_no));           
+             this.unsubProducts= onSnapshot(query_url, async(snapShot) =>{                                       
+                   //     const dc=snapShot._snapshot.docChanges;
                          const user=this.user;
-                         if(dc.length > 1) return false;
                         //get only update doc for message
                         snapShot.docChanges().forEach((change) => {     
                             const res=change.doc.data();   
                             const id=change.doc.id;
                             const edit_user=res.edit_user !=null ? res.edit_user : "";
-                            if(change.type==="added" &&   edit_user.uid==user.uid &&  dc.length ===1){                               
+                            if(change.type==="added" &&   edit_user.uid==user.uid && !this.isDeleting){                               
                                     this.msg.info="The new product code has been created"
                                     this.msg.type="success"
                                     this.resetInput();    
                                     //  hp.setAutoFocus("item_name")     
                                     this.setEdit(this.products[0])
+                                    setTimeout(()=>{
+                                        this.fetchProductCount();
+                                    }, 1000)
                             }
                             if(change.type==="modified" && edit_user.type=="modified" && edit_user.uid==user.uid){
                                     this.msg.info="The selected product code has been updated"
@@ -816,6 +939,9 @@ export default {
                                      this.msg.info="The selected product code has been deleted"
                                     this.msg.type="success"
                                     this.editItem=this.products[0];
+                                    setTimeout(()=>{
+                                        this.fetchProductCount();
+                                    }, 1000)
                             }else if(change.type==="removed"){                                  
                                     if(change.doc.id==this.editItem.id){                                       
                                         this.editItem=this.products[0];
@@ -826,13 +952,4 @@ export default {
                    
                  });       
         },
-  
-      
-       
-    }
-}
-</script>
-<style>
- 
-</style>
-
+-->

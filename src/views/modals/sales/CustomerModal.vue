@@ -110,7 +110,7 @@
    import PageHeader from "@/views/partials/PageHeader.vue"
     import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-   import {Timestamp, collection, addDoc, onSnapshot, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
+   import {Timestamp, collection, addDoc, onSnapshot, query, where, getDocs, limit, getDoc, doc, updateDoc, deleteDoc, orderBy} from 'firebase/firestore'
    import db from '@/firebase/firestore'
    import * as ss from "@/lib/snapshot/customers"
    import * as search from "@/lib/search"
@@ -151,7 +151,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                     created_at : Timestamp.fromDate(new Date()),
                 },
                unsubCustomers:null,
-               limitData: 50,
+               limitData: 100,
            }
        },
      
@@ -195,10 +195,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
            }
        },
        methods:{
-            updateCustomer(){
-                this.isUpdating=true;
-                this.fetchCustomer();
-            },
+          
             setCustomer(p){
                 this.$emit("setCustomer", p)
             },
@@ -208,20 +205,36 @@ import { required, email ,helpers} from '@vuelidate/validators'
                this.search_by_address="";
                this.searchCustomer();
            },
-           searchCustomer(){
-               this.customers=[];
-               if(this.search_by_code){
-                   this.customers=this.customersData.filter((f)=>f.code===this.search_by_code)
-               }else 
-               if(this.search_by_name){
-                   this.customers=search.searchCustomerName(this.customersData, this.search_by_name)
-               }else 
-               if(this.search_by_address){
-                this.customers=search.searchCustomerAddress(this.customersData, this.search_by_address)
-               }else{
-                   this.customers= this.customersData.slice(0, this.limitData)
-               }
-           },
+           async searchCustomer() {
+            this.customers = [];
+            this.isLoading = true;
+            try {
+                if (this.search_by_name) {
+                    const query_url = query(
+                        collection(db, "customers"), where("name_keywords", "array-contains", this.search_by_name.toLowerCase()), orderBy("created_at", "desc"),
+                        limit(this.limitData)
+                    );
+                    const snapShot = await getDocs(query_url);
+                    const cus = ss.customers(snapShot);
+                    this.customers = cus;
+                   
+                } else if (this.search_by_address) {
+                    const query_url = query(
+                        collection(db, "customers"), where("address_keywords", "array-contains", this.search_by_address.toLowerCase()), orderBy("created_at", "desc"),
+                        limit(this.limitData)
+                    );
+                    const snapShot = await getDocs(query_url);
+                    const cus = ss.customers(snapShot);
+                    this.customers = cus;                   
+                } else {
+                    this.customers = this.customersData;                   
+                }
+            } catch (error) {
+                console.error("Error searching customers:", error);
+            } finally {
+                this.isLoading = false;
+            }
+        },     
            sortCustomers(sort){   
                this.customers=[];
                this.sort_item=sort;
@@ -283,13 +296,12 @@ import { required, email ,helpers} from '@vuelidate/validators'
            },
            
            async fetchCustomer(){                    
-               const query_url = query(collection(db, "customers"), orderBy("created_at", "desc"));
+               const query_url = query(collection(db, "customers"), orderBy("created_at", "desc"), limit(this.limitData));
               this.unsubCustomers= onSnapshot(query_url, async(snapShot) =>{                 
                     const customers=ss.customers(snapShot)       
                     this.customersData=customers;
-                    this.customers=this.customersData.slice(0, this.limitData)
+                    this.customers=customers;
                     this.isLoading=false;
-                    this.isUpdating=false;
             });  
           
                

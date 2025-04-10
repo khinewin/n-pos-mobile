@@ -65,7 +65,7 @@
             isLoading:false,
             reports :[],
             sortBy:"asc",
-            perPage: 100,
+            perPage: 500,
             loadMore: false,
             lastDoc:null,
             isEndPagination:false
@@ -151,34 +151,65 @@
                 }
             }
        },
-        async fetchProducts(){   
-            if(this.isLoading) return;
-            this.isLoading=true
-            let query_url=query(collection(db, "products"),orderBy("created_at", "desc"), limit(this.perPage));           
-            if(this.code_no){
-                query_url = query(collection(db, "products"), where("code_no", "==", Number(this.code_no)));
+       async fetchProducts() {
+            if (this.isLoading) return;
+
+            this.isLoading = true;
+
+            let queryConstraints = [];
+
+            // Always order and limit
+            queryConstraints.push(orderBy("created_at", "desc"));
+            queryConstraints.push(limit(this.perPage));
+
+            // Filter by code_no (skip pagination in this case)
+            if (this.code_no) {
+                queryConstraints = [
+                    where("code_no", "==", Number(this.code_no))
+                ];
             }
-            if (this.loadMore && this.lastDoc) {
-                const lastDoc=toRaw(this.lastDoc);
-               query_url = query(collection(db, "products"),orderBy("created_at", "desc"), startAfter(lastDoc), limit(this.perPage));
+
+            // If loadMore is requested and not filtering by code_no
+            if (this.loadMore && this.lastDoc && !this.code_no) {
+                const lastDoc = toRaw(this.lastDoc);
+                queryConstraints.push(startAfter(lastDoc));
             }
-            const snapshot = await getDocs(query_url);
-            if (!snapshot.empty) {
-                this.lastDoc = snapshot.docs[snapshot.docs.length - 1]; // Save last document for next batch
-                const newProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                // 🛑 Prevent duplicate data when loading more
-                this.reports = this.loadMore ? [...this.reports, ...newProducts] : newProducts;
-                this.isLoading=false;
-                if(newProducts.length < this.perPage){
-                    this.isEndPagination=true;
+
+            // Build query
+            const queryRef = query(collection(db, "products"), ...queryConstraints);
+
+            try {
+                const snapshot = await getDocs(queryRef);
+
+                if (!snapshot.empty) {
+                    const newProducts = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+
+                    // Update lastDoc only when not filtering by code_no
+                    if (!this.code_no) {
+                        this.lastDoc = snapshot.docs[snapshot.docs.length - 1];
+                    }
+
+                    // Merge or replace reports
+                    this.reports = this.loadMore && !this.code_no
+                        ? [...this.reports, ...newProducts]
+                        : newProducts;
+
+                    // End of pagination check
+                    if (newProducts.length < this.perPage) {
+                        this.isEndPagination = true;
+                    }
+                } else {
+                    this.isEndPagination = true;
                 }
-            }else{
-                this.isEndPagination=true;
-                this.isLoading=false;
+            } catch (error) {
+                console.error("Failed to fetch products:", error);
+            } finally {
+                this.isLoading = false;
             }
-          
-                                 
-       } ,
+        },
        sortProducts(sort){   
             this.sort_item=sort;
             if(this.sortBy=="asc"){

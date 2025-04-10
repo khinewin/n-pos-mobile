@@ -133,13 +133,14 @@
    import PageHeader from "@/views/partials/PageHeader.vue"
     import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-   import {disableNetwork ,Timestamp, collection, addDoc, setDoc, query, where, getDocs, doc, updateDoc, deleteDoc, orderBy, onSnapshot } from 'firebase/firestore'
+   import {disableNetwork ,Timestamp, collection, addDoc, setDoc, query, where, limit, getDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, onSnapshot } from 'firebase/firestore'
    import db from '@/firebase/firestore'
-   import * as lib from '@/lib/snapshot/suppliers'
+   import * as ss from '@/lib/snapshot/suppliers'
    import * as hp from '@/lib/helper'
    import FlatPickr from 'vue-flatpickr-component';
    import * as search from '@/lib/search'
    import {lang} from "@/lib/language"
+   
 
 
    export default {
@@ -189,8 +190,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
      
        async mounted() {
         this.isLoading=true;
-      //  this.fetchSuppliers();
-        this.checkDatabase();
+        this.fetchSuppliers();
         this.created_at=hp.setToday();
         window.addEventListener('keydown', this.handleCtrl);
 
@@ -277,24 +277,13 @@ import { required, email ,helpers} from '@vuelidate/validators'
             this.search_by_company=event.target.value;
             this.searchSuppliers();
         },
-        async deleteMultiple(){
-            const is_has=this.suppliers.filter((f)=>f.is_deleted)
-            if(is_has.length <=0) return false;
-            const cf=confirm(`Are you sure you want to delete the suppliers ?`)
-            if(!cf) return false;
-            this.isDeleting=true;
-            this.suppliers.filter(async (s)=>{
-                if(s.is_deleted){
-                    const updateDocument=doc(db, "suppliers", s.id)
-                    await updateDoc(updateDocument, {is_deleted: true, edit_user: {uid: this.user.uid, type: 'removed'}})  
-                }
-            })
-        },
+        
         async removeSupplier(s){     
             const cf=confirm(`Are you sure, you want to delete the suppliers "${s.name}" ?`)
             if(!cf) return false;
             this.isDeleting=true;             
             const document=doc(db, "suppliers", s.id)     
+            this.isRemoved(s.code);
             await deleteDoc(document) 
         },
      
@@ -316,75 +305,69 @@ import { required, email ,helpers} from '@vuelidate/validators'
             this.isUpdating=false;
             this.v$.$reset()
         },
-        message(type){
-                this.msg.info=hp.message(type, "supplier")
-                this.msg.type="success"                                                         
-        }, 
-        async checkDatabase(){ 
-            const query_url=query(collection(db, "suppliers"),  orderBy("created_at", "desc"));           
-                onSnapshot(query_url, async(snapShot) =>{
-
-                    const suppliers=lib.suppliers(snapShot);  
+        async isCreated(code){
+            const query_url=query(collection(db, "suppliers"), where("code","==", Number(code)));           
+           const unsub=onSnapshot(query_url, async(snapShot) =>{
+                snapShot.docChanges().forEach((change) => {   
+                    if(change.type != "added") return true;
+                    this.msg.info="The new supplier has been created"
+                    this.msg.type="success"
+                    this.resetInput(); 
+                    unsub();
+                })
+            })
+        },
+        async isUpdated(code){
+            const query_url=query(collection(db, "suppliers"), where("code","==", Number(code)));           
+           const unsub=onSnapshot(query_url, async(snapShot) =>{
+                snapShot.docChanges().forEach((change) => {   
+                    if(change.type != "modified") return true;
+                    this.msg.info="The selected supplier has been updated"
+                    this.msg.type="success"
+                    this.editItem={}
+                    unsub();
+                })
+            })
+        },
+        async isRemoved(code){
+            const query_url=query(collection(db, "suppliers"), where("code","==", Number(code)));           
+           const unsub=onSnapshot(query_url, async(snapShot) =>{
+                snapShot.docChanges().forEach((change) => {   
+                    if(change.type != "removed") return true;
+                    this.msg.info="The selected supplier has been deleted"
+                    this.msg.type="success"
+                    this.editItem={}
+                    this.isDeleting=false;
+                    unsub();
+                })
+            })
+        },     
+        async fetchSuppliers(){                    
+               const query_url = query(collection(db, "suppliers"), orderBy("created_at", "desc"), limit(this.limitData));
+               onSnapshot(query_url, async(snapShot) =>{                    
+                    const suppliers=ss.suppliers(snapShot);           
                     this.suppliersData=suppliers;
-                    this.suppliers=this.suppliersData.slice(0,this.limitData)                    
+                    this.suppliers=suppliers;
                     this.isLoading=false;
-
-                    const dc=snapShot._snapshot.docChanges;
-                    const user=this.user;
-                    if(dc.length > 1) return false;
-                    
-                    snapShot.docChanges().forEach((change) => {                       
-                        const res=change.doc.data();   
-                            if(change.type==="added" && res.edit_user.uid==user.uid && dc.length===1){
-                                    this.msg.info="The new supplier has been created"
-                                    this.msg.type="success"
-                                    this.resetInput();    
-                                    this.editItem={}    
-
-                                   // hp.setAutoFocus("name")     
-                            }           
-                            if(change.type==="modified" && res.edit_user.type=="modified" && res.edit_user.uid==user.uid){
-                                    this.msg.info="The selected supplier has been updated"
-                                    this.msg.type="success"
-                                    this.editItem={}    
-
-                            }  
-                            if(change.type==="removed"  && res.edit_user.uid==user.uid){
-                                     this.msg.info="The selected supplier has been deleted"
-                                    this.msg.type="success"
-                                    this.isDeleting=false;
-                                    this.editItem={}    
-
-                                  //  this.is_check_all=false;
-                                   // console.log(change.doc.id)
-                                   // this.removeSupplier(change.doc.id)
-                            }             
-                    });                 
-                  //  const isLocal=snapShot.metadata.formCache;                              
-            });                              
-        } ,
-        async fetchSuppliers(){ 
-            const query_url=query(collection(db, "suppliers"), orderBy("created_at", "desc"));           
-                onSnapshot(query_url, async(snapShot) =>{                  
-                    const suppliers=lib.suppliers(snapShot);   
-                    this.suppliersData=suppliers;
-                    this.suppliers=this.suppliersData.slice(0, this.limitData)
-                    this.isLoading=false;
-                    this.isUpdating=false;
-            });                              
-        } ,
-       
+            });     
+              
+          } ,
+       generateKeywords(data){
+            return hp.generateKeywords(data);
+       },
         async saveSupplier(){
          //   if(this.editItem.id) this.saveEdit();
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
 
-            let isTaken=this.suppliersData.some((f)=>f.name.toLowerCase() == this.name.toLowerCase())
-            if(isTaken){
+            const coll = collection(db, "suppliers");
+            const q = query(coll, where("name_lower_case", "==", this.name.toLowerCase()));
+            const isTaken = await getDocs(q);           
+            if(!isTaken.empty){                
                 this.msg.info="This supplier name already exists"
                 this.msg.type="error"
-                this.name="";               
-                return false;
+                this.name="";
+                return true;          
             }
 
             this.isSaving=true;
@@ -395,6 +378,9 @@ import { required, email ,helpers} from '@vuelidate/validators'
             const data={
                 user: {uid:this.user.uid, displayName:this.user.displayName},
                 name: this.name, 
+                name_lower_case:this.name.toLowerCase(),
+                name_keywords: this.generateKeywords(this.name),
+                company_keywords: this.generateKeywords(this.company),
                 code: this.code,
                 phone: this.phone,
                 company: this.company,
@@ -402,27 +388,33 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 is_deleted: false,
                 edit_user: {uid: this.user.uid, type: 'added'}         
             }      
+            this.isCreated(this.code);
             await addDoc(dataCollection, data)                          
         },
-           updateSuppliers(){
-               this.isUpdating=true;
-               this.fetchSuppliers();
-           },
+          
           async saveEdit(){    
-            let result=this.suppliersData.some((f)=>f.id != this.editItem.id && f.name.toLowerCase().includes(this.editItem.name) )
-            if(result){
+            const coll = collection(db, "suppliers");
+            const q = query(coll, where("name_lower_case", "==", this.editItem.name.toLowerCase()));
+            const isTaken = await getDocs(q);
+            if(!isTaken.empty){
+                const docRef = doc(db, "suppliers", this.editItem.id);
+                const docSnapshot = await getDoc(docRef);
+                const docData = docSnapshot.data();
+                const index = this.suppliers.findIndex(sp => sp.code == docData.code);
+                this.suppliers[index].name=docData.name;
                 this.msg.info="This supplier name already exists"
-                this.msg.type="error";
-                this.suppliers=this.suppliersData.map((m)=>{
-                    if(m.id==this.editItem.id){
-                        return {...m, name: ""}
-                    }
-                    return m;
-                })
+                this.msg.type="error"
                 return false;
-            }                      
+            }                  
                const updateDocument=doc(db, "suppliers", this.editItem.id)
-                await updateDoc(updateDocument,this.editItem)           
+               const data={
+                ...this.editItem,
+                name_lower_case: this.editItem.name.toLowerCase(),
+                name_keywords: this.generateKeywords(this.editItem.name),
+                company_keywords: this.generateKeywords(this.editItem.company),
+            }
+            this.isUpdated(this.editItem.code);
+            await updateDoc(updateDocument, data)           
            },
            setEdit(p){
                this.editItem={...p,  edit_user:  {uid:this.user.uid, type: "modified"}};
@@ -433,20 +425,36 @@ import { required, email ,helpers} from '@vuelidate/validators'
                this.search_by_company="";
                this.searchSuppliers();
            },
-           searchSuppliers(){
-               this.suppliers=[];
-               if(this.search_by_code){
-                   this.suppliers=this.suppliersData.filter((f)=>f.code===Number(this.search_by_code))
-               }else 
-               if(this.search_by_name){
-                   this.suppliers=search.searchSupplierName(this.suppliersData, this.search_by_name);
-               }else 
-               if(this.search_by_company){
-                    this.suppliers=search.searchSupplierCompany(this.suppliersData, this.search_by_company);
-               }else{
-                   this.suppliers= this.suppliersData.slice(0,this.limitData)
-               }
-           },                   
+           async searchSuppliers() {
+            this.suppliers = [];
+            this.isLoading = true;
+            try {
+                if (this.search_by_name) {
+                    const query_url = query(
+                        collection(db, "suppliers"), where("name_keywords", "array-contains", this.search_by_name.toLowerCase()), orderBy("created_at", "desc"),
+                        limit(this.limitData)
+                    );
+                    const snapShot = await getDocs(query_url);
+                    const cus = ss.suppliers(snapShot);
+                    this.suppliers = cus;
+                   
+                } else if (this.search_by_company) {
+                    const query_url = query(
+                        collection(db, "suppliers"), where("company_keywords", "array-contains", this.search_by_company.toLowerCase()), orderBy("created_at", "desc"),
+                        limit(this.limitData)
+                    );
+                    const snapShot = await getDocs(query_url);
+                    const cus = ss.suppliers(snapShot);
+                    this.suppliers = cus;                   
+                } else {
+                    this.suppliers = this.suppliersData;                   
+                }
+            } catch (error) {
+                console.error("Error searching suppliers:", error);
+            } finally {
+                this.isLoading = false;
+            }
+        },                        
            
           showTime(t){
             return hp.showTime(t)

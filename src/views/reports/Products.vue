@@ -10,7 +10,7 @@
           
         </div>        
         <div class="row"  id="printMe" >
-            <div class="col-12 text-center">
+            <div class="col-12 text-center ">
                 <div class="d-none d-print-block">
                     <LargePrintHeader />
                 </div>

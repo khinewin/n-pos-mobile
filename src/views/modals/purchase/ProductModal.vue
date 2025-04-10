@@ -15,7 +15,7 @@
                                                 <div class="row g-1">
                                                     <div class="col-md-6 col-lg-12">
                                                         <div class="form-floating">
-                                                            <input type="text" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
+                                                            <input type="text" id="search_by_code"  v-model="search_by_code"  @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
                                                             <label for="search_by_code" class="">Code</label>
                                                         </div>
                                                     </div>
@@ -121,7 +121,7 @@
       <!--end modal-->
 </template>
 <script>
-import {Timestamp, collection, addDoc, onSnapshot, getDocs, doc, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
+import {Timestamp, collection, addDoc, onSnapshot, getDocs, doc, setDoc, limit, where, orderBy, updateDoc, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as lib from "@/lib/snapshot/products"
 import * as hp  from "@/lib/helper"
@@ -211,22 +211,39 @@ export default {
                 this.search_by_code="";
             }
        },
-        searchProducts(){
+       searchProducts(){
+            this.products=[]
+            this.isLoading=true;
             if(this.search_by_code){
-                this.products=search.searchByCode(this.productsData, this.search_by_code);
+                const query_url = query(collection(db, "products"),  
+                where("code_no", "==", Number(this.search_by_code)));
+                    const unsub=onSnapshot(query_url, (snapShot)=>{
+                        const products=lib.products(snapShot);   
+                        this.products=products;
+                        this.setCode(products[0]);
+                        unsub()    
+                        this.isLoading=false;
+                })
             }else if(this.search_by_item_name){
-                this.products=search.searchByDescription(this.productsData, this.search_by_item_name);
+                const query_url = query(collection(db, "products"),  
+                where("keywords", "array-contains", this.search_by_item_name.toLowerCase()),  orderBy("created_at", "desc"), limit(this.limitItem));
+                    const unsub=onSnapshot(query_url, (snapShot)=>{
+                        const products=lib.products(snapShot);   
+                        this.products=products;
+                        unsub()    
+                        this.isLoading=false;
+                })
             }else{
-                this.products= this.productsData.slice(0, this.limitData);                                            
+                this.products= this.productsData;                                         
             }
         },
       
         async fetchProducts(){
-        const query_url = query(collection(db, "products"), orderBy("created_at", "desc"));
+        const query_url = query(collection(db, "products"), orderBy("created_at", "desc"), limit(this.limitData));
         onSnapshot(query_url, async(snapShot) =>{                  
                     let products=lib.products(snapShot)      
                     this.productsData=products;
-                    this.products=this.productsData.slice(0, this.limitData)
+                    this.products=products;
                     this.isLoading=false;
                     this.isUpdating=false;
             });        
