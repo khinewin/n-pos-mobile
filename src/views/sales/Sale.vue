@@ -27,7 +27,7 @@
                     <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="print"><i class="fa-solid fa-print" ></i> {{print_link}}</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <button v-if="saleMode=='Sale / New' || saleMode=='Sale / History'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length <=0 || saleMode=='Sale / History' " >
+                        <button v-if="saleMode=='Sale / New' || saleMode=='Sale / History'" type="button" data-bs-toggle="modal" data-bs-target="#cfModal"  class="btn btn-sm" :disabled="isLoading || saleItems.length <=0 || saleMode=='Sale / History' " >
                             <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> {{save_link}}</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>                      
@@ -191,8 +191,68 @@
         <ProductModal @setCode="setCode" :sale_type="sale_type" :saleItems="saleItems"/>
         <SalesModal @setCode="setOldCode" />
         <CustomerModal @setCustomer="setCustomer" />
+        <!-- Modal -->
+        <div class="modal fade" id="cfModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">                
+                <div class="modal-body">
+                    <table class="table table-bordered table-hover mb-0" style="font-weight: bold;">
+                        <tbody class="">
+                            <tr>
+                                <td  class="text-end p-2 fw-bold col-6">Customer</td>
+                                <td class="text-end col-6 p-2">{{customer.name}}</td>    
+                            </tr>
+                            <tr>
+                                <td  class="text-end p-2 fw-bold col-6">Total Amount</td>
+                                <td class="text-end col-6 p-2">{{total_amount}}</td>    
+                            </tr>
+                            <tr>                                    
+                                <td  class="text-end col-6 p-2 fw-bold " >Extra Discount</td>
+                                <td class="text-end col-6 ">
+                                    <input @click="setInput" @mouseleave="setInput" :disabled="saleMode=='Sale / History'"  type="number"   @change="calTotal" @keyup="calTotal" v-model="extra_discount" class="form-control  text-end m-0">
+                                </td>
+                            </tr>
+                            <tr>      
+                                <td  class="text-end col-6 p-2 fw-bold">Net Total Amount</td>
+                                <td class="text-end col-6 p-2">{{net_amount}}</td>  
+                            </tr>                 
+                            <tr>                                                                                    
+                                <td  class="text-end p-2 fw-bold">Paid</td>
+                                <td class="text-end">
+                                    <input @click="setInput" @mouseleave="setInput" :disabled="saleMode=='Sale / History'" @change="calPaid" @keyup="calPaid" type="number" v-model="paid" class="form-control text-end m-0">
+                                </td>                                                                
+                            </tr>
+                            <tr>
+                                <td  class="text-end p-2 fw-bold">Change</td>
+                                <td class="text-end p-2">
+                                    {{change}}
+                                </td>  
+                            </tr>
+                            <tr>                             
+                                <td  class="text-end p-2 fw-bold">Balance</td>
+                                <td class="text-end p-2">
+                                    {{credit}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td  class="text-end p-2 fw-bold">Remark</td>
+                                <td class="text-end">
+                                    <textarea :disabled="saleMode=='Sale / History'"  type="text" v-model="remark" class="form-control"></textarea>
+                                </td>                                                                         
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="mt-2">
+                        <button type="button" class="btn  btn-lg" data-bs-dismiss="modal">{{close_link}}</button>
+                        <button type="button" class="btn btn-primary btn-lg float-end" @click="saveSale">{{save_link}}</button>
+                        </div>
+                </div>                
+            </div>
+            </div>
+        </div>
+  
         <!--Print item start-->
-        <div class="" id="printMe" v-if="saleItems.length > 0" >
+        <div class="d-none" id="printMe" v-if="saleItems.length > 0" >
                 <Print :data="{
                     voucher_no: this.voucher_no,
                     customer: this.customer,
@@ -370,6 +430,11 @@ export default {
        
     },
     methods:{
+        closeCfModal(){
+            const modalEl = document.getElementById('cfModal');
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modalInstance.hide();
+        },
         setPos(){
             localStorage.setItem("pos", this.print_on_save)
         },
@@ -641,6 +706,7 @@ export default {
                 this.msg.type="error"
                 return false
             }
+            this.closeCfModal();
             if(this.customer.code == 123456789){
                 if(this.customer.name != "Default Customer"){
                     this.msg.info="Please select customer name again"
