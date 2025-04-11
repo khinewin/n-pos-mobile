@@ -12,12 +12,12 @@
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button class="btn btn-sm">{{display_link}} {{products.length}} of {{productCount}}</button>
                 </div> 
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveEdit">
                         <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> {{update_link}} </span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                     </button>
-                </div> 
+                </div> -->
                 <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
@@ -25,12 +25,12 @@
                     </button>
                 </div>-->      
                                             
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCode">
                         <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> {{save_link}}</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                     </button>
-                </div> 
+                </div> -->
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn btn-sm packing-unit"><i class="fa-solid fa-boxes-packing"></i> {{packing_units}}</button>
                 </div>   
@@ -42,7 +42,7 @@
                     <div class="card shadow">
                         <div class="card-body p-2">
                             <div class="row g-2">
-                                <div class="form-floating col-sm-3 col-lg-12">
+                                <div class="form-floating col-sm-3 col-lg-12" @click="initScanner(status='search')">
                                     <input type="search" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
                                     <label for="search_by_code" class="small">{{barcode}}</label>
                                 </div>
@@ -76,11 +76,18 @@
                                                   </div>
                                                 <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" @click="checkAll" v-model="is_deleted">-->
                                             </td>
-                                            <td class="p-0 col-3" @click="initScanner(isNew=true)">
+                                            <!--<td class="p-0 col-3" @click="initScanner(status='new')">
                                                 <input placeholder="Code" :readonly="useCamera"  type="text" v-model="code_no" class="form-control py-1  text-center">
-                                            </td>
-                                            <td class="p-0 col-9">
-                                                <input  id="item_name" placeholder="Product Name" @keypress.enter="saveCode"   type="text" v-model="item_name" class="form-control py-1">                                            </td>                                     
+                                            </td>-->
+                                            <td class="p-0 col-12">
+                                                <input  id="item_name" placeholder="Product Name" @keypress.enter="saveCode"   type="text" v-model="item_name" class="form-control py-1">                                
+                                            </td>  
+                                            <td>
+                                                <button class="btn btn-sm text-primary" @click="saveCode">
+                                                    <span v-if="!isSaving"><i class="fa-solid fa-check"></i> </span>
+                                                    <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
+                                                </button>
+                                            </td>                                   
                                         </tr>    
                                     </tbody>
                                     <tbody> 
@@ -100,16 +107,22 @@
                                             </div>-->
                                             <button :disabled="p.user.uid != user.uid" class="btn btn-sm text-danger d-block" @click="removeProduct(p)"><i class="fa-solid fa-trash"></i></button>
                                         </td>                                 
-                                        <td :class="{'table-secondary': sort_item ==='code_no'}" class=" p-0" @click="initScanner(isNew=false)" >
+                                        <!--<td :class="{'table-secondary': sort_item ==='code_no'}" class=" p-0" @click="initScanner(status='edit')" >
                                             <span>
                                                 <input v-if="editItem.id==p.id"   :readonly="useCamera"  @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1 text-center " v-model="p.code_no">
                                                 <div v-else class="py-1" @click="setEdit(p)">{{p.code_no}}</div>
                                             </span>
-                                        </td>
+                                        </td>-->
                                         <td :class="{'table-secondary': sort_item ==='item_name'}" class="p-0">
                                             <input v-if="editItem.id==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1" v-model="p.item_name">
                                             <div v-else class="text-start py-1 px-1" @click="setEdit(p)">{{p.item_name}}</div>
-                                        </td>                                       
+                                        </td>         
+                                        <td>
+                                            <button class="btn btn-sm text-primary" @click="saveEdit">
+                                                <span v-if="!isUpdating && editItem.id==p.id"><i class="fa-solid fa-check"></i> </span>
+                                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating && editItem.id==p.id"></span>
+                                            </button>
+                                        </td>                              
                                     </tr>
                                 </tbody>
                             </table>
@@ -136,6 +149,18 @@
                                         <td :colspan="[editItem.packing_size.largest_unit !=null ? 4 : 5]">
                                             <div class="text-center text-primary h6 pt-2">
                                                     {{editItem.item_name}}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr @click="initScanner(status='edit')">
+                                        <td class="col-1">{{barcode}}</td>
+                                        <td :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]" class="text-center col-3">
+                                            <div class="d-flex">
+                                                <input   :readonly="useCamera"   @keypress.enter="updateCode" type="text" class="form-control-plaintext py-0 text-center " v-model="editItem.code_no">
+                                                <button class="btn btn-sm text-primary" @click="updateCode">
+                                                    <span v-if="!isUpdatingCode"><i class="fa-solid fa-check"></i> </span>
+                                                    <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdatingCode"></span>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -291,6 +316,7 @@ export default {
             editItem:{},
             old_item_name:"",
             isUpdating:false,
+            isUpdatingCode:false,
             isSaving:false,
             isSavePrice:false,
             isDeleting:false,
@@ -421,7 +447,7 @@ export default {
                 if(val.type){
                     setTimeout(()=>{
                         this.msg.type="";
-                        this.msg.info="";
+                       this.msg.info="";
                     }, 2000)
                 }
             },deep:true
@@ -447,7 +473,7 @@ export default {
             }
         },
 
-        initScanner(isNew, camera = true) {
+        initScanner(status="new", camera = true) {
             if (!this.useCamera) return false;
             if (this.scannerActive) return false;
 
@@ -464,11 +490,14 @@ export default {
             const qrCodeSuccessCallback = (decodedText, decodedResult) => {
                 this.scannerActive = false;
 
-                if (isNew) {
+                if (status=="new") {
                     this.code_no = decodedText;
-                } else {
+                } else if(status=="edit") {
                     this.editItem.code_no = decodedText;
-                    this.saveEdit();
+                    this.updateCode();
+                }else if(status=="search"){
+                    this.search_by_code=decodedText
+                    this.searchProducts();
                 }
 
                 this.html5QrCode.stop().then(() => {
@@ -561,32 +590,45 @@ export default {
                 this.saveEdit();
             },300)
         },
+        async updateCode(){
+            if(!this.editItem.code_no) return false;
+            this.isUpdatingCode=true;
+            const updateDocument=doc(db, "products", this.editItem.id)
+            const data={
+                ...this.editItem,
+                code_no: this.editItem.code_no
+            }
+            this.isUpdated(this.editItem.code_no);
+            await updateDoc(updateDocument, data)  
+        },
         async saveEdit(){               
-            if(!this.editItem.item_name || !this.editItem.code_no) return false;
-
+            if(!this.editItem.item_name) return false;
             const coll = collection(db, "products");
             const q = query(coll, where("item_name_lower_case", "==", this.editItem.item_name.toLowerCase()));
             const isTaken = await getDocs(q);
+            this.isUpdating=true;
+
             if(!isTaken.empty){
                 const docRef = doc(db, "products", this.editItem.id);
                 const docSnapshot = await getDoc(docRef);
                 const docData = docSnapshot.data();
-                const index = this.products.findIndex(product => product.id === docData.id);
+                const index = this.products.findIndex(product => product.id == docData.id);
+                if(index !=-1){
                 this.products[index].item_name=docData.item_name;
                 this.editItem.item_name=docData.item_name;
                 this.msg.info="This item name already exists"
                 this.msg.type="error"
+                this.isUpdating=false;
                 return false;
+                }
             }
-            this.old_item_name="";
-            this.isUpdating=true;
-            this.isUpdated(this.editItem.code_no);
             const data={
                 ...this.editItem,
                 item_name_lower_case: this.editItem.item_name.toLowerCase(),
                 keywords: this.generateKeywords(this.editItem.item_name),
              }
             const updateDocument=doc(db, "products", this.editItem.id)
+            this.isUpdated(this.editItem.code_no);
             await updateDoc(updateDocument, data)  
         },
         setPackingSize(p){
@@ -660,7 +702,7 @@ export default {
             this.isSaving=true;
             const save_time=Timestamp.fromDate(new Date());
             const dataCollection=collection(db, "products", )
-            this.code_no=this.code_no ? this.code_no : new Date().getTime()
+            this.code_no=this.code_no ? String(this.code_no) : String(new Date().getTime())
             const data={
                 user: {uid:this.user.uid, displayName:this.user.displayName},
                 item_name: this.item_name, 
@@ -725,7 +767,6 @@ export default {
                 s=Math.floor(item.qty % item.packing_size.smallest_qty);
             }
             this.editItem=p ? {...item,         
-                code_no:Number(p.code_no),
                 l_qty: l ? l : 0, 
                 m_qty:m ? m :0,
                 s_qty: s ? s :0,     
@@ -752,7 +793,7 @@ export default {
             this.isLoading = true;
             try {
                 if (this.search_by_code) {
-                    const query_url = query(collection(db, "products"), where("code_no", "==", Number(this.search_by_code)));
+                    const query_url = query(collection(db, "products"), where("code_no", "==", this.search_by_code));
                     const snapShot = await getDocs(query_url);
                     const products = ss.products(snapShot);
                     this.products = products;
@@ -797,7 +838,7 @@ export default {
                 this.productsData=products;
                 this.products=products;                
                 this.isLoading=false;
-                if(Object.keys(this.editItem).length ==0){
+                if(Object.keys(this.editItem).length ==0 && products.length){
                     this.setEdit(this.products[0]) 
                 }
             });
@@ -806,7 +847,7 @@ export default {
         const query_url=query(collection(db, "products"),where("code_no", "==", code_no));           
          const unsub=onSnapshot(query_url, async(snapShot) =>{   
             snapShot.docChanges().forEach((change) => {     
-                if(change.type !="added") return false;
+                if(change.type =="added"){
                 this.msg.info="The new product code has been created"
                 this.msg.type="success"
                 this.resetInput();    
@@ -814,7 +855,8 @@ export default {
                 setTimeout(()=>{
                     this.fetchProductCount();
                 }, 200)     
-                unsub();                           
+                unsub();         
+            }                  
             })
         })
       },
@@ -822,14 +864,17 @@ export default {
         const query_url=query(collection(db, "products"),where("code_no", "==", code_no));           
          const unsub=onSnapshot(query_url, async(snapShot) =>{   
             snapShot.docChanges().forEach((change) => {   
-                if(change.type !="modified") return false;
                 const res=change.doc.data();   
                 const id=change.doc.id;
                 this.msg.info="The selected product code has been updated"  
                 this.msg.type="success"
                  this.isUpdating=false;
-                this.editItem={...res, id}
-                unsub();                           
+                 this.isUpdatingCode=false;
+                this.editItem={...res, id}                     
+                   
+                if(change.type=="modified"){
+                    unsub();  
+                }               
             })
         })
       },
@@ -837,7 +882,7 @@ export default {
         const query_url=query(collection(db, "products"),where("code_no", "==", code_no));           
          const unsub=onSnapshot(query_url, async(snapShot) =>{   
             snapShot.docChanges().forEach((change) => {   
-                if(change.type !="removed") return false;
+                if(change.type =="removed"){
                 this.isDeleting=false;
                 this.msg.info="The selected product code has been deleted"
                 this.msg.type="success"                
@@ -845,7 +890,8 @@ export default {
                     this.editItem=this.products[0];
                     this.fetchProductCount();
                 }, 1000)
-                unsub();                           
+                unsub();         
+            }                  
             })
         })
       },      
@@ -855,6 +901,8 @@ export default {
             const snapshot = await getCountFromServer(coll);
             this.productCount = snapshot.data().count;       
         },
+      
+
        
     }
 }
@@ -865,7 +913,7 @@ export default {
 
 
 <!--
-    delay(ms) {
+     delay(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
         },
 
@@ -882,12 +930,13 @@ export default {
 
           const updatePromises = batchDocs.map((document) => {
             const data = document.data();
-            const oldItemName = data.item_name || null;
+            const oldItemName = data.item_name || "";
 
             const docRef = doc(db, "products", document.id);
 
             return updateDoc(docRef, {
                 item_name_lower_case:oldItemName.toLowerCase(),
+                code_no: String(data.code_no),
                 keywords: this.generateKeywords(oldItemName),
             });
           });
@@ -904,8 +953,6 @@ export default {
         this.msg.info = "❌ Error occurred!";
       }
     },
-
-
 
      async checkDatabase(code_no){
             const query_url=query(collection(db, "products"),where("code_no", "==", code_no));           

@@ -296,7 +296,7 @@ export default {
             this.isLoading=true;
             if(this.search_by_code){
                 const query_url = query(collection(db, "products"),  
-                where("code_no", "==", Number(this.search_by_code)));
+                where("code_no", "==", this.search_by_code));
                     const unsub=onSnapshot(query_url, (snapShot)=>{
                         const products=lib.products(snapShot);   
                         this.products=products;

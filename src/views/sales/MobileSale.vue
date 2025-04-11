@@ -404,12 +404,10 @@ export default {
     },
     methods:{
         callBarcode(){
-            const myModal = new bootstrap.Modal('#barcodeModal', {
-            keyboard: false
-            })
+            const myModal = new bootstrap.Modal('#barcodeModal')
             myModal.show();
             setTimeout(()=>{
-                this.initScanner(myModal);
+                this.initScanner();
             }, 100)
 
         },
@@ -425,7 +423,7 @@ export default {
             }
         },
 
-        initScanner(myModal) {
+        initScanner() {
         if (this.scannerActive) return false;
 
         const isMobile = window.matchMedia("(max-width: 1199px)").matches;

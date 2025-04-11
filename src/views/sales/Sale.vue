@@ -533,9 +533,15 @@ export default {
             },200)
         }, */
         async setCodeOnPaste(){
-            const query_url = query(collection(db, "products"), where("code_no", "==", Number(this.code_no)));
+            const query_url = query(collection(db, "products"), where("code_no", "==", this.code_no));
            const unsub= onSnapshot(query_url, async(snapShot) =>{
-                    const products=ss.products(snapShot)     
+                    const products=ss.products(snapShot)
+                    if(products.length ==0){
+                        this.msg.info="Barcode not found."
+                        this.msg.type="error"
+                        this.code_no="";
+                        return true;
+                    }     
                     this.setCode(products[0])
                     this.code_no="";
                     unsub();
