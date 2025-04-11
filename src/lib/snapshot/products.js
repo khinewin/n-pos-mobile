@@ -17,6 +17,8 @@ const products=(snapShot)=>{
             auto_cal: data.auto_cal ? data.auto_cal : false,
             edit_user: data.edit_user ? data.edit_user : {},
             is_deleted:data.is_deleted,
+            item_name_lower_case: data.item_name_lower_case,
+            keywords: data.keywords
         };                                
         products.push(product);                           
     });

@@ -24,21 +24,31 @@
                         <table class="table table-bordered mb-0 table-hover">
                             <tbody class="">                                     
                                 <tr class="">
+                                    <td></td>
                                     <!--<td class=""><input id="packing_name" placeholder="Packing name" type="text" @keypress.enter="savePackingSize" v-model="packing_name" class="form-control-plaintext py-0 text-center"></td>-->
                                     <td><input placeholder="Packing unit" type="text" @keypress.enter="savePackingSize" v-model="packing_unit" class="form-control py-1 text-center"></td>
                                     <td class="d-grid">
-                                        <button class="btn btn-sm btn-secondary" @click="savePackingSize">
-                                            <span v-if="!isSaving">Save</span>
+                                        <button class="btn btn-sm text-primary" @click="savePackingSize">
+                                            <span v-if="!isSaving"><i class="fa-solid fa-check"></i> </span>
+                                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                                         </button>
                                     </td>
                                 </tr>                                                                                       
-                                <tr  class="" v-if="packingSizes.length > 0"  v-for="p in packingSizes" :key="p.id" :class="{'table-primary' : p.id==editItem.id}" >                                   
+                                <tr  class="" v-if="packingSizes.length > 0"  v-for="p in packingSizes" :key="p.id" :class="{'table-secondary' : p.id==editItem.id}" >     
+                                    <td>
+                                        <a href="#!" class="btn btn-sm text-danger" @click="removePackingSize(p)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </a>
+                                    </td>                              
                                     <td class="text-center col-12">
                                         <input v-if="editItem.id == p.id"  @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1 text-center" v-model="p.packing_unit">
                                         <div v-else @click="setEdit(p)" class="py-1">{{p.packing_unit}}</div>
                                     </td>
-                                    <td class="d-flex justify-content-around col-0">
-                                        <a href="#!" class="btn btn-sm btn-danger" @click="removePackingSize(p)">Delete</a>
+                                    <td class="">
+                                        <button class="btn btn-sm text-primary" @click="saveEdit" v-if="editItem.id==p.id">
+                                            <span v-if="!isUpdating"><i class="fa-solid fa-check"></i> </span>
+                                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating && editItem.id==p.id"></span>
+                                        </button>
                                     </td>
                                 </tr>
                             </tbody>

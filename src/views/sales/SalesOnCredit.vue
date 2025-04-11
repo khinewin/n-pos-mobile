@@ -361,7 +361,7 @@ export default {
        },
     
         fetchCreditSales(){
-            const   query_url = query(collection(db, "sales"), where("customer.id","==", this.customer.id), where("credit", ">", 0), orderBy("sale_date", "asc"));          
+            const   query_url = query(collection(db, "sales"), where("customer.id","==", this.customer.id), where("payment_type", "==", "Credit"), orderBy("sale_date", "asc"));          
             onSnapshot(query_url, async(snapShot) =>{
                     const items=ss.sales(snapShot)       
                     this.saleItemsData=items;    

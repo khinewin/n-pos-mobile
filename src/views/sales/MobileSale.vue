@@ -715,8 +715,7 @@ export default {
             this.credit=s.credit
             this.sale_user=s.user;
             this.remark=s.remark;
-            this.customer.name=s.customer.name;
-            this.customer.phone=s.customer.phone;
+            this.customer=s.customer;
         },
         async checkDatabase(){ 
             const query_url=query(collection(db, "sales"), where("voucher_no", "==", this.voucher_no));           

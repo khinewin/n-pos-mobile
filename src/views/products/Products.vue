@@ -10,6 +10,16 @@
                       </div>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                        <select class="form-control-plaintext text-center py-0" v-model="limitData" @change="changeLimitData">
+                            <option>50</option>
+                            <option>100</option>
+                            <option>150</option>
+                            <option>200</option>
+                            <option>250</option>
+                            <option>300</option>
+                        </select>
+                </div> 
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button class="btn btn-sm">{{display_link}} {{products.length}} of {{productCount}}</button>
                 </div> 
                 <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
@@ -118,8 +128,8 @@
                                             <div v-else class="text-start py-1 px-1" @click="setEdit(p)">{{p.item_name}}</div>
                                         </td>         
                                         <td>
-                                            <button class="btn btn-sm text-primary" @click="saveEdit">
-                                                <span v-if="!isUpdating && editItem.id==p.id"><i class="fa-solid fa-check"></i> </span>
+                                            <button class="btn btn-sm text-primary" @click="saveEdit" v-if="editItem.id==p.id">
+                                                <span v-if="!isUpdating"><i class="fa-solid fa-check"></i> </span>
                                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating && editItem.id==p.id"></span>
                                             </button>
                                         </td>                              
@@ -332,7 +342,7 @@ export default {
            // deviceId:"",
            unsubProducts:null,
            unsubPackingSizes:null,
-           limitItem: 100,
+           limitData: 100,
            useCamera: false,
            scannerActive: false,
            html5QrCode:null,
@@ -348,6 +358,9 @@ export default {
         this.useCamera=camera=="false" ? false : true;
        
         this.isLoading=true;
+
+        let limitData=localStorage.getItem("limitData");
+        this.limitData=limitData ? limitData : 100;
      
         window.addEventListener('keydown', this.handleCtrl);
        this.fetchPackingSizes();
@@ -455,6 +468,10 @@ export default {
     },
 
     methods:{
+        changeLimitData(){
+            localStorage.setItem("limitData", this.limitData)    
+            this.fetchProducts();   
+        },
         setCamera(){     
             const c=this.useCamera ? false : true;      
             localStorage.setItem("camera", c)    
@@ -803,7 +820,7 @@ export default {
                 } else if (this.search_by_description) {
                     const query_url = query(
                         collection(db, "products"), where("keywords", "array-contains", this.search_by_description.toLowerCase()), orderBy("created_at", "desc"),
-                        limit(this.limitItem)
+                        limit(this.limitData)
                     );
                     const snapShot = await getDocs(query_url);
                     const products = ss.products(snapShot);
@@ -832,7 +849,9 @@ export default {
         })
        },
        async fetchProducts(){
-        const query_url=query(collection(db, "products"), orderBy("created_at", "desc"), limit(this.limitItem));           
+        this.isLoading=true;
+        this.products=[]
+        const query_url=query(collection(db, "products"), orderBy("created_at", "desc"), limit(this.limitData));           
             onSnapshot(query_url, async(snapShot) =>{     
                 const products=ss.products(snapShot);   
                 this.productsData=products;

@@ -10,7 +10,10 @@ const suppliers=(arr)=>{
             phone : doc.data().phone,
             code : doc.data().code,     
             is_deleted : doc.data().is_deleted,
-            edit_user: null,                           
+            edit_user: null,        
+            name_lower_case: doc.data().name_lower_case,
+            name_keywords: doc.data().name_keywords,
+            company_keywords: doc.data().company_keywords                   
         };                                
         supplierItems.push(product);                                               
     });
