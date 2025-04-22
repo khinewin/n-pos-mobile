@@ -10,13 +10,11 @@
                         <div class="col-lg-3">                                                         
                                 <div class="card shadow-sm">
                                     <div class="card-body p-2">
-                                        <div class="row g-1 small">
-                                          
-                                           
+                                        <div class="row g-1 small">                                                                                    
                                            <div class="col-6 col-md-3 col-lg-12">
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
-                                                    <flat-pickr @change="fetchSales" class="form-control-plaintext border-bottom" v-model="search_by_from_sale_date" id="from_date" :config="config" />
+                                                    <flat-pickr  class="form-control-plaintext border-bottom" v-model="search_by_from_sale_date" id="from_date" :config="config" />
                                                     <label for="from_date">{{from_date_link}}</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
@@ -25,7 +23,7 @@
                                            <div class="col-6 col-md-3 col-lg-12">
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
-                                                    <flat-pickr @change="fetchSales" class="form-control-plaintext border-bottom" v-model="search_by_to_sale_date" id="to_date" :config="config" />
+                                                    <flat-pickr  class="form-control-plaintext border-bottom" v-model="search_by_to_sale_date" id="to_date" :config="config" />
                                                     <label for="to_date">{{to_date_link}}</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
@@ -39,14 +37,14 @@
                                            </div>
                                            <div class="col-6 col-md-3 col-lg-12">
                                             <div class="form-floating">
-                                                <input type="search" id="search_by_customer" v-model="search_by_customer" @keypress.enter="searchSales" placeholder="Customer name" class="form-control-plaintext border-bottom">
+                                                <input type="search" id="search_by_customer" v-model="search_by_customer" @input="inputSearchCustomer" placeholder="Customer name" class="form-control-plaintext border-bottom">
                                                 <label for="search_by_customer" class="">{{customer_link}}</label>
                                             </div>
                                            </div>                                   
                                     </div>
                                     <div class="row mt-2">
                                         <div class="col-4 d-grid">
-                                            <button class="btn btn-sm text-dark clear-search-product" @click="searchSales"><i class="fa-solid fa-search"></i> {{search_link}}</button>
+                                            <button class="btn btn-sm text-dark clear-search-product" @click="fetchSales"><i class="fa-solid fa-search"></i> {{search_link}}</button>
                                         </div>
                                             <div class="col-4 d-grid">
                                                 <button class="btn btn-sm  text-dark clear-search-sale" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> {{clear_link}}</button>
@@ -76,7 +74,7 @@
                                                 <td>Sale Date</td>
                                                 <td class="">User</td>                                    
                                             </tr>                                
-                                            <tr class="change-cursor" v-if="sales.length > 0" v-for="s in sales" :key="s.id" @click="setCode(s)" data-bs-dismiss="modal">
+                                            <tr class="change-cursor" v-if="sales.length > 0" v-for="s in sales.sort((a,b)=>a.user.uid.localeCompare(b.user.uid))" :key="s.id" @click="setCode(s)" data-bs-dismiss="modal">
                                                 <td class="text-center">{{s.voucher_no}}</td>
                                                 <td>{{s.customer.name}}</td>
                                                 <td class="text-center">{{s.customer.phone}}</td>
@@ -128,12 +126,7 @@ export default {
            search_by_customer:"",
             isUpdating:false,
            isLoading:false,
-           config: {
-                dateFormat: 'd/m/Y', // Flatpickr options
-                enableTime: false,
-                wrap: true, // set wrap to true only when using 'input-group'
-               // altFormat: 'M j, Y',
-            },  
+          
        }
    },
   
@@ -142,13 +135,14 @@ export default {
        const myModalEl = document.getElementById('salesModal')
        myModalEl.addEventListener('show.bs.modal', event => {                
        })   
-
-       this.isLoading=true;   
        this.fetchSales();  
             
    },
  
    computed:{
+        config(){
+            return this.$store.getters.flat_pickr_config;
+        },
        user(){
            return this.$store.getters.user;
        },       
@@ -206,7 +200,7 @@ export default {
            this.search_by_voucher_no="N-";
            this.search_by_customer="";
             this.setDate();
-            this.searchSales();
+            this.fetchSales();
          //  this.searchSales();
        },
        inputSearchCustomer(){
@@ -225,21 +219,35 @@ export default {
             this.sales=this.salesData;
        }
     },   
-    async fetchSales(){    
-       const from_date=Timestamp.fromDate(hp.searchFromDate(this.search_by_from_sale_date))
-        const to_date=Timestamp.fromDate(hp.searchToDate(this.search_by_to_sale_date))        
-        let query_url="";         
-        if(this.search_by_from_sale_date && this.search_by_to_sale_date){
-            query_url = query(collection(db, "sales"), where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date", "desc"));
-        }
-       onSnapshot(query_url, async(snapShot) =>{                
-                    const sales=ss.sales(snapShot)       
-                    this.salesData=sales;
-                    this.isLoading=false;
-                    this.isUpdating=false;
-                    this.sales=this.salesData;
-            });        
-      } ,
+    async fetchSales() {
+            this.sales=[];
+            this.isLoading = true;
+            this.isUpdating = true;
+
+            try {
+                let salesQuery;
+                if (this.search_by_from_sale_date && this.search_by_to_sale_date) {
+                    const from_date = Timestamp.fromDate(hp.searchFromDate(this.search_by_from_sale_date));
+                    const to_date = Timestamp.fromDate(hp.searchToDate(this.search_by_to_sale_date));
+                    salesQuery = query(
+                        collection(db, "sales"),
+                        where("sale_date", ">=", from_date),
+                        where("sale_date", "<=", to_date),
+                        orderBy("sale_date", "desc")
+                    );
+                } 
+                const snapShot = await getDocs(salesQuery);
+                const sales = ss.sales(snapShot);
+                this.salesData = sales;
+                this.sales = sales;
+            } catch (error) {
+                console.error("Error fetching sales:", error);
+            } finally {
+                this.isLoading = false;
+                this.isUpdating = false;
+            }
+        },
+
       showTime(t){
            return hp.showTimeHourShort(t)
        },

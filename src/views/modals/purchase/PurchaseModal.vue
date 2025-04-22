@@ -15,7 +15,7 @@
                                         <div class="col-6 col-sm-3 col-lg-12">
                                             <div class="input-group">
                                                 <div class="form-floating">
-                                                    <flat-pickr @change="fetchPurchase" class="form-control-plaintext border-bottom" v-model="search_by_from_pur_date" id="from_date" :config="config" />
+                                                    <flat-pickr  class="form-control-plaintext border-bottom" v-model="search_by_from_pur_date" id="from_date" :config="config" />
                                                     <label for="from_date">{{from_date_link}}</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
@@ -24,7 +24,7 @@
                                         <div class="col-6 col-sm-3 col-lg-12">
                                             <div class="input-group">
                                                 <div class="form-floating">
-                                                    <flat-pickr @change="fetchPurchase" class="form-control-plaintext border-bottom" v-model="search_by_to_pur_date" id="to_date" :config="config" />
+                                                    <flat-pickr  class="form-control-plaintext border-bottom" v-model="search_by_to_pur_date" id="to_date" :config="config" />
                                                     <label for="to_date">{{to_date_link}}</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
@@ -38,7 +38,7 @@
                                         </div>
                                         <div class="col-6 col-sm-3 col-lg-12">
                                             <div class="form-floating ">
-                                                <input type="search" v-model="search_by_supplier" @keypress.enter="searchPurchase" placeholder="Supplier" class="form-control-plaintext border-bottom">
+                                                <input type="search" v-model="search_by_supplier" @input="inputSearchSupplier" placeholder="Supplier" class="form-control-plaintext border-bottom">
                                                 <label for="search_by_supplier" class="">{{supplier_link}}</label>
                                             </div>
                                         </div>
@@ -47,7 +47,7 @@
                                 
                                 <div class="row mt-2">
                                     <div class="col-4 d-grid">
-                                        <button class="btn btn-sm text-dark clear-search-product" @click="searchPurchase"><i class="fa-solid fa-search"></i> {{search_link}}</button>
+                                        <button class="btn btn-sm text-dark clear-search-product" @click="fetchPurchase"><i class="fa-solid fa-search"></i> {{search_link}}</button>
                                     </div>
                                         <div class="col-4 d-grid">
                                             <button class="btn btn-sm text-dark clear-search-purchase" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> {{clear_link}}</button>
@@ -214,7 +214,7 @@ export default {
            this.search_by_from_pur_date=hp.setToday();
            this.search_by_to_pur_date=hp.setToday();
            this.search_by_location="";
-           this.searchPurchase();
+           this.fetchPurchase();
        },
       
        searchPurchase(){   
@@ -244,21 +244,35 @@ export default {
            }
        },
      
-    async fetchPurchase(){
-        let query_url="";
-        if(this.search_by_from_pur_date && this.search_by_to_pur_date){
-            const from_date=Timestamp.fromDate(hp.searchFromDate(this.search_by_from_pur_date))
-            const to_date=Timestamp.fromDate(hp.searchToDate(this.search_by_to_pur_date))       
-            query_url = query(collection(db, "purchases"), where("pur_date", ">=", from_date), where("pur_date", "<=", to_date),  orderBy("pur_date", "desc"));
-        }
-        onSnapshot(query_url, (snapShot)=>{                 
-            const pur=ss.purchases(snapShot);      
-            this.purchasesData=pur;
-            this.isLoading=false;
-            this.purchases=this.purchasesData            
-        })
-      
-      } ,
+       async fetchPurchase() {
+            this.purchases=[]
+            this.isLoading = true;
+            try {
+                let purchaseQuery;
+
+                if (this.search_by_from_pur_date && this.search_by_to_pur_date) {
+                    const from_date = Timestamp.fromDate(hp.searchFromDate(this.search_by_from_pur_date));
+                    const to_date = Timestamp.fromDate(hp.searchToDate(this.search_by_to_pur_date));
+
+                    purchaseQuery = query(
+                        collection(db, "purchases"),
+                        where("pur_date", ">=", from_date),
+                        where("pur_date", "<=", to_date),
+                        orderBy("pur_date", "desc")
+                    );
+                } 
+                const snapShot = await getDocs(purchaseQuery);
+                const pur = ss.purchases(snapShot);
+
+                this.purchasesData = pur;
+                this.purchases = pur;
+            } catch (error) {
+                console.error("Error fetching purchases:", error);
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
       showTime(t){
           return hp.showTime(t)
        },

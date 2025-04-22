@@ -12,9 +12,9 @@ const customers=(arr)=>{
             code : data.code,      
             is_deleted: data.is_deleted,
             edit_user:  null ,
-            name_lower_case: data.name_lower_case,
-            name_keywords: data.name_keywords,
-            address_keywords: data.address_keywords
+            name_lower_case: data.name_lower_case ? data.name_lower_case : "",
+            name_keywords: data.name_keywords ? data.name_keywords : "",
+            address_keywords: data.address_keywords ? data.address_keywords : ""
         };                                
         customerItems.push(cus);                                              
     });
