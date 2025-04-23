@@ -114,6 +114,9 @@ const restoreSuppliers=async(d)=>{
     company: d.company,
     phone: d.phone,        
     is_deleted:d.is_deleted, 
+    name_lower_case : d.name_lower_case ? d.name_lower_case : "",
+    name_keywords : d.name_keywords ? d.name_keywords :"",
+    company_keywords: d.company_keywords ? d.company_keywords :"",
 }  
 const saveDocument=doc(db, "suppliers", d.id)
 await setDoc(saveDocument, voucher)   
@@ -128,6 +131,9 @@ const restoreCustomers=async(d)=>{
     address: d.address,
     phone: d.phone,         
     is_deleted:d.is_deleted,
+    name_lower_case : d.name_lower_case ? d.name_lower_case : "",
+    name_keywords :d.name_keywords ? d.name_keywords : "",
+    address_keywords : d.address_keywords ? d.address_keywords : "",
 }  
 const saveDocument=doc(db, "customers", d.id)
 await setDoc(saveDocument, voucher)   

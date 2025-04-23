@@ -287,6 +287,23 @@ export default {
                 this.msg.info=i+1==data.length?`${collection} data has been deleted on the server`:`Deleting ${collection} data (${data.length - 1 - i})...`
                 this.msg.type="error" 
                 if(i+1 == data.length){
+                    if(collection=="products"){
+                        this.fetchProducts();
+                    }else if(collection == "sales"){
+                        this.fetchSales();
+                    }else if(collection == "purchases"){
+                        this.fetchPurchase();
+                    }else if(collection == "stocks"){
+                        this.fetchStocks();
+                    }else if(collection == "adjustments"){
+                        this.fetchAdjustments();
+                    }else if(collection == "packingSizes"){
+                        this.fetchPackingSizes();
+                    }else if(collection == "suppliers"){
+                        this.fetchSuppliers();
+                    }else if(collection == "customers"){
+                        this.fetchCustomers();
+                    }
                    setTimeout(()=>{
                     this.msg.info="";
                     this.msg.type=""    
