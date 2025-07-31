@@ -673,11 +673,20 @@ export default {
                     credit: this.credit,    
                     saleMode: this.saleMode,   
             } 
-            this.$store.dispatch("setPrintData", data);
+         //   this.$store.dispatch("setPrintData", data);
            // this.$router.push({name: "MobilePrint"})
          //  this.$router.push({name: "MobilePrint", params: {voucher_no: this.voucher_no}, query: {print: true}})
+         /*
             let url=window.location.origin + "/mobile/print/" + this.voucher_no;
             window.open(url, '_blank',   'width=' + window.innerWidth + ',height=' + window.innerHeight + ',top=0,left=0,scrollbars=yes,resizable=yes');
+            */ 
+           this.openAndroidApp(data);
+        },
+          openAndroidApp(data) {
+            // Prepare the data in a format the Android app can understand
+           const jsonString = encodeURIComponent(JSON.stringify(data));
+            const url = `https://print?data=${jsonString}`;
+            window.location.href = url;     
         },
         printSale(){         
             if(this.print_on_save){

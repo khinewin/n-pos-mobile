@@ -639,13 +639,40 @@ export default {
                 e.target.value=0;
            }
         },
+         openAndroidApp() {
+            const data={
+                    voucher_no: this.voucher_no,
+                    customer: this.customer,
+                    saleItems: this.saleItems,
+                    sale_date:this.sale_date,
+                    print_date: this.print_date,
+                    total_amount:this.total_amount,
+                    net_amount:this.net_amount,
+                    extra_discount: this.extra_discount,
+                    paid:this.paid,
+                    change:this.change,
+                    user: this.user,     
+                    credit: this.credit,    
+                    saleMode: this.saleMode,   
+            } 
+            // Prepare the data in a format the Android app can understand
+           const jsonString = encodeURIComponent(JSON.stringify(data));
+            const url = `https://print?data=${jsonString}`;
+            window.location.href = url;     
+        },
         async print () {
         // Pass the element id here
         //window.print();
-         await this.$htmlToPaper('printMe');
-         if(this.saleMode=="Sale / New"){
-            this.clearSaleItem();
-         }
+        const isAndroid = /Android/i.test(navigator.userAgent);
+         const isMobile = window.matchMedia("(max-width: 1199px)").matches;
+        if(isAndroid){
+            this.openAndroidApp();
+        }else{
+            await this.$htmlToPaper('printMe');
+            if(this.saleMode=="Sale / New"){
+                this.clearSaleItem();
+            }
+        }
         },
         printSale(){         
             if(this.print_on_save){
