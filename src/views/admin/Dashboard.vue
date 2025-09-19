@@ -27,34 +27,34 @@
             </div>
            <div class="row g-1 my-1 n-link">           
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm  " :to="{name : 'Sale'}" ><i class="fa-solid fa-cash-register text-success"></i>  {{sale_link}}</router-link>
+                <router-link class="btn btn-sm  " :to="{name : 'Sale'}" ><i class="fa-solid fa-cash-register text-success"></i>  {{t('sale')}}</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Purchase'}"><i class="fa-solid fa-cart-shopping text-danger"></i> {{purchase_link}}</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Purchase'}"><i class="fa-solid fa-cart-shopping text-danger"></i> {{t('purchase')}}</router-link>
             </div>
             <div class=" col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Stocks'}"><i class="fa-solid fa-money-bill-trend-up text-primary"></i> {{stocks_link}}</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Stocks'}"><i class="fa-solid fa-money-bill-trend-up text-primary"></i> {{t('stocks')}}</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Products'}"><i class="fa-solid fa-list-check text-warning"></i> {{product_link}}</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Products'}"><i class="fa-solid fa-list-check text-warning"></i> {{t('products')}}</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Suppliers'}"><i class="fa-solid fa-person-walking-luggage text-info"></i> {{suppliers_link}}</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Suppliers'}"><i class="fa-solid fa-person-walking-luggage text-info"></i> {{t('suppliers')}}</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Customers'}"><i class="fa-solid fa-users text-success"></i> {{customers_link}}</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Customers'}"><i class="fa-solid fa-users text-success"></i> {{t('customers')}}</router-link>
             </div>
             <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
                 <router-link class="btn btn-sm " :to="{name : 'Transfers'}"><i class="fa-solid fa-right-left text-danger"></i> Transfer</router-link>
             </div>-->  
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Adjustments'}"><i class="fa-solid fa-sliders text-primary"></i> {{adjustment_link}}</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Adjustments'}"><i class="fa-solid fa-sliders text-primary"></i> {{t('adjustment')}}</router-link>
             </div>           
             <div class="col-6 col-sm-4 col-md-3 col-lg-2  d-grid">
-                <router-link class="btn btn-sm " :to="{name : 'Soc'}"><i class="fa-solid fa-file-invoice-dollar text-warning"></i> {{soc_link}}</router-link>
+                <router-link class="btn btn-sm " :to="{name : 'Soc'}"><i class="fa-solid fa-file-invoice-dollar text-warning"></i> {{t('soc')}}</router-link>
             </div>
             <div class="col-6 col-sm-4 col-md-3 col-lg-2   d-grid">
-                <router-link :to="{name: 'Reports'}" class="btn btn-sm "><i class="fa-solid fa-chart-pie text-info"></i> {{reports_link}}</router-link>
+                <router-link :to="{name: 'Reports'}" class="btn btn-sm "><i class="fa-solid fa-chart-pie text-info"></i> {{t('reports')}}</router-link>
             </div>
             <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2   d-grid">
                 <router-link class="btn btn-sm" :to="{name : 'ReturnIn'}"><i class="fa-solid fa-file-import text-success"></i> Return In</router-link>
@@ -87,64 +87,17 @@ import {lang} from "@/lib/language"
         SalesSession,PageHeader,PurchaseSession,SalesChart, PurchaseChart
      },
      computed:{
+            t() {
+                return (key) => this.$store.getters.t(key);
+                },
             user(){
                 return this.$store.getters.user ? this.$store.getters.user : null;
             },
-            pageTitle(){
-            const sl=this.$store.getters.setLanguage;
-            let  pageTitle=sl=="mm" ?  `${lang.dashboard.mm}` : `${lang.dashboard.eng}`            
-            return pageTitle;
-        },
-        
-        sale_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.sale.mm : lang.sale.eng ;
-            return data;
-        },
-        purchase_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.purchase.mm : lang.purchase.eng ;
-            return data;
-        },
-        stocks_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.stocks.mm : lang.stocks.eng ;
-            return data;
-        },
-        product_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.product_code.mm : lang.product_code.eng ;
-            return data;
-        },
-        suppliers_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.suppliers.mm : lang.suppliers.eng ;
-            return data;
-        },
-        customers_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.customers.mm : lang.customers.eng ;
-            return data;
-        },
-        adjustment_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.adjustment.mm : lang.adjustment.eng ;
-            return data;
-        },
-        soc_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.soc.mm : lang.soc.eng ;
-            return data;
-        },
-        reports_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.reports.mm : lang.reports.eng ;
-            return data;
-        },
+            
         getGreeting() {
             const now = new Date();
             const hours = now.getHours();
-            const sl=this.$store.getters.setLanguage;
+            const sl=this.$store.getters.currentLang;
             if (hours < 12) {
                 return sl=="mm" ? "မင်္ဂလာနံနက်ခင်းပါ" :  "Good morning";
             } else if (hours < 18) {

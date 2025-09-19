@@ -1,4 +1,60 @@
 export const lang={
+    note:{
+        eng: "Note",
+        mm:"မှတ်စု"
+    },
+    notes:{
+        eng: "Notes",
+        mm:"မှတ်စုများ"
+    },
+    balance_due:{
+        eng: "Balance Due",
+        mm:"ကျန်ငွေ"
+    },
+    change:{
+        eng: "Change",
+        mm:"ပြန်အမ်းငွေ"
+    },
+    paid:{
+        eng: "Paid",
+        mm:"ပေးငွေ"
+    },
+    total:{
+        eng: "Total",
+        mm:"စုစုပေါင်း"
+    },
+    additional_discount:{
+        eng: "Additional Discount",
+        mm:"အပိုလျော့စျေး"
+    },
+    subtotal:{
+        eng: "Subtotal",
+        mm:"စုစုပေါင်း"
+    },
+    net_amount:{
+        eng: "Net Amount",
+        mm:"အသားတင်ပမာဏ"
+    },
+    discount:{
+        eng: "Discount",
+        mm:"လျော့စျေး"
+    },
+    amount:{
+        eng: "Amount",
+        mm:"ပမာဏ"
+    },
+    unit_price:{
+        eng: "Unit Price",
+        mm:"ယူနစ်စျေးနှုန်း"
+    },
+    qty:{
+        eng: "Quantity",
+        mm: "အရေအတွက်"
+    },
+    member_since:{
+        eng: "Member Since",
+        mm: "အဖွဲ့ဝင်စတင်သည့်နေ့"
+    },
     credits:{
         eng: "SOC",
         mm: "အကြွေးစာရင်း"
@@ -107,6 +163,14 @@ export const lang={
         eng:"Customer",
         mm:"ဖောက်သည်"
     },
+     date:{
+        eng:"Date",
+        mm:"နေ့စွဲ"
+    },
+     cashier:{
+        eng:"Cashier",
+        mm:"ရောင်းချသူ"
+    },
     customers:{
         eng:"Customers",
         mm:"ဖောက်သည်များ"
@@ -118,6 +182,10 @@ export const lang={
     voucher_no:{
         eng: "Voucher No.",
         mm:"ဘောင်ချာနံပါတ်"
+    },
+       invoice_no:{
+        eng: "Invoice No.",
+        mm:"ပြေစာနံပါတ်"
     },
     supplier:{
         eng: "Supplier",

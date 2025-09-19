@@ -1,7 +1,7 @@
 import { createStore } from 'vuex'
 import {Timestamp} from 'firebase/firestore'
 import { products } from '@/lib/snapshot/products';
-
+import { lang } from "@/lib/language";
 
  const store= createStore({
   state: {
@@ -13,6 +13,7 @@ import { products } from '@/lib/snapshot/products';
       phone:"09xxxxxxxxx",
       company :"",
       created_at : Timestamp.fromDate(new Date()),
+     
   },
   default_customer: {
     id: 123456789,
@@ -31,7 +32,9 @@ import { products } from '@/lib/snapshot/products';
     products:[],
     packingSizes:[],
     printData:{},
-    setLanguage: "eng"
+    setLanguage: "eng",
+     currentLang: "mm", // default language
+     translations: lang
   },
 
   getters: {
@@ -42,7 +45,12 @@ import { products } from '@/lib/snapshot/products';
     products:state=>state.products,
     packingSizes:state=>state.packingSizes,
     printData:state=>state.printData,
-    setLanguage: state=>state.setLanguage
+    setLanguage: state=>state.setLanguage,
+    t: (state) => (key) => {
+      // find translation safely
+      return state.translations[key]?.[state.currentLang] || key;
+    },
+    currentLang: (state) => state.currentLang
   },
 
   mutations: {
@@ -57,7 +65,10 @@ import { products } from '@/lib/snapshot/products';
         },
         SET_PRINT_DATA(state, payload){
           state.printData=payload;
-        }
+        },
+        SET_LANGUAGE(state, langCode) {
+        state.currentLang = langCode;
+      }
       
   },
 
@@ -73,6 +84,9 @@ import { products } from '@/lib/snapshot/products';
         },
         setPrintData(context, payload){
           context.commit("SET_PRINT_DATA", payload)
+        },
+        changeLanguage({ commit }, langCode) {
+          commit("SET_LANGUAGE", langCode);
         }
      
   },

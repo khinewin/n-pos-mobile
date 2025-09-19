@@ -20,27 +20,27 @@
                                 <div class="col-6 col-sm-3 col-lg-12">
                                     <div class="form-floating">
                                         <input type="search" id="search_by_name" v-model="search_by_name" @keypress.enter="searchCustomer" placeholder="Description" class="form-control-plaintext border-bottom">
-                                        <label for="search_by_name" class="">Name</label>
+                                        <label for="search_by_name" class="">{{t('name')}}</label>
                                     </div> 
                                 </div>
                                 <div class="col-6 col-sm-3 col-lg-12">
                                     <div class="form-floating">
                                         <input type="search" id="search_by_address" v-model="search_by_address" @keypress.enter="searchCustomer" placeholder="Address" class="form-control-plaintext border-bottom">
-                                         <label for="search_by_address" class="">Address</label>
+                                         <label for="search_by_address" class="">{{t('address')}}</label>
                                 </div>
                                 </div> 
                                 <div class="col-4 col-sm-3 col-lg-4 d-grid">
-                                    <button class="btn btn-sm text-dark clear-search-product" @click="searchCustomer"><i class="fa-solid fa-search"></i> Search</button>
+                                    <button class="btn btn-sm text-dark clear-search-product" @click="searchCustomer"><i class="fa-solid fa-search"></i> {{t('search_link')}}</button>
                                 </div>
                                 <div class="col-4 col-sm-3 col-lg-4 d-grid"><button class="btn btn-sm text-dark clear-search-customer" @click="clearSearch">
-                                    <i class="fa-solid fa-filter-circle-xmark"></i> Clear </button>
+                                    <i class="fa-solid fa-filter-circle-xmark"></i> {{t('clear_link')}} </button>
                                 </div>
                                 <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateCustomer">
                                     <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
                                     <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                 </button></div>-->
                                 <div class="col-4 col-sm-3 col-lg-4 d-grid"><button class="btn btn-sm text-dark close-customer" data-bs-dismiss="modal">
-                                    <i class="fa-solid fa-circle-xmark"></i> Close </button>
+                                    <i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}} </button>
                                 </div>     
                              </div> 
                         </div>
@@ -51,12 +51,12 @@
                            <div class="card-body p-0 vh-100 overflow-y-auto">
                                <table class="table table-bordered table-hover mb-0">
                                    <tbody class="small">
-                                       <tr class="text-center table-secondary fw-bold sticky-top z-3" >
+                                       <tr class="text-center table-secondary fw-bold sticky-top z-3 change-cursor " >
                                            <!--<td class="col-1" @click="sortCustomers('code')"><i class="fa-solid fa-sort"></i> Code</td>-->
-                                           <td @click="sortCustomers('name')" class="col-1"><i class="fa-solid fa-sort"></i> Name</td>
-                                           <td class="col-1" @click="sortCustomers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
-                                           <td class="col-1" @click="sortCustomers('address')"><i class="fa-solid fa-sort"></i> Address</td>
-                                           <td class="col-1" @click="sortCustomers('created_at')"><i class="fa-solid fa-sort"></i> Member date</td>
+                                           <td @click="sortCustomers('name')" class="col-1"><i class="fa-solid fa-sort"></i> {{t('name')}}</td>
+                                           <td class="col-1" @click="sortCustomers('phone')"><i class="fa-solid fa-sort"></i> {{t('phone')}}</td>
+                                           <td class="col-1" @click="sortCustomers('address')"><i class="fa-solid fa-sort"></i> {{t('address')}}</td>
+                                           <td class="col-1" @click="sortCustomers('created_at')"><i class="fa-solid fa-sort"></i> {{t('member_since')}}</td>
                                        </tr>
                                    </tbody>
                                    <tbody>
@@ -177,6 +177,9 @@ import { required, email ,helpers} from '@vuelidate/validators'
            user(){
                return this.$store.getters.user;
            },
+           t() {
+            return (key) => this.$store.getters.t(key);
+        },
            /*default_customer(){
                 return this.$store.getters.default_customer;
            }*/
