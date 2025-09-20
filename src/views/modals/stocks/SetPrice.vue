@@ -7,7 +7,7 @@
                 <div class="modal-body p-2">
                     <div class="row mb-2">                                             
                         <div class="col-12 text-end">
-                            <button id="close" type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
+                            <button id="close" type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}}</button>
                         </div>
                     </div>
                     <div>
@@ -29,7 +29,7 @@
                                     </td>
                                 </tr>       
                                 <tr class="">
-                                    <td class="pt-2">Pur price</td>
+                                    <td class="pt-2">{{t('pur_price')}}</td>
                                     <td class="text-center p-0"  v-if="ei.packing_size.largest_unit">
                                         <input @keypress.enter="pressClose" :disabled="!ei.packing_size.largest_unit" @keyup="calPurPrice('largest_unit')" type="number" v-model="ei.pur_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
                                     </td>
@@ -41,7 +41,7 @@
                                     </td>                                        
                                 </tr>
                                 <tr class="">
-                                    <td class="pt-2">Sale Price</td>
+                                    <td class="pt-2">{{t('sale_price')}}</td>
                                     <td class="text-center p-0"  v-if="ei.packing_size.largest_unit">
                                         <input @keypress.enter="pressClose" :disabled="!ei.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="ei.retail_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
                                     </td>
@@ -68,7 +68,7 @@
                                     <td class="ps-2 pt-2" colspan="4">
                                         <div class="form-check form-switch">
                                             <input @change="saveAutoCal" v-model="ei.auto_cal" class="form-check-input auto-cal" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
-                                            <label class="form-check-label" for="flexSwitchCheckChecked">Auto cal (shift+a)</label>
+                                            <label class="form-check-label" for="flexSwitchCheckChecked">{{t('auto')}} </label>
                                           </div>                                              
                                     </td>
                                  </tr>               
@@ -86,6 +86,11 @@
     import * as cp from "@/lib/cal_price"
 export default {
     props:['ei'],
+    computed:{
+        t() {
+            return (key) => this.$store.getters.t(key);
+        },
+    },
     methods:{
         calRetailPrice(unit){
             return cp.calRetailPrice(unit, this.ei);

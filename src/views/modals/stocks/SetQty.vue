@@ -8,11 +8,11 @@
                     <div class="row text-end mb-2">                       
                         <div class="col-6">
                             <button id="saveQty" type="button" class="btn btn-sm" @click="saveQty" data-bs-dismiss="modal">
-                                <span ><i class="fa-solid fa-hard-drive"></i> Save</span>
+                                <span ><i class="fa-solid fa-hard-drive"></i> {{t('save_link')}}</span>
                             </button>
                         </div>
                         <div class="col-6">
-                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button>
+                            <button type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}}</button>
                         </div>
                     </div>
                     <div>
@@ -23,8 +23,8 @@
                                 </tr>
                                 <tr>
                                     <!--<td class="text-center col-2">Main Inventory</td>-->
-                                    <td class="text-center col-1">Mart Inv Bal</td>
-                                    <td class="text-center col-1">Unit</td>
+                                    <td class="text-center col-1">{{t('inv_bal')}}</td>
+                                    <td class="text-center col-1">{{t('unit')}}</td>
                                 </tr>
                                 <tr v-if="ei.packing_size.largest_unit">
                                    <!--<td class="p-0">
@@ -78,6 +78,11 @@
 <script>
 export default {
 props:['ei'],
+computed:{
+     t() {
+            return (key) => this.$store.getters.t(key);
+        },
+},
 methods:{
     saveQty(){
         this.$emit("saveQty")

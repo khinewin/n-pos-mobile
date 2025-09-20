@@ -1,4 +1,12 @@
 export const lang={
+    auto:{
+        eng:"Auth",
+        mm:"အော်တို"
+    },
+     unit:{
+        eng: "Unit",
+        mm:"ယူနစ်"
+    },
     note:{
         eng: "Note",
         mm:"မှတ်စု"
@@ -18,6 +26,22 @@ export const lang={
     paid:{
         eng: "Paid",
         mm:"ပေးငွေ"
+    },
+    total_paid:{
+        eng:"Total Paid",
+        mm:"ပေးငွေစုစုပေါင်း"
+    },
+    paid_amount:{
+        eng:"Paid Amount",
+        mm:"ပေးငွေပမာဏ"
+    },
+    total_balance_due:{
+        eng: "Total Balance Due",
+        mm:"ကျန်ငွေစုစုပေါင်း"
+    },
+    pay_for:{
+        eng:"Pay For",
+        mm:"ပေးဆောင်သည်"
     },
     total:{
         eng: "Total",
@@ -42,6 +66,10 @@ export const lang={
     amount:{
         eng: "Amount",
         mm:"ပမာဏ"
+    },
+    unit_cost:{
+        eng: "Unit Cost",
+        mm: "ယူနစ်ကုန်ကျစရိတ်"
     },
     unit_price:{
         eng: "Unit Price",
@@ -143,6 +171,43 @@ export const lang={
         eng: "Stocks",
         mm: "စတော့"            
     },
+    change_password:{
+        eng:"Change Password",
+        mm:"လျှို့ဝှက်နံပါတ်ပြောင်းရန်"
+    },
+    last_login:{
+        eng:"Last Login",
+        mm:"နောက်ဆုံးဝင်ရောက်သည့်နေ့"
+    },
+    email:{
+        eng:"E-mail",
+        mm:"အီလ်းမေး"
+    },
+    uid:{
+        eng:"UID",
+        mm:"ယူအိုင်ဒီ"
+    },
+    user_profile:{
+        eng: "User Profile",
+        mm:"အသုံးပြုသူပရိုဖိုင်"
+    },
+    adj_type:{
+        eng: "Adjustment Type",
+        mm:"စားရင်းညှိအမျိုးအစား"
+    },
+    before_adj:{
+        eng:"Before Adj",
+        mm:"စာရင်းမညှိခင်"
+    },
+    rts_rfs:{
+        eng: "RTS / RFS",
+        mm:"ပြန်ပေး / ပြန်ယူ"
+    },
+    after_adj:{
+        eng: "After Adj",
+        mm:"စားရင်းညှိပြီး"
+    },
+  
     adjustment : {
         eng: "Adjustment",
         mm: "စာရင်းညှိ"            
@@ -195,10 +260,7 @@ export const lang={
         eng:"Suppliers",
         mm:"ကုန်သွင်းသူများ"
     },
-    supplier:{
-        eng:"Supplier",
-        mm:"ကုန်သွင်း"
-    },
+  
     voucher_no:{
         eng: "Voucher No.",
         mm:"ဘောင်ချာနံပါတ်"

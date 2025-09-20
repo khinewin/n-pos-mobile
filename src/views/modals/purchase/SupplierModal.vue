@@ -17,25 +17,25 @@
                             <div class="col-6 col-sm-3 col-lg-12">
                                 <div class="form-floating ">
                                     <input type="search" id="search_by_name" v-model="search_by_name" @keypress.enter="searchSuppliers" placeholder="Name" class="form-control-plaintext border-bottom">
-                                    <label for="search_by_name" class="small ">Name</label>
+                                    <label for="search_by_name" class="small ">{{t('name')}}</label>
                                 </div> 
                             </div>
                             <div class="col-sm-3 col-lg-12">
                                 <div class="form-floating ">
                                     <input type="search" id="search_by_company" v-model="search_by_company" @keypress.enter="searchSuppliers" placeholder="Company" class="form-control-plaintext border-bottom">
-                                    <label for="search_by_company" class="small">Company</label>
+                                    <label for="search_by_company" class="small">{{t("company")}}</label>
                                 </div> 
                             </div>
                             <div class="col-4 col-sm-3 col-lg-4 d-grid">
-                                <button class="btn btn-sm text-dark clear-search-product" @click="searchSuppliers"><i class="fa-solid fa-search"></i> Search</button>
+                                <button class="btn btn-sm text-dark clear-search-product" @click="searchSuppliers"><i class="fa-solid fa-search"></i> {{t('search_link')}}</button>
                             </div>
-                            <div class="col-4 col-sm-3 col-lg-4 d-grid"><button class="btn btn-sm text-dark clear-search-supplier" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button></div>
+                            <div class="col-4 col-sm-3 col-lg-4 d-grid"><button class="btn btn-sm text-dark clear-search-supplier" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> {{t('clear_link')}}</button></div>
                             <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                 </button>
                             </div>-->
                             <div class="col-4 col-sm-3 col-lg-4 d-grid">
-                                <button class="btn btn-sm text-dark close-supplier" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close </button>
+                                <button class="btn btn-sm text-dark close-supplier" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}} </button>
                             </div>
                           </div> 
                      </div>
@@ -46,26 +46,22 @@
                         <div class="card-body p-2 pt-0  vh-100 overflow-y-auto">
                             <table class="table table-bordered table-hover mb-0">
                                 <thead>
-                                    <tr class="text-center table-secondary fw-bold sticky-top z-3">
-                                        <td class="col-1" @click="sortSuppliers('code')"><i class="fa-solid fa-sort"></i> Code</td>
-                                        <td class="col-2" @click="sortSuppliers('name')"><i class="fa-solid fa-sort"></i> Name</td>
-                                        <td class="col-1" @click="sortSuppliers('phone')"><i class="fa-solid fa-sort"></i> Phone</td>
-                                        <td class="col-4" @click="sortSuppliers('company')"><i class="fa-solid fa-sort"></i> Company</td>
-                                        <td class="col-1" @click="sortSuppliers('created_at')"><i class="fa-solid fa-sort"></i> Date</td>
+                                    <tr class="text-center table-secondary fw-bold sticky-top z-3 change-cursor">
+                                        <td class="col-2" @click="sortSuppliers('name')"><i class="fa-solid fa-sort"></i> {{t('name')}}</td>
+                                        <td class="col-2" @click="sortSuppliers('phone')"><i class="fa-solid fa-sort"></i> {{t('phone')}}</td>
+                                        <td class="col-4" @click="sortSuppliers('company')"><i class="fa-solid fa-sort"></i> {{t('company')}}</td>
+                                        <td class="col-2" @click="sortSuppliers('created_at')"><i class="fa-solid fa-sort"></i> {{t('member_since')}}</td>
                                     </tr>
                                 </thead>
                                 <tbody>                                    
                                    <tr @click="setCode(general_supplier)" data-bs-dismiss="modal" class="change-cursor">
-                                        <td class="text-center">{{general_supplier.code}}</td>
                                         <td>{{general_supplier.name}}</td>
                                         <td class="text-center">{{general_supplier.phone}}</td>
                                         <td>{{general_supplier.company}}</td>
                                         <td class="text-center">{{showTime(general_supplier.created_at)}}</td>
                                    </tr>
                                     <tr  class="change-cursor" v-if="suppliers.length > 0"  v-for="(p, i) in suppliers" :key="p.id" @click="setCode(p)" data-bs-dismiss="modal">                                         
-                                        <td :class="{'table-secondary': sort_item ==='code'}" class="text-center">
-                                             {{p.code}}
-                                         </td>
+                                        
                                         <td :class="{'table-secondary': sort_item ==='name'}">
                                             {{p.name}}
                                         </td>
@@ -156,7 +152,9 @@
             user(){
                 return this.$store.getters.user;
             },
-           
+           t() {
+            return (key) => this.$store.getters.t(key);
+        },
         },
         watch:{
          

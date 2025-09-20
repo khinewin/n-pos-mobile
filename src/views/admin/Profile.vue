@@ -1,6 +1,6 @@
 <template lang="">     
     <div>           
-        <PageHeader page-title="User profile" page-code="profile"  :msg-type="msg.type" :msg-info="msg.info" />
+        <PageHeader :page-title="t('user_profile')" page-code="profile"  :msg-type="msg.type" :msg-info="msg.info" />
         <div class="container vh-80 overflow-y-auto">
             <div class="row justify-content-center g-2" v-if="user !==null">
                 <div class="col-sm-10 col-md-8 col-lg-6">
@@ -10,25 +10,25 @@
                                     <table class="table profile-table">
                                         <tbody >
                                             <tr>
-                                                <td>Name <span class="float-end">:</span> </td>
+                                                <td>{{t('name')}} <span class="float-end">:</span> </td>
                                                 <td>
                                                     <input @keypress.enter="saveUsername" type="text" class="form-control-plaintext form-control-sm" v-model="userName">
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td>E-mail <span class="float-end">:</span> </td>
+                                                <td>{{t('email')}} <span class="float-end">:</span> </td>
                                                 <td>{{user.email}}</td>
                                             </tr>
                                             <tr>
-                                                <td>UID <span class="float-end">:</span> </td>
+                                                <td>{{t('uid')}} <span class="float-end">:</span> </td>
                                                 <td>{{user.uid}}</td>
                                             </tr>
                                             <tr>
-                                                <td>Member since <span class="float-end">:</span> </td>
+                                                <td>{{t('member_since')}} <span class="float-end">:</span> </td>
                                                 <td>{{user.metadata.creationTime}}</td>
                                             </tr>
                                             <tr>
-                                                <td>Last login <span class="float-end">:</span> </td>
+                                                <td>{{t('last_login')}} <span class="float-end">:</span> </td>
                                                 <td>{{user.metadata.lastSignInTime}}</td>
                                             </tr>                                          
                                         </tbody>
@@ -37,7 +37,7 @@
                         </div>
                         <div class="card shadow">
                             <div class="card-body">
-                                <div class="mb-3">Change password</div>
+                                <div class="mb-3">{{t('change_password')}}</div>
                                     <div class="row g-1 mb-2">
                                         <div class="col-sm-6">
                                             <div class="form-floating">
@@ -61,7 +61,7 @@
                                     <div class="row">
                                         <div class="col-12 d-grid">
                                             <button class="btn btn-secondary" @click="changePassword">
-                                                <span v-if="!isUpdating">Save</span>
+                                                <span v-if="!isUpdating">{{t('save_link')}}</span>
                                                 <span class="spinner-border text-light spinner-border-sm" role="status" v-if="isUpdating">
                                                     <span class="visually-hidden">Loading...</span>
                                                 </span>
@@ -125,6 +125,10 @@ export default {
     computed:{
         user(){
             return this.$store.getters.user ? this.$store.getters.user : null;
+        },
+       
+         t() {
+            return (key) => this.$store.getters.t(key);
         },
        
     },

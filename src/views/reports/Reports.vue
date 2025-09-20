@@ -11,7 +11,7 @@
                                    <div class="input-group mb-2">
                                     <div class="form-floating">
                                         <flat-pickr class="form-control-plaintext border-bottom" v-model="from_date" id="from_date" :config="config" />
-                                        <label for="from_date">{{from_date_link}}</label>
+                                        <label for="from_date">{{t('from_date')}}</label>
                                     </div>
                                     <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                    </div>  
@@ -20,74 +20,19 @@
                                     <div class="input-group mb-2">
                                         <div class="form-floating">
                                             <flat-pickr class="form-control-plaintext border-bottom" v-model="to_date" id="to_date" :config="config" />
-                                            <label for="to_date">{{to_date_link}}</label>
+                                            <label for="to_date">{{t('to_date')}}</label>
                                         </div>
                                         <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
                                        </div>
                                 </div>
                             </div>                                                    
-                            <!--<div class="row g-2">
-                                <div class="col-6">
-                                    <div class="form-floating mb-2">
-                                        <select v-model="from_location" class="form-control-plaintext border-bottom" id="from_location" @change="handleFromLocation(from_location)">
-                                            <option>Main</option>
-                                            <option>Mart</option>
-                                        </select>
-                                        <label for="from_location">From Location</label>
-                                    </div>  
-                                </div>
-                                <div class="col-6">
-                                    <div class="form-floating mb-2">
-                                        <select v-model="to_location" class="form-control-plaintext border-bottom" id="to_location" @change="handleToLocation(from_location)">
-                                            <option>Main</option>
-                                            <option>Mart</option>
-                                        </select>
-                                        <label for="to_location">To Location</label>
-                                    </div>    
-                                </div>
-                            </div>--> 
-                            <!--<div class="row g-2">
-                                <div class="col-5">
-                                    <div class="mb-2 input-group">
-                                        <div class="form-floating ">
-                                            <input  type="number" class="form-control-plaintext border-bottom" id="gt_equal" v-model="gt_equal" placeholder=">=">
-                                            <label for="gt_equal">>=</label>
-                                        </div> 
-                                        <span class="input-group-text bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
-                                    </div>
-                                </div>
-                                <div class="col-5">
-                                    <div class="mb-2 input-group">
-                                        <div class="form-floating ">
-                                            <input  type="number" class="form-control-plaintext border-bottom" id="lt_equal" v-model="lt_equal" placeholder="<=">
-                                            <label for="lt_equal"><=</label>
-                                        </div> 
-                                        <span class="input-group-text bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
-                                    </div>
-                                </div>
-                                <div class="col-2">
-                                    <div class="form-floating">
-                                        <select v-model="packing_unit" id="packing_unit"  class="form-control-plaintext border-bottom">                                          
-                                            <option>S Unit</option>
-                                        </select>
-                                        <label for="packing_unit">Packing Unit</label>
-                                    </div>
-                                </div>
-                               </div>-->
-                            <!--<div class="form-floating mb-2">
-                                <select v-model="location" class="form-control-plaintext border-bottom">
-                                    <option>All</option>
-                                    <option>Main</option>
-                                    <option>Mart</option>
-                                </select>
-                                <label for="location">Location</label>
-                            </div> -->   
+                           
                            <div class="row g-2">
                                 <div class="col-6">
                                     <div class="mb-2 input-group">
                                         <div class="form-floating ">
                                             <input data-bs-toggle="modal" readonly data-bs-target="#searchCode"  type="text" class="form-control-plaintext border-bottom" id="item_name" v-model="item_name" placeholder="Code">
-                                            <label for="item_name">Code</label>
+                                            <label for="item_name">{{t('item_name')}}</label>
                                         </div> 
                                         <span class="input-group-text bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
                                     </div>
@@ -96,7 +41,7 @@
                                     <div class="mb-2 input-group">
                                         <div class="form-floating ">
                                             <input  type="text" class="form-control-plaintext border-bottom" id="voucher_no" v-model="voucher_no" placeholder="Voucher no.">
-                                            <label for="voucher_no">Voucher No.</label>
+                                            <label for="voucher_no">{{t('invoice_no')}}</label>
                                         </div> 
                                         <span class="input-group-text  bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
                                     </div>
@@ -107,7 +52,7 @@
                                     <div class="input-group">
                                         <div class="form-floating">
                                             <input data-bs-toggle="modal" readonly data-bs-target="#searchSupplier" type="text" class="form-control-plaintext border-bottom" id="supplier" v-model="supplier.name" placeholder="Supplier">
-                                            <label for="supplier">Supplier</label>
+                                            <label for="supplier">{{t('supplier')}}</label>
                                         </div> 
                                         <span class="input-group-text  bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>  
                                     </div> 
@@ -116,7 +61,7 @@
                                     <div class="input-group mb-2">
                                         <div class="form-floating">
                                             <input data-bs-toggle="modal" readonly data-bs-target="#customerModal" type="text" class="form-control-plaintext border-bottom" id="customer" v-model="customer.name" placeholder="Supplier">
-                                            <label for="supplier">Customer</label>
+                                            <label for="supplier">{{t('customer')}}</label>
                                         </div> 
                                         <span class="input-group-text  bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>  
                                     </div>  
@@ -130,7 +75,7 @@
                                                 <option>Increment</option>
                                                 <option>Decrement</option>
                                             </select>
-                                            <label for="adj_type">Adj type</label>
+                                            <label for="adj_type">{{t('adj_type')}}</label>
                                         </div> 
                                         <span class="input-group-text  bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
                                     </div>
@@ -142,7 +87,7 @@
                                                 <option>Yes</option>
                                                 <option>No</option>
                                             </select>
-                                            <label for="item_name">RTS/RFS</label>
+                                            <label for="item_name">{{t('rts_rfs')}}</label>
                                         </div> 
                                         <span class="input-group-text  bg-white border-0 border-bottom" @click="clearInput()"><i class="fa-solid fa-circle-xmark"></i></span>
                                     </div>
@@ -158,22 +103,22 @@
                                 <tbody>
                                     <tr>
                                         <td>
-                                            <ReportList @report="reportProducts" :title="product_link" :arr="products" />
+                                            <ReportList @report="reportProducts" :title="t('product_code')" :arr="products" />
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <ReportList @report="reportStocks" :title="stocks_link" :arr="stocks" />
+                                            <ReportList @report="reportStocks" :title="t('stocks')" :arr="stocks" />
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <ReportList @report="reportSales" :title="sale_link" :arr="sales" />
+                                            <ReportList @report="reportSales" :title="t('sale')" :arr="sales" />
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <ReportList @report="reportPurchase" :title="pur_link" :arr="purchase" />
+                                            <ReportList @report="reportPurchase" :title="t('purchase')" :arr="purchase" />
                                         </td>
                                     </tr>
                                     <!--<tr>
@@ -183,12 +128,12 @@
                                     </tr>-->
                                     <tr>
                                         <td>
-                                            <ReportList @report="reportAdjustments" :title="adj_link" :arr="adjustments" />
+                                            <ReportList @report="reportAdjustments" :title="t('adjustment')" :arr="adjustments" />
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <ReportList @report="reportSoc" :title="soc_link" :arr="soc" />
+                                            <ReportList @report="reportSoc" :title="t('soc')" :arr="soc" />
                                         </td>
                                     </tr>
                                     <!--<tr>
@@ -365,59 +310,12 @@ export default {
             return this.$store.getters.flat_pickr_config;
         },
         pageTitle(){
-            const sl=this.$store.getters.setLanguage;
+            const sl=this.$store.getters.currentLang;
             let  pageTitle=sl=="mm" ?  `${lang.reports.mm}` : `${lang.reports.eng}`            
             return pageTitle;
         },
-        from_date_link(){
-            const sl=this.$store.getters.setLanguage;
-            let  data=sl=="mm" ?  `${lang.from_date.mm}` : `${lang.from_date.eng}`            
-            return data;
-        },
-        to_date_link(){
-            const sl=this.$store.getters.setLanguage;
-            let  data=sl=="mm" ?  `${lang.to_date.mm}` : `${lang.to_date.eng}`            
-            return data;
-        },
-        product_link(){
-            const sl=this.$store.getters.setLanguage;
-            let  data=sl=="mm" ?  `${lang.product_code.mm}` : `${lang.product_code.eng}`            
-            return data;
-        },
-        supplier_link(){
-            const sl=this.$store.getters.setLanguage;
-            let  data=sl=="mm" ?  `${lang.suppliers.mm}` : `${lang.suppliers.eng}`            
-            return data;
-        },
-        customer_link(){
-            const sl=this.$store.getters.setLanguage;
-            let  data=sl=="mm" ?  `${lang.customers.mm}` : `${lang.customers.eng}`            
-            return data;
-        },
-        soc_link(){
-            const sl=this.$store.getters.setLanguage;
-            let  data=sl=="mm" ?  `${lang.credits.mm}` : `${lang.credits.eng}`            
-            return data;
-        },
-        sale_link(){
-            const sl=this.$store.getters.setLanguage;
-            let  data=sl=="mm" ?  `${lang.sale.mm}` : `${lang.sale.eng}`            
-            return data;
-        },
-        pur_link(){
-            const sl=this.$store.getters.setLanguage;
-            let  data=sl=="mm" ?  `${lang.purchase.mm}` : `${lang.purchase.eng}`            
-            return data;
-        },
-        stocks_link(){
-            const sl=this.$store.getters.setLanguage;
-            let  data=sl=="mm" ?  `${lang.stocks.mm}` : `${lang.stocks.eng}`            
-            return data;
-        },
-        adj_link(){
-            const sl=this.$store.getters.setLanguage;
-            let  data=sl=="mm" ?  `${lang.adjustment.mm}` : `${lang.adjustment.eng}`            
-            return data;
+        t() {
+            return (key) => this.$store.getters.t(key);
         },
         
     },

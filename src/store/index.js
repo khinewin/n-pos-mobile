@@ -33,7 +33,7 @@ import { lang } from "@/lib/language";
     packingSizes:[],
     printData:{},
     setLanguage: "eng",
-     currentLang: "mm", // default language
+     currentLang: "eng", // default language
      translations: lang
   },
 

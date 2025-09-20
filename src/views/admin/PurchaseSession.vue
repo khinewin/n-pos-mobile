@@ -41,13 +41,13 @@
                                         <span v-else @click="fetchPurchaseYearly" class="change-cursor"><i class="fa-solid fa-rotate-right"></i></span>
                                     </div>
                                 </div>
-                                <div class="col-5">
+                                <!--<div class="col-5">
                                     <div class="small fw-lighter mb-1 text-center">{{t('this_year')}}</div>
                                     <div class="card-text text-center small">     
                                         <span v-if="purchaseYearlyData.length">{{fM(purchase_this_year)}}   </span>
                                         <span v-else @click="fetchPurchaseYearly" class="change-cursor"><i class="fa-solid fa-rotate-right"></i></span>                             
                                     </div>
-                                </div>
+                                </div>-->
                             </div>
                     </div>
                 </div>
@@ -84,7 +84,7 @@
                 },
         },
         mounted() {
-         //   this.fetchPurchaseYearly();
+            this.fetchPurchaseYearly();
 
         },     
     
@@ -145,8 +145,10 @@
             },
            async fetchPurchaseYearly(){
                 const currentDate = new Date();
-                const theFirst = new Date(currentDate.getFullYear(), 0, 1);
-                const theLast = new Date(currentDate.getFullYear(), 11, 31);
+                 const theFirst = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1, 0, 0, 0, 0);
+
+                // Last day of month at 23:59:59.999
+                const theLast = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999);
                 const first_day_month=Timestamp.fromDate(new Date(theFirst))
                 const last_day_month=Timestamp.fromDate(new Date(theLast))
                 const query_url=query(collection(db, "purchases"),  

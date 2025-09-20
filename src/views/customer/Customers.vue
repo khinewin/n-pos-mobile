@@ -5,7 +5,7 @@
                <div class="row  justify-content-end">  
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isUpdating || Object.keys(editItem).length===0" @click="saveEdit" >
-                        <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> {{update_link}}</span>
+                        <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> {{t('update_link')}}</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                     </button>
                 </div>  
@@ -17,7 +17,7 @@
                 </div>-->                           
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCustomer">
-                        <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> {{save_link}}</span>
+                        <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> {{t('save_link')}}</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                     </button>
                 </div>   
@@ -35,19 +35,19 @@
                                     </div>-->
                                     <div class="form-floating col-sm-3 col-lg-12 ">
                                         <input type="search" id="search_by_name" v-model="search_by_name" @keypress.enter="searchCustomer" placeholder="Description" class="form-control-plaintext border-bottom ">
-                                        <label for="search_by_name" class="small ">{{name_link}}</label>
+                                        <label for="search_by_name" class="small ">{{t('name')}}</label>
                                     </div> 
                                     <div class="form-floating col-sm-3 col-lg-12 ">
                                         <input type="search" id="search_by_address" v-model="search_by_address" @keypress.enter="searchCustomer" placeholder="Address" class="form-control-plaintext border-bottom ">
-                                        <label for="search_by_address" class="small ">{{address_link}}</label>
+                                        <label for="search_by_address" class="small ">{{t('address')}}</label>
                                     </div> 
                                
-                                        <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="searchCustomer"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> {{search_link}}</button></div>
+                                        <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="searchCustomer"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> {{t('search_link')}}</button></div>
                                         <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateCustomer">
                                              <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
                                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                         </button></div>-->
-                                        <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> {{clear_link}}</button></div>
+                                        <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> {{t('clear_link')}}</button></div>
                                  </div>
                             </div>
                        </div>                                                                                                           
@@ -75,13 +75,13 @@
                                                 <input @keyperss.enter="saveCustomer"  type="text" v-model="code" class="form-control-plaintext py-0 text-center" id="code" placeholder="Code">                                                                                       
                                             </td>-->
                                             <td class="">
-                                                <input  @keyperss.enter="saveCustomer" type="text" v-model="name"  class="form-control py-1 " id="name" :placeholder="name_link">                                               
+                                                <input  @keyperss.enter="saveCustomer" type="text" v-model="name"  class="form-control py-1 " id="name" :placeholder="t('name')">                                               
                                             </td>
                                             <td class="">
-                                                <input @keypress.enter="saveCustomer" type="tel" v-model="phone"    class="form-control py-1 text-center" id="phone" :placeholder="phone_link">                                            
+                                                <input @keypress.enter="saveCustomer" type="tel" v-model="phone"    class="form-control py-1 text-center" id="phone" :placeholder="t('phone')">                                            
                                             </td>
                                             <td class="">
-                                                <input @keypress.enter="saveCustomer" type="text" v-model="address"   class="form-control py-1" id="address" :placeholder="address_link">                                              
+                                                <input @keypress.enter="saveCustomer" type="text" v-model="address"   class="form-control py-1" id="address" :placeholder="t('address')">                                              
                                             </td>
                                             <td class="">
                                                 <flat-pickr @change="saveCustomer" class="form-control py-1  text-center" v-model="created_at"  :config="config" />
@@ -210,44 +210,12 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 return this.$store.getters.flat_pickr_config;
            },
            pageTitle(){
-            const sl=this.$store.getters.setLanguage;
+            const sl=this.$store.getters.currentLang;
             let  pageTitle=sl=="mm" ?  `${lang.customers.mm}` : `${lang.customers.eng}`            
             return pageTitle;
         },
-        name_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.name.mm : lang.name.eng ;
-            return data;
-        },
-        phone_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.phone.mm : lang.phone.eng ;
-            return data;
-        },
-        address_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.address.mm : lang.address.eng ;
-            return data;
-        },
-        save_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.save_link.mm : lang.save_link.eng ;
-            return data;
-        },
-        update_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.update_link.mm : lang.update_link.eng ;
-            return data;
-        },
-        search_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.search_link.mm : lang.search_link.eng ;
-            return data;
-        },
-        clear_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.clear_link.mm : lang.clear_link.eng ;
-            return data;
+        t() {
+            return (key) => this.$store.getters.t(key);
         },
        },
        watch:{        

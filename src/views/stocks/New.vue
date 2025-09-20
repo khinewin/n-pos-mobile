@@ -5,12 +5,12 @@
             <div class="row mb-2 justify-content-end">                
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                         <button type="button" @click="saveStocks" class="btn btn-sm" :disabled="isLoading || storeItems.length <=0">
-                            <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> {{save_link}}</span>
+                            <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> {{t('save_link')}}</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                         </button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <router-link :to="{name : 'Stocks'}" class="btn btn-sm close"><i class="fa-solid fa-circle-xmark"></i> {{close_link}}</router-link>
+                        <router-link :to="{name : 'Stocks'}" class="btn btn-sm close"><i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}}</router-link>
                 </div>
             </div>
             <div class="card shadow">
@@ -21,7 +21,7 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4 fw-bold">Remark :</td>
+                                            <td class="text-end col-4 fw-bold">{{t('notes')}} :</td>
                                             <td class="col-8">
                                                 <input type="text" v-model="remark" class="form-control-plaintext p-0  border-bottom" id="remark" placeholder="Remark">                                                
                                             </td>
@@ -33,13 +33,13 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4 fw-bold">Voucher No. :</td>
+                                            <td class="text-end col-4 fw-bold">{{t('invoice_no')}} :</td>
                                             <td class="col-8">
                                                 <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext p-0  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end fw-bold">Date :</td>
+                                            <td class="text-end fw-bold">{{t('date')}} :</td>
                                             <td class="">
                                                 <flat-pickr class="form-control-plaintext p-0 border-bottom" v-model="created_at"  :config="config" />
                                             </td>
@@ -53,12 +53,12 @@
                             <tbody>
                                 <tr class="text-center fw-bold table-secondary change-cursor" data-bs-toggle="modal"  data-bs-target="#searchCode" >
                                     <td class="col-0"></td>
-                                    <td class="col-4 change-cursor description" ><i class="fa-solid fa-circle-plus"></i> Product Name (ctrl+i)</td>
-                                    <td class="col-2">Packing Size</td>
+                                    <td class="col-4 change-cursor description" ><i class="fa-solid fa-circle-plus"></i> {{t('item_name')}}</td>
+                                    <td class="col-2">{{t('packing_size')}}</td>
                                     <!--<td class="col-1 table-info">Main Inv Bal</td>-->     
-                                    <td class="col-2 table-info">Mart Inv Bal</td>   
-                                    <td class="col-2 table-primary">Pur Price</td>
-                                    <td class="col-2 table-primary">Sale Price</td>
+                                    <td class="col-2 table-info">{{t('inv_bal')}}</td>   
+                                    <td class="col-2 table-primary">{{t('pur_price')}}</td>
+                                    <td class="col-2 table-primary">{{t('sale_price')}}</td>
                                     <!--<td class="col-1 table-primary">Wholesale price</td>-->                                  
                                 </tr>
                                 <tr class="" v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id" @mouseenter="setEdit(i)" >
@@ -169,19 +169,12 @@ export default {
             return this.$store.getters.flat_pickr_config;
         },
         pageTitle(){
-            const sl=this.$store.getters.setLanguage;
+            const sl=this.$store.getters.currentLang;
             let  pageTitle=sl=="mm" ?  `${lang.stocks.mm} / ${lang.new.mm}` : `${lang.stocks.eng} / ${lang.new.eng}`            
             return pageTitle;
         },      
-        close_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.close_link.mm : lang.close_link.eng ;
-            return data;
-        },       
-        save_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.save_link.mm : lang.save_link.eng ;
-            return data;
+        t() {
+            return (key) => this.$store.getters.t(key);
         },
       
     },

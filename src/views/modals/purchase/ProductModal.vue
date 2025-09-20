@@ -16,22 +16,22 @@
                                                     <div class="col-md-6 col-lg-12">
                                                         <div class="form-floating">
                                                             <input type="text" id="search_by_code"  v-model="search_by_code"  @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
-                                                            <label for="search_by_code" class="">Code</label>
+                                                            <label for="search_by_code" class="">{{t('barcode')}}</label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6 col-lg-12">
                                                         <div class="form-floating">
                                                             <input type="search" v-model="search_by_item_name" @keypress.enter="searchProducts" placeholder="Product Name" class="form-control-plaintext border-bottom">
-                                                            <label for="search_by_item_name" class="">Product Name</label>
+                                                            <label for="search_by_item_name" class="">{{t('item_name')}}</label>
                                                         </div> 
                                                     </div>
                                                 </div>
                                                 <div class="row mt-2">
                                                     <div class="col-4 d-grid">
-                                                        <button class="btn btn-sm text-dark clear-search-product" @click="searchProducts"><i class="fa-solid fa-search"></i> Search</button>
+                                                        <button class="btn btn-sm text-dark clear-search-product" @click="searchProducts"><i class="fa-solid fa-search"></i> {{t('search_link')}}</button>
                                                     </div>
                                                     <div class="col-4 d-grid">
-                                                        <button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> Clear</button>
+                                                        <button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> {{t('clear_link')}}</button>
                                                     </div>
                                                     <!--<div class="col-4 d-grid">
                                                         <button class="btn btn-sm text-dark" @click="updateProducts">
@@ -40,7 +40,7 @@
                                                         </button>
                                                     </div>-->
                                                     <div class="col-4 d-grid">
-                                                        <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> Close</button>
+                                                        <button class="btn btn-sm text-dark close-product" data-bs-dismiss="modal" aria-label="Close"><i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}}</button>
                                                     </div>
                                                 </div>   
                                                 
@@ -53,8 +53,8 @@
                                                 <table class="table table-bordered mb-0 table-hover">
                                                     <tbody class="">
                                                         <tr class="table-secondary fw-bold text-center position-sticky top-0 z-3">
-                                                            <td>No.</td>
-                                                            <td>Product Name</td>
+                                                            <td>{{t('number')}}</td>
+                                                            <td>{{t('item_name')}}</td>
                                                         </tr>
                                                         <tr  v-if="storeItems.length >0"  v-for="(s,i) in storeItems" :key="s.id">
                                                             <td class="col-1 text-center">{{i+1}}</td>
@@ -75,10 +75,10 @@
                                         <table class="table table-bordered mb-0 table-hover text-nowrap text-break">
                                             <thead>
                                                 <tr class="table-secondary text-center fw-bold sticky-top z-3">
-                                                    <td class="col-1">Code</td>
-                                                    <td class="col-2">Product Name</td>
-                                                    <td class="col-1">Packing size</td>
-                                                    <td class="col-1">Mart Inv Bal</td>
+                                                    <td class="col-1">{{t('barcode')}}</td>
+                                                    <td class="col-2">{{t('item_name')}}</td>
+                                                    <td class="col-1">{{t('packing_size')}}</td>
+                                                    <td class="col-1">{{t('inv_bal')}}</td>
                                                     <!--<td class="col-1">Main Inv Bal</td>-->
                                                 </tr>    
                                                 </thead>
@@ -155,6 +155,9 @@ export default {
     computed:{
         user(){
             return this.$store.getters.user;
+        },
+        t() {
+            return (key) => this.$store.getters.t(key);
         },
      
     },

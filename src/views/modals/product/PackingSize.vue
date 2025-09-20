@@ -9,15 +9,15 @@
                     <div class="row justify-content-end mb-2">
                         <div class="col-4 d-grid">
                             <button class="btn btn-sm text-dark" @click="savePackingSize">
-                                <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                                <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> {{t('save_link')}}</span>
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                             </button>
                         </div>
-                        <div class="col-4 d-grid"><button :disabled="!editItem.id" class="btn btn-sm text-dark" @click="saveEdit"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
+                        <div class="col-4 d-grid"><button :disabled="!editItem.id" class="btn btn-sm text-dark" @click="saveEdit"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> {{t('update_link')}}</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                         </button>
                     </div>
-                        <div class="col-4 d-grid"><button class="btn btn-sm text-dark close-p-z" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button></div>
+                        <div class="col-4 d-grid"><button class="btn btn-sm text-dark close-p-z" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}}</button></div>
                  </div>
                    <div class="row g-2">
                     <div class="col-12 vh-75 overflow-y-auto">
@@ -109,6 +109,9 @@ export default {
        user(){
            return this.$store.getters.user;
        },     
+       t() {
+            return (key) => this.$store.getters.t(key);
+        },
      
    },
   

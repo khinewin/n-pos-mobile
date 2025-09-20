@@ -5,12 +5,12 @@
             <div class="row mb-2 justify-content-end">                
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                         <button type="button" @click="savePurchase" class="btn btn-sm" :disabled="isLoading">
-                            <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> {{save_link}}</span>
+                            <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> {{t('save_link')}}</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <router-link  :to="{name : 'Purchase'}" class="btn btn-sm close"><i class="fa-solid fa-circle-xmark"></i> {{close_link}}</router-link>
+                        <router-link  :to="{name : 'Purchase'}" class="btn btn-sm close"><i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}}</router-link>
                 </div>
             </div>
             <div class="card shadow">
@@ -21,20 +21,12 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
-                                            <td class="text-end col-4 fw-bold">Voucher No. :</td>
+                                            <td class="text-end col-4 fw-bold">{{t('invoice_no')}} :</td>
                                             <td class="col-8">
                                                 <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext  p-0  border-bottom" id="voucher_no" placeholder="Voucher no">                                                
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td class="text-end fw-bold">Location :</td>
-                                            <td class="">
-                                                <select disabled class="form-control-plaintext p-0  border-bottom" v-model="location">
-                                                    <option value="Main">Main</option>
-                                                    <option value="Mart">Mart</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                       
                                     </tbody>
                                 </table>
                             </div>
@@ -42,19 +34,19 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>                                       
                                         <tr>
-                                            <td class="text-end  col-4 fw-bold">Purchase Date :</td>
+                                            <td class="text-end  col-4 fw-bold">{{t('date')}} :</td>
                                             <td class="col-8">
                                                 <flat-pickr class="form-control-plaintext  p-0 border-bottom" v-model="pur_date"  :config="config" />
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end fw-bold">Supplier :</td>
+                                            <td class="text-end fw-bold">{{t('supplier')}} :</td>
                                             <td class="row g-2">
                                                 <div class="col-6">
                                                     <input type="text" :class="{'border-0 border-bottom border-danger' : v$.supplier.name.$errors.length > 0}"  v-model="supplier.name"  class="form-control-plaintext p-0  border-bottom">                                                
                                                 </div>
                                                 <div class="col-6 border-bottom text-center">
-                                                    <span class="d-block text-primary supplier change-cursor" data-bs-toggle="modal" data-bs-target="#searchSupplier" ><i class="fa-solid fa-pen"></i> (ctrl+shift+s)</span>
+                                                    <span class="d-block text-primary supplier change-cursor" data-bs-toggle="modal" data-bs-target="#searchSupplier" ><i class="fa-solid fa-edit"></i></span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -67,16 +59,16 @@
                             <tbody>
                                 <tr class="small text-center fw-bold table-secondary change-cursor" data-bs-toggle="modal" data-bs-target="#searchCode" >
                                     <td class="col-0" colspan="2"> 
-                                        No.
+                                        {{t('number')}}
                                     </td>
-                                    <td class="col-3 change-cursor description change-cursor"  ><i class="fa-solid fa-circle-plus"></i> Product Name (cltr+i)</td>
+                                    <td class="col-3 change-cursor description change-cursor"  ><i class="fa-solid fa-circle-plus"></i> {{t('item_name')}}</td>
                                     <!--<td class="col-1 table-info">Exp. Date</td>-->     
-                                    <td class="col-2">Packing Size</td>                              
-                                    <td class="col-1 table-primary" colspan="1">Qty</td>
-                                    <td class="col-2 table-info" colspan="2">Unit Price</td>     
-                                    <td class="col-1">Amount</td>                               
-                                    <td class="col-2 table-warning" colspan="2">Discount</td>                                    
-                                    <td class="col-1">Unit Cost</td>
+                                    <td class="col-2">{{t('packing_size')}}</td>                              
+                                    <td class="col-1 table-primary" colspan="1">{{t('qty')}}</td>
+                                    <td class="col-2 table-info" colspan="2">{{t('unit_price')}}</td>     
+                                    <td class="col-1">{{t('amount')}}</td>                               
+                                    <td class="col-2 table-warning" colspan="2">{{t('discount')}}</td>                                    
+                                    <td class="col-1">{{t('unit_cost')}}</td>
                                 </tr>
                                 <tr class="small"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase" :key="st.id" @mouseenter="setEdit(i)"  >
                                     <td class=" text-center">
@@ -120,24 +112,24 @@
                         <table class="table table-bordered mb-0 ">
                             <tbody>                           
                                 <tr class="small">
-                                    <td  class="text-end col-3 pe-2 fw-bold">Total</td>
+                                    <td  class="text-end col-3 pe-2 fw-bold">{{t('subtotal')}}</td>
                                     <td class="text-end col-3">{{total}}</td>
                                   
-                                    <td  class="text-end pe-2 col-3 fw-bold">Extra Discount</td>
+                                    <td  class="text-end pe-2 col-3 fw-bold">{{t('additional_discount')}}</td>
                                     <td class="text-end col-3">
                                         <input @click="setInput" @mouseleave="setInput"  type="number" @keyup="calTotal"  v-model="extra_discount" class="form-control-plaintext p-0  text-end" placeholder="0">
                                     </td>
                                 </tr>                            
                                 <tr class="small">
-                                    <td  class="text-end pe-2 fw-bold">Paid</td>
+                                    <td  class="text-end pe-2 fw-bold">{{t('paid')}}</td>
                                     <td class="text-end">
                                         <input @click="setInput" @mouseleave="setInput" @keypress.enter="savePurchase"  type="number" @keyup="calTotal"  v-model="paid" class="form-control-plaintext p-0  text-end" placeholder="0">
                                     </td>
-                                    <td  class="text-end pe-2 fw-bold">Balance</td>
+                                    <td  class="text-end pe-2 fw-bold">{{t('balance_due')}}</td>
                                     <td class="text-end">{{balance}}</td>
                                 </tr>
                                 <tr class="small">
-                                    <td  class="text-end pe-2 fw-bold">Remark</td>
+                                    <td  class="text-end pe-2 fw-bold">{{t('notes')}}</td>
                                     <td class="text-end" colspan="3">
                                         <input @keypress.enter="savePurchase"  type="text"   v-model="remark" class="form-control-plaintext p-0 " placeholder="Remark">
                                     </td>                                   
@@ -238,19 +230,12 @@ export default {
             return this.$store.getters.flat_pickr_config;
         } ,
         pageTitle(){
-            const sl=this.$store.getters.setLanguage;
+            const sl=this.$store.getters.currentLang;
             let  pageTitle=sl=="mm" ?  `${lang.purchase.mm} / ${lang.new.mm}` : `${lang.purchase.eng} / ${lang.new.eng}`            
             return pageTitle;
         },      
-        close_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.close_link.mm : lang.close_link.eng ;
-            return data;
-        },       
-        save_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.save_link.mm : lang.save_link.eng ;
-            return data;
+       t() {
+            return (key) => this.$store.getters.t(key);
         },
     },
     watch:{

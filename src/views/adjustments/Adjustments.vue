@@ -4,19 +4,19 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button @click="print" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-print"></i> {{print_link}}</button>
+                    <button @click="print" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-print"></i> {{t('print_link')}}</button>
                 </div>                
                 <!--<div class="col-sm-2 d-grid">
                         <button @click="goEdit" class="btn btn-sm" :class="{'disabled': !voucher_no || stock_user.uid !== user.uid}"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
                 </div>-->              
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#adjustmentModal"><i class="fa-solid fa-folder-tree"></i> {{open_link}}</button>
+                    <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#adjustmentModal"><i class="fa-solid fa-folder-tree"></i> {{t('open_link')}}</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <router-link :to="{name : 'NewAdjustment'}" class="btn btn-sm new"><i class="fa-solid fa-square-plus"></i> {{new_link}}</router-link>
+                    <router-link :to="{name : 'NewAdjustment'}" class="btn btn-sm new"><i class="fa-solid fa-square-plus"></i> {{t('new_link')}}</router-link>
             </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <button @click="closeAdjustment" class="btn btn-sm" :disabled=" !voucher_no"><i class="fa-solid fa-circle-xmark"></i> {{close_link}}</button>
+                        <button @click="closeAdjustment" class="btn btn-sm" :disabled=" !voucher_no"><i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}}</button>
                 </div>
             </div>
             <div class="card shadow" id="printMe">
@@ -29,14 +29,9 @@
                             <div class="col-sm-6">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
+                                       
                                         <tr>
-                                            <td class="text-end col-4 fw-bold">Location :</td>
-                                            <td class="col-8">
-                                                    {{location}}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-end col-4 fw-bold">Remark :</td>
+                                            <td class="text-end col-4 fw-bold">{{t('notes')}} :</td>
                                             <td class="col-8">
                                                     {{remark}}
                                             </td>
@@ -48,13 +43,13 @@
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>                                         
-                                            <td class="text-end col-4 fw-bold">Voucher No. :</td>
+                                            <td class="text-end col-4 fw-bold">{{t('invoice_no')}} :</td>
                                             <td class="col-8">
                                                 {{voucher_no}}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-end  fw-bold">Date :</td>
+                                            <td class="text-end  fw-bold">{{t('date')}} :</td>
                                             <td class="">
                                                <span v-if="created_at"> {{showTime(created_at)}}</span>
                                             </td>
@@ -67,15 +62,15 @@
                         <table class="table table-bordered mb-0  table-hover inside-table">
                             <tbody>
                                     <tr class="text-center fw-bold table-secondary">
-                                        <td class="col-1">Code</td>
-                                        <td class="col-2">Product Name</td>
-                                        <td class="col-1">Packing size</td>
-                                        <td class="col-1">Before Adj</td>
-                                        <td class="col-1">Adj type</td>
-                                        <td class="col-1">Qty</td>      
-                                        <td class="col-1">After Adj</td>   
-                                        <td class="col-1">RTS/RFS</td>                          
-                                        <td class="col-2">Remark</td>                                                           
+                                        <td class="col-1">{{t('barcode')}}</td>
+                                        <td class="col-2">{{t('item_name')}}</td>
+                                        <td class="col-1">{{t('packing_size')}}</td>
+                                        <td class="col-1">{{t('before_adj')}}</td>
+                                        <td class="col-1">{{t('adj_type')}}</td>
+                                        <td class="col-1">{{t('qty')}}</td>      
+                                        <td class="col-1">{{t('after_adj')}}</td>   
+                                        <td class="col-1">{{t('rts_rfs')}}</td>                          
+                                        <td class="col-2">{{t('notes')}}</td>                                                           
                                 </tr>
                                 <tr class=""v-if="storeItems.length > 0" v-for="(st, i) in storeItems" :key="st.id">
                                     <td class="text-center">
@@ -171,39 +166,12 @@ export default {
             return this.$store.getters.user;
         },    
         pageTitle(){
-            const sl=this.$store.getters.setLanguage;
+            const sl=this.$store.getters.currentLang;
             let  pageTitle=sl=="mm" ?  `${lang.adjustment.mm} / ${lang.history.mm}` : `${lang.adjustment.eng} / ${lang.history.eng}`            
             return pageTitle;
         },
-        edit_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.edit_link.mm : lang.edit_link.eng ;
-            return data;
-        },
-        open_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.open_link.mm : lang.open_link.eng ;
-            return data;
-        },
-        close_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.close_link.mm : lang.close_link.eng ;
-            return data;
-        },
-        print_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.print_link.mm : lang.print_link.eng ;
-            return data;
-        },
-        save_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.save_link.mm : lang.save_link.eng ;
-            return data;
-        },
-        new_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.new_link.mm : lang.new_link.eng ;
-            return data;
+         t() {
+            return (key) => this.$store.getters.t(key);
         },
       
     },

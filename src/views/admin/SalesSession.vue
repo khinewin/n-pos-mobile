@@ -35,19 +35,19 @@
                                     <i class="fa-solid fa-chart-line"></i>
                                 </div>
                                 <div class="col-5">
-                                    <div class="small fw-lighter mb-1 text-center">{{t('this_week')}}</div>
+                                    <div class="small fw-lighter mb-1 text-center">{{t('this_month')}}</div>
                                     <div class="card-text text-center small">                                     
                                         <span v-if="salesYearlyData.length"> {{fM(sales_this_month)}}</span>
                                         <span v-else @click="fetchSalesYearly" class="change-cursor"><i class="fa-solid fa-rotate-right"></i></span>
                                      </div>
                                 </div>
-                                <div class="col-5">
+                                <!--<div class="col-5">
                                     <div class="small fw-lighter mb-1 text-center">{{t('this_year')}}</div>
                                     <div class="card-text text-center small">     
                                         <span v-if="salesYearlyData.length">{{fM(sales_this_year)}}</span> 
                                         <span v-else @click="fetchSalesYearly" class="change-cursor"><i class="fa-solid fa-rotate-right"></i></span>                           
                                     </div>
-                                </div>
+                                </div>-->
                             </div>
                     </div>
                 </div>
@@ -86,7 +86,7 @@
         },
         mounted() {
             //this.isLoading=true;
-           // this.fetchSalesYearly();
+            this.fetchSalesYearly();
         },
      
       
@@ -160,9 +160,10 @@
            async fetchSalesYearly(){
                 this.isLoading=true;
                 const currentDate = new Date();
-                const theFirst = new Date(currentDate.getFullYear(), 0, 1);
-                const theLast = new Date(currentDate.getFullYear(), 11, 31);
-                theLast.setHours("23", "59", "59")
+                 const theFirst = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1, 0, 0, 0, 0);
+
+            // Last day of month at 23:59:59.999
+                 const theLast = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999);
                 const first_day_month=Timestamp.fromDate(new Date(theFirst))
                 const last_day_month=Timestamp.fromDate(new Date(theLast))
                 const query_url=query(collection(db, "sales"),  

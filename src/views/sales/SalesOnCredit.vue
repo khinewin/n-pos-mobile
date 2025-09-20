@@ -4,18 +4,18 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">                                     
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#customerModal"><i class="fa-solid fa-folder-tree"></i> {{open_link}}</button>
+                    <button class="btn btn-sm open" data-bs-toggle="modal" data-bs-target="#customerModal"><i class="fa-solid fa-folder-tree"></i> {{t('open_link')}}</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button  class="btn btn-sm" :disabled="!customer.code"  @click="print"><i class="fa-solid fa-print" ></i> {{print_link}}</button>
+                    <button  class="btn btn-sm" :disabled="!customer.code"  @click="print"><i class="fa-solid fa-print" ></i> {{t('print_link')}}</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <button type="button" @click="savePaid" class="btn btn-sm" v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> {{save_link}}
+                        <button type="button" @click="savePaid" class="btn btn-sm" v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> {{t('save_link')}}
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <button @click="closePage" class="btn btn-sm close" :disabled="!customer.id"><i class="fa-solid fa-circle-xmark"></i> {{close_link}}</button>
+                        <button @click="closePage" class="btn btn-sm close" :disabled="!customer.id"><i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}}</button>
                 </div>
             </div>
         </div>     
@@ -28,15 +28,15 @@
                         </div>
                         <div class="col-6 col-sm-4 col-md-3">
                             <select class="form-control-plaintext  py-0 text-center" v-model="display_type" @change="filterData">
-                                <option>Paid</option>
-                                <option>Credit</option>
+                                <option value="Paid">{{t('paid')}}</option>
+                                <option value="Credit">{{t('balance_due')}}</option>
                             </select>
                         </div>
                         <div class="col-6 col-sm-4 col-md-3">
-                            <span class="fw-bold">Customer : </span><span>{{customer.name}}</span>
+                            <span class="fw-bold">{{t('customer')}} : </span><span>{{customer.name}}</span>
                         </div>
                         <div class="col-6 col-sm-4 col-md-3">
-                            <span class="fw-bold">Address : </span><span>{{customer.address}}</span>
+                            <span class="fw-bold">{{t('address')}} : </span><span>{{customer.address}}</span>
                         </div>                                           
                     </div>
                 <div class="row g-2">
@@ -47,10 +47,10 @@
                                         <tbody>
                                             <tr class="text-center table-secondary fw-bold">
                                                 <td class="text-center col-0"><input type="checkbox" v-model="check_all" @click="handleCheckAll"></td>
-                                                <td class="col-3">Voucher No.</td>
-                                                <td  class="col-3">Date</td>
-                                                <td  class="col-3">Amount</td>
-                                                <td  class="col-3">Credit</td>
+                                                <td class="col-3">{{t('invoice_no')}}</td>
+                                                <td  class="col-3">{{t('date')}}</td>
+                                                <td  class="col-3">{{t('amount')}}</td>
+                                                <td  class="col-3">{{t('balance_due')}}</td>
                                             </tr>
                                         </tbody>
                                         <tbody v-for="s in saleItems" :key="s.id" class="table-group-divider">
@@ -64,18 +64,18 @@
                                              <tr v-if="s.paid">
                                                 <td colspan="2"></td>
                                                 <td class="text-center">{{showTimeHour(s.sale_date)}}</td>
-                                                <td class="text-end fw-bold">Paid</td>
+                                                <td class="text-end fw-bold">{{t('paid')}}</td>
                                                 <td class="text-end">{{s.paid}}</td>
                                              </tr>
                                             <tr v-for="dp in s.debt_payments" :key="dp.paid_date">
                                                     <td colspan="2"></td>
                                                     <td class="text-center">{{showTimeHour(dp.paid_date)}}</td>
-                                                    <td class="text-end fw-bold">Paid</td>
+                                                    <td class="text-end fw-bold">{{t('paid')}}</td>
                                                     <td class="text-end">{{dp.paid}}</td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="3"></td>
-                                                    <td class="text-end fw-bold">Total paid</td>
+                                                    <td class="text-end fw-bold">{{t('paid')}}</td>
                                                     <td class="text-end">{{s.total_paid}}</td>
                                                  </tr>
                                            
@@ -83,9 +83,9 @@
                                         <tbody class="table-group-divider">
                                             <tr class="text-center fw-bold">
                                                 <td colspan="2"></td>
-                                                <td>Total amount</td>
-                                                <td>Total paid</td>
-                                                <td>Total credit</td>
+                                                <td>{{t('total')}}</td>
+                                                <td>{{t("total_paid")}}</td>
+                                                <td>{{t('total_balance_due')}}</td>
                                             </tr>
                                             <tr class="text-end">
                                                 <td colspan="2"></td>
@@ -104,9 +104,9 @@
                                 <table class="table table-hover      table-bordered  mb-0">
                                     <tbody>
                                         <tr class="text-center fw-bold table-secondary">
-                                            <td class="col-1">Pay for</td>
-                                            <td class="col-1">Date</td>
-                                            <td class="col-1">Paid amount</td>
+                                            <td class="col-1">{{t('pay_for')}}</td>
+                                            <td class="col-1">{{t('date')}}</td>
+                                            <td class="col-1">{{t('paid_amount')}}</td>
                                         </tr>
                                         <tr>
                                             <td class="">
@@ -217,29 +217,12 @@ export default {
             return this.$store.getters.flat_pickr_config;
         },
         pageTitle(){
-            const sl=this.$store.getters.setLanguage;
+            const sl=this.$store.getters.currentLang;
             let  pageTitle=sl=="mm" ?  `${lang.soc.mm}` : `${lang.soc.eng}`            
             return pageTitle;
         },      
-        close_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.close_link.mm : lang.close_link.eng ;
-            return data;
-        },       
-        open_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.open_link.mm : lang.open_link.eng ;
-            return data;
-        },
-        print_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.print_link.mm : lang.print_link.eng ;
-            return data;
-        },
-        save_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.save_link.mm : lang.save_link.eng ;
-            return data;
+         t() {
+            return (key) => this.$store.getters.t(key);
         },
       
     },

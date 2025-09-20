@@ -4,19 +4,19 @@
         <div class="container-fluid">
             <div class="row mb-2 justify-content-end">
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button @click="print" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-print"></i> {{print_link}}</button>
+                    <button @click="print" class="btn btn-sm" :disabled="!voucher_no"><i class="fa-solid fa-print"></i> {{t('print_link')}}</button>
                 </div>   
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button @click="goEdit" class='btn btn-sm' :disabled="!voucher_no || pur_user.uid !==  user.uid"><i class="fa-solid fa-pen-to-square"></i> {{edit_link}}</button>
+                    <button @click="goEdit" class='btn btn-sm' :disabled="!voucher_no || pur_user.uid !==  user.uid"><i class="fa-solid fa-pen-to-square"></i> {{t('edit_link')}}</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button class="btn btn-sm open"  data-bs-toggle="modal" data-bs-target="#purchaseModal"><i class="fa-solid fa-folder-tree"></i> {{open_link}}</button>
+                    <button class="btn btn-sm open"  data-bs-toggle="modal" data-bs-target="#purchaseModal"><i class="fa-solid fa-folder-tree"></i> {{t('open_link')}}</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <router-link :to="{name : 'AddPurchase'}" id="add" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> {{new_link}}</router-link>
+                        <router-link :to="{name : 'AddPurchase'}" id="add" class="btn btn-sm"><i class="fa-solid fa-square-plus"></i> {{t('new_link')}}</router-link>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <button class="btn btn-sm" :disabled="!voucher_no" @click="closeVoucher"><i class="fa-solid fa-circle-xmark"></i> {{close_link}}</button>
+                        <button class="btn btn-sm" :disabled="!voucher_no" @click="closeVoucher"><i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}}</button>
                 </div>
             </div>
             <div class="card shadow" id="printMe">
@@ -30,17 +30,17 @@
                         <table class="table mb-0 table-borderless">
                             <tbody>
                                 <tr>
-                                    <td class=" col-4 text-end fw-bold">Voucher No. <span class="">:</span></td>
+                                    <td class=" col-4 text-end fw-bold">{{t('invoice_no')}} <span class="">:</span></td>
                                     <td class="col-8" >
                                         {{voucher_no}}
                                     </td>
                                 </tr>
-                                <tr>
+                                <!--<tr>
                                     <td class=" text-end fw-bold">Location <span class="">:</span></td>
                                     <td class=""  >
                                         {{location}}
                                     </td>
-                                </tr>
+                                </tr>-->
                               
                             </tbody>
                       </table>
@@ -49,7 +49,7 @@
                         <table class="table mb-0 table-borderless">
                             <tbody>                              
                                 <tr>
-                                    <td class="col-4 text-end fw-bold">Purchase Date <span class="">:</span></td>
+                                    <td class="col-4 text-end fw-bold">{{t('date')}} <span class="">:</span></td>
                                     <td class="col-8"  >
                                         <div  v-if="pur_date">
                                             {{showTime(pur_date)}}
@@ -57,7 +57,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="text-end fw-bold">Supplier <span class="">:</span></td>
+                                    <td class="text-end fw-bold">{{t('supplier')}} <span class="">:</span></td>
                                     <td class=""  >
                                         {{supplier.name}}
                                     </td>
@@ -71,15 +71,15 @@
                         <tbody class="table-group-divider">
                             <tr class="text-center fw-bold table-secondary">
                                 <!--<td class="col-1">Code</td>-->
-                                <td class="col-0">No.</td>
-                                <td class="col-3">Product Name</td>
+                                <td class="col-0">{{t('number')}}</td>
+                                <td class="col-3">{{t('item_name')}}</td>
                                 <!--<td class="col-1">Exp. Date</td>-->     
-                                <td class="col-2">Packing Size</td>                              
-                                <td class="col-1" colspan="1">Qty</td>
-                                <td class="col-2">Unit Price</td> 
-                                <td class="col-1">Amount</td>                                   
-                                <td class="col-2" colspan="2">Discount</td>                                    
-                                <td class="col-1">Unit Cost</td>
+                                <td class="col-2">{{t('packing_size')}}</td>                              
+                                <td class="col-1" colspan="1">{{t('qty')}}</td>
+                                <td class="col-2">{{t('unit_price')}}</td> 
+                                <td class="col-1">{{t('amount')}}</td>                                   
+                                <td class="col-2" colspan="2">{{t('discount')}}</td>                                    
+                                <td class="col-1">{{t('unit_cost')}}</td>
                             </tr>
                             </tbody>
                             <tbody class="table-group-divider">
@@ -115,21 +115,21 @@
                     <tbody class="table-group-divider">
                       
                         <tr class="small">
-                            <td  class="text-end col-3 pe-2 fw-bold">Total</td>
+                            <td  class="text-end col-3 pe-2 fw-bold">{{t('subtotal')}}</td>
                             <td class="text-end col-3">{{fM(total)}}</td>
-                            <td  class="text-end pe-2 col-3 fw-bold">Extra Discount</td>
+                            <td  class="text-end pe-2 col-3 fw-bold">{{t('additional_discount')}}</td>
                             <td class="text-end col-3">
                                 {{fM(extra_discount)}}
                             </td>
                         </tr>                            
                         <tr class="small">
-                            <td  class="text-end pe-2 fw-bold">Paid</td>
+                            <td  class="text-end pe-2 fw-bold">{{t('paid')}}</td>
                             <td class="text-end">{{fM(paid)}}</td>
-                            <td  class="text-end pe-2 fw-bold">Balance</td>
+                            <td  class="text-end pe-2 fw-bold">{{t('balance_due')}}</td>
                             <td class="text-end">{{fM(balance)}}</td>
                         </tr>
                         <tr>
-                            <td  class="text-end pe-2 fw-bold">Remark</td>
+                            <td  class="text-end pe-2 fw-bold">{{t('notes')}}</td>
                             <td colspan="3">{{remark}}</td>
                         </tr>
                     </tbody>
@@ -191,39 +191,12 @@ export default {
             return this.$store.getters.user;
         },    
         pageTitle(){
-            const sl=this.$store.getters.setLanguage;
+            const sl=this.$store.getters.currentLang;
             let  pageTitle=sl=="mm" ?  `${lang.purchase.mm} / ${lang.history.mm}` : `${lang.purchase.eng} / ${lang.history.eng}`            
             return pageTitle;
         },
-        edit_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.edit_link.mm : lang.edit_link.eng ;
-            return data;
-        },
-        open_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.open_link.mm : lang.open_link.eng ;
-            return data;
-        },
-        close_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.close_link.mm : lang.close_link.eng ;
-            return data;
-        },
-        print_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.print_link.mm : lang.print_link.eng ;
-            return data;
-        },
-        save_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.save_link.mm : lang.save_link.eng ;
-            return data;
-        },
-        new_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.new_link.mm : lang.new_link.eng ;
-            return data;
+         t() {
+            return (key) => this.$store.getters.t(key);
         },
       
     },

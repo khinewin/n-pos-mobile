@@ -8,7 +8,7 @@
                    <div class="card-body p-2"> 
                     <div class="row justify-content-end mb-2">
                         <div class="col-6 d-grid">
-                            <button id="setBtn" class="btn btn-sm text-dark" data-bs-dismiss="modal" @click="setCode"><span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save</span>
+                            <button id="setBtn" class="btn btn-sm text-dark" data-bs-dismiss="modal" @click="setCode"><span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> {{t('save_link')}}</span>
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                             </button>
                         </div>
@@ -17,7 +17,7 @@
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                             </button>
                         </div>-->
-                        <div class="col-6 d-grid"><button class="btn btn-sm text-dark close-s-p-z" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close (Esc)</button></div>
+                        <div class="col-6 d-grid"><button class="btn btn-sm text-dark close-s-p-z" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}}</button></div>
                     </div> 
                    <div class="row g-2">
                     <div class="col-12">
@@ -115,6 +115,9 @@ export default {
        user(){
            return this.$store.getters.user;
        },    
+       t() {
+            return (key) => this.$store.getters.t(key);
+        },
        
    },
    watch:{       

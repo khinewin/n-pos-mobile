@@ -6,7 +6,7 @@
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <div class="form-check form-switch  d-flex justify-content-center">
                         <!--<input class="form-check-input" @change="setCamera" v-model="useCamera" type="checkbox" role="switch" id="useCamera">-->
-                        <label class="form-check-label ms-1 change-cursor" for="useCamera" @click="setCamera" :class="[useCamera ? 'text-success' : 'text-muted']"> <i class="fa-solid fa-camera"></i></label>
+                        <!--<label class="form-check-label ms-1 change-cursor" for="useCamera" @click="setCamera" :class="[useCamera ? 'text-success' : 'text-muted']"> <i class="fa-solid fa-camera"></i></label>-->
                       </div>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
@@ -20,7 +20,7 @@
                         </select>
                 </div> 
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button class="btn btn-sm">{{display_link}} {{products.length}} of {{productCount}}</button>
+                    <button class="btn btn-sm">{{t('display_link')}} {{products.length}} of {{productCount}}</button>
                 </div> 
                 <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveEdit">
@@ -42,7 +42,7 @@
                     </button>
                 </div> -->
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn btn-sm packing-unit"><i class="fa-solid fa-boxes-packing"></i> {{packing_units}}</button>
+                    <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn btn-sm packing-unit"><i class="fa-solid fa-boxes-packing"></i> {{t('packing_units')}}</button>
                 </div>   
             </div>
         </div>
@@ -54,18 +54,18 @@
                             <div class="row g-2">
                                 <div class="form-floating col-sm-3 col-lg-12" @click="initScanner(status='search')">
                                     <input type="search" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
-                                    <label for="search_by_code" class="small">{{barcode}}</label>
+                                    <label for="search_by_code" class="small">{{t('barcode')}}</label>
                                 </div>
                                 <div class="form-floating col-sm-3 col-lg-12">
                                     <input type="search" id="search_by_description" v-model="search_by_description" @keypress.enter="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
-                                    <label for="search_by_description" class="small">{{product_name}}</label>
+                                    <label for="search_by_description" class="small">{{t('item_name')}}</label>
                                 </div>
                             
-                                    <div class="col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="searchProducts"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> {{search_link}}</button></div>
+                                    <div class="col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="searchProducts"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> {{t('search_link')}}</button></div>
                                     <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateProducts"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
                                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                                     </button></div>-->
-                                    <div class="col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> {{clear_link}}</button></div>
+                                    <div class="col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> {{t('clear_link')}}</button></div>
                              </div> 
                         </div>
                     </div>     
@@ -90,7 +90,7 @@
                                                 <input placeholder="Code" :readonly="useCamera"  type="text" v-model="code_no" class="form-control py-1  text-center">
                                             </td>-->
                                             <td class="p-0 col-12">
-                                                <input  id="item_name" placeholder="Product Name" @keypress.enter="saveCode"   type="text" v-model="item_name" class="form-control py-1">                                
+                                                <input  id="item_name" :placeholder="t('item_name')" @keypress.enter="saveCode"   type="text" v-model="item_name" class="form-control py-1">                                
                                             </td>  
                                             <td>
                                                 <button class="btn btn-sm text-primary" @click="saveCode">
@@ -163,7 +163,7 @@
                                         </td>
                                     </tr>
                                     <tr @click="initScanner(status='edit')">
-                                        <td class="col-1">{{barcode}}</td>
+                                        <td class="col-1">{{t('barcode')}}</td>
                                         <td :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]" class="text-center col-3">
                                             <div class="d-flex">
                                                 <input   :readonly="useCamera"   @keypress.enter="updateCode" type="text" class="form-control-plaintext py-0 text-center " v-model="editItem.code_no">
@@ -175,7 +175,7 @@
                                         </td>
                                     </tr>
                                     <tr class="table-primary packing-size change-cursor"  data-bs-toggle="modal" data-bs-target="#selectPackingSizeModal">
-                                        <td class="col-1">{{packing_size}}</td>
+                                        <td class="col-1">{{t('packing_size')}}</td>
                                         <td :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]" class="text-center col-3">
                                             <div v-if="editItem.packing_size.smallest_unit && editItem.packing_size.medium_unit">
                                                     {{calPackingSize(editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit, editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty)}}
@@ -183,7 +183,7 @@
                                         </td>
                                     </tr>
                                     <tr class="change-cursor table-warning" data-bs-toggle="modal" data-bs-target="#setQtyModal">
-                                        <td class="">{{inv_bal}}</td>                                       
+                                        <td class="">{{t('inv_bal')}}</td>                                       
                                         <td class="text-center" :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]">
                                             <div  v-if="editItem.packing_size">
                                                 {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            
@@ -204,7 +204,7 @@
                                         </td>
                                     </tr>                        
                                     <tr class="">
-                                        <td class="">{{pur_price}}</td>
+                                        <td class="">{{t('pur_price')}}</td>
                                         <td class="text-center" v-if="editItem.packing_size.largest_unit !=null">
                                             <span >
                                             <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calPurPrice('largest_unit')" type="number" v-model="editItem.pur_price.largest_unit" class="form-control-plaintext p-0 text-center">
@@ -222,7 +222,7 @@
                                         </td>                                        
                                     </tr>
                                     <tr class="">
-                                        <td class="">{{sale_price}}</td>
+                                        <td class="">{{t('sale_price')}}</td>
                                         <td class="text-center" v-if="editItem.packing_size.largest_unit !=null">
                                             <span >
                                             <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="editItem.retail_price.largest_unit" class="form-control-plaintext p-0 text-center">
@@ -246,7 +246,7 @@
                                         <td class="small">
                                             <div class="form-check form-switch">
                                                 <input  v-model="editItem.auto_cal" class="form-check-input auto-cal" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
-                                                <label class="form-check-label" for="flexSwitchCheckChecked">Auto </label>
+                                                <label class="form-check-label" for="flexSwitchCheckChecked">{{t('auto')}} </label>
                                               </div>                                              
                                         </td>
                                         <td colspan="3" class="p-0 text-end">
@@ -381,76 +381,15 @@ export default {
             return this.$store.getters.user;
         },
         pageTitle(){
-            const sl=this.$store.getters.setLanguage;
+            const sl=this.$store.getters.currentLang;
             let  pageTitle=sl=="mm" ?  `${lang.product_code.mm}` : `${lang.product_code.eng}`            
             return pageTitle;
         },
+        t() {
+            return (key) => this.$store.getters.t(key);
+        },
         
-        save_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.save_link.mm : lang.save_link.eng ;
-            return data;
-        },
-        update_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.update_link.mm : lang.update_link.eng ;
-            return data;
-        },
-        search_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.search_link.mm : lang.search_link.eng ;
-            return data;
-        },
-        clear_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.clear_link.mm : lang.clear_link.eng ;
-            return data;
-        },
-        display_link(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.display_link.mm : lang.display_link.eng ;
-            return data;
-        },
-        barcode(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.barcode.mm : lang.barcode.eng ;
-            return data;
-        },
-        product_name(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.item_name.mm : lang.item_name.eng ;
-            return data;
-        },
-        pur_price(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.pur_price.mm : lang.pur_price.eng ;
-            return data;
-        },
-        sale_price(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.sale_price.mm : lang.sale_price.eng ;
-            return data;
-        },
-        packing_size(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.packing_size.mm : lang.packing_size.eng ;
-            return data;
-        },
-        packing_units(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.packing_units.mm : lang.packing_units.eng ;
-            return data;
-        },
-        inv_bal(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.inv_bal.mm : lang.inv_bal.eng ;
-            return data;
-        },
-        save_price(){
-            const sl=this.$store.getters.setLanguage;
-            const data=sl=="mm" ? lang.save_price.mm : lang.save_price.eng ;
-            return data;
-        },
+      
       
     },
     watch:{
