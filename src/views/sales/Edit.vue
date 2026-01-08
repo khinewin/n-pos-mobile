@@ -555,7 +555,7 @@ export default {
         },
         async checkDatabase(){ 
             const query_url=query(collection(db, "sales"), where("voucher_no", "==",this.voucher_no));           
-                onSnapshot(query_url, async(snapShot) =>{
+               let unsub= onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {        
                             if(change.type==="modified"){
                                 if(change.doc.data().voucher_no==this.voucher_no){
@@ -565,6 +565,7 @@ export default {
                                     this.msg.info=hp.message("modified", "sale")   
                                     this.isLoading=false;
                                    // this.clearSaleItem(); 
+                                   unsub();
                                 }
                             }
                             if(change.type==="removed"){
@@ -575,6 +576,7 @@ export default {
                                 setTimeout(()=>{
                                     this.goSale();
                                 },2000)
+                                unsub();
                             }
                     });                                              
             });                              

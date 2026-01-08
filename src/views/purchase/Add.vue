@@ -61,11 +61,12 @@
                                     <td class="col-0" colspan="2"> 
                                         {{t('number')}}
                                     </td>
-                                    <td class="col-3 change-cursor description change-cursor"  ><i class="fa-solid fa-circle-plus"></i> {{t('item_name')}}</td>
+                                    <td class="col-2 change-cursor description change-cursor"  ><i class="fa-solid fa-circle-plus"></i> {{t('item_name')}}</td>
                                     <!--<td class="col-1 table-info">Exp. Date</td>-->     
                                     <td class="col-2">{{t('packing_size')}}</td>                              
                                     <td class="col-1 table-primary" colspan="1">{{t('qty')}}</td>
-                                    <td class="col-2 table-info" colspan="2">{{t('unit_price')}}</td>     
+                                    <td class="col-2 table-info" colspan="2">{{t('unit_price')}}</td>    
+                                    <td class="col-1 table-success">{{t('sale_price')}}</td> 
                                     <td class="col-1">{{t('amount')}}</td>                               
                                     <td class="col-2 table-warning" colspan="2">{{t('discount')}}</td>                                    
                                     <td class="col-1">{{t('unit_cost')}}</td>
@@ -94,6 +95,9 @@
                                         <select @change="calEdit" class="form-control-plaintext py-0 change-cursor text-center" v-model="st.qty_pur_price_unit">
                                             <option  v-for="pu in onlyString(st.packing_size)">{{pu}}</option>
                                         </select>
+                                    </td>
+                                    <td class="table-success" >
+                                            <input @keyup="calSalePrice(i)"   type="number"  v-model="st.qty_sale_price" class="form-control-plaintext  py-0  text-center" placeholder="Price">                                        
                                     </td>
                                     <td class="text-end">{{st.amount}}</td>
 
@@ -365,6 +369,47 @@ export default {
                 discount : item.discount ? item.discount : 0
             };
         },
+        calSalePrice(i){
+            const oei=this.editItem;
+            this.storePurchase.map((f)=>{
+                if(f.id===oei.id){
+                    if(f.qty_pur_price && f.qty_pur_price_unit){
+                       const arr=Object.entries(f.packing_size)
+                        const units=arr.filter((ft)=>{
+                            return ft[1]==f.qty_pur_price_unit;
+                        })  
+                       const pur_unit=units[0][0]     
+                     
+
+                       let smallest_price=0;
+                       let medium_price=0;
+                       let largest_price=0; 
+                       if(pur_unit=="largest_unit"){
+                           smallest_price=Math.floor((f.qty_sale_price / (f.packing_size.medium_qty * f.packing_size.smallest_qty)))
+                           medium_price=smallest_price * f.packing_size.smallest_qty
+                           largest_price=medium_price * f.packing_size.medium_qty
+                       }else if(pur_unit=="medium_unit"){
+                            smallest_price=Math.floor((f.qty_sale_price / f.packing_size.smallest_qty))
+                            medium_price=smallest_price * f.packing_size.smallest_qty
+                            largest_price=medium_price * f.packing_size.medium_qty
+                       }else if(pur_unit=="smallest_unit"){
+                            smallest_price=Math.floor(f.qty_sale_price)
+                            medium_price=smallest_price * f.packing_size.smallest_qty
+                            largest_price=medium_price * f.packing_size.medium_qty
+                       }    
+
+                       const sale_price={
+                            largest_unit : largest_price,
+                            medium_unit: medium_price,
+                            smallest_unit: smallest_price
+                       }
+                       f.retail_price=sale_price;
+                      
+                    }
+                }
+            })
+           
+        },
         calEdit(i){
             const oei=this.editItem;
             this.storePurchase.map((f)=>{
@@ -389,18 +434,25 @@ export default {
                        let smallest_price=0;
                        let medium_price=0;
                        let largest_price=0; 
+                       let qty_sale_price=0;
                        if(pur_unit=="largest_unit"){
                            smallest_price=Math.floor((f.qty_pur_price / (f.packing_size.medium_qty * f.packing_size.smallest_qty)))
                            medium_price=smallest_price * f.packing_size.smallest_qty
                            largest_price=medium_price * f.packing_size.medium_qty
+
+                           qty_sale_price=f.retail_price.largest_unit
                        }else if(pur_unit=="medium_unit"){
                             smallest_price=Math.floor((f.qty_pur_price / f.packing_size.smallest_qty))
                             medium_price=smallest_price * f.packing_size.smallest_qty
                             largest_price=medium_price * f.packing_size.medium_qty
+
+                            qty_sale_price=f.retail_price.medium_unit
                        }else if(pur_unit=="smallest_unit"){
                             smallest_price=Math.floor(f.qty_pur_price)
                             medium_price=smallest_price * f.packing_size.smallest_qty
                             largest_price=medium_price * f.packing_size.medium_qty
+
+                            qty_sale_price=f.retail_price.smallest_unit
                        }    
 
                        const pur_price={
@@ -408,6 +460,7 @@ export default {
                             medium_unit: medium_price,
                             smallest_unit: smallest_price
                        }
+                       f.qty_sale_price=qty_sale_price
                        f.pur_price=pur_price;
                       
                     }else{
@@ -511,13 +564,15 @@ export default {
                 if(this.location==="Main"){
                     await updateDoc(updateDocument, {
                      main_qty : increment(pur_qty),
-                     pur_price: p.pur_price
+                     pur_price: p.pur_price,
+                     retail_price: p.retail_price,
                  })
                 }
                  if(this.location==="Mart"){
                     await updateDoc(updateDocument, {
                      qty : increment(pur_qty),
                      pur_price: p.pur_price,
+                     retail_price: p.retail_price
                  })
                 }    
             })     

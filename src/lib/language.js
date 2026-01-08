@@ -1,6 +1,6 @@
 export const lang={
     auto:{
-        eng:"Auth",
+        eng:"Auto",
         mm:"အော်တို"
     },
      unit:{

@@ -76,7 +76,8 @@
                                 <!--<td class="col-1">Exp. Date</td>-->     
                                 <td class="col-2">{{t('packing_size')}}</td>                              
                                 <td class="col-1" colspan="1">{{t('qty')}}</td>
-                                <td class="col-2">{{t('unit_price')}}</td> 
+                                <td class="col-1">{{t('unit_price')}}</td> 
+                                <td class="col-1">{{t('sale_price')}}</td> 
                                 <td class="col-1">{{t('amount')}}</td>                                   
                                 <td class="col-2" colspan="2">{{t('discount')}}</td>                                    
                                 <td class="col-1">{{t('unit_cost')}}</td>
@@ -98,6 +99,9 @@
                                 </td>
                                 <td class="text-center">
                                     {{st.qty_pur_price}}' {{st.qty_pur_price_unit}}
+                                </td>
+                                <td class="text-center">
+                                    {{st.qty_sale_price}}' {{st.qty_pur_price_unit}}
                                 </td>
                                 <td class="text-end">{{fM(st.amount)}}</td>
                                 <td class="text-center w-5">

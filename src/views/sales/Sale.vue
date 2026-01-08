@@ -692,7 +692,7 @@ export default {
         },
         async checkDatabase(){ 
             const query_url=query(collection(db, "sales"), where("voucher_no", "==", this.voucher_no));           
-                onSnapshot(query_url, async(snapShot) =>{
+               let unsub= onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {        
                             if(change.type==="added"){
                                 if(change.doc.data().voucher_no==this.voucher_no){
@@ -701,6 +701,7 @@ export default {
                                     this.msg.type="success";
                                     this.msg.info=hp.message("added", "sale")   
                                     this.clearSaleItem(); 
+                                    unsub();
                                 }
                             }
                     });                                              

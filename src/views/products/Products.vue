@@ -355,7 +355,7 @@ export default {
     mounted() {
 
         let camera=localStorage.getItem("camera");
-        this.useCamera=camera=="false" ? false : true;
+        this.useCamera=camera=="false" ? false : false;
        
         this.isLoading=true;
 
