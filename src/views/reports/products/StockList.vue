@@ -2,7 +2,7 @@
     <div class="overflow-x-auto">                                                     
         <table class="table table-bordered border-dark table-hover mb-0 inside-table">
             <tbody class="">
-                <tr class="text-center fw-bold">
+                <tr class="text-center fw-bold change-cursor table-primary">
                     <td class="col-1"  @click="sortProducts('code_no')"> Code</td>
                     <td class="col-2"  @click="sortProducts('item_name')"> Product Name</td>
                     <td class="col-1">Packing Size</td>
