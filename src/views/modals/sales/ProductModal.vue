@@ -7,7 +7,7 @@
                 <div class="card border-0">
                     <div class="card-body p-2">                                             
                         <div class="row g-2">
-                            <div class="col-lg-4">
+                            <div class="col-lg-3">
                                 <div class="row g-2">
                                     <div class="col-sm-6 col-lg-12">
                                         <div class="card  shadow-sm" :class="{'border-danger border-3' : isError}">
@@ -24,6 +24,13 @@
                                                             <input type="search" v-model="search_by_item_name" @keypress.enter="searchProducts" placeholder="Product Name" class="form-control-plaintext border-bottom">
                                                             <label for="search_by_item_name" class="">{{t('item_name')}}</label>
                                                         </div> 
+                                                    </div>
+                                                    <div class="form-floating col-md-6 col-lg-12">
+                                                        <select id="search_by_category" class="form-control-plaintext border-bottom" v-model="search_by_category">
+                                                            <option value=""></option>
+                                                            <option v-for="c in cats" :key="c.id" :value="c.cat_name">{{c.cat_name}}</option>
+                                                        </select>
+                                                        <label for="search_by_category" class="small">{{t('category')}}</label>
                                                     </div>
                                                 </div>
                                                 <div class="row mt-2">
@@ -68,7 +75,7 @@
                                   
                                                            
                             </div>
-                            <div class="col-lg-8">
+                            <div class="col-lg-9">
                                 <div class="card shadow-sm">
                                     <div class="card-body p-0 vh-100 overflow-y-auto">
                                         <table class="table table-bordered mb-0 table-hover">
@@ -135,6 +142,7 @@ import * as lib from "@/lib/snapshot/products"
 import * as hp  from "@/lib/helper"
 import * as search from "@/lib/search"
 import {lang} from '@/lib/language'
+import * as cat from "@/lib/snapshot/category"
 
 export default {   
     props:['sale_type', 'saleItems'],
@@ -144,10 +152,12 @@ export default {
             productsData: [],
             search_by_code:"",
             search_by_item_name:"",
+            search_by_category:"",
             isUpdating:false,
             isLoading:false,
             isError:false,
             limitData: 100,
+            cats:[]
         }
     },   
     mounted() {
@@ -157,6 +167,7 @@ export default {
          myModalEl.addEventListener('show.bs.modal', event => {
               if(this.productsData.length===0){
                     this.fetchProducts();
+                    this.fetchCategory();
               }            
         })
      
@@ -196,6 +207,15 @@ export default {
     },
   
     methods:{
+         async fetchCategory(){                    
+                const query_url = query(collection(db, "category"), orderBy("created_at", "desc"));
+               const unsub= onSnapshot(query_url, async(snapShot) =>{
+                    const cats=cat.category(snapShot);   
+                    this.cats=cats;             
+                    unsub();
+                })
+               
+           } ,
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
@@ -228,6 +248,7 @@ export default {
         clearSearch(){
             this.search_by_code="";
             this.search_by_item_name="";
+            this.search_by_category="";
             this.searchProducts();
         },
         onPaste(){            
@@ -249,7 +270,7 @@ export default {
             this.search_by_code="";
             
        },
-        searchProducts(){
+      async  searchProducts(){
             this.products=[]
             this.isLoading=true;
             if(this.search_by_code){
@@ -270,7 +291,17 @@ export default {
                         unsub()    
                         this.isLoading=false;
                 })
-            }else{
+            }else if (this.search_by_category) {
+                    const query_url = query(
+                        collection(db, "products"), where("category.cat_name","==", this.search_by_category), orderBy("created_at", "desc"),
+                        limit(this.limitData)
+                    );
+                    const snapShot = await getDocs(query_url);
+                    const products = lib.products(snapShot);
+                    this.products = products;
+                    this.isLoading=false;
+                  
+                }else{
                 this.products= this.productsData;                                         
             }
         },

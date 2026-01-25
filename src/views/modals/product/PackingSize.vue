@@ -7,7 +7,7 @@
                <div class="card">
                    <div class="card-body p-2"> 
                     <div class="row justify-content-end mb-2">
-                        <div class="col-4 d-grid">
+                        <!--<div class="col-4 d-grid">
                             <button class="btn btn-sm text-dark" @click="savePackingSize">
                                 <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> {{t('save_link')}}</span>
                                 <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
@@ -16,17 +16,16 @@
                         <div class="col-4 d-grid"><button :disabled="!editItem.id" class="btn btn-sm text-dark" @click="saveEdit"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> {{t('update_link')}}</span>
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                         </button>
-                    </div>
+                    </div>-->
                         <div class="col-4 d-grid"><button class="btn btn-sm text-dark close-p-z" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}}</button></div>
                  </div>
                    <div class="row g-2">
                     <div class="col-12 vh-75 overflow-y-auto">
                         <table class="table table-bordered mb-0 table-hover">
                             <tbody class="">                                     
-                                <tr class="">
-                                    <td></td>
+                                <tr class="table-secondary">
                                     <!--<td class=""><input id="packing_name" placeholder="Packing name" type="text" @keypress.enter="savePackingSize" v-model="packing_name" class="form-control-plaintext py-0 text-center"></td>-->
-                                    <td><input placeholder="Packing unit" type="text" @keypress.enter="savePackingSize" v-model="packing_unit" class="form-control py-1 text-center"></td>
+                                    <td colspan="2"><input placeholder="Packing unit" type="text" @keypress.enter="savePackingSize" v-model="packing_unit" class="form-control py-1 text-center"></td>
                                     <td class="d-grid">
                                         <button class="btn btn-sm text-primary" @click="savePackingSize">
                                             <span v-if="!isSaving"><i class="fa-solid fa-check"></i> </span>
