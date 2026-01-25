@@ -9,6 +9,10 @@
                         <!--<label class="form-check-label ms-1 change-cursor" for="useCamera" @click="setCamera" :class="[useCamera ? 'text-success' : 'text-muted']"> <i class="fa-solid fa-camera"></i></label>-->
                       </div>
                 </div>
+                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                    <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#categoryManagementModal"><i class="fa-solid fa-code-branch"></i> {{t('categories')}}</button>
+                    <!--<router-link :to="{name: 'Category'}" class="btn btn-sm"><i class="fa-solid fa-code-branch"></i> အမျိုးအစားများ</router-link>-->
+                </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                         <select class="form-control-plaintext text-center py-0" v-model="limitData" @change="changeLimitData">
                             <option>50</option>
@@ -59,6 +63,13 @@
                                 <div class="form-floating col-sm-3 col-lg-12">
                                     <input type="search" id="search_by_description" v-model="search_by_description" @keypress.enter="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
                                     <label for="search_by_description" class="small">{{t('item_name')}}</label>
+                                </div>
+                                <div class="form-floating col-sm-3 col-lg-12">
+                                    <select id="search_by_category" class="form-control-plaintext border-bottom" v-model="search_by_category">
+                                        <option value=""></option>
+                                        <option v-for="c in cats" :key="c.id" :value="c.cat_name">{{c.cat_name}}</option>
+                                    </select>
+                                    <label for="search_by_category" class="small">{{t('category')}}</label>
                                 </div>
                             
                                     <div class="col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="searchProducts"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> {{t('search_link')}}</button></div>
@@ -162,6 +173,12 @@
                                             </div>
                                         </td>
                                     </tr>
+                                      <tr class="change-cursor table-info" data-bs-toggle="modal" data-bs-target="#categoryModal">
+                                        <td class=""> {{t('category')}}</td>                                       
+                                        <td class="text-center" :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]">
+                                               <span v-if="editItem.category"> {{editItem.category.cat_name}}</span>
+                                        </td>
+                                    </tr>  
                                     <tr @click="initScanner(status='edit')">
                                         <td class="col-1">{{t('barcode')}}</td>
                                         <td :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]" class="text-center col-3">
@@ -263,6 +280,8 @@
                 </div>
             </div>
         </div>
+        <CategoryManagementModal @setMsg="setMsg"/>
+        <CategoryModal @setCode="setCategory" />
         <SetQty :ei="editItem" @saveQty="saveQty" />
         <PackingSizeModal @setMsg="setMsg" :packingSizes="packingSizes" />
         <SelectPackingSizeModal @setPackingSize="setPackingSize" :ei="editItem" :packingSizes="packingSizes" />
@@ -297,11 +316,14 @@ import * as pz from "@/lib/snapshot/packingSizes"
 import * as search from "@/lib/search"
 import { Html5QrcodeScanner, Html5Qrcode } from "html5-qrcode";
 import {lang} from "@/lib/language"
+import CategoryManagementModal from "@/views/modals/product/CategoryManagement.vue"
+import CategoryModal from "@/views/modals/product/Category.vue"
 
+import * as cat from "@/lib/snapshot/category"
 
 export default {
     components: {
-            PageHeader, Footer,PackingSizeModal,SelectPackingSizeModal, SetQty
+            PageHeader, Footer,PackingSizeModal,SelectPackingSizeModal, SetQty, CategoryManagementModal, CategoryModal
     },
     setup () {
         return { v$: useVuelidate() }
@@ -321,6 +343,7 @@ export default {
             sort_item:"",
             search_by_code:"",
             search_by_description:"",
+            search_by_category:"",
             productsData:[],
             packingSizes:[],
             editItem:{},
@@ -347,6 +370,7 @@ export default {
            scannerActive: false,
            html5QrCode:null,
            productCount: 0,
+           cats:[],
         }
     },
     created() {     
@@ -366,6 +390,7 @@ export default {
        this.fetchPackingSizes();
        this.fetchProductCount();
        this.fetchProducts();
+       this.fetchCategory();
     },
     unmounted() {
         if(this.unsubProducts){
@@ -407,6 +432,23 @@ export default {
     },
 
     methods:{
+         async fetchCategory(){                    
+                const query_url = query(collection(db, "category"), orderBy("created_at", "desc"));
+                onSnapshot(query_url, async(snapShot) =>{
+                    const cats=cat.category(snapShot);   
+                    this.cats=cats;             
+                })
+               
+           } ,
+       async setCategory(c){
+            if(this.editItem.category &&  this.editItem.category.cat_name== c.cat_name) return false;
+            this.editItem.category=c;
+              const data=this.editItem
+            const updateDocument=doc(db, "products", this.editItem.id)
+            this.isUpdated(this.editItem.code_no);
+            await updateDoc(updateDocument, data)  
+            
+        },
         changeLimitData(){
             localStorage.setItem("limitData", this.limitData)    
             this.fetchProducts();   
@@ -732,6 +774,7 @@ export default {
         clearSearch(){
             this.search_by_code="";
             this.search_by_description="";
+            this.search_by_category="";
             this.searchProducts();
         },
         onPaste(){
@@ -767,7 +810,18 @@ export default {
                     if (products.length) {
                         this.setEdit(products[0]);
                     }
-                } else {
+                } else if (this.search_by_category) {
+                    const query_url = query(
+                        collection(db, "products"), where("category.cat_name","==", this.search_by_category), orderBy("created_at", "desc"),
+                        limit(this.limitData)
+                    );
+                    const snapShot = await getDocs(query_url);
+                    const products = ss.products(snapShot);
+                    this.products = products;
+                    if (products.length) {
+                        this.setEdit(products[0]);
+                    }
+                }else {
                     this.products = this.productsData;
                     if (this.products.length && Object.keys(this.editItem).length <= 0) {
                         this.setEdit(this.products[0]);

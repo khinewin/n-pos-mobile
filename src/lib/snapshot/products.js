@@ -4,21 +4,7 @@ const products=(snapShot)=>{
         const data=doc.data();  
         let product = {
             id: doc.id,
-            user: data.user,
-            item_name: data.item_name,
-            qty : data.qty,
-            created_at : data.created_at,
-            code_no : data.code_no,                        
-            main_qty: data.main_qty, 
-            packing_size: data.packing_size ? data.packing_size : {},
-            retail_price : data.retail_price ? data.retail_price : {},
-            whole_sale_price : data.whole_sale_price ? data.whole_sale_price : {},
-            pur_price : data.pur_price ? data.pur_price : {},
-            auto_cal: data.auto_cal ? data.auto_cal : false,
-            edit_user: data.edit_user ? data.edit_user : {},
-            is_deleted:data.is_deleted,
-            item_name_lower_case: data.item_name_lower_case ? data.item_name_lower_case : "",
-            keywords: data.keywords ? data.keywords : ""
+            ...doc.data()
         };                                
         products.push(product);                           
     });

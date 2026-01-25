@@ -1,4 +1,12 @@
 export const lang={
+    categories:{
+        eng: "Categories",
+        mm:"အမျိုးအစားများ"
+    },
+    category:{
+        eng: "Category",
+        mm:"အမျိုးအစား"
+    },
     auto:{
         eng:"Auto",
         mm:"အော်တို"
