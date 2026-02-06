@@ -39,7 +39,10 @@
                             </div>
                           </div> 
                      </div>
-                   </div>                                                                                                          
+                   </div>          
+                   <div class="mt-3 d-grid">
+                            <router-link class="btn btn-sm  " :to="{name : 'Suppliers'}" ><i class="fa-solid fa-users text-success"></i>  {{t('suppliers')}}</router-link>
+                        </div>                                                                                                  
                 </div>                        
                 <div class="col-lg-9">
                     <div class="card shadow-sm">

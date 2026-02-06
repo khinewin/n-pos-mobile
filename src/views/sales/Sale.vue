@@ -282,7 +282,7 @@ import db from '@/firebase/firestore'
 //import Products from "@/views/sales/Products.vue"
 import SalesModal from "@/views/modals/sales/SalesModal.vue"
 import CustomerModal from "@/views/modals/sales/CustomerModal.vue"
-import Print from "@/views/sales/A4Print.vue"
+import Print from "@/views/sales/A5Print.vue"
 import ProductModal from "@/views/modals/sales/ProductModal.vue"
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/products"

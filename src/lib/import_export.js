@@ -15,18 +15,8 @@ const exportToJson=(arr, file_name)=>{
   const restoreSales=async (d)=> {                
         const voucher={
         voucher_no: d.voucher_no,
-        sale_date: Timestamp.fromDate(new Date(d.sale_date)),
-        products : d.products,
-        user : d.user,
-        total_amount:d.total_amount,
-        extra_discount:d.extra_discount,
-        net_amount: d.net_amount ,
-        paid: d.paid,
-        change:d.change,
-        sale_type:d.sale_type,
-        customer : d.customer,
-        credit: d.credit,
-        payment_type: d.payment_type
+        ...d,
+        sale_date: Timestamp.fromDate(new Date(d.sale_date)),        
     }    
 
     const saveDocument=doc(db, "sales", d.id)
@@ -35,16 +25,8 @@ const exportToJson=(arr, file_name)=>{
 const restorePurchases=async(d)=>{
       const voucher={
         voucher_no: d.voucher_no,
-        pur_date: Timestamp.fromDate(new Date(d.pur_date)),
-        supplier: d.supplier,
-        location: d.location,
-        products : d.products,
-        user : d.user,
-        total_amount:d.total_amount,
-        total_discount:d.total_discount,
-        total_price:d.total_price,
-        extra_discount: d.extra_discount,
-        grand_total_price: d.grand_total_price,
+        ...d,
+        pur_date: Timestamp.fromDate(new Date(d.pur_date)),        
     }      
     const saveDocument=doc(db, "purchases", d.id)
     await setDoc(saveDocument, voucher)   
@@ -52,19 +34,9 @@ const restorePurchases=async(d)=>{
 const restoreProducts=async(d)=>{
   const voucher={
     code_no: d.code_no,
-    created_at: Timestamp.fromDate(new Date(d.created_at)),
-   item_name:d.item_name,
-   user: d.user,
-   qty : d.qty,
-   code_no : d.code_no,                        
-   main_qty: d.main_qty, 
-   packing_size: d.packing_size,
-   retail_price : d.retail_price,
-   whole_sale_price : d.whole_sale_price,
-   pur_price : d.pur_price,
-   auto_cal: d.auto_cal,
-   edit_user: null,
-   is_deleted:d.is_deleted,
+    ...d,
+    created_at: Timestamp.fromDate(new Date(d.created_at))
+  
 }     
 const saveDocument=doc(db, "products", d.id)
 await setDoc(saveDocument, voucher)   
@@ -73,9 +45,8 @@ await setDoc(saveDocument, voucher)
 const restoreStocks=async(d)=>{
   const voucher={
     voucher_no: d.voucher_no,
-    created_at: Timestamp.fromDate(new Date(d.created_at)),           
-    products : d.products,
-    user : d.user              
+    ...d,
+    created_at: Timestamp.fromDate(new Date(d.created_at))              
 }  
 const saveDocument=doc(db, "openingStocks", d.id)
 await setDoc(saveDocument, voucher)   
@@ -84,11 +55,8 @@ await setDoc(saveDocument, voucher)
 const restoreTransfers=async(d)=>{
   const voucher={
     voucher_no: d.voucher_no,
-    created_at: Timestamp.fromDate(new Date(d.created_at)),           
-    products : d.products,
-    user : d.user,
-    from_location: d.from_location,
-    to_location: d.to_location,              
+    ...d,
+    created_at: Timestamp.fromDate(new Date(d.created_at))              
 }  
 const saveDocument=doc(db, "transfers", d.id)
 await setDoc(saveDocument, voucher)   
@@ -97,10 +65,8 @@ await setDoc(saveDocument, voucher)
 const restoreAdjustments=async(d)=>{
   const voucher={
     voucher_no: d.voucher_no,
-    created_at: Timestamp.fromDate(new Date(d.created_at)),           
-    products : d.products,
-    user : d.user,
-    location: d.location,         
+    ...d,
+    created_at: Timestamp.fromDate(new Date(d.created_at))              
 }  
 const saveDocument=doc(db, "adjustments", d.id)
 await setDoc(saveDocument, voucher)   
@@ -108,15 +74,8 @@ await setDoc(saveDocument, voucher)
 const restoreSuppliers=async(d)=>{
   const voucher={
     code: d.code,
-    created_at: Timestamp.fromDate(new Date(d.created_at)),           
-    name : d.name,
-    user : d.user,
-    company: d.company,
-    phone: d.phone,        
-    is_deleted:d.is_deleted, 
-    name_lower_case : d.name_lower_case ? d.name_lower_case : "",
-    name_keywords : d.name_keywords ? d.name_keywords :"",
-    company_keywords: d.company_keywords ? d.company_keywords :"",
+    ...d,
+    created_at: Timestamp.fromDate(new Date(d.created_at))              
 }  
 const saveDocument=doc(db, "suppliers", d.id)
 await setDoc(saveDocument, voucher)   
@@ -125,25 +84,18 @@ await setDoc(saveDocument, voucher)
 const restoreCustomers=async(d)=>{
   const voucher={
     code: d.code,
+    ...d,
     created_at: Timestamp.fromDate(new Date(d.created_at)),           
-    name : d.name,
-    user : d.user,
-    address: d.address,
-    phone: d.phone,         
-    is_deleted:d.is_deleted,
-    name_lower_case : d.name_lower_case ? d.name_lower_case : "",
-    name_keywords :d.name_keywords ? d.name_keywords : "",
-    address_keywords : d.address_keywords ? d.address_keywords : "",
+  
 }  
 const saveDocument=doc(db, "customers", d.id)
 await setDoc(saveDocument, voucher)   
 }
 const restorePackingSizes=async(d)=>{
   const voucher={
-    created_at: Timestamp.fromDate(new Date(d.created_at)),           
-    packing_unit : d.packing_unit,
-    user : d.user,
-   // packing_name: d.packing_name,    
+    ...d,
+    created_at: Timestamp.fromDate(new Date(d.created_at))           
+   
 }  
 const saveDocument=doc(db, "packingSizes", d.id)
 await setDoc(saveDocument, voucher)   
@@ -151,17 +103,9 @@ await setDoc(saveDocument, voucher)
 
 const restoreReturnIn=async(d)=>{
   const voucher={
+    ...d,
     rt_in_date: Timestamp.fromDate(new Date(d.rt_in_date)),           
-    user: d.user,
-    voucher_no: d.voucher_no,
-    products : d.products,    
-    paid:d.paid,
-    change: d.change,
-    total_amount:d.total_amount,
-    customer : d.customer,
-    balance: d.balance,
-    payment_type: d.payment_type,
-    remark: d.remark,
+   
 }  
 const saveDocument=doc(db, "returnIn", d.id)
 await setDoc(saveDocument, voucher)   
@@ -169,16 +113,9 @@ await setDoc(saveDocument, voucher)
 
 const restoreReturnOut=async(d)=>{
   const voucher={
+    ...d,
     rt_out_date: Timestamp.fromDate(new Date(d.rt_out_date)),     
-    user: d.user,
-    voucher_no: d.voucher_no,
-    products : d.products,    
-    paid:d.paid,
-    total_amount:d.total_amount,
-    supplier : d.supplier,
-    balance: d.balance,
-    remark: d.remark,
-    location: d.location,        
+           
 }  
 const saveDocument=doc(db, "returnOut", d.id)
 await setDoc(saveDocument, voucher)   

@@ -172,18 +172,11 @@ const  message=(type, name)=>{
       return `Ks ${f}`
     }
 
-    /*
-  const setVoucherNo=()=>{
-    const d=new Date();
-    const dmy=`${String(d.getFullYear())}${String(d.getMonth()+1).padStart(2,0)}${String(d.getDate()).padStart(2,0)}`
-    const his=`${String(d.getHours()).padStart(2,0)}${String(d.getMinutes()).padStart(2, 0)}${String(d.getSeconds()).padStart(2,0)}`
-    const voucher_no=`N-${dmy}-${his}`
-    return voucher_no;
-  }*/
+  
   const setVoucherNo=(user)=>{
     const n="N";
     const d=new Date();
-    const dmy=`${String(d.getFullYear())}${String(d.getMonth()+1).padStart(2,0)}${String(d.getDate()).padStart(2,0)}`
+    const dmy=`${String(d.getFullYear()).slice(-2)}${String(d.getMonth()+1).padStart(2,0)}${String(d.getDate()).padStart(2,0)}`
     const his=`${String(d.getHours()).padStart(2,0)}${String(d.getMinutes()).padStart(2, 0)}${String(d.getSeconds()).padStart(2,0)}`
     const voucher_no=`${user ? user : n}-${dmy}-${his}`
     return voucher_no;

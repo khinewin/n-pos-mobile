@@ -24,7 +24,7 @@ export const lang={
         mm:"မှတ်စုများ"
     },
     balance_due:{
-        eng: "Balance Due",
+        eng: "Balance",
         mm:"ကျန်ငွေ"
     },
     change:{

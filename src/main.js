@@ -34,7 +34,7 @@ const options = {
     styles: [
       './bootstrap.min.css',
      // '/kidlat.css',
-      './a4print.css',
+      './a5print.css',
     ],
     timeout: 1000, // default timeout before the print window appears
     autoClose: true, // if false, the window will not close after printing

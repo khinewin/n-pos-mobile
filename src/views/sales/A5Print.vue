@@ -1,7 +1,7 @@
 <template lang="">
     <div class="a5-print-container">
     <div class="a5-page" v-for="(pages, index) in paginatedItems">
-        <div class="page-number">
+        <div class="page-number text-end">
             Page {{ index + 1 }} of {{ paginatedItems.length }}
         </div>
      <div v-if="index===0">   

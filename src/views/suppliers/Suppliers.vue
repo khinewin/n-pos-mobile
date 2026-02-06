@@ -49,7 +49,10 @@
                                     <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> {{t('clear_link')}}</button></div>
                              </div> 
                         </div>
-                      </div>                                                                                                          
+                      </div>      
+                      <div class="mt-3 d-grid">
+                            <router-link class="btn btn-sm  " :to="{name : 'AddPurchase'}" ><i class="fa-solid fa-cart-shopping text-danger"></i>   {{t('purchase')}}</router-link>
+                        </div>                                                                                                  
                    </div>                        
                    <div class="col-lg-9">
                        <div class="card shadow vh-75 overflow-y-auto">

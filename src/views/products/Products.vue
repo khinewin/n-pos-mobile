@@ -434,9 +434,10 @@ export default {
     methods:{
          async fetchCategory(){                    
                 const query_url = query(collection(db, "category"), orderBy("created_at", "desc"));
-                onSnapshot(query_url, async(snapShot) =>{
+               const unsub= onSnapshot(query_url, async(snapShot) =>{
                     const cats=cat.category(snapShot);   
-                    this.cats=cats;             
+                    this.cats=cats;         
+                    unsub();    
                 })
                
            } ,
