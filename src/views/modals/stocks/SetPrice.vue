@@ -1,89 +1,112 @@
-<template lang="">
-    <div>
-        <!-- setPrices Modal -->
-        <div class="modal fade" id="setPricesModal" data-bs-backdrop="false"  tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-            <div class="modal-content">               
-                <div class="modal-body p-2">
-                    <div class="row mb-2">                                             
-                        <div class="col-12 text-end">
-                            <button id="close" type="button" class="btn btn-sm" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}}</button>
+<template>
+    <!-- Set Prices Modal -->
+    <div class="modal fade" id="setPricesModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="setPricesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <!-- Premium Header -->
+                <div class="modal-header bg-white border-bottom py-3 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                            <i class="fa-solid fa-tags text-primary fs-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-bold mb-0" id="setPricesModalLabel">{{t('set_price') || 'Configure Pricing'}}</h5>
+                            <p class="text-muted small mb-0" v-if="ei.item_name">{{ei.item_name}}</p>
                         </div>
                     </div>
-                    <div>
-                        <table class="table table-bordered mb-0" v-if="Object.keys(ei).length">
-                            <tbody>
-                                <tr>
-                                    <td colspan="4" class="text-center p-2" >{{ei.item_name}}</td>
-                                </tr>
-                                <tr class="fw-bold">
-                                    <td class="col-1"></td>
-                                    <td class="text-center col-1" v-if="ei.packing_size.largest_unit">
-                                        <span >{{ei.packing_size.largest_unit}}</span>
-                                    </td>
-                                    <td class="text-center col-1" v-if="ei.packing_size.medium_unit">
-                                        <span >{{ei.packing_size.medium_unit}}</span>
-                                    </td>                                        
-                                    <td class="text-center col-1"  v-if="ei.packing_size.smallest_unit">
-                                        <span >{{ei.packing_size.smallest_unit}}</span>
-                                    </td>
-                                </tr>       
-                                <tr class="">
-                                    <td class="pt-2">{{t('pur_price')}}</td>
-                                    <td class="text-center p-0"  v-if="ei.packing_size.largest_unit">
-                                        <input @keypress.enter="pressClose" :disabled="!ei.packing_size.largest_unit" @keyup="calPurPrice('largest_unit')" type="number" v-model="ei.pur_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="text-center p-0"  v-if="ei.packing_size.medium_unit">
-                                        <input @keypress.enter="pressClose" :disabled="!ei.packing_size.medium_unit"  @keyup="calPurPrice('medium_unit')"  type="number" v-model="ei.pur_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="text-center p-0"  v-if="ei.packing_size.smallest_unit">
-                                            <input @keypress.enter="pressClose" :disabled="!ei.packing_size.smallest_unit" @keyup="calPurPrice('smallest_unit')" type="number" v-model="ei.pur_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
-                                    </td>                                        
-                                </tr>
-                                <tr class="">
-                                    <td class="pt-2">{{t('sale_price')}}</td>
-                                    <td class="text-center p-0"  v-if="ei.packing_size.largest_unit">
-                                        <input @keypress.enter="pressClose" :disabled="!ei.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="ei.retail_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="text-center p-0"  v-if="ei.packing_size.medium_unit">
-                                        <input @keypress.enter="pressClose" :disabled="!ei.packing_size.medium_unit"  @keyup="calRetailPrice('medium_unit')"  type="number" v-model="ei.retail_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="text-center p-0"  v-if="ei.packing_size.smallest_unit">
-                                            <input @keypress.enter="pressClose" :disabled="!ei.packing_size.smallest_unit" @keyup="calRetailPrice('smallest_unit')" type="number" v-model="ei.retail_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
-                                    </td>                                        
-                                </tr>
-                                <!--<tr class="">
-                                    <td class="pt-2">Wholesale price</td>
-                                    <td class="text-center p-0"  v-if="ei.packing_size.largest_unit">
-                                        <input @keypress.enter="pressClose" :disabled="!ei.packing_size.largest_unit" @keyup="calWholesalePrice('largest_unit')" type="number" v-model="ei.whole_sale_price.largest_unit" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="text-center p-0"  v-if="ei.packing_size.medium_unit">
-                                        <input @keypress.enter="pressClose" :disabled="!ei.packing_size.medium_unit"  @keyup="calWholesalePrice('medium_unit')"  type="number" v-model="ei.whole_sale_price.medium_unit" class="form-control-plaintext form-control-sm text-center">
-                                    </td>
-                                    <td class="text-center p-0"  v-if="ei.packing_size.smallest_unit">
-                                            <input @keypress.enter="pressClose" :disabled="!ei.packing_size.smallest_unit" @keyup="calWholesalePrice('smallest_unit')" type="number" v-model="ei.whole_sale_price.smallest_unit" class="form-control-plaintext form-control-sm text-center">
-                                    </td>                                        
-                                </tr>-->  
-                                <tr>
-                                    <td class="ps-2 pt-2" colspan="4">
-                                        <div class="form-check form-switch">
-                                            <input @change="saveAutoCal" v-model="ei.auto_cal" class="form-check-input auto-cal" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
-                                            <label class="form-check-label" for="flexSwitchCheckChecked">{{t('auto')}} </label>
-                                          </div>                                              
-                                    </td>
-                                 </tr>               
-                            </tbody>
-                        </table>
+                    <button id="close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body p-2 bg-light-subtle">
+                    <div v-if="Object.keys(ei).length">
+                        <!-- Pricing Grid -->
+                        <div class="card border-0 shadow-sm rounded-3 mb-2 overflow-hidden">
+                            <div class="table-responsive">
+                                <table class="table table-borderless align-middle mb-0">
+                                    <thead class="bg-white border-bottom">
+                                        <tr class="small text-muted text-uppercase fw-bold">
+                                            <th class="py-3 ps-4 border-0"></th>
+                                            <th class="py-3 text-center border-0" v-if="ei.packing_size.largest_unit">{{ei.packing_size.largest_unit}}</th>
+                                            <th class="py-3 text-center border-0" v-if="ei.packing_size.medium_unit">{{ei.packing_size.medium_unit}}</th>
+                                            <th class="py-3 text-center border-0" v-if="ei.packing_size.smallest_unit">{{ei.packing_size.smallest_unit}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white">
+                                        <!-- Purchase Price -->
+                                        <tr class="border-bottom">
+                                            <td class="py-2 ps-2">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fa-solid fa-cart-shopping text-secondary opacity-50 me-2"></i>
+                                                    <span class="fw-medium text-dark">{{t('pur_price')}}</span>
+                                                </div>
+                                            </td>
+                                            <td class="p-2" v-if="ei.packing_size.largest_unit">
+                                                <input @keypress.enter="pressClose" @keyup="calPurPrice('largest_unit')" type="number" v-model="ei.pur_price.largest_unit" class="form-control form-control-sm text-center border-0 bg-light-subtle fw-bold" placeholder="0.00">
+                                            </td>
+                                            <td class="p-2" v-if="ei.packing_size.medium_unit">
+                                                <input @keypress.enter="pressClose" @keyup="calPurPrice('medium_unit')" type="number" v-model="ei.pur_price.medium_unit" class="form-control form-control-sm text-center border-0 bg-light-subtle fw-bold" placeholder="0.00">
+                                            </td>
+                                            <td class="p-2" v-if="ei.packing_size.smallest_unit">
+                                                <input @keypress.enter="pressClose" @keyup="calPurPrice('smallest_unit')" type="number" v-model="ei.pur_price.smallest_unit" class="form-control form-control-sm text-center border-0 bg-light-subtle fw-bold" placeholder="0.00">
+                                            </td>
+                                        </tr>
+                                        <!-- Sale Price -->
+                                        <tr class="border-bottom">
+                                            <td class="py-2 ps-2">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fa-solid fa-sack-dollar text-success opacity-75 me-2"></i>
+                                                    <span class="fw-medium text-dark">{{t('sale_price')}}</span>
+                                                </div>
+                                            </td>
+                                            <td class="p-2" v-if="ei.packing_size.largest_unit">
+                                                <input @keypress.enter="pressClose" @keyup="calRetailPrice('largest_unit')" type="number" v-model="ei.retail_price.largest_unit" class="form-control form-control-sm text-center border-0 bg-primary-subtle text-primary fw-bold" placeholder="0.00">
+                                            </td>
+                                            <td class="p-2" v-if="ei.packing_size.medium_unit">
+                                                <input @keypress.enter="pressClose" @keyup="calRetailPrice('medium_unit')" type="number" v-model="ei.retail_price.medium_unit" class="form-control form-control-sm text-center border-0 bg-primary-subtle text-primary fw-bold" placeholder="0.00">
+                                            </td>
+                                            <td class="p-2" v-if="ei.packing_size.smallest_unit">
+                                                <input @keypress.enter="pressClose" @keyup="calRetailPrice('smallest_unit')" type="number" v-model="ei.retail_price.smallest_unit" class="form-control form-control-sm text-center border-0 bg-primary-subtle text-primary fw-bold" placeholder="0.00">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Auto Calculation Controls -->
+                        <div class="p-2 bg-white rounded-3 shadow-sm border-start border-4 border-primary">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                                        <i class="fa-solid fa-calculator text-primary small"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold mb-0">Synchronize Unit Prices</h6>
+                                        <p class="text-muted small mb-0">Automatically adjust other units when one is changed</p>
+                                    </div>
+                                </div>
+                                <div class="form-check form-switch m-0">
+                                    <input @change="saveAutoCal" v-model="ei.auto_cal" class="form-check-input" type="checkbox" role="switch" id="autoCalSwitch">
+                                    <label class="form-check-label d-none" for="autoCalSwitch">{{t('auto')}}</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>                
-            </div>
+                </div>
+
+                <div class="modal-footer bg-white border-top py-3 px-4">
+                    <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-check me-2"></i>Apply Changes
+                    </button>
+                </div>
             </div>
         </div>
-        <!--end setPrices modal--> 
     </div>
 </template>
+
 <script>
-    import * as cp from "@/lib/cal_price"
+import * as cp from "@/lib/cal_price"
+
 export default {
     props:['ei'],
     computed:{
@@ -102,8 +125,8 @@ export default {
             return cp.calPurPrice(unit, this.ei);
         },    
         pressClose(){
-            const btn=document.getElementById("close")
-            btn.click();
+            const btn = document.getElementById("close")
+            if (btn) btn.click();
         } ,
         saveAutoCal(){
             this.$emit("saveAutoCal")
@@ -111,6 +134,22 @@ export default {
     }
 }
 </script>
-<style lang="">
-    
+
+<style scoped>
+.form-control:focus {
+    box-shadow: none;
+    background-color: #fff !important;
+    outline: 2px solid #0d6efd;
+}
+.bg-light-subtle {
+    background-color: #f8f9fa !important;
+}
+.bg-primary-subtle {
+    background-color: #e7f1ff !important;
+}
+.form-switch .form-check-input {
+    width: 3em;
+    height: 1.5em;
+    cursor: pointer;
+}
 </style>

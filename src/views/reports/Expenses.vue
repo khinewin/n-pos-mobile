@@ -7,35 +7,36 @@
             <div class="col-4 col-sm-3 col-md-2">
                 <button class="btn" @click="print"><i class="fa-solid fa-print"></i> (ctrl+p)</button>
             </div>    
-        </div>         
+        </div>
         <div class="row"  id="printMe" >
             <div class="d-none d-print-block">
                 <LargePrintHeader />
             </div>
             <div class="col-12 text-center">
-                <h6>Reports Transfers {{displayReportType(reportType)}}</h6>
+                <h6>Reports Expenses {{displayReportType(reportType)}}</h6>
                 <div class="row small">
                     <div class="col-sm-6 col-lg-4">
-                        <div v-if="code_no">Code : {{item_name}}</div>
+                        <div class="" v-if="code_no">Code : {{item_name}}</div>
                     </div>
                     <div class="col-sm-6 col-lg-4">
-                        <div>From  : {{from_location}} - To  : {{to_location}}</div>
+                        <div class="" v-if="customer_name">Customer : {{customer_name}}</div>
                     </div>
                     <div class="col-lg-4">
-                        <div v-if="displayFromDate || displayToDate">From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</div>
+                        <div v-if="displayFromDate || displayToDate">Date : From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</div>
                     </div>
                 </div>
             </div>            
             <div class="col-12">                   
                     <div v-if="reportType==='by_date'">
-                        <TransferByDate :fromDate="fromDate"  :toDate="toDate" :from_location="from_location" :to_location="to_location" :code_no="code_no" />
+                        <ExpensesByDate   :fromDate="fromDate"  :toDate="toDate"  />
                     </div>
                     <div v-if="reportType==='by_voucher'">
-                        <TransferByVoucher :fromDate="fromDate"  :toDate="toDate" :voucher_no="voucher_no" :from_location="from_location" :to_location="to_location" :code_no="code_no" />
+                        <ExpensesByVoucher  :fromDate="fromDate"  :toDate="toDate" />
                     </div>
-                    <div v-if="reportType==='by_description'">
-                        <TransferByDescription :fromDate="fromDate"  :toDate="toDate" :from_location="from_location" :to_location="to_location" :code_no="code_no"/>
+                    <div v-if="reportType==='by_category'">
+                        <ExpensesByCategory  :fromDate="fromDate"  :toDate="toDate"/>
                     </div>
+                   
             </div>
         </div>
     </div>
@@ -43,25 +44,27 @@
 <script>
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
-import TransferByDate from "@/views/reports/transfers/TransferByDate.vue"
-import TransferByDescription from "@/views/reports/transfers/TransferByDescription.vue"
-import TransferByVoucher from "@/views/reports/transfers/TransferByVoucher.vue"
+import ExpensesByDate from "@/views/reports/expenses/ExpensesByDate.vue"
+import ExpensesByCategory from "@/views/reports/expenses/ExpensesByCategory.vue"
+import ExpensesByVoucher from "@/views/reports/expenses/ExpensesByVoucher.vue"
+
+
 import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
 import * as rt from "@/lib/reportType"
 
 export default {
     components: {
-        TransferByDate, TransferByDescription, TransferByVoucher,LargePrintHeader
+        ExpensesByDate,ExpensesByCategory,ExpensesByVoucher, LargePrintHeader,
     },
   
     data(){
         return{         
             reportType:this.$route.params['reportType'],
-            from_location: this.$route.params['from_location'],
-            to_location: this.$route.params['to_location'],
             fromDate:this.parseYMD(this.$route.params['fromDate']),
-            toDate:this.parseYMD(this.$route.params['toDate']),
+            toDate:this.parseYMD(this.$route.params['toDate']),     
             voucher_no: this.$route.query.voucher_no,
+            customer_name: this.$route.query.customer_name,
+            customer_code: this.$route.query.customer_code,
             code_no: this.$route.query.code_no,
             item_name: this.$route.query.item_name,
             displayFromDate:"",
@@ -78,10 +81,11 @@ export default {
         }
     },
    
-    mounted() {         
-        this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-        this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-         window.addEventListener('keydown', this.handleCtrl);
+    mounted() {           
+            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
+            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
+            window.addEventListener('keydown', this.handleCtrl);
+
     },
     beforeUnmount() {
          window.removeEventListener('keydown', this.handleCtrl);
@@ -104,11 +108,12 @@ export default {
         user(){
             return this.$store.getters.user;
         },
-      
+   
       
     },
     methods:{
-        handleCtrl(event) {                    
+        handleCtrl(event) {         
+     
             if (event.ctrlKey && event.key === 'p') {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.print(); // Call your custom function
@@ -116,7 +121,9 @@ export default {
             if (event.key==="Escape") {
                 event.preventDefault(); // Prevent the default browser save dialog
                 this.goBack();
-            }                                   
+            }                
+            
+        
         },
         displayReportType(reportType){
             return rt.displayReportType(reportType)

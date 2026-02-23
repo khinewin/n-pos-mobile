@@ -1,114 +1,170 @@
-<template lang="">       
+<template>       
     <div>          
-      <!-- Products Modal -->
+      <!-- Customer Modal -->
     <div class="modal fade" id="customerModal" data-bs-backdrop="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
-          <div class="modal-content"> 
-           <div class="card border-0">
-            <div class="card-body p-2">
-               <div class="row g-2">
-                   <div class="col-lg-3">
-                       <div class="card shadow-sm">
-                        <div class="card-body p-2 small">
-                            <div class="row g-2">
-                                <!--<div class="col-6  col-sm-4 col-lg-12">
-                                    <div class="form-floating">
-                                        <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchCustomer" placeholder="Code" class="form-control-plaintext border-bottom">
-                                        <label for="search_by_code" class="">Code</label>
+          <div class="modal-content bg-light"> 
+            <div class="container-fluid p-2">
+                <div class="row g-2">
+                    <!-- Left Sidebar: Search & Actions -->
+                    <div class="col-lg-3">
+                        <div class="card border-0 shadow-sm rounded-3">
+                            <div class="card-body p-3">
+                                <h6 class="fw-bold text-muted text-uppercase small mb-3">
+                                    <i class="fa-solid fa-filter me-2"></i>Search Filters
+                                </h6>
+                                
+                                <!-- Name Input -->
+                                <div class="mb-2">
+                                    <label class="small text-muted text-uppercase fw-bold mb-1">{{t('name')}}</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-0">
+                                            <i class="fa-solid fa-user text-secondary"></i>
+                                        </span>
+                                        <input 
+                                            type="search" 
+                                            id="search_by_name" 
+                                            v-model="search_by_name" 
+                                            @keypress.enter="searchCustomer" 
+                                            placeholder="Search by name" 
+                                            class="form-control bg-light border-0">
                                     </div>
-                                </div>-->
-                                <div class="col-6 col-sm-3 col-lg-12">
-                                    <div class="form-floating">
-                                        <input type="search" id="search_by_name" v-model="search_by_name" @keypress.enter="searchCustomer" placeholder="Description" class="form-control-plaintext border-bottom">
-                                        <label for="search_by_name" class="">{{t('name')}}</label>
-                                    </div> 
                                 </div>
-                                <div class="col-6 col-sm-3 col-lg-12">
-                                    <div class="form-floating">
-                                        <input type="search" id="search_by_address" v-model="search_by_address" @keypress.enter="searchCustomer" placeholder="Address" class="form-control-plaintext border-bottom">
-                                         <label for="search_by_address" class="">{{t('address')}}</label>
+
+                                <!-- Address Input -->
+                                <div class="mb-2">
+                                    <label class="small text-muted text-uppercase fw-bold mb-1">{{t('address')}}</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-0">
+                                            <i class="fa-solid fa-location-dot text-secondary"></i>
+                                        </span>
+                                        <input 
+                                            type="search" 
+                                            id="search_by_address" 
+                                            v-model="search_by_address" 
+                                            @keypress.enter="searchCustomer" 
+                                            placeholder="Search by address" 
+                                            class="form-control bg-light border-0">
+                                    </div>
                                 </div>
-                                </div> 
-                                <div class="col-4 col-sm-3 col-lg-4 d-grid">
-                                    <button class="btn btn-sm text-dark clear-search-product" @click="searchCustomer"><i class="fa-solid fa-search"></i> {{t('search_link')}}</button>
+
+                                <!-- Action Buttons -->
+                                <div class="d-flex gap-2 mb-3">
+                                    <button class="btn btn-primary flex-fill shadow-sm fw-medium" @click="searchCustomer">
+                                        <i class="fa-solid fa-search me-2"></i> {{t('search_link')}}
+                                    </button>
+                                    <button class="btn btn-light flex-fill shadow-sm fw-medium" @click="clearSearch">
+                                        <i class="fa-solid fa-filter-circle-xmark me-2"></i> {{t('clear_link')}}
+                                    </button>
+                                    <button class="btn btn-light flex-fill shadow-sm fw-medium text-danger" data-bs-dismiss="modal">
+                                        <i class="fa-solid fa-circle-xmark me-2"></i> {{t('close_link')}}
+                                    </button>
                                 </div>
-                                <div class="col-4 col-sm-3 col-lg-4 d-grid"><button class="btn btn-sm text-dark clear-search-customer" @click="clearSearch">
-                                    <i class="fa-solid fa-filter-circle-xmark"></i> {{t('clear_link')}} </button>
+
+                                <!-- Manage Customers Link -->
+                                <div class="border-top pt-3">
+                                    <router-link class="btn btn-success w-100 shadow-sm fw-medium" :to="{name : 'Customers'}">
+                                        <i class="fa-solid fa-users me-2"></i> {{t('customers')}}
+                                    </router-link>
                                 </div>
-                                <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateCustomer">
-                                    <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update </span>
-                                    <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
-                                </button></div>-->
-                                <div class="col-4 col-sm-3 col-lg-4 d-grid"><button class="btn btn-sm text-dark close-customer" data-bs-dismiss="modal">
-                                    <i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}} </button>
-                                </div>     
-                             </div> 
-                        </div>
-                       </div>            
-                       <div class="d-grid mt-3">
-                            <router-link class="btn btn-sm " :to="{name : 'Customers'}"><i class="fa-solid fa-users text-success"></i> {{t('customers')}}</router-link>
+                            </div>
                         </div>                                                                                           
-                   </div>                        
-                   <div class="col-lg-9">
-                       <div class="card shadow-sm">
-                           <div class="card-body p-0 vh-100 overflow-y-auto">
-                               <table class="table table-bordered table-hover mb-0">
-                                   <tbody class="small">
-                                       <tr class="text-center table-secondary fw-bold sticky-top z-3 change-cursor " >
-                                           <!--<td class="col-1" @click="sortCustomers('code')"><i class="fa-solid fa-sort"></i> Code</td>-->
-                                           <td @click="sortCustomers('name')" class="col-1"><i class="fa-solid fa-sort"></i> {{t('name')}}</td>
-                                           <td class="col-1" @click="sortCustomers('phone')"><i class="fa-solid fa-sort"></i> {{t('phone')}}</td>
-                                           <td class="col-1" @click="sortCustomers('address')"><i class="fa-solid fa-sort"></i> {{t('address')}}</td>
-                                           <td class="col-1" @click="sortCustomers('created_at')"><i class="fa-solid fa-sort"></i> {{t('member_since')}}</td>
-                                       </tr>
-                                   </tbody>
-                                   <tbody>
-                                     <tr @click="setCustomer(default_customer)" data-bs-dismiss="modal" class="change-cursor">
-                                        <!--<td class="text-center">{{default_customer.code}}</td>-->
-                                        <td>{{default_customer.name}}</td>
-                                        <td class="text-center">{{default_customer.phone}}</td>
-                                        <td>{{default_customer.address}}</td>
-                                        <td class="text-center">{{showTime(default_customer.created_at)}}</td>
-                                     </tr>
-                                       
-                                       <tr class="change-cursor" data-bs-dismiss="modal" @click="setCustomer(p)" v-if="customers.length > 0"  v-for="(p, i) in customers" :key="p.id" >                                         
-                                           <!--<td :class="{'table-secondary': sort_item ==='code'}" class="text-center">
-                                                {{p.code}}
-                                            </td>-->
-                                           <td :class="{'table-secondary': sort_item ==='name'}">
-                                                {{p.name}}
-                                           </td>
-                                           <td :class="{'table-secondary': sort_item ==='phone'}" class="text-center">
-                                                {{p.phone}}
-                                           </td>
-                                           <td :class="{'table-secondary': sort_item ==='address'}">
-                                                {{p.address}}
-                                           </td>
-                                           <td :class="{'table-secondary': sort_item ==='created_at'}" class="text-center">{{showTime(p.created_at)}}</td>
-                                       </tr>
-                                   </tbody>
-                               </table>
-                               <div v-if="isLoading">
-                                <div colspan="5">
-                                    <div class="d-flex justify-content-center my-5">
-                                        <div class="spinner-border text-primary"  role="status">
-                                          <span class="visually-hidden">Loading...</span>
+                    </div>
+
+                    <!-- Right: Customers Table -->
+                    <div class="col-lg-9">
+                        <div class="card border-0 shadow-sm rounded-3">
+                            <div class="card-body p-0">
+                                <div class="vh-100 overflow-y-auto">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="position-sticky top-0 z-3">
+                                            <tr class="table-light fw-bold cursor-pointer">
+                                                <th @click="sortCustomers('name')" class="col-3 border-0">
+                                                    <i class="fa-solid fa-sort me-1"></i>
+                                                    <i class="fa-solid fa-user me-1"></i>{{t('name')}}
+                                                </th>
+                                                <th class="col-2 text-center border-0" @click="sortCustomers('phone')">
+                                                    <i class="fa-solid fa-sort me-1"></i>
+                                                    <i class="fa-solid fa-phone me-1"></i>{{t('phone')}}
+                                                </th>
+                                                <th class="col-4 border-0" @click="sortCustomers('address')">
+                                                    <i class="fa-solid fa-sort me-1"></i>
+                                                    <i class="fa-solid fa-location-dot me-1"></i>{{t('address')}}
+                                                </th>
+                                                <th class="col-2 text-center border-0" @click="sortCustomers('created_at')">
+                                                    <i class="fa-solid fa-sort me-1"></i>
+                                                    <i class="fa-solid fa-calendar me-1"></i>{{t('member_since')}}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="small">
+                                            <!-- Default Customer -->
+                                            <tr @click="setCustomer(default_customer)" data-bs-dismiss="modal" class="cursor-pointer bg-light" style="transition: all 0.2s;">
+                                                <td class="fw-bold">
+                                                    <i class="fa-solid fa-star text-warning me-2"></i>{{default_customer.name}}
+                                                </td>
+                                                <td class="text-center text-muted">{{default_customer.phone}}</td>
+                                                <td class="text-muted">{{default_customer.address}}</td>
+                                                <td class="text-center">
+                                                    <span class="badge bg-secondary">{{showTime(default_customer.created_at)}}</span>
+                                                </td>
+                                            </tr>
+                                            
+                                            <!-- Customer List -->
+                                            <tr 
+                                                class="cursor-pointer" 
+                                                data-bs-dismiss="modal" 
+                                                @click="setCustomer(p)" 
+                                                v-if="customers.length > 0"  
+                                                v-for="(p, i) in customers" 
+                                                :key="p.id"
+                                                style="transition: all 0.2s;">
+                                                <td :class="{'table-secondary': sort_item ==='name'}" class="fw-medium">
+                                                    {{p.name}}
+                                                </td>
+                                                <td :class="{'table-secondary': sort_item ==='phone'}" class="text-center text-muted">
+                                                    {{p.phone}}
+                                                </td>
+                                                <td :class="{'table-secondary': sort_item ==='address'}" class="text-muted">
+                                                    {{p.address}}
+                                                </td>
+                                                <td :class="{'table-secondary': sort_item ==='created_at'}" class="text-center">
+                                                    <span class="badge bg-light text-dark border">{{showTime(p.created_at)}}</span>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Empty State -->
+                                            <tr v-if="!isLoading && customers.length === 0">
+                                                <td colspan="4" class="text-center text-muted py-5">
+                                                    <i class="fa-solid fa-users fa-3x mb-3 opacity-25"></i>
+                                                    <div class="h6">No customers found</div>
+                                                    <small>Try adjusting your search filters</small>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <!-- Loading State -->
+                                    <div v-if="isLoading" class="d-flex justify-content-center align-items-center py-5">
+                                        <div class="text-center">
+                                            <div class="spinner-border text-primary mb-3" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <div class="text-muted">Loading customers...</div>
                                         </div>
-                                      </div>
                                     </div>
-                                </div>                               
-                           </div>
-                       </div>
-                   </div>
-               </div>
-               </div>
-           </div>
-           </div>
-           </div>
-           </div>
-   </div>   
-    
-   </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+    </div>   
+    </div>
+     
+    </template>
    <script>
    import PageHeader from "@/views/partials/PageHeader.vue"
     import { useVuelidate  } from '@vuelidate/core'

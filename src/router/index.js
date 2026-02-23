@@ -1,59 +1,85 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Login from '@/views/auth/Login.vue'
 import Dashboard from "@/views/admin/Dashboard.vue"
+import DashboardOld from "@/views/admin/DashboardOld.vue"
 import Products from '@/views/products/Products.vue'
+import ProductsOld from '@/views/products/ProductsOld.vue'
 import Profile from "@/views/admin/Profile.vue"
 import AddPurchase from '@/views/purchase/Add.vue'
+import AddPurchaseOld from '@/views/purchase/AddOld.vue'
 import Purchase from '@/views/purchase/Purchase.vue'
+import PurchaseOld from '@/views/purchase/PurchaseOld.vue'
 import EditPurchase from '@/views/purchase/Edit.vue'
+import EditPurchaseOld from '@/views/purchase/EditOld.vue'
 import Stocks from '@/views/stocks/Stocks.vue'
+import StocksOld from '@/views/stocks/StocksOld.vue'
 import NewStocks from '@/views/stocks/New.vue'
+import NewStocksOld from '@/views/stocks/NewOld.vue'
 import EditStocks from '@/views/stocks/Edit.vue'
+import EditStocksOld from '@/views/stocks/EditOld.vue'
 import Sale from '@/views/sales/Sale.vue'
+import SaleOld from '@/views/sales/SaleOld.vue'
 import MobileSale from '@/views/sales/MobileSale.vue'
 import MobilePrint from '@/views/sales/MobilePrint.vue'
 import Suppliers from '@/views/suppliers/Suppliers.vue'
+import SuppliersOld from '@/views/suppliers/SuppliersOld.vue'
 import PrintSale from '@/views/sales/Print.vue'
 import Reports from '@/views/reports/Reports.vue'
+import ReportsOld from '@/views/reports/ReportsOld.vue'
 import ReportSales from '@/views/reports/Sales.vue'
+import ReportExpenses from "@/views/reports/Expenses.vue"
 import ReportStocks from '@/views/reports/Stocks.vue'
 import ReportPurchase from '@/views/reports/Purchase.vue'
 import ReportProduct from '@/views/reports/Products.vue'
 import Customers from '@/views/customer/Customers.vue'
+import CustomersOld from '@/views/customer/CustomersOld.vue'
 import store from "@/store"
-import NewTransfer from '@/views/transfers/New.vue'
-import Transfers from '@/views/transfers/Transfers.vue'
-import EditTransfer from '@/views/transfers/Edit.vue'
-import ReportsTransfers from '@/views/reports/Transfers.vue'
 import Adjustments from '@/views/adjustments/Adjustments.vue'
+import AdjustmentsOld from '@/views/adjustments/AdjustmentsOld.vue'
 import NewAdjustment from '@/views/adjustments/New.vue'
+import NewAdjustmentOld from '@/views/adjustments/NewOld.vue'
 import ReportAdjustments from '@/views/reports/Adjustments.vue'
 import SalesOnCredit from '@/views/sales/SalesOnCredit.vue'
+import SalesOnCreditOld from '@/views/sales/SalesOnCreditOld.vue'
 import ReportsSoc from '@/views/reports/Soc.vue'
 import BackupRestore from '@/views/backup/BackupRestore.vue'
 import EditSale from '@/views/sales/Edit.vue'
-import ReturnIn from '@/views/returnin/ReturnIn.vue'
-import EditReturnIn from '@/views/returnin/Edit.vue'
-import Returnout from '@/views/returnout/Returnout.vue'
-import EditReturnOut from '@/views/returnout/Edit.vue'
-import ReportReturnIn from '@/views/reports/ReturnIn.vue'
-import ReportReturnOut from '@/views/reports/ReturnOut.vue'
-import Test from '@/views/Test.vue'
+import EditSaleOld from '@/views/sales/EditOld.vue'
+
+import CustomerDisplay from '@/views/sales/CustomerDisplay.vue'
+
+import Expense from '@/views/expenses/Expense.vue'
+import ExpenseOld from '@/views/expenses/ExpenseOld.vue'
+import EditExpenseOld from '@/views/expenses/EditExpenseOld.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),  
   routes: [
+    {
+      path: '/expense',
+      name: 'Expense',     
+      component: store.getters.theme === "new" ? Expense : ExpenseOld,
+      meta : {title: "N-POS | Expense"}
+    },
+    {
+      path: '/expense/:id/edit',
+      name: 'EditExpense',
+      component: EditExpenseOld,
+      meta: { title: 'N-POS | Expense / Edit' }
+    },
+    {
+      path: "/customer-display", 
+      name: "CustomerDisplay", 
+      component: CustomerDisplay,
+      meta : {title : "N-POS | NTG Technology"}
+    },
     {
       path: '/mobile/print/:voucher_no',
       name: 'MobilePrint',     
       component: MobilePrint,
       meta : {title: "N-POS | Print"}
     },
-    {
-      path: "/test",
-      name: "Test",
-      component:Test
-    },
+ 
     {
       path: '/',
       name: 'Welcome',
@@ -71,41 +97,13 @@ const router = createRouter({
     {
       path: '/admin/dashboard',
       name: 'Dashboard',     
-      component: Dashboard,
+      component: store.getters.theme === "new" ? Dashboard : DashboardOld,
       meta : {title: "N-POS | Admin dashboard"}
-    },
-    {
-      path: '/return-out',
-      name: 'ReturnOut',     
-      component: Returnout,
-      meta : {title: "N-POS | Return Out"}
-
-    },
-    {
-      path: '/return-out/:id/edit',
-      name: 'EditReturnOut',     
-      component: EditReturnOut,
-      meta : {title: "N-POS | Return Out / Edit"}
-
-    },
-    {
-      path: '/return-in',
-      name: 'ReturnIn',     
-      component: ReturnIn,
-      meta : {title: "N-POS | Return In"}
-
-    },
-    {
-      path: '/return-in/:id/edit',
-      name: 'EditReturnIn',     
-      component: EditReturnIn,
-      meta : {title: "N-POS | Return In / Edit"}
-
     },
     {
       path: '/sale',
       name: 'Sale',     
-      component: Sale,
+      component: store.getters.theme === "new" ? Sale : SaleOld,
       meta : {title: "N-POS | Sale"}
     },
     {
@@ -118,14 +116,14 @@ const router = createRouter({
     {
       path: '/sale/:id/edit',
       name: 'EditSale',     
-      component: EditSale,
+      component: store.getters.theme === "new" ? EditSale : EditSaleOld,
       meta : {title: "N-POS | Sale / Edit"}
 
     },
     {
       path: '/soc',
       name: 'Soc',     
-      component: SalesOnCredit,
+      component: store.getters.theme === "new" ? SalesOnCredit : SalesOnCreditOld,
       meta : {title: "N-POS | SOC"}
 
     },
@@ -138,63 +136,63 @@ const router = createRouter({
     {
       path: '/products',
       name: 'Products',     
-      component: Products,
+      component: store.getters.theme === "new" ? Products : ProductsOld,
       meta : {title: "N-POS | Product Code"}
 
     },
     {
       path: '/stocks',
       name: 'Stocks',     
-      component: Stocks,
+      component: store.getters.theme === "new" ? Stocks : StocksOld,
       meta : {title: "N-POS |  Stocks / History"}
 
     },
     {
       path: '/stocks/new',
       name: 'NewStocks',     
-      component: NewStocks,
+      component: store.getters.theme === "new" ? NewStocks : NewStocksOld,
       meta : {title: "N-POS | Stocks / New"}
     },
     {
       path: '/stocks/:id/edit',
       name: 'EditStocks',     
-      component: EditStocks,
+      component: store.getters.theme === "new" ? EditStocks : EditStocksOld,
       meta : {title: "N-POS | Stocks / Edit"}
     },
     {
       path: '/purchase',
       name: 'Purchase',     
-      component: Purchase,
+      component: store.getters.theme === "new" ? Purchase : PurchaseOld,
       meta : {title: "N-POS | Purchase / History"}
     },
     {
       path: '/purchase/:id/edit',
       name: 'EditPurchase',     
-      component: EditPurchase,
+      component: store.getters.theme === "new" ? EditPurchase : EditPurchaseOld,
       meta : {title: "N-POS | Purchase / Edit"}
     },
     {
       path: '/purchase/add',
       name: 'AddPurchase',     
-      component: AddPurchase,
+      component: store.getters.theme === "new" ? AddPurchase : AddPurchaseOld,
       meta : {title: "N-POS | Purchase / New"}    },
    
     {
       path: '/suppliers',
       name: 'Suppliers',     
-      component: Suppliers,
+      component: store.getters.theme === "new" ? Suppliers : SuppliersOld,
       meta : {title: "N-POS | Suppliers"}
     },
     {
       path: '/customers',
       name: 'Customers',     
-      component: Customers,
+      component: store.getters.theme === "new" ? Customers : CustomersOld,
       meta : {title: "N-POS | Customers"}
     },
     {
       path: "/reports",
       name: "Reports",
-      component: Reports,
+      component: store.getters.theme === "new" ? Reports : ReportsOld,
       meta : {title: "N-POS | Reports"}
     },
     {
@@ -203,12 +201,7 @@ const router = createRouter({
       component: ReportProduct,
       meta : {title: "N-POS | Report Medicine Code"}
     },
-    {
-      path: "/reports/transfers/:reportType/:fromDate/:toDate/:from_location/:to_location",
-      name: "ReportsTransfer",
-      component: ReportsTransfers,
-      meta : {title: "N-POS | Report Transfers"}
-    },
+    
     {
       path: "/reports/stocks/:reportType/:fromDate/:toDate/:location",
       name: "ReportsStocks",
@@ -220,6 +213,12 @@ const router = createRouter({
       name: "ReportsSales",
       component: ReportSales,
       meta : {title: "N-POS | Report Sales"}
+    },
+    {
+      path: "/reports/expenses/:reportType/:fromDate/:toDate",
+      name: "ReportsExpenses",
+      component: ReportExpenses,
+      meta : {title: "N-POS | Report Expenses"}
     },
     {
       path: "/reports/purchase/:reportType/:fromDate/:toDate/:location",
@@ -239,46 +238,18 @@ const router = createRouter({
       component: ReportsSoc,
       meta : {title: "N-POS | Report SOC"}
     },
-    {
-      path: "/reports/return-in/:reportType/:fromDate/:toDate",
-      name: "ReportsReturnIn",
-      component: ReportReturnIn,
-      meta : {title: "N-POS | Report Return In"}
-    },
-    {
-      path: "/reports/return-out/:reportType/:fromDate/:toDate",
-      name: "ReportsReturnOut",
-      component: ReportReturnOut,
-      meta : {title: "N-POS | Report Return Out"}
-    },
-    {
-      path: '/transfers/:id/edit',
-      name: 'EditTransfer',     
-      component: EditTransfer,    
-      meta: { title: 'N-POS | Transfer / Edit' },
-    },
-    {
-      path: '/transfers/new',
-      name: 'AddTransfer',     
-      component: NewTransfer,    
-      meta: { title: 'N-POS | Transfer / New' },
-    },
-    {
-      path: '/transfer',
-      name: 'Transfers',     
-      component: Transfers,    
-      meta: { title: 'N-POS | Transfer' },
-    },
+   
+  
     {
       path: '/adjustments',
       name: 'Adjustments',     
-      component: Adjustments,
+      component: store.getters.theme === "new" ? Adjustments : AdjustmentsOld,
       meta : {title: "N-POS | Adjustment"}
     },
     {
       path: '/adjustments/add',
       name: 'NewAdjustment',     
-      component: NewAdjustment,
+      component: store.getters.theme === "new" ? NewAdjustment : NewAdjustmentOld,
       meta : {title: "N-POS | Adjustment / New"}
     },
    

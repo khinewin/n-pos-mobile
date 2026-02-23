@@ -1,11 +1,14 @@
 <template lang="">
     <div class="container-fluid">  
         <div v-if="isLoading">
-                <div class="d-flex justify-content-center my-5">
-                    <div class="spinner-border text-primary"  role="status">
-                      <span class="visually-hidden">Loading...</span>
-                    </div>
+            <div class="d-flex justify-content-center my-5">
+                <div class="spinner-border text-primary"  role="status">
+                  <span class="visually-hidden">Loading...</span>
                 </div>
+            </div>
+        </div>
+        <div v-if="!isLoading && reports.length === 0" class="text-center my-5">
+            <h5 class="text-muted">No data available</h5>
         </div>  
          <div class="row" v-if="reports" v-for="stock in reports">
             <div class="col-12 mb-2">
@@ -54,7 +57,8 @@
                                     <td class="col-1" v-if="location=='Mart' || location=='All'">Mart Inv Bal</td>                          
                                     <td class="col-1">Pur Price</td>
                                     <td class="col-1">Sale Price</td>
-                                    <!--<td class="col-1">Wholesale Price</td>-->  
+                                    <td class="col-1">Total Pur</td>
+                                    <td class="col-1">Total Sale</td>
                                 </tr>
                                 <tr class=""v-if="stock.products.length > 0" v-for="(p, i) in stock.products" :key="p.id">
                                     <td class="text-center">                                       
@@ -76,20 +80,30 @@
                                     <td class="text-end">
                                              {{displayPrice(p.retail_price.largest_unit, p.retail_price.medium_unit, p.retail_price.smallest_unit)}}
                                     </td>
-                                    <!--<td class="text-end">
-                                            {{displayPrice(p.whole_sale_price.largest_unit, p.whole_sale_price.medium_unit, p.whole_sale_price.smallest_unit)}}
-                                    </td>-->                                   
+                                    <td class="text-end">
+                                        {{fM(p.pur_amount)}}
+                                    </td>
+                                    <td class="text-end">
+                                        {{fM(p.retail_amount)}}
+                                    </td>                                  
                                 </tr>    
                                 <tr>
-                                    <td :colspan="[location=='All' ? 5 : 4]" class="text-end fw-bold pe-2">Total Amount (Ks)</td>
-                                    <td class="text-end ">{{fM(stock.retail_amount)}}</td>
-                                    <!--<td class="text-end ">{{fM(stock.whole_sale_amount)}}</td>-->
+                                    <td :colspan="[location=='All' || location=='Mart' ? 6 : 5]" class="text-end fw-bold pe-2">Total Amount (Ks)</td>
+                                    <td class="text-end fw-bold">{{fM(stock.pur_amount)}}</td>
+                                    <td class="text-end fw-bold">{{fM(stock.retail_amount)}}</td>
                                 </tr>                                                                                     
                             </tbody>
                         </table>     
                         </div>                                
                     </div>
                 </div>
+            </div>
+         </div>
+         <div class="row pt-3 border-top mt-3" v-if="reports.length > 0">
+            <div class="col-12 text-end fw-bold py-2 bg-light border">
+                 Grand Total ({{reports.length}} Vouchers) — 
+                 Total Pur: <span class="text-primary">{{fM(total_pur_amount)}}</span> | 
+                 Total Sale: <span class="text-success">{{fM(total_sale_amount)}}</span>
             </div>
          </div>
     </div>
@@ -113,8 +127,14 @@ export default {
                 type :"",
                 info :"",
             },       
+            unsubscribe: null,
         }
     },   
+    beforeUnmount() {
+        if (this.unsubscribe) {
+            this.unsubscribe();
+        }
+    },
     mounted() {    
                 this.isLoading=true;
                 this.fetchStocks();  
@@ -146,7 +166,12 @@ export default {
         report_type(){
             return this.$store.getters.reportType;
         },
-      
+        total_pur_amount() {
+            return this.reports.reduce((total, s) => total + (s.pur_amount || 0), 0);
+        },
+        total_sale_amount() {
+            return this.reports.reduce((total, s) => total + (s.retail_amount || 0), 0);
+        },
     },
     methods:{
         fM(amount){
@@ -183,7 +208,7 @@ export default {
              query_url = query(collection(db, "stocks"),  
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
             }
-            onSnapshot(query_url, (snapShot)=>{ //all on snapshot
+            this.unsubscribe =  onSnapshot(query_url, (snapShot)=>{ //all on snapshot
                 let stockItems=ss.stocks(snapShot);       
                 if(this.code_no){            
                     stockItems=stockItems.map((st)=>{
@@ -196,12 +221,20 @@ export default {
                 stockItems=stockItems.map((i)=>{
                     let retail_amount=0;
                     let whole_sale_amount=0;
-                    i.products.map((rep)=>{
-                        retail_amount +=this.location=="All" ? (rep.qty + rep.main_qty) * rep.retail_price.smallest_unit : this.location=="Main" ? rep.main_qty * rep.retail_price.smallest_unit : rep.qty * rep.retail_price.smallest_unit ;
-                        whole_sale_amount += this.location=="All" ? rep.whole_sale_price.smallest_unit * (rep.qty + rep.main_qty) : this.location=="Main" ? rep.whole_sale_price.smallest_unit *rep.main_qty : rep.whole_sale_price.smallest_unit *rep.qty;
-
+                    let pur_amount=0;
+                    const products = i.products.map((rep)=>{
+                        const q = this.location=="All" ? (rep.qty + rep.main_qty) : this.location=="Main" ? rep.main_qty : rep.qty;
+                        const p_pur = q * rep.pur_price.smallest_unit;
+                        const p_retail = q * rep.retail_price.smallest_unit;
+                        const p_whole = q * rep.whole_sale_price.smallest_unit;
+                        
+                        pur_amount += p_pur;
+                        retail_amount += p_retail;
+                        whole_sale_amount += p_whole;
+                        
+                        return { ...rep, pur_amount: p_pur, retail_amount: p_retail, whole_sale_amount: p_whole }
                     })
-                    return {...i, retail_amount: retail_amount, whole_sale_amount: whole_sale_amount}
+                    return {...i, products, pur_amount, retail_amount, whole_sale_amount}
                 })           
                 this.reports=stockItems; 
                 this.isLoading=false;

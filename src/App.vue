@@ -3,7 +3,7 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>     
-        <div class="roboto-regular">                     
+        <div class="roboto-regular my-0 py-0">                     
                 <RouterView />       
         </div>        
 </template>

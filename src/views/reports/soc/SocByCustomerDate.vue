@@ -1,6 +1,9 @@
 <template lang="">
     <div class="overflow-x-auto">
         <table class="table table-bordered border-dark table-hover inside-table">
+            <tbody v-if="!isLoading && reports.length === 0">
+                <tr><td colspan="2" class="text-center text-muted py-4">No data available</td></tr>
+            </tbody>
             <tbody class="" v-if="reports.length > 0">                            
                 <tr v-for="r in reports" :key="r[0]">
                     <td class="col-1 text-center">{{r[0]}}</td>
@@ -75,12 +78,10 @@
              
             </tbody>
         </table>
-        <div v-if="isLoading">
-                <div class="d-flex justify-content-center my-5">
-                    <div class="spinner-border text-primary"  role="status">
-                      <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
+        <div v-if="isLoading" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </div>                                      
     </div>
 </template>
@@ -104,23 +105,20 @@ export default {
             total_paid: 0,
             total_credit:0,
             isLoading:false,
+            unsub: null,
             msg : {
                 type :"",
                 info :"",
             },        
-
         }
     },
    
     mounted() {    
-                this.isLoading=true;
-                this.fetchSales();  
-            
-            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType="by_date"){
-                this.displayReportType="by Date"
-            }
+        this.isLoading = true;
+        this.fetchSales();
+    },
+    beforeUnmount() {
+        if (this.unsub) this.unsub();
     },
    watch:{
    
@@ -281,13 +279,12 @@ export default {
                  where("credit", ">", 0),
                   orderBy("sale_date", "desc"));
             }
-           onSnapshot(query_url, (snapShot)=>{
-            let saleItems=ss.sales(snapShot)       
-          //  saleItems=saleItems.filter((f)=>f.credit > 0)     
-            this.salesData=saleItems;
-            this.displayReports();
-            this.isLoading=false;
-           })            
+            this.unsub = onSnapshot(query_url, (snapShot) => {
+                let saleItems = ss.sales(snapShot)
+                this.salesData = saleItems;
+                this.displayReports();
+                this.isLoading = false;
+            })
         }
     }
 }

@@ -11,11 +11,12 @@
                     <td class="col-1" v-if="location=='Mart' || location=='All'">Mart Inv Bal</td>                                           
                     <td class="col-1">Pur Price</td>
                     <td class="col-1">Sale Price</td>
-                    <!--<td class="col-1">Wholesale Price</td>-->    
+                    <td class="col-1">Total Pur</td>
+                    <td class="col-1">Total Sale</td>
                 </tr>
             </tbody>
             <tbody v-if="reports.length > 0" v-for="r in reports" :key="r[0]" class="table-group-divider">       
-                <tr><td class="text-center" :rowspan="r[1].length + 2">{{r[0]}}</td></tr>                                     
+                <tr><td class="text-center" :rowspan="r[1].length + 1">{{r[0]}}</td></tr>                                     
                 <tr v-for="p in r[1]" :key="p.code_no">
                     <td class="text-center">{{p.code_no}}</td>
                     <td class="">{{p.item_name}}</td>
@@ -34,14 +35,26 @@
                     <td class="text-end">
                              {{displayPrice(p.retail_price.largest_unit, p.retail_price.medium_unit, p.retail_price.smallest_unit)}}
                     </td>
-                    <!--<td class="text-end">
-                            {{displayPrice(p.whole_sale_price.largest_unit, p.whole_sale_price.medium_unit, p.whole_sale_price.smallest_unit)}}
-                    </td>-->
+                    <td class="text-end">
+                        {{fM(p.pur_amount)}}
+                    </td>
+                    <td class="text-end">
+                        {{fM(p.retail_amount)}}
+                    </td>
                 </tr>
                 <tr>
-                    <td :colspan="[location=='All' ? 5 : 4]" class="text-end fw-bold  pe-2">Total Amount (Ks)</td>
+                    <td :colspan="[location=='All' || location=='Mart' ? 7 : 6]" class="text-end fw-bold  pe-2">Total Amount (Ks)</td>
+                    <td class="text-end fw-bold"> {{fM(r[2].pur_amount)}}</td>
                     <td class="text-end fw-bold"> {{fM(r[2].retail_amount)}}</td>
-                    <!--<td class="text-end fw-bold"> {{fM(r[2].whole_sale_amount)}}</td>-->
+                </tr>
+            </tbody>
+            <tbody v-if="reports.length > 0" class="table-group-divider">
+                <tr class="fw-bold text-end">
+                    <td :colspan="[location=='All' || location=='Mart' ? 7 : 6]">
+                        Grand Total (Ks)
+                    </td>
+                    <td>{{fM(total_pur_amount)}}</td>
+                    <td>{{fM(total_sale_amount)}}</td>
                 </tr>
             </tbody>
         </table>
@@ -51,9 +64,13 @@
                   <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
+        </div>
+        <div v-if="!isLoading && reports.length === 0" class="text-center my-5">
+            <h5 class="text-muted">No data available</h5>
+        </div>
     </div>                                                                                           
           
-    </div>
+    
 </template>
 <script>
 import {Timestamp, onSnapshot, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
@@ -74,8 +91,8 @@ export default {
             msg : {
                 type :"",
                 info :"",
-            },        
-
+            },       
+            unsubscribe: null,
         }
     },
    
@@ -88,6 +105,11 @@ export default {
             if(this.reportType="by_date"){
                 this.displayReportType="by Date"
             }
+    },
+    beforeUnmount() {
+        if (this.unsubscribe) {
+            this.unsubscribe();
+        }
     },
    watch:{
    
@@ -110,7 +132,12 @@ export default {
         report_type(){
             return this.$store.getters.reportType;
         },
-      
+        total_pur_amount() {
+            return this.reports.reduce((total, r) => total + r[2].pur_amount, 0);
+        },
+        total_sale_amount() {
+            return this.reports.reduce((total, r) => total + r[2].retail_amount, 0);
+        },
     },
     methods:{
         fM(amount){
@@ -172,17 +199,17 @@ export default {
                     item.pur_price =rep.pur_price;
                     item.packing_size=rep.packing_size;
                     item.retail_price =rep.retail_price;
-                    item.retail_amount +=this.location=="All" ? (rep.qty + rep.main_qty) * rep.retail_price.smallest_unit : this.location=="Main" ? rep.main_qty * rep.retail_price.smallest_unit : rep.qty * rep.retail_price.smallest_unit ;
+                    const q = this.location=="All" ? (rep.qty + rep.main_qty) : this.location=="Main" ? rep.main_qty : rep.qty;
+                    item.pur_amount += q * rep.pur_price.smallest_unit;
+                    item.retail_amount += q * rep.retail_price.smallest_unit;
                     item.whole_sale_price =rep.whole_sale_price;
-                    item.whole_sale_amount += this.location=="All" ? rep.whole_sale_price.smallest_unit * (rep.qty + rep.main_qty) : this.location=="Main" ? rep.whole_sale_price.smallest_unit *rep.main_qty : rep.whole_sale_price.smallest_unit *rep.qty;
-                   // item.main_retail_amount += rep.retail_price.smallest_unit * rep.main_qty;
-                   // item.main_whole_sale_amount += rep.whole_sale_price.smallest_unit * rep.main_qty;
-                   
+                    item.whole_sale_amount += q * rep.whole_sale_price.smallest_unit;
                 })
                 return item;
                 }).sort((a,b)=>a.code_no - b.code_no)
-                let res3={retail_amount:0, whole_sale_amount:0, main_retail_amount:0, main_whole_sale_amount:0}
+                let res3={pur_amount:0, retail_amount:0, whole_sale_amount:0, main_retail_amount:0, main_whole_sale_amount:0}
                 res2.map((res)=>{
+                    res3.pur_amount += res.pur_amount;
                     res3.retail_amount += res.retail_amount;
                     res3.whole_sale_amount += res.whole_sale_amount;
                    // res3.main_retail_amount += res.main_retail_amount;
@@ -208,7 +235,7 @@ export default {
             
             const query_url = query(collection(db, "stocks"), 
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
-            onSnapshot(query_url, (snapShot)=>{
+            this.unsubscribe = onSnapshot(query_url, (snapShot)=>{
                 const stockItems=ss.stocks(snapShot);           
                 this.stocksData=stockItems;
                 this.displayReports();

@@ -10,7 +10,8 @@
                     <td class="col-1" v-if="location=='Mart' || location=='All'">Mart Inv Bal</td>                                           
                     <td class="col-1">Pur Price</td>
                     <td class="col-1">Sale Price</td>
-                    <!--<td class="col-1">Wholesale Price</td>-->                                            
+                    <td class="col-1">Total Pur</td>
+                    <td class="col-1">Total Sale</td>
                 </tr>   
                 </tbody>
                 <tbody  v-if="reports.length > 0">                     
@@ -32,28 +33,34 @@
                     <td class="text-end">
                              {{displayPrice(p.retail_price.largest_unit, p.retail_price.medium_unit, p.retail_price.smallest_unit)}}
                     </td>
-                    <!--<td class="text-end">
-                            {{displayPrice(p.whole_sale_price.largest_unit, p.whole_sale_price.medium_unit, p.whole_sale_price.smallest_unit)}}
-                    </td>-->
+                    <td class="text-end">
+                        {{fM(p.pur_amount)}}
+                    </td>
+                    <td class="text-end">
+                        {{fM(p.retail_amount)}}
+                    </td>
                     </tr>
                    
                
             </tbody>
             <tbody class="table-group-divider" v-if="reports.length > 0">
                 <tr>
-                    <td :colspan="[location=='All' ? 5 : 4]" class="text-end fw-bold pe-2">Total Amount (Ks)</td>                        
-                    <td class="text-end">{{fM(total_retail_amount)}}</td>
-                    <!--<td class="text-end">{{fM(total_whole_sale_amount)}}</td>-->
+                    <td :colspan="[location=='All' || location=='Mart' ? 6 : 5]" class="text-end fw-bold pe-2">Total Amount (Ks)</td>                        
+                    <td class="text-end fw-bold">{{fM(total_pur_amount)}}</td>
+                    <td class="text-end fw-bold">{{fM(total_retail_amount)}}</td>
                 </tr>
             </tbody>
         </table>
         <div v-if="isLoading">
-                <div class="d-flex justify-content-center my-5">
-                    <div class="spinner-border text-primary"  role="status">
-                      <span class="visually-hidden">Loading...</span>
-                    </div>
+            <div class="d-flex justify-content-center my-5">
+                <div class="spinner-border text-primary"  role="status">
+                  <span class="visually-hidden">Loading...</span>
                 </div>
-        </div>                                              
+            </div>
+        </div>
+        <div v-if="!isLoading && reports.length === 0" class="text-center my-5">
+            <h5 class="text-muted">No data available</h5>
+        </div>
     </div>
 </template>
 <script>
@@ -71,16 +78,12 @@ export default {
         return{                
             reports:[],
             stocksData:[],
-            total_pur_amount:0,
-            total_retail_amount:0,
-            total_whole_sale_amount:0,
-            total_main_retail_amount:0,
-            total_main_whole_sale_amount:0,
             isLoading:false,
             msg : {
                 type :"",
                 info :"",
             },       
+            unsubscribe: null,
         }
     },
    
@@ -93,6 +96,11 @@ export default {
             if(this.reportType="by_date"){
                 this.displayReportType="by Date"
             }
+    },
+    beforeUnmount() {
+        if (this.unsubscribe) {
+            this.unsubscribe();
+        }
     },
    watch:{
    
@@ -114,7 +122,13 @@ export default {
         },
         report_type(){
             return this.$store.getters.reportType;
-        },      
+        },
+        total_pur_amount() {
+            return this.reports.reduce((total, p) => total + p.pur_amount, 0);
+        },
+        total_retail_amount() {
+            return this.reports.reduce((total, p) => total + p.retail_amount, 0);
+        },
     },
     methods:{
         fM(amount){
@@ -172,20 +186,18 @@ export default {
                     item.qty += rep.qty;
                     item.pur_price =rep.pur_price;
                     item.retail_price =rep.retail_price;
-                    item.retail_amount +=this.location=="All" ? (rep.qty + rep.main_qty) * rep.retail_price.smallest_unit : this.location=="Main" ? rep.main_qty * rep.retail_price.smallest_unit : rep.qty * rep.retail_price.smallest_unit ;
+                    const q = this.location=="All" ? (rep.qty + rep.main_qty) : this.location=="Main" ? rep.main_qty : rep.qty;
+                    item.pur_amount += q * rep.pur_price.smallest_unit;
+                    item.retail_amount += q * rep.retail_price.smallest_unit;
                     item.whole_sale_price =rep.whole_sale_price;
-                    item.whole_sale_amount += this.location=="All" ? rep.whole_sale_price.smallest_unit * (rep.qty + rep.main_qty) : this.location=="Main" ? rep.whole_sale_price.smallest_unit *rep.main_qty : rep.whole_sale_price.smallest_unit *rep.qty;
+                    item.whole_sale_amount += q * rep.whole_sale_price.smallest_unit;
                     item.main_qty += rep.main_qty;
                     item.packing_size =rep.packing_size;
                 })
                 return item;
             }).sort((a,b)=>a.code_no - b.code_no)
-                     
-               res2.map((ren)=>{
-                    this.total_retail_amount += ren.retail_amount;
-                     this.total_whole_sale_amount+= ren.whole_sale_amount;                    
-               })
-              this.reports=[...res2];        
+                      
+            this.reports=[...res2];        
         },      
         async fetchStocks(){
             const date=new Date();         
@@ -198,7 +210,7 @@ export default {
             
             const query_url = query(collection(db, "stocks"),
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
-            onSnapshot(query_url, (snapShot)=>{
+            this.unsubscribe =  onSnapshot(query_url, (snapShot)=>{
                 const stockItems=ss.stocks(snapShot);           
                 this.stocksData=stockItems;
                 this.displayReports();

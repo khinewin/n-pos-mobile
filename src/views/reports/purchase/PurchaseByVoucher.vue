@@ -1,15 +1,14 @@
 <template lang="">
     <div class="container-fluid">  
-        <div v-if="isLoading">
-            <div colspan="5">
-                <div class="d-flex justify-content-center my-5">
-                    <div class="spinner-border text-primary"  role="status">
-                      <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
+        <div v-if="isLoading" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
-        </div>  
-         <div class="row" v-if="reports" v-for="p in reports">
+        </div>
+        <div v-else-if="reports.length === 0" class="text-center text-muted py-5">
+            No data available
+        </div>
+        <div class="row" v-else v-for="p in reports">
             <div class="mb-2 col-12">
                 <div class="card">
                     <div class="card-body p-2">
@@ -131,6 +130,7 @@ export default {
             reports:[],
             purchaseData:[],
             isLoading:false,
+            unsub: null,
             msg : {
                 type :"",
                 info :"",
@@ -139,14 +139,11 @@ export default {
     },
    
     mounted() {    
-                this.isLoading=true;
-                this.fetchPurchase();  
-            
-            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType="by_date"){
-                this.displayReportType="by Date"
-            }
+        this.isLoading = true;
+        this.fetchPurchase();
+    },
+    beforeUnmount() {
+        if (this.unsub) this.unsub();
     },
    watch:{
    
@@ -222,11 +219,11 @@ export default {
              query_url = query(collection(db, "purchases"), 
             where("pur_date", ">=", from_date), where("pur_date", "<=", to_date), orderBy("pur_date", "desc"));
            }           
-           onSnapshot(query_url, (snapShot)=>{
-                const purchaseItems=ss.purchases(snapShot)
-                this.reports=purchaseItems;
-                this.isLoading=false;
-           })
+            this.unsub = onSnapshot(query_url, (snapShot) => {
+                const purchaseItems = ss.purchases(snapShot)
+                this.reports = purchaseItems;
+                this.isLoading = false;
+            })
         }
     }
 }

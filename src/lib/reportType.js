@@ -35,6 +35,9 @@ const displayReportType=(reportType)=>{
    }else
     if(reportType==='by_exp_date'){
         return "by Expire date"
+   }else
+    if(reportType==='by_category'){
+        return "by Category"
    }
 }
    

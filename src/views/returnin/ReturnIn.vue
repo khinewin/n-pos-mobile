@@ -189,18 +189,28 @@ import db from '@/firebase/firestore'
 //import Products from "@/views/sales/Products.vue"
 import ReturnInModal from "@/views/modals/sales/ReturnInModal.vue"
 import CustomerModal from "@/views/modals/sales/CustomerModal.vue"
+import CustomerModalOld from "@/views/modals/sales/CustomerModalOld.vue"
 import Print from "@/views/returnin/Print.vue"
 import ProductModal from "@/views/modals/sales/ProductModal.vue"
+import ProductModalOld from "@/views/modals/sales/ProductModalOld.vue"
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/products"
 import setQtyModal from "@/views/modals/setQtyModal.vue";
+import setQtyModalOld from "@/views/modals/setQtyModalOld.vue";
 import setDiscountModal from "@/views/modals/setDiscountModal.vue";
 import FlatPickr from 'vue-flatpickr-component';
 import * as hc from "@/lib/handleCtrl"
 
 export default {
     components: {
-        PageHeader,ReturnInModal,CustomerModal,Print, ProductModal,setQtyModal,setDiscountModal, FlatPickr
+        PageHeader,
+        ReturnInModal,
+        CustomerModal: store.getters.theme === "new" ? CustomerModal : CustomerModalOld,
+        Print, 
+        ProductModal: store.getters.theme === "new" ? ProductModal : ProductModalOld,
+        setQtyModal: store.getters.theme === "new" ? setQtyModal : setQtyModalOld,
+        setDiscountModal, 
+        FlatPickr
     },
     setup () {
         return { v$: useVuelidate() }

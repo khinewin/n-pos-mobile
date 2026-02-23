@@ -1,7 +1,7 @@
 <template lang="">
-    <div>
+  
             <div class="justify-content-center">
-                <div class="text-white">     
+                <div class="text-light">     
                         <div class="h5 mb-3">Upgrade Your Mini Mart with</div>     
                         <div class="h2 mb-3">N-POS Software</div>                                                                 
                         <div class="mb-2"><i class="fa-solid fa-circle-check"></i> Fast Checkout</div>
@@ -13,7 +13,7 @@
                  
                 </div>
             </div>
-    </div>
+
 </template>
 <script>
 export default {

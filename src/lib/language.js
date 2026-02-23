@@ -1,4 +1,16 @@
 export const lang={
+    confirm_delete:{
+        eng:"Confirm Delete",
+        mm:"အတည်ပြုရန်"
+    },
+    expense:{
+        eng:"Expense",
+        mm:"အသုံးစရိတ်များ"
+    },
+    advanced_filters:{
+        eng:"Advanced Filters",
+        mm:"အဆင့်မြင့်ရှာဖွေမှု"
+    },
     categories:{
         eng: "Categories",
         mm:"အမျိုးအစားများ"
@@ -106,6 +118,10 @@ export const lang={
     number:{
         eng: "No.",
         mm:"စဥ်"
+    },
+    actions:{
+        eng: "Actions",
+        mm:"လုပ်ဆောင်ချက်များ"
     },
     address:{
         eng:"Address",
@@ -289,6 +305,10 @@ export const lang={
         eng: "Product name",
         mm:"ကုန်ပစ္စည်းအမည်"
     },
+     set_price:{
+        eng: "Set Price",
+        mm:"စျေးသတ်မှတ်ရန်"
+    },
     pur_price:{
         eng: "Pur Price",
         mm:"ဝယ်စျေး"
@@ -317,7 +337,11 @@ export const lang={
         eng:"Update",
         mm: "အပ်ဒိတ်"
     },
-    search_link:{
+    member_since:{
+        eng:"Member Since",
+        mm: "အဖွဲ့ဝင်ဖြစ်သည့်နေ့"
+    },
+    search_link:{   
         eng: "Search",
         mm:"ရှာမည်"
     },
@@ -360,6 +384,18 @@ export const lang={
     new_link : {
         eng :"New",
         mm: "အသစ်"
+    },
+    theme : {
+        eng : "Theme",
+        mm: "ဆောင်ပုဒ်"
+    },
+    new_theme : {
+        eng : "New Version",
+        mm: "ဗားရှင်းအသစ်"
+    },
+    old_theme : {
+        eng : "Old Version",
+        mm: "ဗားရှင်းအဟောင်း"
     }
 
 }

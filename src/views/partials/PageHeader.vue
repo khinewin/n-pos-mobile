@@ -29,15 +29,18 @@
 <script>
     import RightSidebar from '@/views/partials/RightSidebar.vue';
     import LeftSidebar from "@/views/partials/LeftSidebar.vue"
+    import RightSidebarOld from '@/views/partials/RightSidebarOld.vue';
+    import LeftSidebarOld from "@/views/partials/LeftSidebarOld.vue"
     import Navbar from "@/views/partials/Navbar.vue"
     import LeftMenuBtn from '@/views/partials/LeftMenuBtn.vue'
     import db from '@/firebase/firestore'
+    import store from "@/store"
     import { enableNetwork, disableNetwork } from "firebase/firestore"; 
 
 export default {
     props: ['pageTitle', 'isOffline', 'msgType', 'msgInfo',],
     components : {
-        LeftMenuBtn, RightSidebar, LeftSidebar, Navbar
+        LeftMenuBtn, RightSidebar: store.getters.theme === "new" ? RightSidebar : RightSidebarOld, LeftSidebar: store.getters.theme === "new" ? LeftSidebar : LeftSidebarOld, Navbar
     },
     mounted() {
         this.checkConnection();

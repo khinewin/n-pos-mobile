@@ -1,501 +1,583 @@
-<template lang="">       
-    <div>           
-           <PageHeader :page-title="pageTitle" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info"/>
-           <div class="container-fluid">
-               <div class="row  justify-content-end">  
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button type="button" class="btn btn-sm" :disabled="isUpdating || Object.keys(editItem).length===0" @click="saveEdit">
-                        <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> {{t('update_link')}}</span>
-                        <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
-                    </button>
-                </div>  
-                <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
-                        <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
-                        <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
-                    </button>
-                </div>-->                           
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveSupplier">
-                        <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> {{t('save_link')}}</span>
-                        <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
-                    </button>
-                </div>   
-               </div>
-           </div>
-           <div class="container-fluid my-2">
-               <div class="row g-2">
-                   <div class="col-lg-3">
-                      <div class="card shadow">
-                        <div class="card-body p-2">
-                            <div class="row g-2">
-                                <!--<div class="form-floating col-sm-4 col-lg-12">
-                                    <input type="search" id="search_by_code" v-model="search_by_code" @keypress.enter="searchSuppliers" placeholder="Code" class="form-control-plaintext border-bottom ">
-                                    <label for="search_by_code" class="small">Code</label>
-                                </div>-->
-                                <div class="form-floating col-sm-3 col-lg-12">
-                                    <input type="search" id="search_by_name" v-model="search_by_name" @keypress.enter="searchSuppliers" placeholder="Description" class="form-control-plaintext border-bottom ">
-                                    <label for="search_by_name" class="small">{{t('name')}}</label>
-                                </div> 
-                                <div class="form-floating col-sm-3 col-lg-12">
-                                    <input type="search" id="search_by_company" v-model="search_by_company" @keypress.enter="searchSuppliers" placeholder="Company" class="form-control-plaintext border-bottom ">
-                                    <label for="search_by_company" class="small">{{t('company')}}</label>
-                                 </div> 
-                           
-                                    <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="searchSuppliers"><i class="fa-solid fa-magnifying-glass-arrow-right"></i>  {{t('search_link')}}</button></div>
-                                    <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateSuppliers"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
-                                        <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
-                                    </button></div>-->
-                                    <div class="col-6 col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> {{t('clear_link')}}</button></div>
-                             </div> 
+<template>
+    <div>
+        <PageHeader :page-title="pageTitle" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info"/>
+        <div class="container-fluid">
+        <div class="row g-3">
+            <!-- Sidebar: Search Filters -->
+            <div class="col-12 col-lg-3">
+                <div class="card border-0 shadow-sm rounded-3 fade-in sticky-top" style="top: 1rem; z-index: 10;">
+                    <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                        <h6 class="card-title fw-bold text-primary mb-0">
+                            <i class="fa-solid fa-filter me-2"></i>{{ t('search_link') }} <span class="badge float-end bg-primary rounded-pill">{{ suppliers.length }}</span>
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                             <div class="col-sm-6 col-lg-12">
+                                <div class="">
+                                    <label class="form-label small text-muted text-uppercase fw-bold">{{ t('name') }}</label>
+                                    <input 
+                                        type="search" class="form-control" :placeholder="t('name')"
+                                        v-model="search_by_name" @keydown.enter="performServerSearch"
+                                    >
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-lg-12">
+                                <div class="">
+                                    <label class="form-label small text-muted text-uppercase fw-bold">{{ t('company') }}</label>
+                                    <input 
+                                        type="search" class="form-control" :placeholder="t('company')"
+                                        v-model="search_by_company" @keydown.enter="performServerSearch"
+                                    >
+                                </div>
+                            </div>
+                             <div class="col-12">
+                                <div class="d-grid gap-2">
+                                     <button class="btn btn-primary" @click="performServerSearch">
+                                        <i class="fa-solid fa-search me-2"></i> {{ t('search_link') }}
+                                    </button>
+                                    <button class="btn btn-light text-danger" @click="clearSearch" v-if="search_by_name || search_by_company">
+                                        <i class="fa-solid fa-xmark me-2"></i> {{ t('clear_link') }}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                      </div>      
-                      <div class="mt-3 d-grid">
-                            <router-link class="btn btn-sm  " :to="{name : 'AddPurchase'}" ><i class="fa-solid fa-cart-shopping text-danger"></i>   {{t('purchase')}}</router-link>
-                        </div>                                                                                                  
-                   </div>                        
-                   <div class="col-lg-9">
-                       <div class="card shadow vh-75 overflow-y-auto">
-                           <div class="card-body p-2">
-                               <table class="table table-bordered table-hover mb-0">
-                                   <tbody class="table-secondary sticky-top z-3">
-                                       <!--<tr class="text-center table-secondary change-cursor">
-                                        <td class="col-0">
-                                        </td>
-                                           <td @click="sortSuppliers('name')" class="col4-"><i class="fa-solid fa-sort"></i> Name</td>
-                                           <td @click="sortSuppliers('phone')" class="col-2"><i class="fa-solid fa-sort"></i> Phone</td>
-                                           <td @click="sortSuppliers('company')" class="col-4"><i class="fa-solid fa-sort"></i> Company</td>
-                                           <td @click="sortSuppliers('created_at')" class="col-2"><i class="fa-solid fa-sort"></i> Date</td>
-                                       </tr>-->
-                                       <tr>
-                                        <td class="text-center">
-                                            <!--<input class="form-check-input" type="checkbox" @click="checkAll" v-model="is_deleted">-->
-                                        </td>
-                                            <!--<td class="">
-                                                <input @keypress.enter="saveSupplier" type="text" v-model="code" class="form-control-plaintext py-0 text-center" id="code" placeholder="Code">                                                                                       
-                                            </td>-->
-                                            <td class="">
-                                                <input @keypress.enter="saveSupplier" type="text" v-model="name" class="form-control py-1 textc " id="name" :placeholder="t('name')">                                               
-                                            </td>
-                                            <td class="">
-                                                <input @keypress.enter="saveSupplier" type="tel" v-model="phone"  class="form-control py-1  text-center" id="phone" :placeholder="t('phone')">                                            
-                                            </td>
-                                            <td class="">
-                                                <input @keypress.enter="saveSupplier" type="text" v-model="company"   class="form-control py-1" id="company" :placeholder="t('company')">                                              
-                                            </td>
-                                            <td class="">
-                                                <flat-pickr @change="saveSupplier" class="form-control py-1  text-center" v-model="created_at"  :config="config" />
+                    </div>
+                </div>
+
+                 <!-- Action Bar -->
+                 <div class="d-flex justify-content-between mt-3">
+                     <router-link class="btn shadow-sm px-4 fw-medium" :to="{name : 'AddPurchase'}" >
+                        <i class="fa-solid fa-cart-shopping me-2"></i> {{t('purchase')}}
+                    </router-link>
+                    <button class="btn btn-primary shadow-sm px-4 fw-medium" @click="openModal">
+                        <i class="fa-solid fa-plus me-2"></i> {{t('new_link')}}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content: Data Table -->
+            <div class="col-12 col-lg-9">
+                 <div class="fade-in">
+                    <!-- Table Card -->
+                    <div class="card border-0 shadow-sm rounded-3 vh-80 overflow-y-auto" >
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light text-secondary text-uppercase small fw-semibold">
+                                        <tr >
+                                            <th class="ps-4 border-0 py-3" style="width: 25%">{{t('name')}}</th>
+                                            <th class="border-0 py-3" style="width: 20%">{{t('phone')}}</th>
+                                            <th class="border-0 py-3" style="width: 30%">{{t('company')}}</th>
+                                            <th class="text-center border-0 py-3" style="width: 15%">{{t('member_since')}}</th>
+                                            <th class="text-end pe-4 border-0 py-3" style="width: 10%">{{t('actions')}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="isLoading">
+                                         <tr>
+                                            <td colspan="5" class="py-5 text-center">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
                                             </td>
                                         </tr>
-                                       </tbody>
-                                       <tbody v-if="suppliers.length > 0">
-                                       <tr class="text-center"   v-for="(p, i) in suppliers" :key="p.id"  >                                           
-                                        <td class="d-grid">
-                                            <!--<input class="form-check-input" type="checkbox" v-model="p.is_deleted">-->
-                                            <button :disabled="user.uid != p.user.uid" class="btn btn-sm text-danger" @click="removeSupplier(p)"><i class="fa-solid fa-trash"></i></button>
-                                        </td>
-                                           <!--<td :class="{'table-secondary': sort_item ==='code'}" class="position-relative">
-                                                <span class="position-absolute start-50 top-50 translate-middle">{{p.code}}</span>
-                                            </td>-->
-                                           <td :class="{'table-secondary': sort_item ==='name'}" class="">
-                                                <input v-if="editItem.id ==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1 m-0" v-model="p.name">
-                                                <div v-else class="pt-1 text-start" @click="setEdit(p)">{{p.name}}</div>
-                                           </td>
-                                           <td :class="{'table-secondary': sort_item ==='phone'}" class="">
-                                            <input  v-if="editItem.id==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control text-center py-1  m-0" v-model="p.phone">
-                                            <div v-else class="pt-1" @click="setEdit(p)">{{p.phone}}</div>
-                                           </td>
-                                           <td :class="{'table-secondary': sort_item ==='company'}" class="">
-                                            <input v-if="editItem.id==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1  m-0" v-model="p.company">
-                                            <div v-else class="pt-1 text-start" @click="setEdit(p)">{{p.company}}</div>
-                                           </td>
-                                           <td :class="{'table-secondary': sort_item ==='created_at'}" class="position-relative">
-                                                <span class="position-absolute start-50 top-50 translate-middle">{{showTime(p.created_at)}}</span>
-                                           </td>
-                                       </tr>
-                                   </tbody>
-                               </table>
-                               <div v-if="isLoading">
-                                <div colspan="5">
-                                    <div class="d-flex justify-content-center my-5">
-                                        <div class="spinner-border text-primary"  role="status">
-                                          <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                </div>                               
-                           </div>
-                       </div>
-                   </div>
-               </div>
-           </div>
-   </div>   
-    
-   </template>
-   <script>
-   import PageHeader from "@/views/partials/PageHeader.vue"
-    import { useVuelidate  } from '@vuelidate/core'
-import { required, email ,helpers} from '@vuelidate/validators'
-   import {disableNetwork ,Timestamp, collection, addDoc, setDoc, query, where, limit, getDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, onSnapshot } from 'firebase/firestore'
-   import db from '@/firebase/firestore'
-   import * as ss from '@/lib/snapshot/suppliers'
-   import * as hp from '@/lib/helper'
-   import FlatPickr from 'vue-flatpickr-component';
-   import * as search from '@/lib/search'
-   import {lang} from "@/lib/language"
-   
+                                    </tbody>
+                                    <tbody v-else-if="suppliers.length > 0">
+                                        <tr v-for="s in suppliers" :key="s.id" class="cursor-pointer transition-hover">
+                                             <td class="ps-4 py-2">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle me-3 bg-primary-subtle text-primary fw-bold shadow-sm" style="width: 38px; height: 38px;">
+                                                        {{ s.name.charAt(0).toUpperCase() }}
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-dark">{{ s.name }}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-secondary"><i class="fa-solid fa-phone me-2 small text-muted opacity-50"></i>{{ s.phone }}</td>
+                                            <td class="text-secondary"><i class="fa-solid fa-building me-2 small text-muted opacity-50"></i>{{ s.company }}</td>
+                                            <td class="text-center text-secondary small">{{ showTime(s.created_at) }}</td>
+                                            <td class="text-end pe-4">
+                                                <div class="btn-group">
+                                                    <button 
+                                                        class="btn btn-sm btn-light text-primary rounded-2 me-1" 
+                                                        @click.stop="editSupplier(s)" 
+                                                        title="Edit"
+                                                    >
+                                                        <i class="fa-solid fa-pen-to-square"></i>
+                                                    </button>
+                                                    <button 
+                                                        class="btn btn-sm btn-light text-danger rounded-2" 
+                                                        @click.stop="removeSupplier(s)" 
+                                                        :disabled="user.uid != s.user.uid"
+                                                        title="Delete"
+                                                    >
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                     <tbody v-else>
+                                        <tr>
+                                            <td colspan="5" class="text-center py-5 text-muted">
+                                                <div class="mb-3"><i class="fa-solid fa-inbox fa-3x opacity-25"></i></div>
+                                                <div>No suppliers found</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+        </div>
+        </div>
+        
+        <!-- Add/Edit Modal -->
+        <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="supplierModal" tabindex="-1" aria-hidden="true" ref="supplierModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header border-bottom-0 pb-0">
+                         <h5 class="modal-title fw-bold">{{ isUpdating ? 'Edit Supplier' : t('save_link') + ' Supplier' }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                         <form @submit.prevent="handleSubmit">
+                            <div class="mb-3">
+                                <label for="s_name" class="form-label small text-muted text-uppercase fw-bold">{{t('name')}}</label>
+                                <input type="text" class="form-control" id="s_name" v-model="form.name" :class="{'is-invalid': v$.form.name.$error}" placeholder="Enter supplier name">
+                                <div class="invalid-feedback" v-if="v$.form.name.$error">Name is required</div>
+                            </div>
+                             <div class="mb-3">
+                                <label for="s_phone" class="form-label small text-muted text-uppercase fw-bold">{{t('phone')}}</label>
+                                <input type="tel" class="form-control" id="s_phone" v-model="form.phone" :class="{'is-invalid': v$.form.phone.$error}" placeholder="Enter phone number">
+                                <div class="invalid-feedback" v-if="v$.form.phone.$error">Phone is required</div>
+                            </div>
+                             <div class="mb-3">
+                                <label for="s_company" class="form-label small text-muted text-uppercase fw-bold">{{t('company')}}</label>
+                                <input type="text" class="form-control" id="s_company" v-model="form.company" :class="{'is-invalid': v$.form.company.$error}" placeholder="Enter company">
+                                <div class="invalid-feedback" v-if="v$.form.company.$error">Company is required</div>
+                            </div>
+                             <div class="mb-3" v-if="!isUpdating">
+                                <label class="form-label small text-muted text-uppercase fw-bold">{{t('member_since')}}</label>
+                                <flat-pickr class="form-control bg-white" v-model="form.created_at" :config="config" />
+                            </div>
+                        </form>
+                    </div>
+                     <div class="modal-footer border-top-0 pt-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary px-4" @click="handleSubmit" :disabled="isSaving || isUpdatingProcess">
+                             <span v-if="isSaving || isUpdatingProcess" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                             {{ isUpdating ? 'Update' : 'Save' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-hidden="true" ref="deleteConfirmationModal">
+             <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold text-danger">Confirm Delete</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center py-4">
+                        <div class="mb-3 text-danger opacity-50">
+                            <i class="fa-solid fa-triangle-exclamation fa-3x"></i>
+                        </div>
+                        <p class="mb-0 fw-medium">Are you sure you want to delete this supplier?</p>
+                        <p class="text-muted small" v-if="supplierToDelete">"{{ supplierToDelete.name }}"</p>
+                    </div>
+                    <div class="modal-footer border-top-0 pt-0 justify-content-center">
+                        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger px-4" @click="confirmDelete">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-   export default {
-       components: {
-               PageHeader, FlatPickr
-       },
-       setup () {
+    </div>
+</template>
+
+<script>
+import PageHeader from "@/views/partials/PageHeader.vue"
+import { useVuelidate } from '@vuelidate/core'
+import { required } from '@vuelidate/validators'
+import { Timestamp, collection, addDoc, query, where, getDocs, onSnapshot, limit, doc, updateDoc, deleteDoc, orderBy } from 'firebase/firestore'
+import db from '@/firebase/firestore'
+import * as hp from "@/lib/helper"
+import * as ss from "@/lib/snapshot/suppliers"
+import FlatPickr from 'vue-flatpickr-component';
+import { lang } from "@/lib/language"
+import { Modal } from 'bootstrap'
+
+export default {
+    components: {
+        PageHeader, FlatPickr
+    },
+    setup() {
         return { v$: useVuelidate() }
     },
-    validations(){
-            return {
-                name: {required},
-                phone: {required},
-                company:{required}
+    validations() {
+        return {
+            form: {
+                name: { required },
+                phone: { required },
+                company: { required }
             }
+        }
     },
-       data(){
-           return{
-           
-            code :"",
-            name:"",
-            phone:"",
-            company:'',
-            created_at:"",
-               suppliers : [],
-               isLoading: false,
-               sortBy:"asc",
-               sort_item:"",
-               search_by_code:"",
-               search_by_name:"",
-               search_by_company:"",
-               suppliersData:[],
-               editItem:{},
-               isUpdating:false,
-               isSaving:false,
-               isOffline:false,
-               msg : {
-                   type :"",
-                   info :"",
-               },
-               is_deleted:false,
-               is_check_all: false,
-               isDeleting:false,
-               limitData: 100,
-           }
-       },
-     
-       async mounted() {
-        this.isLoading=true;
+    data() {
+        return {
+            form: {
+                id: null,
+                code: "",
+                name: "",
+                phone: "",
+                company: "",
+                created_at: "",
+                is_deleted: false,
+            },
+            search_by_name: "",
+            search_by_company: "",
+            suppliers: [],
+            suppliersData: [],
+            isLoading: false,
+            isSaving: false,
+            isUpdating: false,
+            isUpdatingProcess: false,
+            isOffline: false,
+            msg: {
+                type: "",
+                info: "",
+            },
+            limitData: 100,
+            modalInstance: null,
+            deleteModalInstance: null,
+            supplierToDelete: null,
+        }
+    },
+    mounted() {
+        this.form.created_at = hp.setToday();
         this.fetchSuppliers();
-        this.created_at=hp.setToday();
+        this.modalInstance = new Modal(this.$refs.supplierModal);
+        this.deleteModalInstance = new Modal(this.$refs.deleteConfirmationModal);
         window.addEventListener('keydown', this.handleCtrl);
-
-       },
-       beforeUnmount() {
-         window.removeEventListener('keydown', this.handleCtrl);
-     },
-       computed:{
-           user(){
-               return this.$store.getters.user;
-           },
-           config(){
-            return this.$store.getters.flat_pickr_config;
-           },
-           pageTitle(){
-            const sl=this.$store.getters.currentLang;
-            let  pageTitle=sl=="mm" ?  `${lang.suppliers.mm}` : `${lang.suppliers.eng}`            
-            return pageTitle;
+    },
+    beforeUnmount() {
+        if (this.modalInstance) this.modalInstance.hide();
+        if (this.deleteModalInstance) this.deleteModalInstance.hide();
+        window.removeEventListener('keydown', this.handleCtrl);
+    },
+    computed: {
+        user() {
+            return this.$store.getters.user;
         },
-       t() {
+        config() {
+            return this.$store.getters.flat_pickr_config;
+        },
+        pageTitle() {
+            const sl = this.$store.getters.currentLang;
+            return sl == "mm" ? `${lang.suppliers.mm}` : `${lang.suppliers.eng}`;
+        },
+        t() {
             return (key) => this.$store.getters.t(key);
         },
-       },
-       watch:{        
-           msg:{
-               handler(val){
-                   if(val.type){
-                       setTimeout(()=>{
-                           this.msg.type="";
-                           this.msg.info="";
-                       }, 2000)
-                   }
-               },deep:true
-           }
-       },
-       methods:{
+    },
+    watch: {
+        msg: {
+            handler(val) {
+                if (val.type) {
+                    setTimeout(() => {
+                        this.msg.type = "";
+                        this.msg.info = "";
+                    }, 3000)
+                }
+            }, deep: true
+        }
+    },
+    methods: {
         handleCtrl(event) {
-            if (event.ctrlKey && event.key === 'd') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                this.deleteMultiple();
-            }
             if (event.ctrlKey && event.key === 's') {
-                event.preventDefault(); // Prevent the default browser save dialog
-                this.saveSupplier(); // Call your custom function
-            }                 
+                event.preventDefault();
+                const modalEl = this.$refs.supplierModal;
+                if (modalEl.classList.contains('show')) {
+                     this.handleSubmit();
+                } else {
+                     this.openModal();
+                }
+            }
         },
-        inputSearchName(){
-            this.search_by_name=event.target.value;
-            this.searchSuppliers();
+        openModal() {
+            this.resetForm();
+            this.modalInstance.show();
         },
-        inputSearchCompany(){
-            this.search_by_company=event.target.value;
-            this.searchSuppliers();
+        closeModal() {
+            this.modalInstance.hide();
+        },
+        resetForm() {
+            this.form = {
+                id: null,
+                code: "",
+                name: "",
+                phone: "",
+                company: "",
+                created_at: hp.setToday(),
+                is_deleted: false,
+            };
+            this.isUpdating = false;
+            this.isSaving = false;
+            this.isUpdatingProcess = false;
+            this.v$.$reset();
+        },
+        editSupplier(s) {
+            this.isUpdating = true;
+            this.form = {
+                ...s,
+            };
+            this.modalInstance.show();
+        },
+        async handleSubmit() {
+            const validation = await this.v$.$validate();
+            if (!validation) return;
+
+            if (this.isUpdating) {
+                await this.updateSupplier();
+            } else {
+                await this.saveSupplier();
+            }
+        },
+        generateKeywords(data) {
+            return hp.generateKeywords(data);
+        },
+        async saveSupplier() {
+            // Check duplicate name
+            const coll = collection(db, "suppliers");
+            const q = query(coll, where("name_lower_case", "==", this.form.name.toLowerCase()));
+            const isTaken = await getDocs(q);
+            if (!isTaken.empty) {
+                this.msg.info = "This supplier name already exists";
+                this.msg.type = "error";
+                return;
+            }
+
+            this.isSaving = true;
+            const date = hp.insertDateNoTime(this.form.created_at);
+            const code = this.form.code ? this.form.code : hp.g_code();
+            const created_at = Timestamp.fromDate(date);
+            const dataCollection = collection(db, "suppliers");
+
+            const data = {
+                user: { uid: this.user.uid, displayName: this.user.displayName },
+                name: this.form.name,
+                name_lower_case: this.form.name.toLowerCase(),
+                name_keywords: this.generateKeywords(this.form.name),
+                company_keywords: this.generateKeywords(this.form.company),
+                code: code,
+                phone: this.form.phone,
+                company: this.form.company,
+                created_at: created_at,
+                is_deleted: this.form.is_deleted,
+                edit_user: { uid: this.user.uid, type: 'added' }
+            };
+
+            this.isCreated(code); 
+            await addDoc(dataCollection, data);
+        },
+        async updateSupplier() {
+            const coll = collection(db, "suppliers");
+            // Check duplicate name
+            const q = query(coll, where("name_lower_case", "==", this.form.name.toLowerCase()));
+            const isTaken = await getDocs(q);
+            
+            let duplicate = false;
+             if (!isTaken.empty) {
+                isTaken.forEach(doc => {
+                    if (doc.id !== this.form.id) duplicate = true;
+                });
+            }
+
+            if (duplicate) {
+                this.msg.info = "This supplier name already exists";
+                this.msg.type = "error";
+                return;
+            }
+
+            this.isUpdatingProcess = true;
+            const updateDocument = doc(db, "suppliers", this.form.id);
+            const data = {
+                name: this.form.name,
+                phone: this.form.phone,
+                company: this.form.company,
+                name_lower_case: this.form.name.toLowerCase(),
+                name_keywords: this.generateKeywords(this.form.name),
+                company_keywords: this.generateKeywords(this.form.company),
+                edit_user: { uid: this.user.uid, type: "modified" }
+            };
+
+            this.isUpdated(this.form.code);
+            await updateDoc(updateDocument, data);
+        },
+        async removeSupplier(s) {
+            this.supplierToDelete = s;
+            this.deleteModalInstance.show();
+        },
+        async confirmDelete() {
+            if (!this.supplierToDelete) return;
+            const s = this.supplierToDelete;
+            
+            const document = doc(db, "suppliers", s.id);
+            this.isRemoved(s.code);
+            await deleteDoc(document);
+            
+            this.deleteModalInstance.hide();
+            this.supplierToDelete = null;
         },
         
-        async removeSupplier(s){     
-            const cf=confirm(`Are you sure, you want to delete the suppliers "${s.name}" ?`)
-            if(!cf) return false;
-            this.isDeleting=true;             
-            const document=doc(db, "suppliers", s.id)     
-            this.isRemoved(s.code);
-            await deleteDoc(document) 
-        },
-     
-        checkAll(){
-            setTimeout(()=>{
-                this.suppliers=this.suppliers.map((s)=>{
-               return {...s, is_deleted : this.is_check_all ? true : false}
-             })
-            }, 100)
-        },
-        resetInput(){
-            this.name="";
-            this.phone="";
-            this.code= "";
-            this.created_at=hp.setToday();
-            this.company="";
-            this.isSaving=false;
-            this.isLoading=false;
-            this.isUpdating=false;
-            this.v$.$reset()
-        },
-        async isCreated(code){
-            const query_url=query(collection(db, "suppliers"), where("code","==", Number(code)));           
-           const unsub=onSnapshot(query_url, async(snapShot) =>{
-                snapShot.docChanges().forEach((change) => {   
-                    if(change.type != "added") return true;
-                    this.msg.info="The new supplier has been created"
-                    this.msg.type="success"
-                    this.resetInput(); 
+        // Listeners
+        async isCreated(code) {
+            const query_url = query(collection(db, "suppliers"), where("code", "==", Number(code)));
+            const unsub = onSnapshot(query_url, async (snapShot) => {
+                snapShot.docChanges().forEach((change) => {
+                    if (change.type != "added") return;
+                    this.msg.info = "Supplier created successfully";
+                    this.msg.type = "success";
+                    this.closeModal();
                     unsub();
                 })
             })
         },
-        async isUpdated(code){
-            const query_url=query(collection(db, "suppliers"), where("code","==", Number(code)));           
-           const unsub=onSnapshot(query_url, async(snapShot) =>{
-                snapShot.docChanges().forEach((change) => {   
-                    if(change.type != "modified") return true;
-                    this.msg.info="The selected supplier has been updated"
-                    this.msg.type="success"
-                    this.editItem={}
+        async isUpdated(code) {
+            const query_url = query(collection(db, "suppliers"), where("code", "==", Number(code)));
+            const unsub = onSnapshot(query_url, async (snapShot) => {
+                snapShot.docChanges().forEach((change) => {
+                    if (change.type != "modified") return;
+                    this.msg.info = "Supplier updated successfully";
+                    this.msg.type = "success";
+                    this.closeModal();
                     unsub();
                 })
             })
         },
-        async isRemoved(code){
-            const query_url=query(collection(db, "suppliers"), where("code","==", Number(code)));           
-           const unsub=onSnapshot(query_url, async(snapShot) =>{
-                snapShot.docChanges().forEach((change) => {   
-                    if(change.type != "removed") return true;
-                    this.msg.info="The selected supplier has been deleted"
-                    this.msg.type="success"
-                    this.editItem={}
-                    this.isDeleting=false;
-                    unsub();
-                })
-            })
-        },     
-        async fetchSuppliers(){                    
-               const query_url = query(collection(db, "suppliers"), orderBy("created_at", "desc"), limit(this.limitData));
-               onSnapshot(query_url, async(snapShot) =>{                    
-                    const suppliers=ss.suppliers(snapShot);           
-                    this.suppliersData=suppliers;
-                    this.suppliers=suppliers;
-                    this.isLoading=false;
-            });     
-              
-          } ,
-       generateKeywords(data){
-            return hp.generateKeywords(data);
-       },
-        async saveSupplier(){
-         //   if(this.editItem.id) this.saveEdit();
-            const validattion = await this.v$.$validate()
-            if(!validattion) return false;
+        async isRemoved(code) {
+            this.msg.info = "Supplier deleted successfully";
+            this.msg.type = "success";
+        },
 
-            const coll = collection(db, "suppliers");
-            const q = query(coll, where("name_lower_case", "==", this.name.toLowerCase()));
-            const isTaken = await getDocs(q);           
-            if(!isTaken.empty){                
-                this.msg.info="This supplier name already exists"
-                this.msg.type="error"
-                this.name="";
-                return true;          
-            }
-
-            this.isSaving=true;
-            const date=hp.insertDateNoTime(this.created_at)
-            const created_at=Timestamp.fromDate(date);
-            const dataCollection=collection(db, "suppliers")
-            this.code=this.code ? this.code : hp.g_code();
-            const data={
-                user: {uid:this.user.uid, displayName:this.user.displayName},
-                name: this.name, 
-                name_lower_case:this.name.toLowerCase(),
-                name_keywords: this.generateKeywords(this.name),
-                company_keywords: this.generateKeywords(this.company),
-                code: this.code,
-                phone: this.phone,
-                company: this.company,
-                created_at : created_at,      
-                is_deleted: false,
-                edit_user: {uid: this.user.uid, type: 'added'}         
-            }      
-            this.isCreated(this.code);
-            await addDoc(dataCollection, data)                          
-        },
-          
-          async saveEdit(){    
-            const coll = collection(db, "suppliers");
-            const q = query(coll, where("name_lower_case", "==", this.editItem.name.toLowerCase()));
-            const isTaken = await getDocs(q);
-            if(!isTaken.empty){
-                const docRef = doc(db, "suppliers", this.editItem.id);
-                const docSnapshot = await getDoc(docRef);
-                const docData = docSnapshot.data();
-                const index = this.suppliers.findIndex(sp => sp.code == docData.code);
-                this.suppliers[index].name=docData.name;
-                this.msg.info="This supplier name already exists"
-                this.msg.type="error"
-                return false;
-            }                  
-               const updateDocument=doc(db, "suppliers", this.editItem.id)
-               const data={
-                ...this.editItem,
-                name_lower_case: this.editItem.name.toLowerCase(),
-                name_keywords: this.generateKeywords(this.editItem.name),
-                company_keywords: this.generateKeywords(this.editItem.company),
-            }
-            this.isUpdated(this.editItem.code);
-            await updateDoc(updateDocument, data)           
-           },
-           setEdit(p){
-               this.editItem={...p,  edit_user:  {uid:this.user.uid, type: "modified"}};
-           },
-           clearSearch(){
-               this.search_by_code="";
-               this.search_by_name="";
-               this.search_by_company="";
-               this.searchSuppliers();
-           },
-           async searchSuppliers() {
-            this.suppliers = [];
+        async fetchSuppliers() {
             this.isLoading = true;
+            const query_url = query(collection(db, "suppliers"), orderBy("created_at", "desc"), limit(this.limitData));
+            onSnapshot(query_url, async (snapShot) => {
+                const suppliers = ss.suppliers(snapShot);
+                this.suppliersData = suppliers;
+                this.suppliers = suppliers;
+                this.isLoading = false;
+            });
+        },
+        
+        clearSearch() {
+            this.search_by_name = "";
+            this.search_by_company = "";
+            this.fetchSuppliers();
+        },
+        async performServerSearch() {
+            if (!this.search_by_name && !this.search_by_company) {
+                return;
+            }
+            this.isLoading = true;
+            this.suppliers = []; 
             try {
-                if (this.search_by_name) {
-                    const query_url = query(
-                        collection(db, "suppliers"), where("name_keywords", "array-contains", this.search_by_name.toLowerCase()), orderBy("created_at", "desc"),
+                 const promises = [];
+                 
+                 if (this.search_by_name) {
+                     const q = query(
+                        collection(db, "suppliers"), 
+                        where("name_keywords", "array-contains", this.search_by_name.toLowerCase()), 
+                        orderBy("created_at", "desc"),
                         limit(this.limitData)
                     );
-                    const snapShot = await getDocs(query_url);
-                    const cus = ss.suppliers(snapShot);
-                    this.suppliers = cus;
-                   
-                } else if (this.search_by_company) {
-                    const query_url = query(
-                        collection(db, "suppliers"), where("company_keywords", "array-contains", this.search_by_company.toLowerCase()), orderBy("created_at", "desc"),
+                    promises.push(getDocs(q));
+                 }
+                 
+                 if (this.search_by_company) {
+                     const q = query(
+                        collection(db, "suppliers"), 
+                        where("company_keywords", "array-contains", this.search_by_company.toLowerCase()), 
+                        orderBy("created_at", "desc"),
                         limit(this.limitData)
                     );
-                    const snapShot = await getDocs(query_url);
-                    const cus = ss.suppliers(snapShot);
-                    this.suppliers = cus;                   
-                } else {
-                    this.suppliers = this.suppliersData;                   
-                }
+                    promises.push(getDocs(q));
+                 }
+
+                const snapshots = await Promise.all(promises);
+                let results = [];
+                snapshots.forEach(snap => {
+                    results = [...results, ...ss.suppliers(snap)];
+                });
+
+                // Deduplicate
+                const map = new Map();
+                results.forEach(s => {
+                    if(!map.has(s.id)) map.set(s.id, s);
+                });
+
+                this.suppliers = Array.from(map.values());
+                
             } catch (error) {
-                console.error("Error searching suppliers:", error);
+                console.error("Error searching:", error);
             } finally {
                 this.isLoading = false;
             }
-        },                        
-           
-          showTime(t){
+        },
+        showTime(t) {
             return hp.showTime(t)
-         },
-         sortSuppliers(sort){   
-               this.suppliers=[];
-               this.sort_item=sort;
-               if(this.sortBy=="asc"){
-                   this.sortBy="desc"                   
-                   this.suppliers=this.suppliersData.sort((a,b)=>{
-                       const item_a=a.name.toUpperCase();
-                       const item_b=b.name.toUpperCase();
-                       const com_a=a.company.toUpperCase();
-                       const com_b=b.company.toUpperCase();
-                       const date_a=new Date(a.created_at.toDate()).getTime();
-                       const date_b=new Date(b.created_at.toDate()).getTime();
-                       switch(sort){
-                           case "phone":
-                               return a.phone - b.phone;
-                           break;
-                           case "name":
-                             return item_a < item_b ? 1 : -1;
-                           break;
-                           case "code":
-                               return a.code - b.code;
-                           break;
-                           case "company":
-                           return com_a < com_b ? 1 : -1;
-                           break;
-                           case "created_at":
-                              return  date_a - date_b;
-                           break;
-                       }
-                   })
-               }else{
-                   this.sortBy="asc"                  
-                   this.suppliers=this.suppliersData.sort((a,b)=>{
-                       const item_a=a.name.toUpperCase();
-                       const item_b=b.name.toUpperCase();
-                       const com_a=a.company.toUpperCase();
-                       const com_b=b.company.toUpperCase();
-                       const date_a=new Date(a.created_at.toDate()).getTime();
-                       const date_b=new Date(b.created_at.toDate()).getTime();
-                       switch(sort){
-                           case "phone":
-                               return a.phone + b.phone;
-                           break;
-                           case "name":
-                               return item_a < item_b ? -1 : 1;
-                           break;
-                           case "code":
-                               return a.code + b.code;
-                           break;
-                           case "company":
-                               return com_a < com_b ? -1 : 1;
-                           break;
-                           case "created_at":
-                              return  date_a + date_b;
-                           break;
-                       }
-                     })
-                       
-               }            
-           },
-       },
-       
-   }
-   </script>
-   <style lang="">
-       
-   </style>
-   
-   
+        },
+    }
+
+}
+</script>
+
+<style scoped>
+.fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.transition-hover {
+    transition: background-color 0.2s, transform 0.1s;
+}
+.transition-hover:hover {
+    background-color: #f8f9fa; 
+    transform: scale(1.002);
+}
+
+/* Custom scrollbar for table container if needed */
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+}
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+</style>

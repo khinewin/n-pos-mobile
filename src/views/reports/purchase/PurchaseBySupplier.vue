@@ -14,6 +14,9 @@
                     <td class="col-1">Unit Cost</td>
                 </tr>
             </tbody>
+            <tbody v-if="!isLoading && reports.length === 0">
+                <tr><td colspan="10" class="text-center text-muted py-4">No data available</td></tr>
+            </tbody>
             <tbody v-if="reports.length > 0" v-for="r in reports" :key="r[0]" class="table-group-divider">
                 <tr>
                     <td class="text-center" :rowspan="r[1].length + 5">
@@ -78,12 +81,10 @@
                 </tr>
             </tbody>
         </table>                                                   
-        <div v-if="isLoading">
-                <div class="d-flex justify-content-center my-5">
-                    <div class="spinner-border text-primary"  role="status">
-                      <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
+        <div v-if="isLoading" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </div>
     </div>       
 </template>
@@ -105,22 +106,19 @@ export default {
             total_extra_discount:0,
             total_balance:0,
             isLoading:false,
+            unsub: null,
             msg : {
                 type :"",
                 info :"",
             },      
-
         }
     },   
     mounted() {    
-                this.isLoading=true;
-                this.fetchPurchase();  
-            
-            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType="by_date"){
-                this.displayReportType="by Date"
-            }
+        this.isLoading = true;
+        this.fetchPurchase();
+    },
+    beforeUnmount() {
+        if (this.unsub) this.unsub();
     },
    watch:{   
     msg:{
@@ -276,12 +274,12 @@ export default {
             query_url = query(collection(db, "purchases"), 
             where("pur_date", ">=", from_date), where("pur_date", "<=", to_date), orderBy("pur_date", "desc"));
            }             
-           onSnapshot(query_url, (snapShot)=>{
-                const purchaseItems=ss.purchases(snapShot)
-                this.purchaseData=purchaseItems;
+            this.unsub = onSnapshot(query_url, (snapShot) => {
+                const purchaseItems = ss.purchases(snapShot)
+                this.purchaseData = purchaseItems;
                 this.displayReports();
-                this.isLoading=false;
-           })
+                this.isLoading = false;
+            })
         }
     }
 }

@@ -57,14 +57,15 @@
                     </tr>
                
             </tbody>
+                <tbody v-if="!isLoading && reports.length === 0">
+                    <tr><td colspan="9" class="text-center text-muted py-4">No data available</td></tr>
+                </tbody>
         </table>
-        <div v-if="isLoading">
-                <div class="d-flex justify-content-center my-5">
-                    <div class="spinner-border text-primary"  role="status">
-                      <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-        </div>                                                
+        <div v-if="isLoading" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -86,6 +87,7 @@ export default {
             total_retail_amount:0,
             total_whole_sale_amount:0,
             isLoading:false,
+            unsub: null,
             msg : {
                 type :"",
                 info :"",
@@ -94,14 +96,11 @@ export default {
     },
    
     mounted() {    
-                this.isLoading=true;
-                this.fetchAdjustments();  
-            
-            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType="by_date"){
-                this.displayReportType="by Date"
-            }
+        this.isLoading = true;
+        this.fetchAdjustments();
+    },
+    beforeUnmount() {
+        if (this.unsub) this.unsub();
     },
    watch:{
    
@@ -180,12 +179,12 @@ export default {
             
             const query_url = query(collection(db, "adjustments"),
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
-           onSnapshot(query_url, (snapShot)=>{
-                const items=ss.adjustments(snapShot)    
-                this.adjustmentsData=items;
+           this.unsub = onSnapshot(query_url, (snapShot) => {
+                const items = ss.adjustments(snapShot);
+                this.adjustmentsData = items;
                 this.displayReports();
-                this.isLoading=false;
-           })
+                this.isLoading = false;
+           });
         }
     }
 }

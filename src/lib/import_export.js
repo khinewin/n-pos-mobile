@@ -101,25 +101,7 @@ const saveDocument=doc(db, "packingSizes", d.id)
 await setDoc(saveDocument, voucher)   
 }
 
-const restoreReturnIn=async(d)=>{
-  const voucher={
-    ...d,
-    rt_in_date: Timestamp.fromDate(new Date(d.rt_in_date)),           
-   
-}  
-const saveDocument=doc(db, "returnIn", d.id)
-await setDoc(saveDocument, voucher)   
-}
 
-const restoreReturnOut=async(d)=>{
-  const voucher={
-    ...d,
-    rt_out_date: Timestamp.fromDate(new Date(d.rt_out_date)),     
-           
-}  
-const saveDocument=doc(db, "returnOut", d.id)
-await setDoc(saveDocument, voucher)   
-}
 
 const deleteData=(data, collection)=>{
   data.map((d, i)=>{
@@ -141,8 +123,6 @@ const deleteData=(data, collection)=>{
     restoreSuppliers,
     restoreCustomers,
     restorePackingSizes,
-    deleteData,
-    restoreReturnIn,
-    restoreReturnOut
+    deleteData
   }
   

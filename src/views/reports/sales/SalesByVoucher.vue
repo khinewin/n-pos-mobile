@@ -1,13 +1,12 @@
 <template lang="">
     <div class="container-fluid">  
-        <div v-if="isLoading">
-                <div class="d-flex justify-content-center my-5">
-                    <div class="spinner-border text-primary"  role="status">
-                      <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-        </div>  
-         <div class="row" v-if="reports" v-for="sale in reports">
+        <div v-if="isLoading" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <div v-else-if="reports.length === 0" class="text-center text-muted py-4">No data available</div>
+         <div class="row" v-else v-for="sale in reports">
             <div class="col-12 mb-2">
                 <div class="card">
                     <div class="card-body p-2">
@@ -139,23 +138,20 @@ export default {
             reports:[],
             salesData:[],          
             isLoading:false,
+            unsub: null,
             msg : {
                 type :"",
                 info :"",
             },        
-
         }
     },
    
     mounted() {    
-                this.isLoading=true;
-                this.fetchSales();  
-            
-            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType="by_date"){
-                this.displayReportType="by Date"
-            }
+        this.isLoading = true;
+        this.fetchSales();
+    },
+    beforeUnmount() {
+        if (this.unsub) this.unsub();
     },
    watch:{
    
@@ -219,12 +215,11 @@ export default {
                 query_url = query(collection(db, "sales"), 
                 where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), where("customer.code", "==", Number(this.customer_code)), orderBy("sale_date", "desc"));
             }        
-            onSnapshot(query_url, (snapShot)=>{
-                const saleItems=ss.sales(snapShot);            
-                this.reports=saleItems;
-                this.isLoading=false;
-            })
-           
+            this.unsub = onSnapshot(query_url, (snapShot) => {
+                const saleItems = ss.sales(snapShot);
+                this.reports = saleItems;
+                this.isLoading = false;
+            });
         }
     }
 }

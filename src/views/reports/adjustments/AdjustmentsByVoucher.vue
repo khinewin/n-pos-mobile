@@ -9,7 +9,8 @@
                 </div>
             </div>
         </div>  
-         <div class="" v-if="reports">
+         <div v-if="!isLoading && reports.length === 0" class="text-center text-muted py-4">No data available</div>
+         <div class="" v-if="reports.length > 0">
             <div class="mb-2"  v-for="adj in reports" :key="adj.id">
                 <div class="card">
                     <div class="card-body p-2">
@@ -112,6 +113,7 @@ export default {
             salesData:[],
             grand_total:"",
             isLoading:false,
+            unsub: null,
             msg : {
                 type :"",
                 info :"",
@@ -119,14 +121,11 @@ export default {
         }
     },   
     mounted() {    
-                this.isLoading=true;
-                this.fetchadjs();  
-            
-            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType="by_date"){
-                this.displayReportType="by Date"
-            }
+        this.isLoading = true;
+        this.fetchadjs();
+    },
+    beforeUnmount() {
+        if (this.unsub) this.unsub();
     },
    watch:{
    
@@ -184,11 +183,11 @@ export default {
              query_url = query(collection(db, "adjustments"),  
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
             }
-            onSnapshot(query_url, (snapShot)=>{
-                const items=ss.adjustments(snapShot)    
-                this.reports=items;
-                this.isLoading=false;
-           })
+            this.unsub = onSnapshot(query_url, (snapShot) => {
+                const items = ss.adjustments(snapShot);
+                this.reports = items;
+                this.isLoading = false;
+           });
         }
     }
 }

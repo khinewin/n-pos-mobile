@@ -2,7 +2,7 @@
     <div class="overflow-x-auto">                                                     
         <table class="table table-bordered border-dark table-hover mb-0 inside-table">
             <tbody class="">
-                <tr class="text-center fw-bold change-cursor table-primary">
+                <tr class="text-center fw-bold change-cursor">
                     <td class="col-1"  @click="sortProducts('code_no')"> Code</td>
                     <td class="col-2"  @click="sortProducts('item_name')"> Product Name</td>
                     <td class="col-1">Packing Size</td>
@@ -10,7 +10,8 @@
                     <td class="col-1" @click="sortProducts('qty')" v-if="location =='All' || location=='Mart'"> Mart Inv Bal</td>
                     <td class="col-1"  v-if="pur_price"  @click="sortProducts('pur_price')"> Pur Price</td>
                     <td class="col-1" v-if="sale_price"  @click="sortProducts('retail_price')"> Sale Price</td>
-                    <!--<td class="col-1" v-if="sale_price"  @click="sortProducts('whole_sale_price')"> Wholesale Price</td>-->
+                    <td class="col-1" v-if="pur_price" @click="sortProducts('total_pur_price')"> Total Pur</td>
+                    <td class="col-1" v-if="sale_price" @click="sortProducts('total_sale_price')"> Total Sale</td>
                 </tr>   
             </tbody>  
             <tbody v-if="reports.length > 0" >                                                  
@@ -30,12 +31,26 @@
                         {{displayPrice(p.pur_price.largest_unit, p.pur_price.medium_unit, p.pur_price.smallest_unit)}}
                     </td>
                     <td class="text-end"  v-if="sale_price" >
-                            {{p.retail_price.smallest_unit}}-{{p.packing_size.smallest_unit}}
+                            {{displayPrice(p.retail_price.largest_unit, p.retail_price.medium_unit, p.retail_price.smallest_unit)}}
                     </td>
                     <!--<td class="text-end"  v-if="sale_price" >
                             {{displayPrice(p.whole_sale_price.largest_unit, p.whole_sale_price.medium_unit, p.whole_sale_price.smallest_unit)}}
                     </td>-->
-                                                    
+                    <td class="text-end"  v-if="pur_price">
+                        {{fM((location === 'Main' ? (p.main_qty || 0) : (p.qty || 0)) * (p.pur_price?.smallest_unit || 0))}}
+                    </td>
+                    <td class="text-end"  v-if="sale_price">
+                        {{fM((location === 'Main' ? (p.main_qty || 0) : (p.qty || 0)) * (p.retail_price?.smallest_unit || 0))}}
+                    </td>                                                
+                </tr>
+            </tbody>
+            <tbody v-if="reports.length > 0" class="table-group-divider">
+                <tr class="fw-bold text-end">
+                    <td :colspan="3 + (location === 'All' || location === 'Mart' ? 1 : 0) + (pur_price ? 1 : 0) + (sale_price ? 1 : 0)">
+                        Grand Total (Ks)
+                    </td>
+                    <td v-if="pur_price">{{fM(total_pur_amount)}}</td>
+                    <td v-if="sale_price">{{fM(total_sale_amount)}}</td>
                 </tr>
             </tbody>
         </table>
@@ -80,14 +95,23 @@
     mounted() {
         this.fetchProducts();
     },
-    watch:{
-     
-    },
+   
     computed:{
         user(){
             return this.$store.getters.user;
         },
-       
+        total_pur_amount() {
+            return this.reports.reduce((total, p) => {
+                const qty = this.location === 'Main' ? (p.main_qty || 0) : (p.qty || 0);
+                return total + (qty * (p.pur_price?.smallest_unit || 0));
+            }, 0);
+        },
+        total_sale_amount() {
+            return this.reports.reduce((total, p) => {
+                const qty = this.location === 'Main' ? (p.main_qty || 0) : (p.qty || 0);
+                return total + (qty * (p.retail_price?.smallest_unit || 0));
+            }, 0);
+        },
     },
     beforeDestroy() {
       if (this.unsubscribe) this.unsubscribe();
@@ -95,6 +119,9 @@
     methods: {
         displayPrice(l_unit, m_unit, s_unit){
             return hp.displayPrice(l_unit, m_unit, s_unit);
+        },
+        fM(amount) {
+            return hp.formattedAmount(amount);
         },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
@@ -159,7 +186,7 @@
             let queryConstraints = [];
 
             // Always order and limit
-            queryConstraints.push(orderBy("created_at", "desc"));
+            queryConstraints.push(orderBy("packing_size.smallest_qty", "desc"));
             queryConstraints.push(limit(this.perPage));
 
             // Filter by code_no (skip pagination in this case)
@@ -210,37 +237,45 @@
                 this.isLoading = false;
             }
         },
-       sortProducts(sort){   
+        sortProducts(sort){   
             this.sort_item=sort;
             if(this.sortBy=="asc"){
                 this.sortBy="desc"
                 this.reports=this.reports.sort((a,b)=>{
                     const item_a=a.item_name.toUpperCase();
                     const item_b=b.item_name.toUpperCase();
+                    const qty_a = this.location === 'Main' ? a.main_qty : a.qty;
+                    const qty_b = this.location === 'Main' ? b.main_qty : b.qty;
                     switch(sort){
                         case "qty":
-                            return a.qty - b.qty;
+                            return qty_b - qty_a;
                         break;
                         case "main_qty":
-                            return a.main_qty - b.main_qty;
+                            return b.main_qty - a.main_qty;
                         break;
                         case "item_per_package":
-                            return a.item_per_package - b.item_per_package;
+                            return b.item_per_package - a.item_per_package;
                         break;
                         case "item_name":
                           return item_a < item_b ? 1 : -1;
                         break;
                         case "code_no":
-                            return a.code_no - b.code_no;
+                            return b.code_no - a.code_no;
                         break;
                         case "retail_price":
-                            return a.retail_price.largest_unit - b.retail_price.largest_unit;
+                            return b.retail_price.smallest_unit - a.retail_price.smallest_unit;
                         break;
                         case "whole_sale_price":
-                           return  a.whole_sale_price.largest_unit - b.whole_sale_price.largest_unit;
+                           return  b.whole_sale_price.smallest_unit - a.whole_sale_price.smallest_unit;
                         break;
                         case "pur_price":
-                           return  a.pur_price.largest_unit - b.pur_price.largest_unit;
+                           return  b.pur_price.smallest_unit - a.pur_price.smallest_unit;
+                        break;
+                        case "total_pur_price":
+                            return (qty_b * b.pur_price.smallest_unit) - (qty_a * a.pur_price.smallest_unit);
+                        break;
+                        case "total_sale_price":
+                            return (qty_b * b.retail_price.smallest_unit) - (qty_a * a.retail_price.smallest_unit);
                         break;
                     }
                 })
@@ -249,30 +284,38 @@
                 this.reports=this.reports.sort((a,b)=>{
                     const item_a=a.item_name.toUpperCase();
                     const item_b=b.item_name.toUpperCase();
+                    const qty_a = this.location === 'Main' ? a.main_qty : a.qty;
+                    const qty_b = this.location === 'Main' ? b.main_qty : b.qty;
                     switch(sort){
                         case "qty":
-                            return a.qty + b.qty;
+                            return qty_a - qty_b;
                         break;
                         case "main_qty":
-                            return a.main_qty + b.main_qty;
+                            return a.main_qty - b.main_qty;
                         break;
                         case "item_per_package":
-                            return a.item_per_package + b.item_per_package;
+                            return a.item_per_package - b.item_per_package;
                         break;
                         case "item_name":
                             return item_a < item_b ? -1 : 1;
                         break;
                         case "code_no":
-                            return a.code_no + b.code_no;
+                            return a.code_no - b.code_no;
                         break;
                         case "retail_price":
-                            return a.retail_price.largest_unit + b.retail_price.largest_unit;
+                            return a.retail_price.smallest_unit - b.retail_price.smallest_unit;
                         break;
                         case "whole_sale_price":
-                           return  a.whole_sale_price.largest_unit+ b.whole_sale_price.largest_unit;
+                           return  a.whole_sale_price.smallest_unit - b.whole_sale_price.smallest_unit;
                         break;
                         case "pur_price":
-                           return  a.pur_price.largest_unit + b.pur_price.largest_unit;
+                           return  a.pur_price.smallest_unit - b.pur_price.smallest_unit;
+                        break;
+                        case "total_pur_price":
+                            return (qty_a * a.pur_price.smallest_unit) - (qty_b * b.pur_price.smallest_unit);
+                        break;
+                        case "total_sale_price":
+                            return (qty_a * a.retail_price.smallest_unit) - (qty_b * b.retail_price.smallest_unit);
                         break;
                     }
                 })

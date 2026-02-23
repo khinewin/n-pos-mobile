@@ -161,14 +161,19 @@ export default {
             monthlySalesAmountOptions: {              
                 colors : ["red", "orange","yellow", "green","teal","blue"],
                 is3D:true,
-            }
+            },
+            unsubDaily: null,
+            unsubMonthly: null,
         }
     },
     mounted() {
-                this.isLoading=true;
-                this.fetchSalesDaily();  
-                this.fetchSalesMonthly();
-            
+        this.isLoading = true;
+        this.fetchSalesDaily();
+        this.fetchSalesMonthly();
+    },
+    beforeUnmount() {
+        if (this.unsubDaily) this.unsubDaily();
+        if (this.unsubMonthly) this.unsubMonthly();
     },
    
     watch:{
@@ -249,13 +254,12 @@ export default {
              query_url = query(collection(db, "sales"),  
             where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date"));
             }
-            onSnapshot(query_url, (snapShot)=>{
-                let saleItems=ss.sales(snapShot);           
-                this.salesMonthlyData=saleItems;
+            this.unsubMonthly = onSnapshot(query_url, (snapShot) => {
+                let saleItems = ss.sales(snapShot);
+                this.salesMonthlyData = saleItems;
                 this.monthlyReports();
-                this.isLoading=false;
+                this.isLoading = false;
             })
-           
         },
         dailyReports(){
             let sales=[]
@@ -330,12 +334,12 @@ export default {
              query_url = query(collection(db, "sales"),  
             where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date"));
             }
-            onSnapshot(query_url, (snapShot)=>{
-                const saleItems=ss.sales(snapShot)
-                this.salesData=saleItems;
+            this.unsubDaily = onSnapshot(query_url, (snapShot) => {
+                const saleItems = ss.sales(snapShot)
+                this.salesData = saleItems;
                 this.dailyReports();
-                this.isLoading=false;
-            })           
+                this.isLoading = false;
+            })
         },
         showTime(t){
             return hp.showTime(t)

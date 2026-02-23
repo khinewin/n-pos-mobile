@@ -68,14 +68,15 @@
                     <td class="text-end">{{fM(total_profit - total_discount)}}</td>
                 </tr>   
             </tbody>
+        <tbody v-if="!isLoading && reports.length === 0">
+            <tr><td colspan="8" class="text-center text-muted py-4">No data available</td></tr>
+        </tbody>
         </table>
-        <div v-if="isLoading">
-            <div class="d-flex justify-content-center my-5">
-                <div class="spinner-border text-primary"  role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
+        <div v-if="isLoading" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
-    </div>                                                                                                                 
+        </div>
     </div>
 </template>
 <script>
@@ -90,33 +91,27 @@ export default {
   
     data(){
         return{       
-           
             reports:[],
-          //  current_month:[],
             salesData:[],
             total_sale_amount:0,
             total_pur_amount:0,
             total_profit:0,
             total_discount:0,
             isLoading:false,
+            unsub: null,
             msg : {
                 type :"",
                 info :"",
             },        
-
         }
     },
    
     mounted() {    
-           
-                this.isLoading=true;
-                this.fetchSales();  
-        
-            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType="by_date"){
-                this.displayReportType="by Date"
-            }
+        this.isLoading = true;
+        this.fetchSales();
+    },
+    beforeUnmount() {
+        if (this.unsub) this.unsub();
     },
    watch:{
    
@@ -279,13 +274,12 @@ export default {
                  query_url = query(collection(db, "sales"), 
                  where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date", "desc"));
             }
-            onSnapshot(query_url, (snapShot)=>{
-                const saleItems=ss.sales(snapShot);           
-                this.salesData=saleItems;
+            this.unsub = onSnapshot(query_url, (snapShot) => {
+                const saleItems = ss.sales(snapShot);
+                this.salesData = saleItems;
                 this.displayReports();
-                this.isLoading=false;
-            })
-           
+                this.isLoading = false;
+            });
         }
     }
 }

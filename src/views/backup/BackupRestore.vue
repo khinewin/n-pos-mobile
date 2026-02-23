@@ -116,12 +116,6 @@
                                         <div class="col-6 col-sm-4 d-grid">
                                             <button :disabled="packingSizes.length <=0" @click="exportPackingSizes" class="btn py-4 btn-outline-primary">Packing Size ({{packingSizes.length}})</button>
                                         </div>-->
-                                        <!--<div class="col-6 col-sm-4 d-grid">
-                                            <button :disabled="returnIn.length <=0" @click="exportReturnIn" class="btn py-4 btn-outline-primary">Return In ({{returnIn.length}})</button>
-                                        </div>
-                                        <div class="col-6 col-sm-4 d-grid">
-                                            <button :disabled="returnOut.length <=0" @click="exportReturnOut" class="btn py-4 btn-outline-primary">Return Out ({{returnOut.length}})</button>
-                                        </div>-->
                                 </div>
                             </div>                                                     
                         </div>
@@ -155,12 +149,6 @@
                                 <div class="col-6 col-sm-4 d-grid">
                                     <button :disabled="packingSizes.length <=0" @click="deletePackingSizes" class="btn py-4 btn-danger" >Packing Size ({{packingSizes.length}})</button>
                                 </div>
-                                <!--<div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="returnIn.length <=0" @click="deleteReturnIn" class="btn py-4 btn-danger" >Return In ({{returnIn.length}})</button>
-                                </div>
-                                <div class="col-6 col-sm-4 d-grid">
-                                    <button :disabled="returnOut.length <=0" @click="deleteReturnOut" class="btn py-4 btn-danger" >Return Out ({{returnOut.length}})</button>
-                                </div>-->
                         </div>
                         </div>
                     </div>
@@ -185,8 +173,6 @@ import * as hp_adjustments from "@/lib/snapshot/adjustments"
 import * as hp_suppliers from "@/lib/snapshot/suppliers"
 import * as hp_customers from "@/lib/snapshot/customers"
 import * as hp_packingSizes from "@/lib/snapshot/packingSizes"
-import * as hp_rt_in from "@/lib/snapshot/returnIn"
-import * as hp_rt_out from "@/lib/snapshot/returnOut"
 
 import {lang} from "@/lib/language"
 import * as hp  from "@/lib/helper"
@@ -211,8 +197,6 @@ export default {
                 suppliers:[],
                 customers:[],
                 packingSizes:[],
-                returnIn:[],
-                returnOut:[],
 
                 from_date:"",
                 to_date:"",
@@ -339,12 +323,6 @@ export default {
         deleteCustomers(){
             this.deleteData(this.customers, "customers")
         },
-        deleteReturnIn(){
-            this.deleteData(this.returnIn, "returnIn")
-        },
-        deleteReturnOut(){
-            this.deleteData(this.returnOut, "returnOut")
-        },
         
 
         changeBackupDate(){
@@ -401,10 +379,6 @@ export default {
                             ie.restoreCustomers(d);
                         }else if(this.restore_name=="PackingSize"){
                             ie.restorePackingSizes(d);
-                        }else if(this.restore_name=="ReturnIn"){
-                            ie.restoreReturnIn(d);
-                        }else if(this.restore_name=="ReturnOut"){
-                            ie.restoreReturnOut(d);
                         }
                         if(i+1 == data.length){
                             this.finishProcess(this.restore_name)
@@ -500,22 +474,6 @@ export default {
        const result= ie.exportToJson(this.packingSizes, `PackingSize_${this.from_date}_${this.to_date}`)
        if (result){
            this.msg.info="Packing size data has been backup to local"
-           this.msg.type="success"
-       }
-    },
-    exportReturnIn(){
-        if(this.returnIn.length<=0) return false;
-       const result= ie.exportToJson(this.returnIn, `ReturnIn_${this.from_date}_${this.to_date}`)
-       if (result){
-           this.msg.info="Return In data has been backup to local"
-           this.msg.type="success"
-       }
-    },
-    exportReturnOut(){
-        if(this.returnOut.length<=0) return false;
-       const result= ie.exportToJson(this.returnOut, `ReturnOut_${this.from_date}_${this.to_date}`)
-       if (result){
-           this.msg.info="Return Out data has been backup to local"
            this.msg.type="success"
        }
     },
@@ -628,28 +586,6 @@ export default {
                             return {...p, created_at: new Date(p.created_at.toDate())}
                         })
                        this.packingSizes=packingSizes;
-                       unsub();
-                });              
-        },
-        fetchReturnIn(){           
-            const query_url = query(collection(db, "returnIn"));
-            const unsub=onSnapshot(query_url, async(snapShot) =>{                  
-                        let returnIn=hp_rt_in.returnIn(snapShot)  
-                        returnIn=returnIn.map((p)=>{
-                            return {...p, rt_in_date: new Date(p.rt_in_date.toDate())}
-                        })
-                       this.returnIn=returnIn;
-                       unsub();
-                });              
-        },
-        fetchReturnOut(){           
-            const query_url = query(collection(db, "returnOut"));
-            const unsub= onSnapshot(query_url, async(snapShot) =>{                  
-                        let returnOut=hp_rt_out.returnOut(snapShot)  
-                        returnOut=returnOut.map((p)=>{
-                            return {...p, rt_out_date: new Date(p.rt_out_date.toDate())}
-                        })
-                       this.returnOut=returnOut;
                        unsub();
                 });              
         },

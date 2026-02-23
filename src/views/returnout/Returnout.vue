@@ -190,18 +190,28 @@ import db from '@/firebase/firestore'
 //import Products from "@/views/sales/Products.vue"
 import ReturnOutModal from "@/views/modals/purchase/ReturnOutModal.vue"
 import SupplierModal from "@/views/modals/purchase/SupplierModal.vue"
+import SupplierModalOld from "@/views/modals/purchase/SupplierModalOld.vue"
 import Print from "@/views/returnout/Print.vue"
 import ProductModal from "@/views/modals/purchase/ProductModal.vue"
+import ProductModalOld from "@/views/modals/purchase/ProductModalOld.vue"
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/products"
 import setQtyModal from "@/views/modals/setQtyModal.vue";
+import setQtyModalOld from "@/views/modals/setQtyModalOld.vue";
 import setDiscountModal from "@/views/modals/setDiscountModal.vue";
 import FlatPickr from 'vue-flatpickr-component';
 import * as hc from "@/lib/handleCtrl"
 
 export default {
     components: {
-        PageHeader,ReturnOutModal,SupplierModal,Print, ProductModal,setQtyModal,setDiscountModal, FlatPickr
+        PageHeader,
+        ReturnOutModal,
+        SupplierModal: store.getters.theme === "new" ? SupplierModal : SupplierModalOld,
+        Print, 
+        ProductModal: store.getters.theme === "new" ? ProductModal : ProductModalOld,
+        setQtyModal: store.getters.theme === "new" ? setQtyModal : setQtyModalOld,
+        setDiscountModal, 
+        FlatPickr
     },
     setup () {
         return { v$: useVuelidate() }

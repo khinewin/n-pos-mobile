@@ -1,247 +1,292 @@
 <template>
-    <div class="modal fade" id="categoryManagementModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content ">                                    
-          
-                            <div class="card shadow-sm  ">
-                                <div class="card-body p-2">
-                                    <div class="row  justify-content-end mb-2">   
-                                        <!--<div class="col-4 d-grid">
-                                            <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCategory">
-                                                <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> Save </span>
-                                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
-                                            </button>
-                                        </div>   
-                                        <div class="col-4 d-grid">
-                                            <button type="button"  :disabled="!editItem.id" class="btn btn-sm"  @click="saveEdit">
-                                                <span><i class="fa-solid fa-hard-drive"></i> Update</span>
-                                            </button>
-                                        </div>    -->                                                                                                                          
-                                        <div class="col-4 d-grid">
-                                            <button class="btn btn-sm text-dark close-p-z" data-bs-dismiss="modal"><i class="fa-solid fa-circle-xmark"></i> Close</button>
-                    
-                                        </div> 
-                                    </div> 
-                                    <div class="row g-2">
-                                        <div class="col-12 vh-75 overflow-y-auto">
-                                            <table class="table table-bordered table-hover mb-0">
-                                                <tbody>
-                                                   
-                                                    <tr class="table-secondary sticky-top z-3">
-                                                        
-                                                        <td class="col-12" colspan="2">
-                                                            <input @keypress.enter="saveCategory" v-model="cat_name" type="text" class="form-control text-center py-1 px-2" placeholder="Category Name">
-                                                        </td>
-                                                        <td class="col-0">
-                                                            <button type="button" class="btn btn-sm text-primary" :disabled="isLoading" @click="saveCategory">
-                                                                <span v-if="!isSaving"><i class="fa-solid fa-check"></i> </span>
-                                                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr v-if="cats.length" v-for="c in cats" :key="c.code">
-                                                        <td class="col-0">
-                                                              <button :disabled="c.user.uid != user.uid" class="btn btn-sm text-danger" @click="removeCategory(c)"><i class="fa-solid fa-trash"></i></button>
+    <div class="modal fade" id="categoryManagementModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="categoryManagementModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg ripple-container">
+                <!-- Modern Header -->
+                <div class="modal-header bg-white border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold text-primary" id="categoryManagementModalLabel">
+                        <i class="fa-solid fa-tags me-2"></i>{{t('categories')}}
+                    </h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
-                                                        </td>
-                                                        <td @click="setEdit(c)" class="text-center col-12" >
-                                                            <span v-if="editItem.id !== c.id">{{c.cat_name}}</span>
-                                                            <input v-else @input="setEdit(c)" @keypress.enter="saveEditCategory" type="text" v-model="c.cat_name" class="form-control text-center px-2 py-1">
-            
-                                                        </td>
-                                                        <td>
-                                                            <button type="button"  :disabled="!editItem.id" class="btn btn-sm text-primary"  @click="saveEdit" v-if="editItem.id==c.id">
-                                                                <span><i class="fa-solid fa-check"></i> </span>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>                                                                                  
-                        
-                       </div>
-                        <div v-if="isLoading">
-                            <div colspan="5">
-                                <div class="d-flex justify-content-center my-5">
-                                    <div class="spinner-border text-primary"  role="status">
-                                      <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                </div>
+                <div class="modal-body p-4">
+                    <!-- Add Category Section -->
+                    <div class="card bg-light border-0 rounded-3 mb-2">
+                        <div class="card-body p-2">
+                            <div class="input-group shadow-sm rounded-3 overflow-hidden">
+                                <span class="input-group-text bg-white border-0">
+                                    <i class="fa-solid fa-plus text-success"></i>
+                                </span>
+                                <input 
+                                    @keypress.enter="saveCategory" 
+                                    v-model="cat_name" 
+                                    type="text" 
+                                    class="form-control border-0 bg-white py-2" 
+                                    placeholder="Enter category name...">
+                                <button 
+                                    class="btn btn-primary px-3" 
+                                    type="button" 
+                                    :disabled="isSaving || !cat_name" 
+                                    @click="saveCategory">
+                                    <span v-if="!isSaving"><i class="fa-solid fa-check"></i></span>
+                                    <span class="spinner-border spinner-border-sm" v-else></span>
+                                </button>
                             </div>
                         </div>
-                </div> 
-          </div>
+                    </div>
+
+                    <!-- Category List -->
+                    <div class="vh-50 overflow-y-auto custom-scrollbar pe-2">
+                        <div v-if="isLoading" class="d-flex justify-content-center align-items-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+
+                        <div v-else-if="cats.length === 0" class="text-center text-muted py-5">
+                            <i class="fa-solid fa-folder-open fa-3x mb-3 opacity-25"></i>
+                            <p class="mb-0">No categories found</p>
+                        </div>
+
+                        <div v-else>
+                            <table class="table table-hover align-middle border-0">
+                                <thead class="sticky-top bg-white z-3">
+                                    <tr class="small text-muted text-uppercase fw-bold border-bottom">
+                                        <th class="border-0 px-0">Name</th>
+                                        <th class="border-0 text-end" style="width: 100px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="c in cats" :key="c.id" class="border-0 category-row">
+                                        <template v-if="editItem.id !== c.id">
+                                            <td class="p-2">
+                                                <div @click="setEdit(c)" class="fw-medium text-dark ps-2 cursor-pointer category-name">
+                                                    {{c.cat_name}}
+                                                </div>
+                                            </td>
+                                            <td class="text-end p-2">
+                                                <button 
+                                                    :disabled="c.user.uid != user.uid" 
+                                                    class="btn btn-link link-danger text-decoration-none py-1 px-2 rounded-circle hover-bg-danger" 
+                                                    @click="confirmRemove(c)">
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </td>
+                                        </template>
+                                        <td v-else colspan="2" class="p-2">
+                                            <div class="input-group shadow-sm rounded-3 overflow-hidden">
+                                                <span class="input-group-text bg-white border-0">
+                                                    <i class="fa-solid fa-pen-to-square text-success"></i>
+                                                </span>
+                                                <input 
+                                                    @keypress.enter="saveEditCategory" 
+                                                    type="text" 
+                                                    v-model="c.cat_name" 
+                                                    class="form-control border-0 bg-white py-2"
+                                                    @input="setEdit(c)"
+                                                    v-focus>
+                                                <button class="btn btn-primary px-3" @click="saveEditCategory">
+                                                    <i class="fa-solid fa-check"></i>
+                                                </button>
+                                                <button class="btn btn-light px-3" @click="editItem = {}">
+                                                    <i class="fa-solid fa-times text-muted"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+              
+            </div>
         </div>
-      </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-hidden="true" ref="deleteCategoryModal">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-body text-center p-4">
+                        <div class="bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+                            <i class="fa-solid fa-triangle-exclamation fa-2x"></i>
+                        </div>
+                        <h6 class="fw-bold mb-2">Delete Category?</h6>
+                        <p class="text-muted small mb-4">Are you sure you want to delete <span class="fw-bold text-dark">"{{ categoryToDelete?.cat_name }}"</span>? This action cannot be undone.</p>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-danger rounded-3 py-2 fw-bold shadow-sm" @click="proceedDeletion" :disabled="isDeleting">
+                                <span v-if="!isDeleting">Delete Forever</span>
+                                <span class="spinner-border spinner-border-sm" v-else></span>
+                            </button>
+                            <button type="button" class="btn btn-light rounded-3 py-2 text-muted fw-medium" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
-    import {Timestamp, collection, onSnapshot, addDoc, getDocs, doc, limit, deleteDoc, setDoc, where, orderBy, updateDoc, query} from 'firebase/firestore'
-    import db from '@/firebase/firestore'
-    import * as cat from "@/lib/snapshot/category"
-    
-    import * as hp  from "@/lib/helper"
-    import { useVuelidate  } from '@vuelidate/core'
-    import { required, email ,helpers} from '@vuelidate/validators'
-    import PageHeader from "@/views/partials/PageHeader.vue"
-    
-    export default {   
-      components:{
-        PageHeader
-      },
-       data(){
-           return{         
-               isLoading:false,       
-               editItem:{},
-               cat_name:"",
-               brand_name:"",
-               cats:[],
-               brands:[],
-               isSaving:false,
-               isDeleting:false,
-               editItem:{},
-               msg :{
-                    type: "",
-                    info:"",
-               },
-               is_check_all_cat:false,
-               is_check_all_brand:false,
-               limitItem: 100,
-           }
-       },   
-       mounted() {
-            this.isLoading=true;      
-         //   this.checkDatabaseBrand();
-           // this.fetchCategory();   
-         //   this.fetchBrand();    
-         this.checkDatabaseCategory();  
-       },
-       watch:{       
-           msg:{
-               handler(val){
-                   if(val.type){
-                       setTimeout(()=>{
-                           this.msg.type="";
-                           this.msg.info="";
-                       }, 3000)
-                   }
-               },deep:true
-           }
-       }, 
-       computed:{
-           user(){
-               return this.$store.getters.user;
-           },     
-       },
-      
-       methods:{
-         setMsg(){
+import { Timestamp, collection, onSnapshot, addDoc, doc, deleteDoc, updateDoc, query, orderBy } from 'firebase/firestore'
+import db from '@/firebase/firestore'
+import * as cat from "@/lib/snapshot/category"
+import * as hp from "@/lib/helper"
+import { Modal } from 'bootstrap'
+
+export default {
+    directives: {
+        focus: {
+            mounted(el) {
+                el.focus()
+            }
+        }
+    },
+    data() {
+        return {
+            isLoading: false,
+            editItem: {},
+            cat_name: "",
+            cats: [],
+            isSaving: false,
+            isDeleting: false,
+            msg: {
+                type: "",
+                info: "",
+            },
+            limitItem: 100,
+            categoryToDelete: null,
+            deleteModalInstance: null
+        }
+    },
+    mounted() {
+        this.isLoading = true;
+        this.checkDatabaseCategory();
+        this.deleteModalInstance = new Modal(this.$refs.deleteCategoryModal);
+    },
+    unmounted() {
+        if (this.deleteModalInstance) this.deleteModalInstance.hide();
+    },
+    computed: {
+        user() {
+            return this.$store.getters.user;
+        },
+        t() {
+            return (key) => this.$store.getters.t(key);
+        }
+    },
+    methods: {
+        setMsg() {
             this.$emit("setMsg", this.msg.info, this.msg.type)
         },
-       
-        setEdit(item){
-            this.editItem=item;
+        setEdit(item) {
+            this.editItem = { ...item };
         },
-        saveEdit(){
-          
-            this.saveEditCategory();
-           
+        async saveEditCategory() {
+            if (!this.editItem.cat_name) return;
+            const dataCollection = doc(db, "category", this.editItem.id)
+            const data = {
+                cat_name: this.editItem.cat_name,
+                edit_user: { uid: this.user.uid, type: 'modified' },
+            }
+            await updateDoc(dataCollection, data);
+            this.editItem = {};
         },
-        async saveEditCategory(){
-            const dataCollection=doc(db, "category", this.editItem.id)         
-                const data={
-                    cat_name:this.editItem.cat_name,          
-                    edit_user: {uid: this.user.uid, type: 'modified'},
-                }
-            await updateDoc(dataCollection, data);    
+        async saveCategory() {
+            if (!this.cat_name) return false;
+            this.isSaving = true;
+            const dataCollection = collection(db, "category")
+            const save_time = Timestamp.fromDate(new Date());
+            const code = new Date().getTime()
+            const data = {
+                user: { uid: this.user.uid, displayName: this.user.displayName },
+                cat_name: this.cat_name,
+                code: code.toString(),
+                edit_user: { uid: this.user.uid, type: 'added' },
+                created_at: save_time,
+            }
+            await addDoc(dataCollection, data);
+            this.cat_name = "";
+            this.isSaving = false;
         },
-      
-       async saveCategory(){
-            if(!this.cat_name) return false;
-                this.isSaving=true;
-                const dataCollection=collection(db, "category", )
-                const save_time=Timestamp.fromDate(new Date());
-                const code=new Date().getTime()
-                const data={
-                    user: {uid:this.user.uid, displayName:this.user.displayName},
-                    cat_name:this.cat_name,
-                    code: code.toString(),
-                    edit_user: {uid: this.user.uid, type: 'added'},
-                    created_at: save_time,
-                }
-            await addDoc(dataCollection, data);    
+        confirmRemove(p) {
+            this.categoryToDelete = p;
+            this.deleteModalInstance.show();
         },
-        
-        message(type, name){
-                    this.msg.info=hp.message(type, name)
-                    this.msg.type="success"                                                         
-         }, 
-         async removeCategory(p){   
-                const cf=confirm(`Are you sure,  you want to delete the category ${p.cat_name}`)
-                if(!cf) return false;
-                this.isDeleting=true;       
-                const document=doc(db, "category", p.id)            
-                 await deleteDoc(document)  
-            },
-        async checkDatabaseCategory(){ 
-            const query_url=query(collection(db, "category"), orderBy("created_at", "desc"));           
-                 this.unsubProducts= onSnapshot(query_url, async(snapShot) =>{                    
-                        //update  docs
-                                    const category=cat.category(snapShot);   
-                                    this.cats=category.slice(0, this.limitItem);                               
-                                    this.isLoading=false;
-    
-                            const dc=snapShot._snapshot.docChanges;
-                             const user=this.user;
-                             if(dc.length > 1) return false;
-                            //get only update doc for message
-                            snapShot.docChanges().forEach((change) => {     
-                                const res=change.doc.data();   
-                                const id=change.doc.id;
-                                const edit_user=res.edit_user !=null ? res.edit_user : "";
-                                if(change.type==="added" &&   edit_user.uid==user.uid &&  dc.length ===1){                               
-                                        this.msg.info="The new category has been created"
-                                        this.msg.type="success"
-                                        this.isSaving=false;
-                                        this.cat_name="";
-                                        this.setMsg();
-                                        //  hp.setAutoFocus("item_name")     
-                                }
-                                if(change.type==="modified" && edit_user.type=="modified" && edit_user.uid==user.uid){
-                                        this.msg.info="The selected category  has been updated"
-                                        this.msg.type="success"
-                                        this.isUpdating=false;
-                                        this.editItem={};
-                                        this.setMsg();
-                                      //  const items=this.products.filter((f)=>f.id==this.editItem.id)
-                                }  
-                                if(change.type==="removed" && this.isDeleting){
-                                        this.isDeleting=false;
-                                         this.msg.info="The selected category  has been deleted"
-                                        this.msg.type="success"
-                                        this.setMsg();
-                                }
-                          
-                            })
-                       
-                     });                      
-            } ,
-          
-            async fetchCategory(){                    
-                const query_url = query(collection(db, "category"), orderBy("created_at", "desc"));
-                onSnapshot(query_url, async(snapShot) =>{
-                    const cats=cat.category(snapShot);   
-                    this.cats=cats;             
-                    this.isLoading=false;
+        async proceedDeletion() {
+            if (!this.categoryToDelete) return;
+            this.isDeleting = true;
+            const document = doc(db, "category", this.categoryToDelete.id)
+            await deleteDoc(document);
+            this.isDeleting = false;
+            this.deleteModalInstance.hide();
+            this.categoryToDelete = null;
+        },
+        async checkDatabaseCategory() {
+            const query_url = query(collection(db, "category"), orderBy("created_at", "desc"));
+            onSnapshot(query_url, async (snapShot) => {
+                const category = cat.category(snapShot);
+                this.cats = category.slice(0, this.limitItem);
+                this.isLoading = false;
+
+                snapShot.docChanges().forEach((change) => {
+                    const res = change.doc.data();
+                    const edit_user = res.edit_user != null ? res.edit_user : "";
+                    const user = this.user;
+
+                    if (change.type === "added" && edit_user.uid == user.uid && snapShot.docChanges().length === 1) {
+                        this.msg.info = "The new category has been created"
+                        this.msg.type = "success"
+                        this.setMsg();
+                    }
+                    if (change.type === "modified" && edit_user.type == "modified" && edit_user.uid == user.uid) {
+                        this.msg.info = "The selected category has been updated"
+                        this.msg.type = "success"
+                        this.setMsg();
+                    }
+                    if (change.type === "removed" && this.isDeleting) {
+                        this.msg.info = "The selected category has been deleted"
+                        this.msg.type = "success"
+                        this.setMsg();
+                    }
                 })
-               
-           } ,
-         
-          showTime(t){
-               return hp.showTime(t)
-           },
-       }
-       
+            });
+        }
     }
-    </script>
+}
+</script>
+
+<style scoped>
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e0e0e0;
+    border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #cccccc;
+}
+
+.category-row:hover .category-name {
+    color: var(--bs-primary) !important;
+}
+
+.hover-bg-danger:hover {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+.category-name {
+    transition: color 0.2s;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+</style>

@@ -1,303 +1,460 @@
-<template lang="">       
- <div>           
+<template>       
+    <div>           
         <PageHeader :page-title="pageTitle" page-code="medicineCode" :msg-type="msg.type" :msg-info="msg.info"/>
-        <div class="container-fluid">
-            <div class="row  justify-content-end">   
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <div class="form-check form-switch  d-flex justify-content-center">
-                        <!--<input class="form-check-input" @change="setCamera" v-model="useCamera" type="checkbox" role="switch" id="useCamera">-->
-                        <!--<label class="form-check-label ms-1 change-cursor" for="useCamera" @click="setCamera" :class="[useCamera ? 'text-success' : 'text-muted']"> <i class="fa-solid fa-camera"></i></label>-->
-                      </div>
-                </div>
-                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#categoryManagementModal"><i class="fa-solid fa-code-branch"></i> {{t('categories')}}</button>
-                    <!--<router-link :to="{name: 'Category'}" class="btn btn-sm"><i class="fa-solid fa-code-branch"></i> အမျိုးအစားများ</router-link>-->
-                </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <select class="form-control-plaintext text-center py-0" v-model="limitData" @change="changeLimitData">
-                            <option>50</option>
-                            <option>100</option>
-                            <option>150</option>
-                            <option>200</option>
-                            <option>250</option>
-                            <option>300</option>
-                        </select>
+        
+        <!-- Modern Toolbar -->
+         <div class="container-fluid">
+        <div class="container-fluid bg-light border-bottom sticky-top py-2 shadow-sm rounded-3">
+            <div class="row g-2 justify-content-end align-items-center">   
+                <div class="col-auto">
+                    <select class="form-select form-select shadow-sm" v-model="limitData" @change="changeLimitData" style="width: auto;">
+                        <option>50</option>
+                        <option>100</option>
+                        <option>150</option>
+                        <option>200</option>
+                        <option>250</option>
+                        <option>300</option>
+                    </select>
                 </div> 
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button class="btn btn-sm">{{t('display_link')}} {{products.length}} of {{productCount}}</button>
+                <div class="col-auto me-auto">
+                    <span class="btn btn-light text-danger shadow-sm px-3 py-2">
+                        <i class="fa-solid fa-list me-1"></i> {{products.length}} / {{productCount}}
+                    </span>
                 </div> 
-                <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveEdit">
-                        <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> {{update_link}} </span>
-                        <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
+                <div class="col-auto">
+                    <button class="btn btn-light text-primary  shadow-sm" data-bs-toggle="modal" data-bs-target="#categoryManagementModal">
+                        <i class="fa-solid fa-code-branch me-1"></i> {{t('categories')}}
+                    </button>                                                                        
+                </div>
+                
+                <div class="col-auto">
+                    <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn btn-light text-success shadow-sm packing-unit">
+                        <i class="fa-solid fa-boxes-packing me-1"></i> {{t('packing_units')}}
                     </button>
-                </div> -->
-                <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
-                        <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
-                        <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
-                    </button>
-                </div>-->      
-                                            
-                <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCode">
-                        <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> {{save_link}}</span>
-                        <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
-                    </button>
-                </div> -->
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button data-bs-toggle="modal" data-bs-target="#packingSizeModal" class="btn btn-sm packing-unit"><i class="fa-solid fa-boxes-packing"></i> {{t('packing_units')}}</button>
                 </div>   
             </div>
         </div>
+        </div>
+
+        <!-- Main Content -->
         <div class="container-fluid my-2">
-            <div class="row g-1">
+            <div class="row g-2">
+                <!-- Left: Search Filters -->
                 <div class="col-lg-3">
-                    <div class="card shadow">
-                        <div class="card-body p-2">
-                            <div class="row g-2">
-                                <div class="form-floating col-sm-3 col-lg-12" @click="initScanner(status='search')">
-                                    <input type="search" id="search_by_code"  v-model="search_by_code" @paste="onPaste" @keypress.enter="searchProducts" placeholder="Code" class="form-control-plaintext border-bottom">
-                                    <label for="search_by_code" class="small">{{t('barcode')}}</label>
+                    <div class="card border-0 shadow-sm rounded-3">
+                        <div class="card-body p-3">
+                            <h6 class="fw-bold text-muted text-uppercase small mb-3">
+                                <i class="fa-solid fa-filter me-2"></i>Search Filters
+                            </h6>
+                            
+                            <!-- Barcode Input -->
+                            <div class="mb-2">
+                                <label class="small text-muted text-uppercase fw-bold mb-1">{{t('barcode')}}</label>
+                                <div class="input-group" @click="initScanner(status='search')">
+                                    <span class="input-group-text bg-light border-0">
+                                        <i class="fa-solid fa-barcode text-secondary"></i>
+                                    </span>
+                                    <input 
+                                        type="search" 
+                                        id="search_by_code"  
+                                        v-model="search_by_code" 
+                                        @paste="onPaste" 
+                                        @keypress.enter="searchProducts" 
+                                        placeholder="Enter barcode" 
+                                        class="form-control bg-light border-0">
                                 </div>
-                                <div class="form-floating col-sm-3 col-lg-12">
-                                    <input type="search" id="search_by_description" v-model="search_by_description" @keypress.enter="searchProducts" placeholder="Description" class="form-control-plaintext border-bottom">
-                                    <label for="search_by_description" class="small">{{t('item_name')}}</label>
+                            </div>
+
+                            <!-- Item Name Input -->
+                            <div class="mb-2">
+                                <label class="small text-muted text-uppercase fw-bold mb-1">{{t('item_name')}}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0">
+                                        <i class="fa-solid fa-box text-secondary"></i>
+                                    </span>
+                                    <input 
+                                        type="search" 
+                                        id="search_by_description" 
+                                        v-model="search_by_description" 
+                                        @keypress.enter="searchProducts" 
+                                        placeholder="Search product name" 
+                                        class="form-control bg-light border-0">
                                 </div>
-                                <div class="form-floating col-sm-3 col-lg-12">
-                                    <select id="search_by_category" class="form-control-plaintext border-bottom" v-model="search_by_category">
-                                        <option value=""></option>
+                            </div>
+
+                            <!-- Category Select -->
+                            <div class="mb-3">
+                                <label class="small text-muted text-uppercase fw-bold mb-1">{{t('category')}}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0">
+                                        <i class="fa-solid fa-tags text-secondary"></i>
+                                    </span>
+                                    <select 
+                                        id="search_by_category" 
+                                        class="form-select bg-light border-0" 
+                                        v-model="search_by_category">
+                                        <option value="">All Categories</option>
                                         <option v-for="c in cats" :key="c.id" :value="c.cat_name">{{c.cat_name}}</option>
                                     </select>
-                                    <label for="search_by_category" class="small">{{t('category')}}</label>
                                 </div>
-                            
-                                    <div class="col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark" @click="searchProducts"><i class="fa-solid fa-magnifying-glass-arrow-right"></i> {{t('search_link')}}</button></div>
-                                    <!--<div class="col-4 d-grid"><button class="btn btn-sm text-dark" @click="updateProducts"><span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> Update</span>
-                                        <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
-                                    </button></div>-->
-                                    <div class="col-sm-3 col-lg-6 d-grid"><button class="btn btn-sm text-dark clear-search-product" @click="clearSearch"><i class="fa-solid fa-filter-circle-xmark"></i> {{t('clear_link')}}</button></div>
-                             </div> 
-                        </div>
-                    </div>     
-                  
-                                                                                                                
-                </div>                        
-                <div class="col-md-7 col-lg-5">
-                    <div class="card shadow vh-75 overflow-y-auto">
-                        <div class="card-body p-2">
-                            <div>
+                            </div>
 
-                                <table class="table table-bordered mb-0">
-                                    <tbody>
-                                        <tr class="table-secondary position-sticky top-0">
-                                            <td class="position-relative col-0">
-                                                <!--<div class="form-check form-switch">
-                                                    <input @click="checkAll"  v-model="is_check_all" class="form-check-input " type="checkbox" role="switch" >
-                                                  </div>
-                                                <input class="position-absolute start-50 top-50 translate-middle" type="checkbox" @click="checkAll" v-model="is_deleted">-->
-                                            </td>
-                                            <!--<td class="p-0 col-3" @click="initScanner(status='new')">
-                                                <input placeholder="Code" :readonly="useCamera"  type="text" v-model="code_no" class="form-control py-1  text-center">
-                                            </td>-->
-                                            <td class="p-0 col-12">
-                                                <input  id="item_name" :placeholder="t('item_name')" @keypress.enter="saveCode"   type="text" v-model="item_name" class="form-control py-1">                                
-                                            </td>  
-                                            <td>
-                                                <button class="btn btn-sm text-primary" @click="saveCode">
-                                                    <span v-if="!isSaving"><i class="fa-solid fa-check"></i> </span>
-                                                    <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
-                                                </button>
-                                            </td>                                   
-                                        </tr>    
-                                    </tbody>
-                                    <tbody> 
-                                        <!--<tr class="text-center table-secondary" style="cursor: context-menu;">
-                                            <td class="co-0">
-                                                <input  type="checkbox" @click="checkAll" v-model="is_check_all" class="form-check-input">
-                                            </td>
-                                            <td class="col-3">Code</td>
-                                            <td class="col-9">Product Name</td>
-                                        </tr>-->                                                                    
-                                        
-                                                                
-                                    <tr class="text-center"  v-if="products.length > 0"  v-for="(p, i) in products" :key="p.id"  :class="{'table-secondary' : editItem.id === p.id}">   
-                                        <td class="">
-                                            <!--<div class="form-check form-switch">
-                                                <input class=" form-check-input" type="checkbox" v-model="p.is_deleted">
-                                            </div>-->
-                                            <button :disabled="p.user.uid != user.uid" class="btn btn-sm text-danger d-block" @click="removeProduct(p)"><i class="fa-solid fa-trash"></i></button>
-                                        </td>                                 
-                                        <!--<td :class="{'table-secondary': sort_item ==='code_no'}" class=" p-0" @click="initScanner(status='edit')" >
-                                            <span>
-                                                <input v-if="editItem.id==p.id"   :readonly="useCamera"  @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1 text-center " v-model="p.code_no">
-                                                <div v-else class="py-1" @click="setEdit(p)">{{p.code_no}}</div>
-                                            </span>
-                                        </td>-->
-                                        <td :class="{'table-secondary': sort_item ==='item_name'}" class="p-0">
-                                            <input v-if="editItem.id==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1" v-model="p.item_name">
-                                            <div v-else class="text-start py-1 px-1" @click="setEdit(p)">{{p.item_name}}</div>
-                                        </td>         
-                                        <td>
-                                            <button class="btn btn-sm text-primary" @click="saveEdit" v-if="editItem.id==p.id">
-                                                <span v-if="!isUpdating"><i class="fa-solid fa-check"></i> </span>
-                                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating && editItem.id==p.id"></span>
-                                            </button>
-                                        </td>                              
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <div v-if="isLoading">
-                                <div colspan="5">
-                                    <div class="d-flex justify-content-center my-5">
-                                        <div class="spinner-border text-primary"  role="status">
-                                          <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>   
+                            <!-- Action Buttons -->
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary flex-fill shadow-sm fw-medium" @click="searchProducts">
+                                    <i class="fa-solid fa-search me-2"></i> {{t('search_link')}}
+                                </button>
+                                <button class="btn btn-light flex-fill shadow-sm fw-medium clear-search-product" @click="clearSearch">
+                                    <i class="fa-solid fa-filter-circle-xmark me-2"></i> {{t('clear_link')}}
+                                </button>
+                            </div>
                         </div>
-                     </div>                            
                     </div>
                 </div>
-                <div class="col-md-5 col-lg-4">
-                    <div class="card shadow">
-                        <div class="card-body p-2">
-                            <table class="table table-bordered mb-0 table-hover" v-if="Object.keys(editItem).length >0" >
-                                <tbody>
-                                    <tr class="">
-                                        <td :colspan="[editItem.packing_size.largest_unit !=null ? 4 : 5]">
-                                            <div class="text-center text-primary h6 pt-2">
-                                                    {{editItem.item_name}}
+
+                <!-- Center: Product List -->
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-sm rounded-3">
+                        <div class="card-header bg-white border-0 pb-0">
+                            <h6 class="fw-bold text-muted text-uppercase small mb-0">
+                                <i class="fa-solid fa-list me-2"></i>Products
+                            </h6>
+                        </div>
+                        <div class="card-body p-0 vh-75 overflow-y-auto">
+                            <table class="table table-hover mb-0">
+                                <thead class="position-sticky top-0 z-3">
+                                    <tr class="table-light">
+                                        <th class="col-0 border-0 text-center small align-middle">
+                                            <i class="fa-solid fa-plus text-success"></i>
+                                        </th>
+                                        <th class="col-12 border-0 small">
+                                            <input  
+                                                id="item_name" 
+                                                :placeholder="t('item_name')" 
+                                                @keypress.enter="saveCode"   
+                                                type="text" 
+                                                v-model="item_name" 
+                                                class="form-control form-control-sm bg-light border-0">
+                                        </th>  
+                                        <th class="col-0 border-0 ">
+                                            <button class="btn btn-sm btn-success shadow-sm" @click="saveCode">
+                                                <span v-if="!isSaving"><i class="fa-solid fa-check"></i></span>
+                                                <span class="spinner-border spinner-border-sm" v-if="isSaving"></span>
+                                            </button>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="small">
+                                    <tr 
+                                        v-if="products.length > 0"  
+                                        v-for="(p, i) in products" 
+                                        :key="p.id"  
+                                        :class="{'table-secondary' : editItem.id === p.id}"
+                                        class="cursor-pointer"
+                                        style="transition: all 0.2s;">   
+                                        <td class="text-center col-0 align-middle">
+                                            <button 
+                                                :disabled="p.user.uid != user.uid" 
+                                                class="btn btn-sm text-danger" 
+                                                @click="setProductToDelete(p)">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </td>
+                                        <td :class="{'table-secondary': sort_item ==='item_name'}" class="py-1 col-12">
+                                            <input 
+                                                v-if="editItem.id==p.id" 
+                                                @input="setEdit(p)" 
+                                                @keypress.enter="saveEdit" 
+                                                type="text" 
+                                                class="form-control form-control-sm border-0" 
+                                                v-model="p.item_name">
+                                            <div 
+                                                v-else 
+                                                class="py-2 px-2 fw-medium" 
+                                                @click="setEdit(p)">
+                                                {{p.item_name}}
                                             </div>
+                                        </td>         
+                                        <td class="text-center col-0 align-middle">
+                                            <button 
+                                                class="btn btn-sm btn-primary shadow-sm" 
+                                                @click="saveEdit" 
+                                                v-if="editItem.id==p.id">
+                                                <span v-if="!isUpdating"><i class="fa-solid fa-check"></i></span>
+                                                <span class="spinner-border spinner-border-sm" v-if="isUpdating && editItem.id==p.id"></span>
+                                            </button>
                                         </td>
                                     </tr>
-                                      <tr class="change-cursor table-info" data-bs-toggle="modal" data-bs-target="#categoryModal">
-                                        <td class=""> {{t('category')}}</td>                                       
-                                        <td class="text-center" :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]">
-                                               <span v-if="editItem.category"> {{editItem.category.cat_name}}</span>
-                                        </td>
-                                    </tr>  
-                                    <tr @click="initScanner(status='edit')">
-                                        <td class="col-1">{{t('barcode')}}</td>
-                                        <td :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]" class="text-center col-3">
-                                            <div class="d-flex">
-                                                <input   :readonly="useCamera"   @keypress.enter="updateCode" type="text" class="form-control-plaintext py-0 text-center " v-model="editItem.code_no">
-                                                <button class="btn btn-sm text-primary" @click="updateCode">
-                                                    <span v-if="!isUpdatingCode"><i class="fa-solid fa-check"></i> </span>
-                                                    <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdatingCode"></span>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr class="table-primary packing-size change-cursor"  data-bs-toggle="modal" data-bs-target="#selectPackingSizeModal">
-                                        <td class="col-1">{{t('packing_size')}}</td>
-                                        <td :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]" class="text-center col-3">
-                                            <div v-if="editItem.packing_size.smallest_unit && editItem.packing_size.medium_unit">
-                                                    {{calPackingSize(editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit, editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty)}}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr class="change-cursor table-warning" data-bs-toggle="modal" data-bs-target="#setQtyModal">
-                                        <td class="">{{t('inv_bal')}}</td>                                       
-                                        <td class="text-center" :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]">
-                                            <div  v-if="editItem.packing_size">
-                                                {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}                                            
-                                            </div>
-                                        </td>
-                                    </tr>    
-                                   
-                                    <tr class="fw-bold">
-                                        <td></td>
-                                        <td class="text-center " v-if="editItem.packing_size.largest_unit !=null">
-                                            <span >{{editItem.packing_size.largest_unit}}</span>
-                                        </td>
-                                        <td class="text-center " v-if="editItem.packing_size.medium_unit !=null">
-                                            <span >{{editItem.packing_size.medium_unit}}</span>
-                                        </td>                                        
-                                        <td class="text-center"  v-if="editItem.packing_size.smallest_unit !=null">
-                                            <span>{{editItem.packing_size.smallest_unit}}</span>
-                                        </td>
-                                    </tr>                        
-                                    <tr class="">
-                                        <td class="">{{t('pur_price')}}</td>
-                                        <td class="text-center" v-if="editItem.packing_size.largest_unit !=null">
-                                            <span >
-                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calPurPrice('largest_unit')" type="number" v-model="editItem.pur_price.largest_unit" class="form-control-plaintext p-0 text-center">
-                                            </span>
-                                        </td>
-                                        <td class="text-center">
-                                            <span v-if="editItem.packing_size.medium_unit !=null">
-                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.medium_unit"  @keyup="calPurPrice('medium_unit')"  type="number" v-model="editItem.pur_price.medium_unit" class="form-control-plaintext p-0 text-center">
-                                            </span>
-                                        </td>
-                                        <td class="text-center">
-                                            <span v-if="editItem.packing_size.smallest_unit !=null">
-                                                <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.smallest_unit" @keyup="calPurPrice('smallest_unit')" type="number" v-model="editItem.pur_price.smallest_unit" class="form-control-plaintext p-0 text-center">
-                                            </span>
-                                        </td>                                        
-                                    </tr>
-                                    <tr class="">
-                                        <td class="">{{t('sale_price')}}</td>
-                                        <td class="text-center" v-if="editItem.packing_size.largest_unit !=null">
-                                            <span >
-                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.largest_unit" @keyup="calRetailPrice('largest_unit')" type="number" v-model="editItem.retail_price.largest_unit" class="form-control-plaintext p-0 text-center">
-                                            </span>
-                                        </td>
-                                        <td class="text-center">
-                                            <span v-if="editItem.packing_size.medium_unit !=null">
-                                            <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.medium_unit"  @keyup="calRetailPrice('medium_unit')"  type="number" v-model="editItem.retail_price.medium_unit" class="form-control-plaintext p-0 text-center">
-                                            </span>
-                                        </td>
-                                        <td class="text-center">
-                                            <span v-if="editItem.packing_size.smallest_unit !=null">
-                                                <input @keypress.enter="savePrice" :disabled="!editItem.packing_size.smallest_unit" @keyup="calRetailPrice('smallest_unit')" type="number" v-model="editItem.retail_price.smallest_unit" class="form-control-plaintext p-0 text-center">
-                                            </span>
-                                        </td>                                        
-                                    </tr>
-                                                                        
                                 </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td class="small">
-                                            <div class="form-check form-switch">
-                                                <input  v-model="editItem.auto_cal" class="form-check-input auto-cal" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
-                                                <label class="form-check-label" for="flexSwitchCheckChecked">{{t('auto')}} </label>
-                                              </div>                                              
-                                        </td>
-                                        <td colspan="3" class="p-0 text-end">
-                                            <button class="btn btn-sm" @click="savePrice">                     
-                                            <span v-if="!isSavePrice"><i class="fa-solid fa-hard-drive"></i> {{save_price}}</span>
-                                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSavePrice"></span>
-                                             </button>
-                                        </td>
-                                    </tr>
-                                </tfoot>
                             </table>
+
+                            <!-- Loading State -->
+                            <div v-if="isLoading" class="d-flex justify-content-center align-items-center py-5">
+                                <div class="text-center">
+                                    <div class="spinner-border text-primary mb-3" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <div class="text-muted">Loading products...</div>
+                                </div>
+                            </div>
+
+                            <!-- Empty State -->
+                            <div v-if="!isLoading && products.length === 0" class="text-center text-muted py-5">
+                                <i class="fa-solid fa-box-open fa-3x mb-3 opacity-25"></i>
+                                <div class="h6">No products found</div>
+                                <small>Try adjusting your search filters</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Product Details -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-3">
+                        <div class="card-body p-0">
+                            <div v-if="Object.keys(editItem).length > 0" class="vh-75 overflow-y-auto">
+                                <table class="table table-bordered mb-0">
+                                    <tbody>
+                                        <!-- Product Name Header -->
+                                        <tr class="table-light">
+                                            <td colspan="3" class="border-0">
+                                                <div class="text-center text-success h6 py-2 mb-0">
+                                                    {{editItem.item_name}}
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Category -->
+                                        <tr class="change-cursor table-info" data-bs-toggle="modal" data-bs-target="#categoryModal">
+                                            <td class="fw-medium col-4 align-middle text-start ps-2">
+                                                <i class="fa-solid fa-tags me-2"></i>{{t('category')}}
+                                            </td>                                       
+                                            <td class="text-center col-8" :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]">
+                                                <span v-if="editItem.category">{{editItem.category.cat_name}}</span>
+                                                <span v-else class="text-muted small">Click to set category</span>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Barcode -->
+                                        <tr @click="initScanner(status='edit')" class="change-cursor">
+                                            <td class="fw-medium align-middle text-start ps-2">
+                                                <i class="fa-solid fa-barcode me-2"></i>{{t('barcode')}}
+                                            </td>
+                                            <td :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]" class="text-center">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <input 
+                                                        :readonly="useCamera"   
+                                                        @keypress.enter="updateCode" 
+                                                        type="text" 
+                                                        class="form-control form-control-sm text-center" 
+                                                        v-model="editItem.code_no">
+                                                    <button class="btn btn-sm btn-primary shadow-sm" @click="updateCode">
+                                                        <span v-if="!isUpdatingCode"><i class="fa-solid fa-check"></i></span>
+                                                        <span class="spinner-border spinner-border-sm" v-if="isUpdatingCode"></span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Packing Size -->
+                                        <tr class="table-primary packing-size change-cursor" data-bs-toggle="modal" data-bs-target="#selectPackingSizeModal">
+                                            <td class="fw-medium align-middle text-start ps-2">
+                                                <i class="fa-solid fa-boxes-packing me-2"></i>{{t('packing_size')}}
+                                            </td>
+                                            <td :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]" class="text-center">
+                                                <div v-if="editItem.packing_size.smallest_unit && editItem.packing_size.medium_unit">
+                                                    {{calPackingSize(editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit, editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty)}}
+                                                </div>
+                                                <span v-else class="text-muted small">Click to set packing size</span>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Inventory Balance -->
+                                        <tr class="change-cursor table-warning" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                            <td class="fw-medium align-middle text-start ps-2">
+                                                <i class="fa-solid fa-warehouse me-2"></i>{{t('inv_bal')}}
+                                            </td>                                       
+                                            <td class="text-center" :colspan="[editItem.packing_size.largest_unit !=null ? 3 : 4]">
+                                                <div v-if="editItem.packing_size">
+                                                    <span class="rounded-2 px-2 py-1 text-white" :class="editItem.qty > 10 ? 'bg-success' : editItem.qty > 0 ? 'bg-warning text-dark' : 'bg-danger'">
+                                                        {{calPackingQty(editItem.packing_size.medium_qty, editItem.packing_size.smallest_qty, editItem.qty, editItem.packing_size.largest_unit, editItem.packing_size.medium_unit, editItem.packing_size.smallest_unit)}}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Unit Headers -->
+                                        <tr class="fw-bold table-light">
+                                            <td class="small text-muted text-center">Unit</td>
+                                            <td class="text-center small" v-if="editItem.packing_size.largest_unit !=null">
+                                                {{editItem.packing_size.largest_unit}}
+                                            </td>
+                                            <td class="text-center small" v-if="editItem.packing_size.medium_unit !=null">
+                                                {{editItem.packing_size.medium_unit}}
+                                            </td>                                        
+                                            <td class="text-center small" v-if="editItem.packing_size.smallest_unit !=null">
+                                                {{editItem.packing_size.smallest_unit}}
+                                            </td>
+                                        </tr>
+
+                                        <!-- Purchase Price -->
+                                        <tr>
+                                            <td class="fw-medium small align-middle text-start ps-2">
+                                                <i class="fa-solid fa-dollar-sign me-2"></i>{{t('pur_price')}}
+                                            </td>
+                                            <td class="text-center p-1" v-if="editItem.packing_size.largest_unit !=null">
+                                                <input 
+                                                    @keypress.enter="savePrice" 
+                                                    :disabled="!editItem.packing_size.largest_unit" 
+                                                    @keyup="calPurPrice('largest_unit')" 
+                                                    type="number" 
+                                                    v-model="editItem.pur_price.largest_unit" 
+                                                    class="form-control form-control-sm text-center">
+                                            </td>
+                                            <td class="text-center p-1">
+                                                <input 
+                                                    v-if="editItem.packing_size.medium_unit !=null"
+                                                    @keypress.enter="savePrice" 
+                                                    :disabled="!editItem.packing_size.medium_unit"  
+                                                    @keyup="calPurPrice('medium_unit')"  
+                                                    type="number" 
+                                                    v-model="editItem.pur_price.medium_unit" 
+                                                    class="form-control form-control-sm text-center">
+                                            </td>
+                                            <td class="text-center p-1">
+                                                <input 
+                                                    v-if="editItem.packing_size.smallest_unit !=null"
+                                                    @keypress.enter="savePrice" 
+                                                    :disabled="!editItem.packing_size.smallest_unit" 
+                                                    @keyup="calPurPrice('smallest_unit')" 
+                                                    type="number" 
+                                                    v-model="editItem.pur_price.smallest_unit" 
+                                                    class="form-control form-control-sm text-center">
+                                            </td>
+                                        </tr>
+
+                                        <!-- Sale Price -->
+                                        <tr>
+                                            <td class="fw-medium small align-middle text-start ps-2">
+                                                <i class="fa-solid fa-tag me-2"></i>{{t('sale_price')}}
+                                            </td>
+                                            <td class="text-center p-1" v-if="editItem.packing_size.largest_unit !=null">
+                                                <input 
+                                                    @keypress.enter="savePrice" 
+                                                    :disabled="!editItem.packing_size.largest_unit" 
+                                                    @keyup="calRetailPrice('largest_unit')" 
+                                                    type="number" 
+                                                    v-model="editItem.retail_price.largest_unit" 
+                                                    class="form-control form-control-sm text-center">
+                                            </td>
+                                            <td class="text-center p-1">
+                                                <input 
+                                                    v-if="editItem.packing_size.medium_unit !=null"
+                                                    @keypress.enter="savePrice" 
+                                                    :disabled="!editItem.packing_size.medium_unit"  
+                                                    @keyup="calRetailPrice('medium_unit')"  
+                                                    type="number" 
+                                                    v-model="editItem.retail_price.medium_unit" 
+                                                    class="form-control form-control-sm text-center">
+                                            </td>
+                                            <td class="text-center p-1">
+                                                <input 
+                                                    v-if="editItem.packing_size.smallest_unit !=null"
+                                                    @keypress.enter="savePrice" 
+                                                    :disabled="!editItem.packing_size.smallest_unit" 
+                                                    @keyup="calRetailPrice('smallest_unit')" 
+                                                    type="number" 
+                                                    v-model="editItem.retail_price.smallest_unit" 
+                                                    class="form-control form-control-sm text-center">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+
+                                    <!-- Footer with Auto Calculate & Save -->
+                                    <tfoot class="table-light">
+                                        <tr>
+                                            <td class="align-middle">
+                                                <div class="form-check form-switch">
+                                                    <input 
+                                                        v-model="editItem.auto_cal" 
+                                                        class="form-check-input auto-cal" 
+                                                        type="checkbox" 
+                                                        role="switch" 
+                                                        id="flexSwitchCheckChecked">
+                                                    <label class="form-check-label small" for="flexSwitchCheckChecked">
+                                                        {{t('auto')}}
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td colspan="3" class="text-end">
+                                                <button class="btn btn-light text-primary  shadow-sm" @click="savePrice">                     
+                                                    <span v-if="!isSavePrice">
+                                                        <i class="fa-solid fa-save me-1"></i>Save Prices
+                                                    </span>
+                                                    <span class="spinner-border spinner-border-sm" v-if="isSavePrice"></span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                            <!-- Empty State for Details Panel -->
+                            <div v-else class="text-center text-muted py-5">
+                                <i class="fa-solid fa-hand-pointer fa-3x mb-3 opacity-25"></i>
+                                <div class="h6">Select a product</div>
+                                <small>Click on a product from the list to view and edit details</small>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Modals -->
         <CategoryManagementModal @setMsg="setMsg"/>
         <CategoryModal @setCode="setCategory" />
         <SetQty :ei="editItem" @saveQty="saveQty" />
         <PackingSizeModal @setMsg="setMsg" :packingSizes="packingSizes" />
         <SelectPackingSizeModal @setPackingSize="setPackingSize" :ei="editItem" :packingSizes="packingSizes" />
-          <!-- Barcode Modal -->
-          <div class="modal fade" id="barcodeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog position-relative">
-            <div class="modal-content">   
-                <div class="modal-body ">
-                    <button class="btn btn-secondary btn-sm position-absolute end-0 top-0 z-3" data-bs-dismiss="modal" @click="stopScanner">Close</button>
-                    <div id="reader" class="img-fluid"></div>
-                </div>               
-            </div>
+        
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteProductModal" tabindex="-1" aria-hidden="true" ref="deleteProductModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold text-danger">Confirm Delete</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center py-4">
+                        <div class="mb-3 text-danger opacity-50">
+                            <i class="fa-solid fa-triangle-exclamation fa-3x"></i>
+                        </div>
+                        <p class="mb-0 fw-medium">Are you sure you want to delete this product?</p>
+                        <p class="text-muted small" v-if="productToDelete">"{{ productToDelete.item_name }}"</p>
+                    </div>
+                    <div class="modal-footer border-top-0 pt-0 justify-content-center">
+                        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger px-4" @click="confirmDelete">Delete</button>
+                    </div>
+                </div>
             </div>
         </div>
-</div>   
- 
+
+        <!-- Barcode Scanner Modal -->
+        <div class="modal fade" id="barcodeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog position-relative">
+                <div class="modal-content">   
+                    <div class="modal-body">
+                        <button class="btn btn-secondary btn-sm position-absolute end-0 top-0 z-3 m-2" data-bs-dismiss="modal" @click="stopScanner">
+                            <i class="fa-solid fa-times me-1"></i>Close
+                        </button>
+                        <div id="reader" class="img-fluid"></div>
+                    </div>               
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 <script>
 import PageHeader from "@/views/partials/PageHeader.vue"
@@ -307,23 +464,35 @@ import {Timestamp,onSnapshot, collection, addDoc, query, where, setDoc, getCount
 import db from '@/firebase/firestore'
 import Footer from '@/views/partials/Footer.vue'
 import * as ss from "@/lib/snapshot/products"
+import store from "@/store"
+import * as cat from "@/lib/snapshot/category"
+import CategoryManagementModal from "@/views/modals/product/CategoryManagement.vue"
+import CategoryManagementModalOld from "@/views/modals/product/CategoryManagementOld.vue"
+import CategoryModal from "@/views/modals/product/Category.vue"
+import CategoryModalOld from "@/views/modals/product/CategoryOld.vue"
 import PackingSizeModal from "@/views/modals/product/PackingSize.vue";
+import PackingSizeModalOld from "@/views/modals/product/PackingSizeOld.vue";
 import SelectPackingSizeModal from "@/views/modals/product/SelectPackingSize.vue";
+import SelectPackingSizeModalOld from "@/views/modals/product/SelectPackingSizeOld.vue";
+import SetQty from '@/views/modals/stocks/SetQty.vue'
+import SetQtyOld from '@/views/modals/stocks/SetQtyOld.vue'
 import * as hp from "@/lib/helper"
 import * as cp from "@/lib/cal_price"
-import SetQty from '@/views/modals/stocks/SetQty.vue'
+import { Modal } from 'bootstrap'
 import * as pz from "@/lib/snapshot/packingSizes"
 import * as search from "@/lib/search"
 import { Html5QrcodeScanner, Html5Qrcode } from "html5-qrcode";
 import {lang} from "@/lib/language"
-import CategoryManagementModal from "@/views/modals/product/CategoryManagement.vue"
-import CategoryModal from "@/views/modals/product/Category.vue"
-
-import * as cat from "@/lib/snapshot/category"
 
 export default {
     components: {
-            PageHeader, Footer,PackingSizeModal,SelectPackingSizeModal, SetQty, CategoryManagementModal, CategoryModal
+            PageHeader, 
+            Footer,
+            PackingSizeModal: store.getters.theme === "new" ? PackingSizeModal : PackingSizeModalOld,
+            SelectPackingSizeModal: store.getters.theme === "new" ? SelectPackingSizeModal : SelectPackingSizeModalOld, 
+            SetQty: store.getters.theme === "new" ? SetQty : SetQtyOld, 
+            CategoryManagementModal: store.getters.theme === "new" ? CategoryManagementModal : CategoryManagementModalOld, 
+            CategoryModal: store.getters.theme === "new" ? CategoryModal : CategoryModalOld
     },
     setup () {
         return { v$: useVuelidate() }
@@ -371,6 +540,8 @@ export default {
            html5QrCode:null,
            productCount: 0,
            cats:[],
+           productToDelete: null,
+           deleteModalInstance: null,
         }
     },
     created() {     
@@ -391,6 +562,7 @@ export default {
        this.fetchProductCount();
        this.fetchProducts();
        this.fetchCategory();
+       this.deleteModalInstance = new Modal(this.$refs.deleteProductModal);
     },
     unmounted() {
         if(this.unsubProducts){
@@ -399,6 +571,7 @@ export default {
         if(this.unsubPackingSizes){
             this.unsubPackingSizes=null;
         }
+        if (this.deleteModalInstance) this.deleteModalInstance.hide();
     },
  
     computed:{
@@ -563,13 +736,19 @@ export default {
               await updateDoc(updateDocument, this.editItem)  
         },
       
-        async removeProduct(p){   
-            const cf=confirm(`Are you sure,  you want to delete product code ${p.item_name}`)
-            if(!cf) return false;
-            this.isDeleting=true;       
-            const document=doc(db, "products", p.id)      
-            this.isRemoved(p.code_no);      
-             await deleteDoc(document)  
+        setProductToDelete(p) {
+            this.productToDelete = p;
+            this.deleteModalInstance.show();
+        },
+        async confirmDelete() {
+            if (!this.productToDelete) return false;
+            this.isDeleting = true;
+            const document = doc(db, "products", this.productToDelete.id);
+            this.isRemoved(this.productToDelete.code_no);
+            await deleteDoc(document);
+            this.deleteModalInstance.hide();
+            this.productToDelete = null;
+            this.isDeleting = false;
         },
         checkAll(){
             setTimeout(()=>{

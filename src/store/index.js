@@ -34,7 +34,8 @@ import { lang } from "@/lib/language";
     printData:{},
     setLanguage: "eng",
      currentLang: "eng", // default language
-     translations: lang
+     translations: lang,
+     theme: "old", // default theme
   },
 
   getters: {
@@ -50,7 +51,8 @@ import { lang } from "@/lib/language";
       // find translation safely
       return state.translations[key]?.[state.currentLang] || key;
     },
-    currentLang: (state) => state.currentLang
+    currentLang: (state) => state.currentLang,
+    theme: (state) => state.theme,
   },
 
   mutations: {
@@ -68,7 +70,11 @@ import { lang } from "@/lib/language";
         },
         SET_LANGUAGE(state, langCode) {
         state.currentLang = langCode;
-      }
+      },
+        SET_THEME(state, theme) {
+          state.theme = theme;
+        }
+      
       
   },
 
@@ -87,6 +93,9 @@ import { lang } from "@/lib/language";
         },
         changeLanguage({ commit }, langCode) {
           commit("SET_LANGUAGE", langCode);
+        },
+        setTheme({ commit }, theme) {
+          commit("SET_THEME", theme);
         }
      
   },

@@ -14,6 +14,9 @@
                     <td class="col-1">Unit Cost</td>
                 </tr>
             </tbody>
+            <tbody v-if="!isLoading && reports.length === 0">
+                <tr><td colspan="10" class="text-center text-muted py-4">No data available</td></tr>
+            </tbody>
             <tbody v-if="reports.length >0" v-for="r in reports" :key="r[0]">   
                 <tr><td :rowspan="r[1].length + 2" class="text-center">{{r[0]}}</td></tr>                                         
                 <tr v-for="st in r[1]" :key="st.code_no">
@@ -40,13 +43,11 @@
                 </tr>
             </tbody>
         </table>
-        <div v-if="isLoading">
-            <div class="d-flex justify-content-center my-5">
-                <div class="spinner-border text-primary"  role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
+        <div v-if="isLoading" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
-    </div>                                                                                    
+        </div>                                                                                    
     </div>
 </template>
 <script>
@@ -67,23 +68,20 @@ export default {
             total_discount:0,
             extra_discount:0,
             isLoading:false,
+            unsub: null,
             msg : {
                 type :"",
                 info :"",
             },        
-
         }
     },
    
     mounted() {    
-                this.isLoading=true;
-                this.fetchPurchase();  
-            
-            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType="by_date"){
-                this.displayReportType="by Date"
-            }
+        this.isLoading = true;
+        this.fetchPurchase();
+    },
+    beforeUnmount() {
+        if (this.unsub) this.unsub();
     },
    watch:{
    
@@ -221,12 +219,12 @@ export default {
                 where("pur_date", ">=", prevDate), where("pur_date", "<=", nowDate),
                  orderBy("pur_date", "desc"));     
             }
-            onSnapshot(query_url, (snapShot)=>{
-                const purchaseItems=ss.purchases(snapShot)
-                this.purchaseData=purchaseItems;
+            this.unsub = onSnapshot(query_url, (snapShot) => {
+                const purchaseItems = ss.purchases(snapShot)
+                this.purchaseData = purchaseItems;
                 this.displayReports();
-                this.isLoading=false;
-           })
+                this.isLoading = false;
+            })
         }
     }
 }

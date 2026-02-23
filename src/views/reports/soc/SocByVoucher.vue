@@ -125,7 +125,7 @@
                 </div>
             </div>
          </div>
-         <div>
+         <div v-if="reports.length > 0">
             <table class="table table-bordered border-dark table-hover">
                 <tbody>
                     <tr class="text-center fw-bold">
@@ -141,6 +141,9 @@
                 </tbody>
             </table>
          </div>
+         <div v-if="!isLoading && reports.length === 0" class="text-center text-muted py-5">
+             No data available
+         </div>
     </div>
 </template>
 <script>
@@ -155,6 +158,7 @@ export default {
             reports:[],
             salesData:[],          
             isLoading:false,
+            unsub: null,
             total_amount:0,
             total_paid:0,
             total_credit:0,
@@ -162,19 +166,15 @@ export default {
                 type :"",
                 info :"",
             },        
-
         }
     },
    
     mounted() {    
-                this.isLoading=true;
-                this.fetchSales();  
-            
-            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType="by_date"){
-                this.displayReportType="by Date"
-            }
+        this.isLoading = true;
+        this.fetchSales();
+    },
+    beforeUnmount() {
+        if (this.unsub) this.unsub();
     },
    watch:{
    
@@ -244,22 +244,21 @@ export default {
                 where("credit", ">", 0),
                  orderBy("sale_date", "desc"));
             }           
-            onSnapshot(query_url, (snapShot)=>{
-                let saleItems=ss.sales(snapShot);    
-              //  saleItems=saleItems.filter((f)=>f.credit > 0)      
-                saleItems=saleItems.map((s)=>{
-                    const debt_paid=s.debt_payments.reduce((accu, cur)=>accu + cur.paid,0)
+            this.unsub = onSnapshot(query_url, (snapShot) => {
+                let saleItems = ss.sales(snapShot);
+                //  saleItems=saleItems.filter((f)=>f.credit > 0)      
+                saleItems = saleItems.map((s) => {
+                    const debt_paid = s.debt_payments.reduce((accu, cur) => accu + cur.paid, 0)
 
-                    this.total_amount+= s.net_amount;
+                    this.total_amount += s.net_amount;
                     this.total_paid += s.paid + debt_paid;
-                    this.total_credit +=s.credit;
+                    this.total_credit += s.credit;
 
-                    return {...s, "paid": s.paid + debt_paid}
-                })      
-                this.reports=saleItems;
-                this.isLoading=false;
+                    return { ...s, "paid": s.paid + debt_paid }
+                })
+                this.reports = saleItems;
+                this.isLoading = false;
             })
-           
         }
     }
 }

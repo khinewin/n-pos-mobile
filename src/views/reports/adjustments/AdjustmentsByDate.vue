@@ -78,15 +78,16 @@
                 </tr>
             </tbody>
            
-        </table>
-        <div v-if="isLoading">
-            <div class="d-flex justify-content-center my-5">
-                <div class="spinner-border text-primary"  role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
-    </div>               
         
+        <tbody v-if="!isLoading && reports.length === 0">
+            <tr><td colspan="10" class="text-center text-muted py-4">No data available</td></tr>
+        </tbody>
+        </table>
+        <div v-if="isLoading" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -100,31 +101,26 @@ export default {
     },  
     data(){
         return{       
-           
             reports:[],
-          //  current_month:[],
             adjsData:[],         
             total_retail_amount:0,
             total_pur_amount:0,
             total_whole_sale_amount:0,
             isLoading:false,
+            unsub: null,
             msg : {
                 type :"",
                 info :"",
             },        
-
         }
     },
    
     mounted() {    
-                this.isLoading=true;
-                this.fetchAdjustments();  
-            
-            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType="by_date"){
-                this.displayReportType="by Date"
-            }
+        this.isLoading = true;
+        this.fetchAdjustments();
+    },
+    beforeUnmount() {
+        if (this.unsub) this.unsub();
     },
    watch:{
    
@@ -249,13 +245,12 @@ export default {
             
             const query_url = query(collection(db, "adjustments"), 
             where("created_at", ">=", from_date), where("created_at", "<=", to_date), orderBy("created_at", "desc"));
-           onSnapshot(query_url,(snapShot)=>{
-                const adjItems=ss.adjustments(snapShot);           
-                this.adjsData=adjItems;
+           this.unsub = onSnapshot(query_url, (snapShot) => {
+                const adjItems = ss.adjustments(snapShot);
+                this.adjsData = adjItems;
                 this.displayReports();
-                this.isLoading=false;
-           })
-           
+                this.isLoading = false;
+           });
         }
     }
 }

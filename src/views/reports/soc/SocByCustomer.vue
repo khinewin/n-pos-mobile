@@ -11,6 +11,9 @@
                     <td class="col-1 text-center">Sale Amount</td>                
                 </tr>
             </tbody>
+            <tbody v-if="!isLoading && reports.length === 0">
+                <tr><td colspan="6" class="text-center text-muted py-4">No data available</td></tr>
+            </tbody>
             <tbody v-if="reports.length > 0" v-for="r in reports" :key="r[0]" class="table-group-divider">      
                 <tr>
                     <td :rowspan="r[1].length + 4" class="text-center col-1">{{r[0]}}</td>
@@ -55,13 +58,11 @@
                 </tr>   
             </tbody>
         </table>
-        <div v-if="isLoading">
-            <div class="d-flex justify-content-center my-5">
-                <div class="spinner-border text-primary"  role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
+        <div v-if="isLoading" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
-    </div>                                                                                                                 
+        </div>                                                                                                                 
     </div>
 </template>
 <script>
@@ -84,24 +85,20 @@ export default {
             total_credit:0,
             total_paid:0,
             isLoading:false,
+            unsub: null,
             msg : {
                 type :"",
                 info :"",
             },        
-
         }
     },
    
     mounted() {    
-          
-                this.isLoading=true;
-                this.fetchSales();  
-            
-            this.displayFromDate=Timestamp.fromDate(new Date(this.fromDate))
-            this.displayToDate=Timestamp.fromDate(new Date(this.toDate))
-            if(this.reportType="by_date"){
-                this.displayReportType="by Date"
-            }
+        this.isLoading = true;
+        this.fetchSales();
+    },
+    beforeUnmount() {
+        if (this.unsub) this.unsub();
     },
    watch:{
    
@@ -265,14 +262,12 @@ export default {
                  where("credit", ">", 0),
                  orderBy("sale_date", "desc"));
             }
-            onSnapshot(query_url, (snapShot)=>{
-                let saleItems=ss.sales(snapShot);   
-             //   saleItems=saleItems.filter((f)=>f.credit > 0)  
-                this.salesData=saleItems;
+            this.unsub = onSnapshot(query_url, (snapShot) => {
+                let saleItems = ss.sales(snapShot);
+                this.salesData = saleItems;
                 this.displayReports();
-                this.isLoading=false;
+                this.isLoading = false;
             })
-           
         }
     }
 }

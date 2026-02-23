@@ -13,6 +13,9 @@
                     <td class="col-1 text-center">Profit</td>
                 </tr>
             </tbody>
+            <tbody v-if="!isLoading && reports.length === 0">
+                <tr><td colspan="8" class="text-center text-muted py-4">No data available</td></tr>
+            </tbody>
             <tbody v-if="reports.length > 0" v-for="r in reports" :key="r[0]" class="table-group-divider">    
                 <tr><td class="text-center" :rowspan="r[1].length + 4">{{r[0]}}</td></tr>                                        
                 <tr v-for="p in r[1]" :key="p.code_no">
@@ -88,18 +91,20 @@ export default {
             reports:[],
             salesData:[],          
             isLoading:false,
-         
+            unsub: null,
             msg : {
                 type :"",
                 info :"",
             },        
-
         }
     },
    
     mounted() {    
-        this.isLoading=true;
-        this.fetchSales();  
+        this.isLoading = true;
+        this.fetchSales();
+    },
+    beforeUnmount() {
+        if (this.unsub) this.unsub();
     },
    watch:{
    
@@ -258,13 +263,12 @@ export default {
             query_url = query(collection(db, "sales"), 
             where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), where("customer.code", "==", Number(this.customer_code)), orderBy("sale_date", "desc"));
            }
-            onSnapshot(query_url, (snapShot)=>{
-                const saleItems=ss.sales(snapShot)           
-                this.salesData=saleItems;
+           this.unsub = onSnapshot(query_url, (snapShot) => {
+                const saleItems = ss.sales(snapShot);
+                this.salesData = saleItems;
                 this.displayReports();
-                this.isLoading=false;
-            })
-           
+                this.isLoading = false;
+            });
         }
     }
 }

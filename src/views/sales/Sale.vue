@@ -1,255 +1,369 @@
-<template lang="">
-    <div>           
+<template>
+    <div>       
+      
         <PageHeader :page-title="pageTitle" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info" />
-        <div class="container-fluid">
-            <div class="row mb-2 justify-content-end">   
-                <div class="col-6 col-sm-4 col-md-3 col-lg-1   d-flex flex-column justify-content-center">
-                    <div class="form-check form-switch  d-flex justify-content-center">
-                        <input class="form-check-input" @change="setPos" v-model="print_on_save" type="checkbox" role="switch" id="flexSwitchCheckDisabled">
-                        <label class="form-check-label ms-1" for="flexSwitchCheckDisabled" :class="[print_on_save ? 'text-success' : 'text-muted']"><i class="fa-solid fa-print"></i></label>
-                      </div>
-                </div>                         
-           
-                <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <select  class="form-control-plaintext text-center small" @change="changeSaleType" :disabled="saleMode=='Sale / History'" v-model="sale_type">
-                        <option value="retail">Retail</option>
-                        <option value="whole_sale">Wholesale</option>
-                    </select>
-                </div>-->    
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">    
-                    <button class="btn btn-sm" @click="goEdit" :disabled="!id || user.uid != sale_user.uid"><i class="fa-solid fa-pen-to-square"></i> {{t('edit_link')}}</button>
-                </div>
-                
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button class="btn btn-sm open"  data-bs-toggle="modal" data-bs-target="#salesModal"><i class="fa-solid fa-folder-tree"></i> {{t('open_link')}}</button>
-                </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-sm"  @click="print"><i class="fa-solid fa-print" ></i> {{t('print_link')}}</button>
-                </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <button v-if="saleMode=='Sale / New' || saleMode=='Sale / History'" type="button" data-bs-toggle="modal" data-bs-target="#cfModal"  class="btn btn-sm" :disabled="isLoading || saleItems.length <=0 || saleMode=='Sale / History' " >
-                            <span v-if="!isLoading"><i class="fa-solid fa-hard-drive"></i> {{t('save_link')}}</span>
-                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
-                        </button>                      
-                </div>
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                        <button @click="clearSaleItem" class="btn btn-sm" :disabled="saleItems.length <=0"><i class="fa-solid fa-circle-xmark"></i> {{t('close_link')}}</button>
-                </div>
+          <div class="container-fluid">    
+        <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center bg-white p-2 rounded-3 shadow-sm flex-wrap gap-2">
+                 <!-- Left: Scan/Actions -->
+                 <div class="d-flex gap-2">
+                     <button class="btn btn-light shadow-sm text-primary fw-bold border-0" data-bs-toggle="modal" data-bs-target="#salesModal">
+                        <i class="fa-solid fa-folder-tree me-2"></i> {{t('open_link')}}
+                     </button>
+                      <button class="btn btn-light shadow-sm text-dark fw-bold border-0" @click="goEdit" :disabled="!id || user.uid != sale_user.uid">
+                        <i class="fa-solid fa-pen-to-square me-2"></i> {{t('edit_link')}}
+                     </button>
+                 </div>
+
+                 <!-- Center: Print Toggle -->
+                 <div class="form-check form-switch d-flex align-items-center bg-light rounded-pill px-3 py-2">
+                    <input class="form-check-input" @change="setPos" v-model="print_on_save" type="checkbox" role="switch" id="flexSwitchCheckDisabled" style="cursor: pointer;">
+                    <label class="form-check-label ms-2 fw-medium small text-muted text-uppercase cursor-pointer" for="flexSwitchCheckDisabled">
+                        <i class="fa-solid fa-print me-1"></i> Auto Print
+                    </label>
+                 </div>
+
+                 <!-- Right: Main Actions -->
+                 <div class="d-flex gap-2">
+                     <button :disabled="saleItems.length <=0 || saleMode=='Sale / New'" class="btn btn-light shadow-sm fw-medium border-0" @click="print">
+                        <i class="fa-solid fa-print me-2"></i> {{t('print_link')}}
+                     </button>
+                     <button @click="clearSaleItem" class="btn btn-light shadow-sm text-danger fw-medium border-0" :disabled="saleItems.length <=0">
+                        <i class="fa-solid fa-circle-xmark me-2"></i> {{t('close_link')}}
+                     </button>
+                     <button v-if="saleMode=='Sale / New' || saleMode=='Sale / History'" type="button" data-bs-toggle="modal" data-bs-target="#cfModal" class="btn btn-primary shadow-sm px-4 fw-bold border-0" :disabled="isLoading || saleItems.length <=0 || saleMode=='Sale / History'">
+                        <span v-if="!isLoading"><i class="fa-solid fa-hard-drive me-2"></i> {{t('save_link')}}</span>
+                        <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
+                    </button>
+                 </div>
             </div>
-        </div>     
-        <div class="container-fluid my-2">
-            <div class="row g-1">              
-                <div class="col-12">
-                    <div class="card shadow">
-                        <div class="card-body p-2">
-                            <div class="row justify-content-end mb-2">
-                                <div class="col-sm-6">
-                                    <table class="table mb-0 table-borderless">
-                                        <tbody class="">
-                                            <tr class="">
-                                                <td class="text-end col-4 fw-bold">{{t('invoice_no')}} :</td>
-                                                <td class="col-8">
-                                                    <input type="text" :class="{'border-0 border-bottom border-danger' : v$.voucher_no.$errors.length > 0}"  v-model="voucher_no" class="form-control-plaintext   border-bottom py-0" id="voucher_no" placeholder="Voucher no">                                                
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-end fw-bold change-cursor" @click="setBarcodeFocus">{{t('barcode')}} :</td>
-                                                <td class="">
-                                                    <input :disabled="saleMode=='Sale / History'" @keypress.enter="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control-plaintext py-0   " placeholder="Barcode">
-                                                </td>
-                                            </tr> 
-                                                                                   
-                                        </tbody>
-                                  </table>
-                                </div>
-                                <div class="col-sm-6">
-                                    <table class="table mb-0 table-borderless">
-                                        <tbody class="">                                           
-                                            <tr>
-                                                <td class="text-end col-4 fw-bold">{{t('customer')}} :</td>
-                                                <td class="col-8">
-                                                    <div class="row g-2">
-                                                        <div class="col-6">
-                                                            <input type="text" v-model="customer.name" class="form-control-plaintext py-0 border-bottom" id="customer_name" placeholder="Name">                                                
-                                                        </div>
-                                                        <div class="col-6 border-bottom text-center">
-                                                            <span class="d-block text-primary customer change-cursor" :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#customerModal']" ><i class="fa-solid fa-edit"></i> </span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>      
-                                            <tr>
-                                                <td class="text-end fw-bold">{{t('date')}} :</td>
-                                                <td class="">
-                                                    <flat-pickr class="form-control-plaintext py-0  border-bottom" v-model="sale_date" id="sale_date" :config="config" />
-                                                </td>
-                                            </tr>                                             
-                                        </tbody>
-                                  </table>
-                                </div>
-                            </div>                               
-                              <div class="vh-50 overflow-y-scroll dataContainer">
-                                <table class="table table-bordered table-hover mb-0">
-                                    <tbody class="small fw-bold table-group-divider position-sticky top-0 z-3">
-                                        <tr class="table-secondary change-cursor"  :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#searchCode']" >
-                                         
-                                            <td class=" text-center col-0" colspan="2">
-                                                {{t('number')}}
-                                            </td>
-                                            <td class="col-3 text-center  description">
-                                                <span v-if="saleMode=='Sale / New'"><i class="fa-solid fa-circle-plus"></i></span> {{t('item_name')}} <span v-if="saleMode=='Sale / New'"></span>
-                                            </td>  
-                                            <!--<td class="col-1  text-center">Packing Size</td>-->                                                                                
-                                            <td class="col-2 text-center  table-primary">{{t('qty')}}</td>
-                                            <td class="col-2 text-center  table-info">{{t('unit_price')}}</td>
-                                            <td class="col-1 text-center ">{{t('amount')}}</td>
-                                            <td class="col-2 text-center  table-warning" colspan="2">{{t('discount')}}</td>
-                                            <td class="col-1 text-center ">{{t('net_amount')}}</td>
+        </div>
+
+        <div class="mb-2">
+             <div class="row g-3">
+                 <!-- Invoice Details Card -->
+                 <div class="col-12">
+                     <div class="card border-0 shadow-sm rounded-3">
+                         <div class="card-body p-2">
+                             <div class="row g-4 align-items-center">
+                                 <!-- Voucher No -->
+                                 <div class="col-md-3">
+                                     <label class=" small text-muted text-uppercase fw-bold">{{t('invoice_no')}}</label>
+                                     <div class="input-group">
+                                         <span class="input-group-text bg-light border-0"><i class="fa-solid fa-hashtag text-secondary"></i></span>
+                                         <input type="text" :class="{'is-invalid' : v$.voucher_no.$errors.length > 0}" v-model="voucher_no" class="form-control bg-light border-0 fw-bold text-dark" id="voucher_no" placeholder="Invoice #">
+                                     </div>
+                                 </div>
+                                 
+                                  <!-- Date -->
+                                 <div class="col-md-3">
+                                     <label class=" small text-muted text-uppercase fw-bold">{{t('date')}}</label>
+                                       <div class="input-group">
+                                         <span class="input-group-text bg-light border-0"><i class="fa-regular fa-calendar text-secondary"></i></span>
+                                         <flat-pickr class="form-control bg-light border-0 fw-medium" v-model="sale_date" id="sale_date" :config="config" />
+                                       </div>
+                                 </div>
+
+                                  <!-- Customer -->
+                                 <div class="col-md-3">
+                                     <label class=" small text-muted text-uppercase fw-bold">{{t('customer')}}</label>
+                                     <div class="input-group" :class="{'cursor-pointer': saleMode!='Sale / History'}" :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#customerModal']">
+                                         <span class="input-group-text bg-light border-0"><i class="fa-regular fa-user text-secondary"></i></span>
+                                          <input type="text" readonly v-model="customer.name" class="form-control bg-light border-0 fw-medium cursor-pointer" id="customer_name" placeholder="Select Customer">
+                                          <span class="input-group-text bg-light border-0 text-primary"><i class="fa-solid fa-chevron-down small"></i></span>
+                                     </div>
+                                 </div>
+
+                                  <!-- Barcode -->
+                                 <div class="col-md-3">
+                                      <label class=" small text-muted text-uppercase fw-bold change-cursor" @click="setBarcodeFocus">{{t('barcode')}}</label>
+                                      <div class="input-group shadow-sm">
+                                            <span class="input-group-text bg-primary text-white border-0"><i class="fa-solid fa-barcode"></i></span>
+                                            <input :disabled="saleMode=='Sale / History'" @keypress.enter="setCodeOnPaste" id="code_no" v-model="code_no" type="text" class="form-control border-0 bg-white fw-bold" placeholder="Scan Barcode..." autofocus>
+                                      </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+        </div>
+                              <!-- Redesigned Sales Table -->
+                              <div class="vh-50 overflow-y-auto dataContainer bg-white rounded-3 shadow-sm border-0 mb-3">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="sticky-top z-3 text-nowrap">
+                                        <tr class="table-primary fw-bold small text-center cursor-pointer" :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#searchCode']">
+                                            <th class="py-2 border-0" colspan="2" style="width: 80px;">{{t('number')}}</th>
+                                            <th class="py-2 text-start border-0" style="min-width: 200px;">
+                                                <i class="fa-solid fa-circle-plus me-1 text-primary"></i> {{t('item_name')}}
+                                            </th>  
+                                            <th class="py-2 border-0">{{t('packing_size')}}</th>                                                                                
+                                            <th class="py-2 border-0 table-primary-subtle" style="width: 140px;">{{t('qty')}}</th>
+                                            <th class="py-2 border-0" style="width: 160px;">{{t('unit_price')}}</th>
+                                            <th class="py-2 border-0 text-end">{{t('amount')}}</th>
+                                            <th class="py-2 border-0 text-center" colspan="2">{{t('discount')}}</th>
+                                            <th class="py-2 border-0 text-end" style="width: 120px;">{{t('net_amount')}}</th>
                                         </tr>    
-                                    </tbody>                                  
-                                    <tbody class="text-nowrap text-break">                                                                         
-                                        <tr  v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(s)"  >
-                                            <td class="text-center d-grid">
-                                                    <button type="button" @click="removeSaleItem(i)" class="btn btn-sm text-danger" :disabled="saleMode=='Sale / History'"><i class="fa-solid fa-square-minus"></i></button>
+                                    </thead>                                  
+                                    <tbody class="text-nowrap">                                                                         
+                                        <tr v-if="saleItems.length > 0" v-for="(s, i) in saleItems" :key="s.id" @mouseenter="setEdit(s)" class="small">
+                                            <td class="text-center border-0 px-1">
+                                                <button type="button" @click="removeSaleItem(i)" class="btn btn-link text-danger p-0 border-0 opacity-75 hover-opacity-100" :disabled="saleMode=='Sale / History'">
+                                                    <i class="fa-solid fa-circle-minus fs-5"></i>
+                                                </button>
                                             </td>
-                                            <td class="text-center position-relative ">                                                
+                                            <td class="text-center text-muted border-0 ps-0">                                                
                                                 {{i+1}}
                                             </td>
-                                            <td class="">{{s.item_name}}</td>   
-                                            <!--<td class=" ">
-                                                {{calPackingSize(s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit, s.packing_size.medium_qty, s.packing_size.smallest_qty)}}
-                                            </td>-->                                        
-                                            <td class=" text-end table-primary d-flex justify-content-between">
-                                                <button class="btn btn-sm btn-primary " :disabled="saleMode=='Sale / History'"  @click="decreaseQty(s, s.sale_unit, s.barcode)"><i class="fa-solid fa-minus"></i></button>
-                                                <div>
-                                                    <input :disabled="saleMode=='Sale / History'" type="number" class="form-control-plaintext py-0 text-center" @keyup="setEdit(s)"  @keypress.enter="calEdit(s)" v-model="s.sale_qty" @change="calEdit(s)">
+                                            <td class="fw-bold border-0">{{s.item_name}}</td>   
+                                            <td class="text-center border-0">
+                                                <span v-if="s.packing_size" class="badge bg-light text-primary border border-primary-subtle px-2 py-1">
+                                                    {{calPackingSize(s.packing_size.largest_unit, s.packing_size.medium_unit, s.packing_size.smallest_unit, s.packing_size.medium_qty, s.packing_size.smallest_qty)}}
+                                                </span>
+                                            </td>                                        
+                                            <td class="border-0 table-primary-subtle p-0">
+                                                <div class="d-flex align-items-center justify-content-center px-1">
+                                                    <button class="btn btn-link text-danger p-0 border-0 opacity-75 hover-opacity-100 shadow-none" :disabled="saleMode=='Sale / History'" @click="decreaseQty(s)">
+                                                        <i class="fa-solid fa-circle-minus fs-4"></i>
+                                                    </button>
+                                                    <input 
+                                                        :disabled="saleMode=='Sale / History'" 
+                                                        type="number" 
+                                                        class="form-control form-control-sm border-0 bg-transparent text-center fw-bold px-1" 
+                                                        style="width: 55px;"
+                                                        @keyup="setEdit(s)"  
+                                                        @keypress.enter="calEdit(s)" 
+                                                        v-model="s.sale_qty" 
+                                                        @change="calEdit(s)">
+                                                    <button :disabled="saleMode=='Sale / History'" class="btn btn-link text-success p-0 border-0 opacity-75 hover-opacity-100 shadow-none" @click="increaseQty(s)">
+                                                        <i class="fa-solid fa-circle-plus fs-4"></i>
+                                                    </button>
                                                 </div>
-                                                <button :disabled="saleMode=='Sale / History'"  class="btn btn-sm btn-primary" @click="increaseQty(s)"><i class="fa-solid fa-plus"></i></button>   
                                             </td>                                            
-                                            <td class=" table-info">
-                                                <div class="d-flex">
-                                                    <input disabled  type="number"  v-model="s.qty_sale_price" class="form-control-plaintext py-0  text-center w-75" placeholder="Price"> 
-                                                    <div class="w-25">{{s.qty_sale_price_unit}}</div>
+                                            <td class="border-0 text-center">
+                                                <div class="d-flex align-items-center justify-content-center">
+                                                    <span class="fw-bold text-dark">{{s.qty_sale_price}}</span>
+                                                    <small class="text-muted ms-1">/ {{s.qty_sale_price_unit}}</small>
                                                 </div>                                       
                                             </td>
                                            
-                                            <td class=" text-end">{{s.amount}}</td>
-                                            <td class=" text-center table-warning change-cursor" id="setDiscount" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
-                                                <span v-if="s.dis_qty">{{s.dis_qty}}{{s.dis_qty_unit}}</span>
-                                                <span v-if="s.dis_amount">Ks {{s.dis_amount}}</span>
-                                                <span v-if="s.dis_percent">{{s.dis_percent}}%</span>      
+                                            <td class="text-end border-0 fw-bold">{{s.amount}}</td>
+                                            <td class="text-center border-0 cursor-pointer" id="setDiscount" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
+                                                <div v-if="s.dis_qty" class="badge bg-danger-subtle text-danger">{{s.dis_qty}}{{s.dis_qty_unit}}</div>
+                                                <div v-if="s.dis_amount" class="badge bg-danger-subtle text-danger">{{s.dis_amount}} Ks</div>
+                                                <div v-if="s.dis_percent" class="badge bg-danger-subtle text-danger">{{s.dis_percent}}%</div>      
+                                                <span v-if="!s.dis_qty && !s.dis_amount && !s.dis_percent" class="text-muted opacity-25">
+                                                    <i class="fa-solid fa-tag"></i>
+                                                </span>
                                             </td>
-                                            <td class=" text-end table-warning change-cursor" data-bs-toggle="modal" data-bs-target="#setDiscountModal">{{s.discount}}</td>
-                                            <td class="  text-end">{{s.final_amount}}</td>
+                                            <td class="text-end border-0 text-danger fw-bold cursor-pointer" data-bs-toggle="modal" data-bs-target="#setDiscountModal">
+                                                {{fM(s.discount??0)}}
+                                            </td>
+                                            <td class="text-end border-0 fw-bold text-primary">{{fM(s.final_amount)}}</td>
                                         </tr> 
-                                    </tbody>
-                                </table>
-                                </div>
-                                <div class="fixed-bottom container-fluid sale-footer">
-                                <table class="table table-bordered table-hover mb-0">
-                                    <tbody class="table-group-divider">
-                                        <tr>
-                                            <td  class="text-end pe-2 fw-bold col-2">{{t('subtotal')}}</td>
-                                            <td class="text-end col-2">{{total_amount}}</td>                                        
-                                            <td  class="text-end col-2 pe-2 fw-bold " >{{t('additional_discount')}}</td>
-                                            <td class="text-end col-2 ">
-                                                <input @click="setInput" @mouseleave="setInput" :disabled="saleMode=='Sale / History'"  type="number"   @change="calTotal" @keyup="calTotal" v-model="extra_discount" class="form-control-plaintext py-0  text-end m-0">
-                                            </td>  
-                                            <td  class="text-end col-2 pe-2 fw-bold">{{t('total')}}</td>
-                                            <td class="text-end col-2">{{net_amount}}</td>  
-                                        </tr>                 
-                                        <tr>                                                                                    
-                                            <td  class="text-end pe-2 fw-bold">{{t('paid')}}</td>
-                                            <td class="text-end">
-                                                <input @click="setInput" @mouseleave="setInput" :disabled="saleMode=='Sale / History'" @keypress.enter="saveSale" @change="calPaid" @keyup="calPaid" type="number" v-model="paid" class="form-control-plaintext py-0 text-end m-0">
-                                            </td>                                                                
-                                     
-                                            <td  class="text-end pe-2 fw-bold">{{t('change')}}</td>
-                                            <td class="text-end">
-                                                {{change}}
-                                            </td>  
-                                                                        
-                                            <td  class="text-end pe-2 fw-bold">{{t('balance_due')}}</td>
-                                            <td class="text-end">
-                                                {{credit}}
+                                        <!-- Empty State -->
+                                        <tr v-if="saleItems.length === 0" class="text-center text-muted cursor-pointer" :data-bs-toggle="[saleMode=='Sale / History' ? '' : 'modal']" :data-bs-target="[saleMode=='Sale / History' ? '' : '#searchCode']">
+                                            <td colspan="10" class="py-5">
+                                                <i class="fa-solid fa-cart-plus fa-3x mb-3 opacity-25 text-primary"></i>
+                                                <p class="mb-0 fw-medium">Click here to add items</p>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td  class="text-end pe-2 fw-bold">{{t('notes')}}</td>
-                                            <td class="text-end" colspan="5">
-                                                <input :disabled="saleMode=='Sale / History'" @keypress.enter="saveSale" type="text" v-model="remark" class="form-control-plaintext py-0">
-                                            </td>                                                                         
-                                        </tr>
                                     </tbody>
                                 </table>
+                              </div>
+
                                 </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> 
+
+                                
+                                <!-- Premium Sticky Bottom Summary Bar -->
+                                <div class="sticky-bottom bg-white shadow-lg border-top py-3 px-4 z-2">
+                                    <div class="row align-items-center">
+                                         <!-- Left: Remarks/Notes -->
+                                         <div class="col-lg-3 mb-2 mb-lg-0">
+                                              <div class="form-floating">
+                                                  <textarea :disabled="saleMode=='Sale / History'" @keypress.enter="saveSale" v-model="remark" class="form-control border-0 bg-light rounded-3" placeholder="Notes" id="remarkArea" style="height: 60px; resize: none;"></textarea>
+                                                  <label for="remarkArea" class="text-muted small">{{t('notes')}}</label>
+                                              </div>
+                                         </div>
+            
+                                         <!-- Right: Totals Breakdown -->
+                                         <div class="col-lg-9">
+                                              <div class="row g-2 align-items-end justify-content-end text-nowrap">
+                                                   <!-- Subtotal -->
+                                                   <div class="col-6 col-md-2 text-end">
+                                                        <label class="small text-muted fw-bold d-block text-uppercase mb-1" style="font-size: 0.7rem;">{{t('subtotal')}}</label>
+                                                        <div class="fs-5 fw-bold text-secondary">{{fM(total_amount)}}</div>
+                                                   </div>
+
+                                                   <!-- Additional Discount -->
+                                                   <div class="col-6 col-md-2 text-end">
+                                                        <label class="small text-danger fw-bold d-block text-uppercase mb-1" style="font-size: 0.7rem;">{{t('additional_discount')}}</label>
+                                                        <div class="d-flex align-items-center justify-content-end">
+                                                            <input 
+                                                                @focus="setInput" 
+                                                                @blur="setInput" 
+                                                                :disabled="saleMode=='Sale / History'" 
+                                                                type="number" 
+                                                                @keyup="calTotal" 
+                                                                v-model="extra_discount" 
+                                                                class="form-control form-control-sm text-end border-0 bg-transparent fw-bold text-danger p-0 fs-5 shadow-none" 
+                                                                style="width: 100px;"
+                                                                placeholder="0">
+                                                        </div>
+                                                   </div>
+            
+                                                   <!-- Net Amount (Highlighted) -->
+                                                   <div class="col-12 col-sm-4 col-md-3 text-end bg-primary text-white p-2 rounded-2 shadow-sm mx-2">
+                                                        <label class="small fw-bold d-block text-uppercase opacity-75" style="font-size: 0.65rem;">{{t('total')}}</label>
+                                                        <div class="fs-3 fw-bolder lh-1">{{fM(net_amount)}}</div>
+                                                    </div>
+            
+                                                   <!-- Paid -->
+                                                   <div class="col-6 col-md-2 text-end">
+                                                        <label class="small text-success fw-bold text-uppercase mb-1 d-block" style="font-size: 0.7rem;">{{t('paid')}}</label>
+                                                        <div class="d-flex align-items-center justify-content-end">
+                                                            <input 
+                                                                @focus="setInput" 
+                                                                @blur="setInput" 
+                                                                :disabled="saleMode=='Sale / History'" 
+                                                                @keypress.enter="saveSale" 
+                                                                @keyup="calPaid" 
+                                                                type="number" 
+                                                                v-model="paid" 
+                                                                class="form-control form-control-sm text-end border-0 bg-transparent fw-bold text-success p-0 fs-5 shadow-none" 
+                                                                style="width: 100px;"
+                                                                placeholder="0">
+                                                        </div>
+                                                   </div>
+                                                   
+                                                   <!-- Change / Balance Due -->
+                                                   <div class="col-6 col-md-2 text-end border-start ps-3">
+                                                       <div v-if="change > 0">
+                                                           <label class="small text-muted fw-bold d-block text-uppercase mb-0" style="font-size: 0.6rem;">{{t('change')}}</label>
+                                                           <span class="fs-5 fw-bold text-dark">{{fM(change)}}</span>
+                                                       </div>
+                                                       <div v-else>
+                                                           <label class="small text-danger fw-bold d-block text-uppercase mb-0" style="font-size: 0.6rem;">{{t('balance_due')}}</label>
+                                                           <span class="fs-5 fw-bold text-danger">{{fM(credit)}}</span>
+                                                       </div>
+                                                   </div>
+                                              </div>
+                                         </div>
+                                    </div>
+                                </div>
+
+                        
+                   
         <ProductModal @setCode="setCode" :sale_type="sale_type" :saleItems="saleItems"/>
         <SalesModal @setCode="setOldCode" />
         <CustomerModal @setCustomer="setCustomer" />
-        <!-- Modal -->
-        <div class="modal fade" id="cfModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-            <div class="modal-content">                
-                <div class="modal-body">
-                    <table class="table table-bordered table-hover mb-0" style="font-weight: bold;">
-                        <tbody class="">
-                            <tr>
-                                <td  class="text-end p-2 fw-bold col-6">{{t('customer')}}</td>
-                                <td class="text-end col-6 p-2">{{customer.name}}</td>    
-                            </tr>
-                            <tr>
-                                <td  class="text-end p-2 fw-bold col-6">{{t('subtotal')}}</td>
-                                <td class="text-end col-6 p-2">{{total_amount}}</td>    
-                            </tr>
-                            <tr>                                    
-                                <td  class="text-end col-6 p-2 fw-bold " >{{t('additional_discount')}}</td>
-                                <td class="text-end col-6 ">
-                                    <input @click="setInput" @mouseleave="setInput" :disabled="saleMode=='Sale / History'"  type="number"   @change="calTotal" @keyup="calTotal" v-model="extra_discount" class="form-control  text-end m-0">
-                                </td>
-                            </tr>
-                            <tr>      
-                                <td  class="text-end col-6 p-2 fw-bold">{{t('total')}}</td>
-                                <td class="text-end col-6 p-2">{{net_amount}}</td>  
-                            </tr>                 
-                            <tr>                                                                                    
-                                <td  class="text-end p-2 fw-bold">{{t('paid')}}</td>
-                                <td class="text-end">
-                                    <input @click="setInput" @mouseleave="setInput" :disabled="saleMode=='Sale / History'" @change="calPaid" @keyup="calPaid" type="number" v-model="paid" class="form-control text-end m-0">
-                                </td>                                                                
-                            </tr>
-                            <tr>
-                                <td  class="text-end p-2 fw-bold">{{t('change')}}</td>
-                                <td class="text-end p-2">
-                                    {{change}}
-                                </td>  
-                            </tr>
-                            <tr>                             
-                                <td  class="text-end p-2 fw-bold">{{t('balance_due')}}</td>
-                                <td class="text-end p-2">
-                                    {{credit}}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td  class="text-end p-2 fw-bold">{{t('notes')}}</td>
-                                <td class="text-end">
-                                    <textarea :disabled="saleMode=='Sale / History'"  type="text" v-model="remark" class="form-control"></textarea>
-                                </td>                                                                         
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="mt-2">
-                        <button type="button" class="btn  btn-lg" data-bs-dismiss="modal">{{t('close_link')}}</button>
-                        <button type="button" class="btn btn-primary btn-lg float-end" @click="saveSale">{{t('save_link')}}</button>
+        <!-- Redesigned Checkout Confirmation Modal -->
+        <div class="modal fade" id="cfModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <!-- Modal Header -->
+                    <div class="modal-header bg-primary text-white border-0 py-3 px-4">
+                        <h5 class="modal-title fw-bold" id="checkoutModalLabel">
+                            <i class="fa-solid fa-receipt me-2"></i>{{t('save_link')}} Confirmation
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    
+                    <div class="modal-body p-2 bg-light">
+                        <!-- Summary Card -->
+                        <div class="card border-0 shadow-sm rounded-3 mb-2 overflow-hidden">
+                            <div class="card-body p-0">
+                                <!-- Customer Info -->
+                                <div class="bg-primary-subtle p-2 border-bottom border-white border-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary text-white rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="fa-solid fa-user"></i>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted fw-bold text-uppercase d-block" style="font-size: 0.7rem;">{{t('customer')}}</small>
+                                            <div class="fw-bold text-dark fs-5">{{customer.name}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Financial Breakdown -->
+                                <div class="p-2">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted fw-medium">{{t('subtotal')}}</span>
+                                        <span class="fw-bold text-dark fs-5">{{fM(total_amount)}}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div class="text-danger fw-medium d-flex align-items-center">
+                                            <i class="fa-solid fa-tag me-2 small"></i>{{t('additional_discount')}}
+                                        </div>
+                                        <div style="width: 130px;">
+                                            <input 
+                                                @click="setInput" 
+                                                @mouseleave="setInput" 
+                                                :disabled="saleMode=='Sale / History'" 
+                                                type="number" 
+                                                @change="calTotal" 
+                                                @keyup="calTotal" 
+                                                v-model="extra_discount" 
+                                                class="form-control form-control-sm text-end fw-bold text-danger border-danger-subtle bg-danger-subtle rounded-3">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Grand Total Highlighting -->
+                                    <div class="bg-primary text-white p-2 rounded-3 d-flex justify-content-between align-items-center mb-2 shadow-sm">
+                                        <span class="text-uppercase fw-bold opacity-75" style="letter-spacing: 1px;">{{t('total')}}</span>
+                                        <span class="fs-2 fw-bolder">{{fM(net_amount)}}</span>
+                                    </div>
+
+                                    <!-- Payment Input Section -->
+                                    <div class="row g-3 mb-2">
+                                        <div class="col-6">
+                                            <label class="small text-success fw-bold text-uppercase mb-1 d-block"><i class="fa-solid fa-hand-holding-dollar me-1"></i>{{t('paid')}}</label>
+                                            <input 
+                                                @click="setInput" 
+                                                @mouseleave="setInput" 
+                                                :disabled="saleMode=='Sale / History'" 
+                                                @change="calPaid" 
+                                                @keyup="calPaid" 
+                                                type="number" 
+                                                v-model="paid" 
+                                                class="form-control form-control-lg text-end fw-bold text-success border-success-subtle bg-success-subtle rounded-3 shadow-none">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-muted fw-bold text-uppercase mb-1 d-block"><i class="fa-solid fa-coins me-1"></i>{{t('change')}}</label>
+                                            <div class="form-control form-control-lg border-0 bg-white text-end fw-bold text-dark fs-5 pt-1 shadow-sm px-3 rounded-3">{{fM(change)}}</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Balance Due (Only show if credit > 0) -->
+                                    <div v-if="credit > 0" class="alert alert-danger border-0 rounded-3 py-2 px-3 d-flex justify-content-between align-items-center mb-2 shadow-sm">
+                                        <div class="fw-bold"><i class="fa-solid fa-triangle-exclamation me-2"></i>{{t('balance_due')}}</div>
+                                        <div class="fs-4 fw-bolder">{{fM(credit)}}</div>
+                                    </div>
+
+                                    <!-- Notes Area -->
+                                    <div class="form-floating text-muted">
+                                        <textarea :disabled="saleMode=='Sale / History'" v-model="remark" class="form-control border-0 bg-light rounded-3" placeholder="Notes" id="checkoutNote" style="height: 70px; resize: none;"></textarea>
+                                        <label for="checkoutNote" class="small">{{t('notes')}}</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                </div>                
-            </div>
+
+                        <!-- Footer Actions -->
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-light btn-lg flex-fill fw-bold text-muted border-0 shadow-sm py-3" data-bs-dismiss="modal">
+                                <i class="fa-solid fa-arrow-left me-2"></i>{{t('close_link')}}
+                            </button>
+                            <button type="button" class="btn btn-primary btn-lg flex-fill fw-bolder shadow py-3" @click="saveSale">
+                                <i class="fa-solid fa-circle-check me-2"></i>{{t('save_link')}}
+                            </button>
+                        </div>
+                    </div>                
+                </div>
             </div>
         </div>
+
   
         <!--Print item start-->
         <div class="d-none" id="printMe" v-if="saleItems.length > 0" >
@@ -270,157 +384,192 @@
             }  " />
         </div>       
         <setDiscountModal @saveDiscount="saveDiscount" :ei="editItem" />
-
+        
     </div>
 </template>
 <script>
- import PageHeader from "@/views/partials/PageHeader.vue"
- import { useVuelidate  } from '@vuelidate/core'
-import { required, email ,helpers} from '@vuelidate/validators'
-import {disableNetwork, Timestamp, collection, addDoc, doc, increment, limit,  updateDoc, onSnapshot, query, where, orderBy, getDocs} from 'firebase/firestore'
+import PageHeader from "@/views/partials/PageHeader.vue"
+import { useVuelidate } from '@vuelidate/core'
+import { required, email, helpers } from '@vuelidate/validators'
+import { disableNetwork, Timestamp, collection, addDoc, doc, increment, limit, updateDoc, onSnapshot, query, where, orderBy, getDocs } from 'firebase/firestore'
 import db from '@/firebase/firestore'
-//import Products from "@/views/sales/Products.vue"
+import store from "@/store"
 import SalesModal from "@/views/modals/sales/SalesModal.vue"
+import SalesModalOld from "@/views/modals/sales/SalesModalOld.vue"
 import CustomerModal from "@/views/modals/sales/CustomerModal.vue"
+import CustomerModalOld from "@/views/modals/sales/CustomerModalOld.vue"
 import Print from "@/views/sales/A5Print.vue"
 import ProductModal from "@/views/modals/sales/ProductModal.vue"
+import ProductModalOld from "@/views/modals/sales/ProductModalOld.vue"
 import * as hp from "@/lib/helper"
 import * as ss from "@/lib/snapshot/products"
-import setQtyModal from "@/views/modals/setQtyModal.vue";
-import setDiscountModal from "@/views/modals/setDiscountModal.vue";
-import FlatPickr from 'vue-flatpickr-component';
+import setQtyModal from "@/views/modals/setQtyModal.vue"
+import setQtyModalOld from "@/views/modals/setQtyModalOld.vue"
+import setDiscountModal from "@/views/modals/setDiscountModal.vue"
+import setDiscountModalOld from "@/views/modals/setDiscountModalOld.vue"
+import FlatPickr from 'vue-flatpickr-component'
 import * as hc from "@/lib/handleCtrl"
-import {lang} from "@/lib/language"
+import { lang } from "@/lib/language"
 
 export default {
     components: {
-        PageHeader,SalesModal,CustomerModal,Print, ProductModal,setQtyModal,setDiscountModal, FlatPickr
+        PageHeader, 
+        SalesModal: store.getters.theme === "new" ? SalesModal : SalesModalOld,
+        CustomerModal: store.getters.theme === "new" ? CustomerModal : CustomerModalOld,
+        Print, 
+        ProductModal: store.getters.theme === "new" ? ProductModal : ProductModalOld,
+        setQtyModal: store.getters.theme === "new" ? setQtyModal : setQtyModalOld,
+        setDiscountModal: store.getters.theme === "new" ? setDiscountModal : setDiscountModalOld,
+        FlatPickr
     },
     setup () {
         return { v$: useVuelidate() }
     },
-    data(){
-        return{    
-           
-            id:"",
+    data() {
+        return {
+            id: "",
             saleMode: "Sale / New",
-            isLoading:false,
+            isLoading: false,
             sale_type: "retail",
-            saleItems:[],
-            editItem:{},
-            store_item:{},
-            voucher_no:"",
-            sale_date:"",
-            print_date:"",
-            total_amount:0,
-            net_amount:0,
-            extra_discount:0,
-            credit:0,
-            charges:0,
-            remark:"",
-            paid:0,
-            change:0,
-            isLimitQty:false,
+            saleItems: [],
+            editItem: {},
+            store_item: {},
+            voucher_no: "",
+            sale_date: "",
+            print_date: "",
+            total_amount: 0,
+            net_amount: 0,
+            extra_discount: 0,
+            credit: 0,
+            charges: 0,
+            remark: "",
+            paid: 0,
+            change: 0,
+            isLimitQty: false,
             customer: {},
-            code_no:"",
-            products:[],
-            print_date:"",
+            code_no: "",
+            products: [],
             isOffline: false,
-            sale_user:{},
-            print_on_save:false,
-            
-            msg : {
-                type :"",
-                info :"",
+            sale_user: {},
+            print_on_save: false,
+            msg: {
+                type: "",
+                info: ""
             },
-            output: null,        
-             
+            output: null,
+             buffer: '',
+            lastTime: 0,
+            SCAN_GAP: 40,      // ms between keys (scanner speed)
+            MIN_LENGTH: 4,    // minimum barcode length
         }
     },
-    validations(){
-            return {
-                voucher_no: {required},
-                sale_date: {required}
-            }
+    validations() {
+        return {
+            voucher_no: { required },
+            sale_date: { required }
+        }
     },
    
     mounted() {
-        let pos=localStorage.getItem("pos");
-        this.print_on_save=pos=="false" ? false : true;
+        let pos = localStorage.getItem("pos");
+        this.print_on_save = pos == "false" ? false : true;
 
-        this.voucher_no=this.setVoucherNo();
-        this.setVoucherNo();
-        this.sale_date=hp.setToday()
-        this.print_date=hp.setToday();
-        this.setCustomer(this.default_customer)
-      //  this.fetchProducts();
-       
-      // await disableNetwork(db)
-     //set print date     
-         window.addEventListener('keydown', this.handleCtrl);
-         const isMobile = window.matchMedia("(max-width: 1199px)").matches;
-        if(!isMobile){
-            this.setBarcodeFocus();
+        this.voucher_no = this.setVoucherNo();
+        this.sale_date = hp.setToday();
+        this.print_date = hp.setToday();
+        this.setCustomer(this.default_customer);
+
+        window.addEventListener('keydown', this.handleCtrl);
+        const isMobile = window.matchMedia("(max-width: 1199px)").matches;
+        if (!isMobile) {
+           // this.setBarcodeFocus();
         }
-     
+        window.addEventListener('keydown', this.handleKey)
     },
     beforeUnmount() {
-         window.removeEventListener('keydown', this.handleCtrl);
-     },
+        window.removeEventListener('keydown', this.handleCtrl);
+        window.removeEventListener('keydown', this.handleKey)
+    },
   
-    watch:{
-      
-        msg:{
-            handler(val){
-                if(val.type){
-                    setTimeout(()=>{
-                        this.msg.type="";
-                        this.msg.info="";
+    watch: {
+        msg: {
+            handler(val) {
+                if (val.type) {
+                    setTimeout(() => {
+                        this.msg.type = "";
+                        this.msg.info = "";
                     }, 2000)
                 }
-            },deep:true
+            },
+            deep: true
         }
     },
-    computed:{
-        user(){
+    computed: {
+        user() {
             return this.$store.getters.user;
         },
-        default_customer(){
+        default_customer() {
             return this.$store.getters.default_customer;
         },
-        config(){
+        config() {
             return this.$store.getters.flat_pickr_config;
         },
-        pageTitle(){
-            const sl=this.$store.getters.currentLang;
-            let pageTitle="";
-            if(this.saleMode=="Sale / New"){
-                 pageTitle=sl=="mm" ?  `${lang.sale.mm} / ${lang.new.mm}` : `${lang.sale.eng} / ${lang.new.eng}`
-            }else{
-                 pageTitle=sl=="mm" ?  `${lang.sale.mm} / ${lang.history.mm}` : `${lang.sale.eng} / ${lang.history.eng}`
+        pageTitle() {
+            const sl = this.$store.getters.currentLang;
+            let pageTitle = "";
+            if (this.saleMode == "Sale / New") {
+                pageTitle = sl == "mm" ? `${lang.sale.mm} / ${lang.new.mm}` : `${lang.sale.eng} / ${lang.new.eng}`
+            } else {
+                pageTitle = sl == "mm" ? `${lang.sale.mm} / ${lang.history.mm}` : `${lang.sale.eng} / ${lang.history.eng}`
             }
             return pageTitle;
         },
         t() {
             return (key) => this.$store.getters.t(key);
-        },
-
-       
+        }
     },
-    methods:{
-        closeCfModal(){
+    methods: {
+        fM(amount) {
+            return hp.formattedAmount(amount)
+        },
+        handleKey(e) {
+            const now = Date.now()
+            const diff = now - this.lastTime
+            this.lastTime = now
+
+            // If typing is slow → human → reset
+            if (diff > this.SCAN_GAP) {
+                this.buffer = ''
+            }
+
+            // Scanner end key
+            if (e.key === 'Enter') {
+                if (this.buffer.length >= this.MIN_LENGTH) {
+                    const code_no=String(this.buffer)
+                    this.code_no=code_no;
+                    this.setCodeOnPaste()
+                }
+                this.buffer = ''
+                return
+            }
+            // Accept only printable chars
+            if (e.key.length === 1) {
+                this.buffer += e.key
+            }
+            },
+        closeCfModal() {
             const modalEl = document.getElementById('cfModal');
             const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
             modalInstance.hide();
         },
-        setPos(){
+        setPos() {
             localStorage.setItem("pos", this.print_on_save)
         },
-        setBarcodeFocus(){
-            setTimeout(()=>{
-            const code_no=document.getElementById("code_no");
-            code_no.focus();
-        }, 100)
+        setBarcodeFocus() {
+            setTimeout(() => {
+                const code_no = document.getElementById("code_no");
+                code_no.focus();
+            }, 100)
         },
         getUsername(email) {
             return email.split('@')[0]; // Split by '@' and take the first part
@@ -501,30 +650,21 @@ export default {
             this.$router.push({name: "EditSale", params: {id:this.voucher_no}})
         },      
 
-     /*   setCodeOnPaste(){
-            setTimeout(()=>{                
-            const item=this.products.filter((f)=>f.code_no==this.code_no);
-            if(item.length){
-                this.setCode(item[0])
-                this.code_no="";
-            }
-            },200)
-        }, */
-        async setCodeOnPaste(){
+        async setCodeOnPaste() {
             const query_url = query(collection(db, "products"), where("code_no", "==", this.code_no));
-           const unsub= onSnapshot(query_url, async(snapShot) =>{
-                    const products=ss.products(snapShot)
-                    if(products.length ==0){
-                        this.msg.info="Barcode not found."
-                        this.msg.type="error"
-                        this.code_no="";
-                        return true;
-                    }     
-                    this.setCode(products[0])
-                    this.code_no="";
-                    unsub();
-            });              
-       } ,
+            const unsub = onSnapshot(query_url, async (snapShot) => {
+                const products = ss.products(snapShot)
+                if (products.length == 0) {
+                    this.msg.info = "Barcode not found."
+                    this.msg.type = "error"
+                    this.code_no = "";
+                    return true;
+                }
+                this.setCode(products[0])
+                this.code_no = "";
+                unsub();
+            });
+        },
         calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty){
             return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
         },
@@ -660,17 +800,9 @@ export default {
         changeCustomer(){
            this.setCustomer(this.default_customer)
         },
-        setCustomer(p){
-            this.customer={};
-            this.customer=p;
-            /*
-            this.customer.id=p.id;
-            this.customer.name=p.name;
-            this.customer.code=p.code
-            this.customer.phone=p.phone
-            this.customer.address=p.address
-            this.customer.created_at=p.created_at
-            */
+        setCustomer(p) {
+            this.customer = {};
+            this.customer = p;
         },
         setOldCode(s){
             this.id=s.id;
@@ -738,13 +870,8 @@ export default {
             }           
 
               this.isLoading=true;
-                this.msg.type="";
-                this.msg.info="";
-
-              /*  if(this.credit > 0){
-                    this.saveCredit();
-                }
-                    */
+                this.msg.type = "";
+                this.msg.info = "";
 
                 const sale_date=hp.insertDate(this.sale_date)
 
@@ -822,14 +949,10 @@ export default {
                 this.v$.$reset()
 
         },
-        removeSaleItem(i){
+        removeSaleItem(i) {
             this.saleItems.splice(i, 1)
             this.calTotal();
         },
-       /* removeSaleItems(){
-            this.saleItems=this.saleItems.filter((f)=>!f.is_check)
-            this.calTotal()
-        },*/
      
         checkQty(p){           
             if(p.qty  <1 + p.sale_qty ){
@@ -889,10 +1012,6 @@ export default {
             })
             this.calTotal();
         },
-        /*calDiscount(){           
-            this.calTotal();
-            this.charges=this.total_amount - this.discount;
-        },*/
         calPaid(){
             this.change=this.paid - this.net_amount > 0 ? this.paid - this.net_amount : 0;
             this.credit=this.paid - this.net_amount < 0 ? Math.abs(this.paid - this.net_amount) : 0;
