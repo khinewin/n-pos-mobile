@@ -68,54 +68,32 @@
                                         <button type="button" v-if="purchases.length <= 0"  @click="fetchPurchase"  class="btn position-absolute top-50 start-50 translate-middle"><i class="fa-solid fa-rotate-right"></i></button>
                                     </div>
                                     <div class="col-6 col-sm-4 d-grid position-relative">
-                                        <button :disabled="stocks.length <=0" @click="exportStocks" class="btn py-4 btn-secondary">Stocks ({{stocks.length}})</button>
+                                        <button :disabled="stocks.length <=0" @click="exportStocks" class="btn py-4 btn-warning">Stocks ({{stocks.length}})</button>
                                         <button type="button" v-if="stocks.length <= 0"  @click="fetchStocks"  class="btn position-absolute top-50 start-50 translate-middle"><i class="fa-solid fa-rotate-right"></i></button>
                                     </div>
                                   
                                     <div class="col-6 col-sm-4 d-grid position-relative">
-                                        <button :disabled="adjustments.length <=0" @click="exportAdjustments" class="btn py-4 btn-success">Adjustments ({{adjustments.length}})</button>
+                                        <button :disabled="adjustments.length <=0" @click="exportAdjustments" class="btn py-4 btn-primary">Adjustments ({{adjustments.length}})</button>
                                         <button type="button" v-if="adjustments.length <= 0"  @click="fetchAdjustments"  class="btn position-absolute top-50 start-50 translate-middle"><i class="fa-solid fa-rotate-right"></i></button>
                                     </div>
                                     <div class="col-6 col-sm-4 d-grid position-relative">
-                                        <button :disabled="suppliers.length <=0" @click="exportSuppliers" class="btn py-4 btn-success">Suppliers ({{suppliers.length}})</button>
+                                        <button :disabled="suppliers.length <=0" @click="exportSuppliers" class="btn py-4 btn-secondary">Suppliers ({{suppliers.length}})</button>
                                         <button type="button" v-if="suppliers.length <= 0"  @click="fetchSuppliers"  class="btn position-absolute top-50 start-50 translate-middle"><i class="fa-solid fa-rotate-right"></i></button>
                                     </div>
                                     <div class="col-6 col-sm-4 d-grid position-relative">
-                                        <button :disabled="customers.length <=0" @click="exportCustomers" class="btn py-4 btn-secondary">Customers ({{customers.length}})</button>
+                                        <button :disabled="customers.length <=0" @click="exportCustomers" class="btn py-4 btn-info">Customers ({{customers.length}})</button>
                                         <button type="button" v-if="customers.length <= 0"  @click="fetchCustomers"  class="btn position-absolute top-50 start-50 translate-middle"><i class="fa-solid fa-rotate-right"></i></button>
                                     </div>
                                     <div class="col-6 col-sm-4 d-grid position-relative">
-                                        <button :disabled="packingSizes.length <=0" @click="exportPackingSizes" class="btn py-4 btn-primary">Packing Size ({{packingSizes.length}})</button>
+                                        <button :disabled="packingSizes.length <=0" @click="exportPackingSizes" class="btn py-4 btn-success">Packing Size ({{packingSizes.length}})</button>
                                         <button type="button" v-if="packingSizes.length <= 0"  @click="fetchPackingSizes"  class="btn position-absolute top-50 start-50 translate-middle"><i class="fa-solid fa-rotate-right"></i></button>
                                     </div>
+                                    <div class="col-6 col-sm-4 d-grid position-relative">
+                                        <button :disabled="categories.length <=0" @click="exportCategories" class="btn py-4 btn-primary">Categories ({{categories.length}})</button>
+                                        <button type="button" v-if="categories.length <= 0"  @click="fetchCategories"  class="btn position-absolute top-50 start-50 translate-middle"><i class="fa-solid fa-rotate-right"></i></button>
+                                    </div>
                                                                
-                                        <!--<div class="col-6 col-sm-4 d-grid">
-                                            <button :disabled="products.length <=0" @click="exportProducts" class="btn py-4 btn-outline-primary">Product Code ({{products.length}})</button>
-                                        </div>
-                                        <div class="col-6 col-sm-4 d-grid">
-                                            <button :disabled="sales.length <=0" @click="exportSales" class="btn py-4 btn-outline-success">Sales ({{sales.length}})</button>
-                                        </div>
-                                        <div class="col-6 col-sm-4 d-grid">
-                                            <button :disabled="purchases.length <=0" @click="exportPurchases" class="btn py-4 btn-outline-dark">Purchases ({{purchases.length}})</button>
-                                        </div>
-                                        <div class="col-6 col-sm-4 d-grid">
-                                            <button :disabled="stocks.length <=0" @click="exportStocks" class="btn py-4 btn-outline-secondary">Stocks ({{stocks.length}})</button>
-                                        </div>-->
-                                        <!--<div class="col-6 col-sm-4 d-grid">
-                                            <button :disabled="transfers.length <=0" @click="exportTransfers" class="btn py-4 btn-outline-primary">Transfers ({{transfers.length}})</button>
-                                        </div>-->
-                                        <!--<div class="col-6 col-sm-4 d-grid">
-                                            <button :disabled="adjustments.length <=0" @click="exportAdjustments" class="btn py-4 btn-outline-success">Adjustments ({{adjustments.length}})</button>
-                                        </div>
-                                        <div class="col-6 col-sm-4 d-grid">
-                                            <button :disabled="suppliers.length <=0" @click="exportSuppliers" class="btn py-4 btn-outline-success">Suppliers ({{suppliers.length}})</button>
-                                        </div>
-                                        <div class="col-6 col-sm-4 d-grid">
-                                            <button :disabled="customers.length <=0" @click="exportCustomers" class="btn py-4 btn-outline-secondary">Customers ({{customers.length}})</button>
-                                        </div>
-                                        <div class="col-6 col-sm-4 d-grid">
-                                            <button :disabled="packingSizes.length <=0" @click="exportPackingSizes" class="btn py-4 btn-outline-primary">Packing Size ({{packingSizes.length}})</button>
-                                        </div>-->
+                                      
                                 </div>
                             </div>                                                     
                         </div>
@@ -149,6 +127,9 @@
                                 <div class="col-6 col-sm-4 d-grid">
                                     <button :disabled="packingSizes.length <=0" @click="deletePackingSizes" class="btn py-4 btn-danger" >Packing Size ({{packingSizes.length}})</button>
                                 </div>
+                                <div class="col-6 col-sm-4 d-grid">
+                                    <button :disabled="categories.length <=0" @click="deleteCategories" class="btn py-4 btn-danger" >Categories ({{categories.length}})</button>
+                                </div>
                         </div>
                         </div>
                     </div>
@@ -173,6 +154,7 @@ import * as hp_adjustments from "@/lib/snapshot/adjustments"
 import * as hp_suppliers from "@/lib/snapshot/suppliers"
 import * as hp_customers from "@/lib/snapshot/customers"
 import * as hp_packingSizes from "@/lib/snapshot/packingSizes"
+import * as hp_categories from "@/lib/snapshot/category"
 
 import {lang} from "@/lib/language"
 import * as hp  from "@/lib/helper"
@@ -197,6 +179,7 @@ export default {
                 suppliers:[],
                 customers:[],
                 packingSizes:[],
+                categories:[],
 
                 from_date:"",
                 to_date:"",
@@ -257,6 +240,7 @@ export default {
         this.fetchSuppliers();
         this.fetchCustomers();
         this.fetchPackingSizes();
+        this.fetchCategories();
       //  this.fetchReturnIn();
         //this.fetchReturnOut();
         */
@@ -287,6 +271,8 @@ export default {
                         this.fetchSuppliers();
                     }else if(collection == "customers"){
                         this.fetchCustomers();
+                    }else if(collection == "category"){
+                        this.fetchCategories();
                     }
                    setTimeout(()=>{
                     this.msg.info="";
@@ -322,6 +308,9 @@ export default {
         },
         deleteCustomers(){
             this.deleteData(this.customers, "customers")
+        },
+        deleteCategories(){
+            this.deleteData(this.categories, "category")
         },
         
 
@@ -379,6 +368,8 @@ export default {
                             ie.restoreCustomers(d);
                         }else if(this.restore_name=="PackingSize"){
                             ie.restorePackingSizes(d);
+                        }else if(this.restore_name=="Categories"){
+                            ie.restoreCategory(d);
                         }
                         if(i+1 == data.length){
                             this.finishProcess(this.restore_name)
@@ -404,6 +395,7 @@ export default {
         this.exportSuppliers();
         this.exportCustomers();
         this.exportPackingSizes();
+        this.exportCategories();
     }, 
     exportSales(){
     if(this.sales.length<=0) return false;
@@ -474,6 +466,14 @@ export default {
        const result= ie.exportToJson(this.packingSizes, `PackingSize_${this.from_date}_${this.to_date}`)
        if (result){
            this.msg.info="Packing size data has been backup to local"
+           this.msg.type="success"
+       }
+    },
+    exportCategories(){
+        if(this.categories.length<=0) return false;
+       const result= ie.exportToJson(this.categories, `Categories_${this.from_date}_${this.to_date}`)
+       if (result){
+           this.msg.info="Categories data has been backup to local"
            this.msg.type="success"
        }
     },
@@ -586,6 +586,17 @@ export default {
                             return {...p, created_at: new Date(p.created_at.toDate())}
                         })
                        this.packingSizes=packingSizes;
+                       unsub();
+                });              
+        },
+        fetchCategories(){           
+            const query_url = query(collection(db, "category"));
+            const unsub=onSnapshot(query_url, async(snapShot) =>{                  
+                        let categories=hp_categories.category(snapShot)  
+                        categories=categories.map((p)=>{
+                            return {...p, created_at: new Date(p.created_at.toDate())}
+                        })
+                       this.categories=categories;
                        unsub();
                 });              
         },

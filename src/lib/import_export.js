@@ -101,6 +101,16 @@ const saveDocument=doc(db, "packingSizes", d.id)
 await setDoc(saveDocument, voucher)   
 }
 
+const restoreCategory=async(d)=>{
+  const voucher={
+    ...d,
+    created_at: Timestamp.fromDate(new Date(d.created_at))           
+   
+}  
+const saveDocument=doc(db, "category", d.id)
+await setDoc(saveDocument, voucher)   
+}
+
 
 
 const deleteData=(data, collection)=>{
@@ -123,6 +133,7 @@ const deleteData=(data, collection)=>{
     restoreSuppliers,
     restoreCustomers,
     restorePackingSizes,
+    restoreCategory,
     deleteData
   }
   

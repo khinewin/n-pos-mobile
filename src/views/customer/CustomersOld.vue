@@ -3,24 +3,24 @@
            <PageHeader :page-title="pageTitle" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info"/>
            <div class="container-fluid">
                <div class="row  justify-content-end">  
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isUpdating || Object.keys(editItem).length===0" @click="saveEdit" >
                         <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> {{t('update_link')}}</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                     </button>
-                </div>  
-                ,<!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                </div> --> 
+                <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
                     </button>
                 </div>-->                           
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+               <!-- <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveCustomer">
                         <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> {{t('save_link')}}</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                     </button>
-                </div>   
+                </div>   -->
                </div>
            </div>
            <div class="container-fluid my-2">
@@ -56,27 +56,13 @@
                         </div>                                                                                                  
                    </div>                        
                    <div class="col-lg-9">
-                       <div class="card shadow vh-75 overflow-y-auto">
+                       <div class="card shadow vh-80 overflow-y-auto">
                            <div class="card-body p-2">
-                               <table class="table table-bordered table-hover mb-0">
-                                   <tbody class="small sticky-top z-3 table-secondary">
-                                       <!--<tr class="text-center table-secondary change-cursor">
-                                        <td class="col-0">
-                                            <input type="checkbox" class="form-check-input" @click="checkAll" v-model="is_check_all">
-                                        </td>
-                                           <td @click="sortCustomers('code')" class="col-2"><i class="fa-solid fa-sort"></i> Code</td>
-                                           <td @click="sortCustomers('name')" class="col-4"><i class="fa-solid fa-sort"></i> Name</td>
-                                           <td @click="sortCustomers('phone')" class="col-2"><i class="fa-solid fa-sort"></i> Phone</td>
-                                           <td @click="sortCustomers('address')" class="col-4"><i class="fa-solid fa-sort"></i> Address</td>
-                                           <td @click="sortCustomers('created_at')" class="col-2"><i class="fa-solid fa-sort"></i> Member date</td>
-                                       </tr>-->
-                                       <tr>
-                                        <td class="">
-                                            <!--<input class="form-check-input" type="checkbox" @click="checkAll" v-model="is_deleted">-->
-                                        </td>
-                                           <!--<td class="">
-                                                <input @keyperss.enter="saveCustomer"  type="text" v-model="code" class="form-control-plaintext py-0 text-center" id="code" placeholder="Code">                                                                                       
-                                            </td>-->
+                               <table class="table table-bordered  table-hover mb-0">
+                                   <tbody class="small sticky-top z-3 ">
+                                    
+                                       <tr>              
+                                        <td class="text-center align-middle"><i class="fa-solid fa-trash"></i></td>                         
                                             <td class="">
                                                 <input  @keyperss.enter="saveCustomer" type="text" v-model="name"  class="form-control py-1 " id="name" :placeholder="t('name')">                                               
                                             </td>
@@ -89,12 +75,18 @@
                                             <td class="">
                                                 <flat-pickr @change="saveCustomer" class="form-control py-1  text-center" v-model="created_at"  :config="config" />
                                             </td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm text-success" :disabled="isLoading" @click="saveCustomer">
+                                                    <span v-if="!isSaving"><i class="fa-solid fa-check"></i></span>
+                                                    <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
+                                                </button>
+                                            </td>
                                         </tr>
                                        </tbody>
                                        <tbody  v-if="customers.length > 0"  >
                                        <tr class=""v-for="(p, i) in customers" :key="p.id">                                            
-                                        <td class="d-grid">
-                                            <button :disabled="user.uid != p.user.uid" class="btn btn-sm text-danger" @click="removeCustomer(p)"><i class="fa-solid fa-trash"></i></button>
+                                        <td class="d-grid col-0">
+                                            <button :disabled="user.uid != p.user.uid" class="btn btn-sm text-danger" @click="setCustomerToDelete(p)"><i class="fa-solid fa-trash"></i></button>
 
                                             <!--<input class="form-check-input" type="checkbox" v-model="p.is_deleted">-->
                                         </td>
@@ -102,7 +94,7 @@
                                                 {{p.code}}
                                             </td>-->
                                            <td :class="{'table-secondary': sort_item ==='name'}" class="">
-                                                <input v-if="editItem.id==p.id" @input="setEdit(p)"  @keypress.enter="saveEdit" type="text" class="form-control  py-1 " v-model="p.name">
+                                                <input @keyup="editName=true" v-if="editItem.id==p.id" @input="setEdit(p)"  @keypress.enter="saveEdit" type="text" class="form-control  py-1 " v-model="p.name">
                                                 <div v-else @click="setEdit(p)">{{p.name}}</div>
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='phone'}" class="">
@@ -114,6 +106,13 @@
                                                 <div v-else @click="setEdit(p)">{{p.address}}</div>
                                            </td>
                                            <td :class="{'table-secondary': sort_item ==='created_at'}" class="text-center">{{showTime(p.created_at)}}</td>
+                                           <td>
+                                            <button class="btn btn-sm text-primary" @click="saveEdit" :disabled="editItem.id !=p.id">
+                                                <span v-if="!isUpdating"><i class="fa-solid fa-check"></i> </span>
+                                                <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating && editItem.id==p.id"></span>
+                                            </button>
+                                          </td>
+                                          
                                        </tr>
                                    </tbody>
                                </table>
@@ -133,6 +132,44 @@
            </div>
    </div>   
     
+   <!-- Delete Confirmation Modal -->
+   <div class="modal fade" id="deleteCustomerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+       <div class="modal-dialog modal-dialog-centered">
+           <div class="modal-content border-0 shadow">
+               <div class="modal-header border-bottom-0 pb-0">
+                   <h5 class="modal-title fw-bold text-danger">Confirm Delete</h5>
+                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body py-2 px-5">
+                   <div class="mb-3 text-danger opacity-50 text-center">
+                       <i class="fa-solid fa-triangle-exclamation fa-3x"></i>
+                   </div>
+                   <p class="fw-medium text-center">Are you sure you want to delete this customer?</p>
+                   <table class="table table-bordered" v-if="customerToDelete">
+                       <tbody>
+                           <tr>
+                               <td class="col-4 text-end pe-3">{{t("name")}}</td>
+                               <td class="col-8 fw-bold ps-3">{{ customerToDelete.name }}</td>
+                           </tr>
+                           <tr>
+                               <td class="text-end pe-3">{{t("phone")}}</td>
+                               <td class="fw-bold ps-3">{{ customerToDelete.phone }}</td>
+                           </tr>
+                           <tr>
+                               <td class="text-end pe-3">{{t("address")}}</td>
+                               <td class="fw-bold ps-3">{{ customerToDelete.address }}</td>
+                           </tr>
+                       </tbody>
+                   </table>
+               </div>
+               <div class="modal-footer border-top-0 pt-0 justify-content-center">
+                   <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                   <button type="button" class="btn btn-danger px-4" @click="confirmDelete">Delete</button>
+               </div>
+           </div>
+       </div>
+   </div>
+
    </template>
    <script>
    import PageHeader from "@/views/partials/PageHeader.vue"
@@ -189,6 +226,9 @@ import { required, email ,helpers} from '@vuelidate/validators'
                is_check_all: false,
                isDeleting:false,
                limitData: 100,
+               editName:false,
+               customerToDelete: null,
+               deleteModalInstance: null,
            }
        },
        created() {     
@@ -200,10 +240,11 @@ import { required, email ,helpers} from '@vuelidate/validators'
         this.created_at=hp.setToday();
        this.fetchCustomer();
         window.addEventListener('keydown', this.handleCtrl);
-
+        this.deleteModalInstance = new bootstrap.Modal('#deleteCustomerModal');
        },
        beforeUnmount() {
          window.removeEventListener('keydown', this.handleCtrl);
+         if (this.deleteModalInstance) this.deleteModalInstance.hide();
      },
        computed:{
            user(){
@@ -261,13 +302,18 @@ import { required, email ,helpers} from '@vuelidate/validators'
            },100)
         },
       
-        async removeCustomer(c){   
-            const cf=confirm(`Are you sure, you want to delete the customers "${c.name}" ?`)
-            if(!cf) return false;
-            this.isDeleting=true;        
-            const document=doc(db, "customers", c.id)   
-            this.isRemoved(c.code);  
-            await deleteDoc(document)           
+        setCustomerToDelete(c) {
+            this.customerToDelete = c;
+            this.deleteModalInstance.show();
+        },
+        async confirmDelete() {
+            if (!this.customerToDelete) return false;
+            this.isDeleting = true;
+            const document = doc(db, "customers", this.customerToDelete.id);
+            this.isRemoved(this.customerToDelete.code);
+            await deleteDoc(document);
+            this.deleteModalInstance.hide();
+            this.customerToDelete = null;
         },
        generateKeywords(data){
             return hp.generateKeywords(data);
@@ -318,7 +364,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
             const coll = collection(db, "customers");
             const q = query(coll, where("name_lower_case", "==", this.editItem.name.toLowerCase()));
             const isTaken = await getDocs(q);
-            if(!isTaken.empty){
+            if(!isTaken.empty && this.editName){
                 const docRef = doc(db, "customers", this.editItem.id);
                 const docSnapshot = await getDoc(docRef);
                 const docData = docSnapshot.data();
@@ -326,8 +372,10 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 this.customers[index].name=docData.name;
                 this.msg.info="This customer name already exists"
                 this.msg.type="error"
+                this.editName=false;
                 return false;
             }
+            this.editName=false;
             const updateDocument=doc(db, "customers", this.editItem.id)
             const data={
                 ...this.editItem,
@@ -335,6 +383,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 name_keywords: this.generateKeywords(this.editItem.name),
                 address_keywords: this.generateKeywords(this.editItem.address),
             }
+            this.isUpdating=true;
             this.isUpdated(this.editItem.code);
             await updateDoc(updateDocument,data)  
            },
@@ -372,6 +421,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                     this.msg.info="The selected customer has been updated"
                     this.msg.type="success"
                     this.editItem={}
+                    this.isUpdating=false;
                     unsub();
                 })
             })
@@ -510,4 +560,3 @@ import { required, email ,helpers} from '@vuelidate/validators'
    <style lang="">
        
    </style>
-   

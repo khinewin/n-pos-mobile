@@ -234,13 +234,13 @@ export default {
             }else 
             if(this.customer_code){
                 query_url = query(collection(db, "sales"), 
-                where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), 
+              
                 where("customer.code", "==", Number(this.customer_code)), 
                 where("credit", ">", 0),
                 orderBy("sale_date", "desc"));
             }else{
                 query_url = query(collection(db, "sales"), 
-                where("sale_date", ">=", from_date), where("sale_date", "<=", to_date),
+            
                 where("credit", ">", 0),
                  orderBy("sale_date", "desc"));
             }           
@@ -248,7 +248,7 @@ export default {
                 let saleItems = ss.sales(snapShot);
                 //  saleItems=saleItems.filter((f)=>f.credit > 0)      
                 saleItems = saleItems.map((s) => {
-                    const debt_paid = s.debt_payments.reduce((accu, cur) => accu + cur.paid, 0)
+                    const debt_paid =s.debt_payments?.length ? s.debt_payments.reduce((accu, cur) => accu + cur.paid, 0) : 0
 
                     this.total_amount += s.net_amount;
                     this.total_paid += s.paid + debt_paid;

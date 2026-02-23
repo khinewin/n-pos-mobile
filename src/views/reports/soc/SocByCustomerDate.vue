@@ -174,7 +174,7 @@ export default {
                             customer_name: res.customer.name,
                             group_date :  this.showTime(res.sale_date),
                              voucher_no: res.voucher_no, credit: res.credit, paid: res.paid,
-                             debt_paid: res.debt_payments.reduce((accu, cur)=>accu + cur.paid,0)
+                             debt_paid: res.debt_payments?.length ? res.debt_payments.reduce((accu, cur)=>accu + cur.paid,0) : 0
                             })
                         }else{
                             sales.push({...data, group_customer: res.customer.code,
@@ -269,13 +269,13 @@ export default {
             let query_url=""
             if(this.customer_code){
                 query_url = query(collection(db, "sales"), 
-                where("sale_date", ">=", from_date), where("sale_date", "<=", to_date),
+           
                  where("customer.code", "==", Number(this.customer_code)), 
                  where("credit", ">", 0),
                  orderBy("sale_date", "desc"));
             }else{
                  query_url = query(collection(db, "sales"), 
-                 where("sale_date", ">=", from_date), where("sale_date", "<=", to_date),
+              
                  where("credit", ">", 0),
                   orderBy("sale_date", "desc"));
             }

@@ -3,24 +3,24 @@
            <PageHeader :page-title="pageTitle" :isOffline="isOffline" :msg-type="msg.type" :msg-info="msg.info"/>
            <div class="container-fluid">
                <div class="row  justify-content-end">  
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+                <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isUpdating || Object.keys(editItem).length===0" @click="saveEdit">
                         <span v-if="!isUpdating"><i class="fa-solid fa-retweet"></i> {{t('update_link')}}</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating"></span>
                     </button>
-                </div>  
+                </div> --> 
                 <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button"  class="btn btn-sm text-danger" :disabled="isLoading" @click="deleteMultiple">
                         <span v-if="!isDeleting"><i class="fa-solid fa-trash"></i> Delete (ctrl+d)</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isDeleting"></span>
                     </button>
                 </div>-->                           
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
+               <!-- <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <button type="button" class="btn btn-sm" :disabled="isLoading" @click="saveSupplier">
                         <span v-if="!isSaving"><i class="fa-solid fa-hard-drive"></i> {{t('save_link')}}</span>
                         <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
                     </button>
-                </div>   
+                </div>   -->
                </div>
            </div>
            <div class="container-fluid my-2">
@@ -55,65 +55,62 @@
                         </div>                                                                                                  
                    </div>                        
                    <div class="col-lg-9">
-                       <div class="card shadow vh-75 overflow-y-auto">
+                       <div class="card shadow vh-80 overflow-y-auto">
                            <div class="card-body p-2">
                                <table class="table table-bordered table-hover mb-0">
-                                   <tbody class="table-secondary sticky-top z-3">
-                                       <!--<tr class="text-center table-secondary change-cursor">
-                                        <td class="col-0">
-                                        </td>
-                                           <td @click="sortSuppliers('name')" class="col4-"><i class="fa-solid fa-sort"></i> Name</td>
-                                           <td @click="sortSuppliers('phone')" class="col-2"><i class="fa-solid fa-sort"></i> Phone</td>
-                                           <td @click="sortSuppliers('company')" class="col-4"><i class="fa-solid fa-sort"></i> Company</td>
-                                           <td @click="sortSuppliers('created_at')" class="col-2"><i class="fa-solid fa-sort"></i> Date</td>
-                                       </tr>-->
+                                   <tbody class="small sticky-top z-3">
                                        <tr>
-                                        <td class="text-center">
-                                            <!--<input class="form-check-input" type="checkbox" @click="checkAll" v-model="is_deleted">-->
-                                        </td>
-                                            <!--<td class="">
-                                                <input @keypress.enter="saveSupplier" type="text" v-model="code" class="form-control-plaintext py-0 text-center" id="code" placeholder="Code">                                                                                       
-                                            </td>-->
+                                        <td class="text-center align-middle"><i class="fa-solid fa-trash"></i></td>
                                             <td class="">
-                                                <input @keypress.enter="saveSupplier" type="text" v-model="name" class="form-control py-1 textc " id="name" :placeholder="t('name')">                                               
+                                                <input @keypress.enter="saveSupplier" type="text" v-model="name" class="form-control py-1" id="name" :placeholder="t('name')">                                               
                                             </td>
                                             <td class="">
-                                                <input @keypress.enter="saveSupplier" type="tel" v-model="phone"  class="form-control py-1  text-center" id="phone" :placeholder="t('phone')">                                            
+                                                <input @keypress.enter="saveSupplier" type="tel" v-model="phone"  class="form-control py-1 text-center" id="phone" :placeholder="t('phone')">                                            
                                             </td>
                                             <td class="">
                                                 <input @keypress.enter="saveSupplier" type="text" v-model="company"   class="form-control py-1" id="company" :placeholder="t('company')">                                              
                                             </td>
                                             <td class="">
-                                                <flat-pickr @change="saveSupplier" class="form-control py-1  text-center" v-model="created_at"  :config="config" />
+                                                <flat-pickr @change="saveSupplier" class="form-control py-1 text-center" v-model="created_at"  :config="config" />
                                             </td>
-                                        </tr>
-                                       </tbody>
-                                       <tbody v-if="suppliers.length > 0">
-                                       <tr class="text-center"   v-for="(p, i) in suppliers" :key="p.id"  >                                           
-                                        <td class="d-grid">
-                                            <!--<input class="form-check-input" type="checkbox" v-model="p.is_deleted">-->
-                                            <button :disabled="user.uid != p.user.uid" class="btn btn-sm text-danger" @click="removeSupplier(p)"><i class="fa-solid fa-trash"></i></button>
-                                        </td>
-                                           <!--<td :class="{'table-secondary': sort_item ==='code'}" class="position-relative">
-                                                <span class="position-absolute start-50 top-50 translate-middle">{{p.code}}</span>
-                                            </td>-->
-                                           <td :class="{'table-secondary': sort_item ==='name'}" class="">
-                                                <input v-if="editItem.id ==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1 m-0" v-model="p.name">
-                                                <div v-else class="pt-1 text-start" @click="setEdit(p)">{{p.name}}</div>
-                                           </td>
-                                           <td :class="{'table-secondary': sort_item ==='phone'}" class="">
-                                            <input  v-if="editItem.id==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control text-center py-1  m-0" v-model="p.phone">
-                                            <div v-else class="pt-1" @click="setEdit(p)">{{p.phone}}</div>
-                                           </td>
-                                           <td :class="{'table-secondary': sort_item ==='company'}" class="">
-                                            <input v-if="editItem.id==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1  m-0" v-model="p.company">
-                                            <div v-else class="pt-1 text-start" @click="setEdit(p)">{{p.company}}</div>
-                                           </td>
-                                           <td :class="{'table-secondary': sort_item ==='created_at'}" class="position-relative">
-                                                <span class="position-absolute start-50 top-50 translate-middle">{{showTime(p.created_at)}}</span>
-                                           </td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm text-success" :disabled="isLoading" @click="saveSupplier">
+                                                    <span v-if="!isSaving"><i class="fa-solid fa-check"></i></span>
+                                                    <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isSaving"></span>
+                                                </button>
+                                            </td>
                                        </tr>
                                    </tbody>
+                                   <tbody v-if="suppliers.length > 0">
+                                   <tr class="" v-for="(p, i) in suppliers" :key="p.id">                                           
+                                    <td class="d-grid">
+                                        <!--<input class="form-check-input" type="checkbox" v-model="p.is_deleted">-->
+                                        <button :disabled="user.uid != p.user.uid" class="btn btn-sm text-danger" @click="setSupplierToDelete(p)"><i class="fa-solid fa-trash"></i></button>
+                                    </td>
+                                       <!--<td :class="{'table-secondary': sort_item ==='code'}" class="position-relative">
+                                            <span class="position-absolute start-50 top-50 translate-middle">{{p.code}}</span>
+                                        </td>-->
+                                       <td :class="{'table-secondary': sort_item ==='name'}" class="">
+                                            <input @keyup="editName=true" v-if="editItem.id==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1 m-0" v-model="p.name">
+                                            <div v-else class="pt-1 text-start" @click="setEdit(p)">{{p.name}}</div>
+                                       </td>
+                                       <td :class="{'table-secondary': sort_item ==='phone'}" class="">
+                                        <input v-if="editItem.id==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control text-center py-1 m-0" v-model="p.phone">
+                                        <div v-else class="pt-1 text-center" @click="setEdit(p)">{{p.phone}}</div>
+                                       </td>
+                                       <td :class="{'table-secondary': sort_item ==='company'}" class="">
+                                        <input v-if="editItem.id==p.id" @input="setEdit(p)" @keypress.enter="saveEdit" type="text" class="form-control py-1 m-0" v-model="p.company">
+                                        <div v-else class="pt-1 text-start" @click="setEdit(p)">{{p.company}}</div>
+                                       </td>
+                                       <td :class="{'table-secondary': sort_item ==='created_at'}" class="text-center">{{showTime(p.created_at)}}</td>
+                                       <td>
+                                        <button class="btn btn-sm text-primary" @click="saveEdit" :disabled="editItem.id !=p.id">
+                                            <span v-if="!isUpdating"><i class="fa-solid fa-check"></i> </span>
+                                            <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isUpdating && editItem.id==p.id"></span>
+                                        </button>
+                                      </td>
+                                   </tr>
+                               </tbody>
                                </table>
                                <div v-if="isLoading">
                                 <div colspan="5">
@@ -131,6 +128,44 @@
            </div>
    </div>   
     
+   <!-- Delete Confirmation Modal -->
+   <div class="modal fade" id="deleteSupplierModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+       <div class="modal-dialog modal-dialog-centered">
+           <div class="modal-content border-0 shadow">
+               <div class="modal-header border-bottom-0 pb-0">
+                   <h5 class="modal-title fw-bold text-danger">Confirm Delete</h5>
+                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body py-2 px-5">
+                   <div class="mb-3 text-danger opacity-50 text-center">
+                       <i class="fa-solid fa-triangle-exclamation fa-3x"></i>
+                   </div>
+                   <p class="fw-medium text-center">Are you sure you want to delete this supplier?</p>
+                   <table class="table table-bordered" v-if="supplierToDelete">
+                       <tbody>
+                           <tr>
+                               <td class="col-4 text-end pe-3">{{t("name")}}</td>
+                               <td class="col-8 fw-bold ps-3">{{ supplierToDelete.name }}</td>
+                           </tr>
+                           <tr>
+                               <td class="text-end pe-3">{{t("phone")}}</td>
+                               <td class="fw-bold ps-3">{{ supplierToDelete.phone }}</td>
+                           </tr>
+                           <tr>
+                               <td class="text-end pe-3">{{t("company")}}</td>
+                               <td class="fw-bold ps-3">{{ supplierToDelete.company }}</td>
+                           </tr>
+                       </tbody>
+                   </table>
+               </div>
+               <div class="modal-footer border-top-0 pt-0 justify-content-center">
+                   <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                   <button type="button" class="btn btn-danger px-4" @click="confirmDelete">Delete</button>
+               </div>
+           </div>
+       </div>
+   </div>
+
    </template>
    <script>
    import PageHeader from "@/views/partials/PageHeader.vue"
@@ -188,6 +223,9 @@ import { required, email ,helpers} from '@vuelidate/validators'
                is_check_all: false,
                isDeleting:false,
                limitData: 100,
+               editName:false,
+               supplierToDelete: null,
+               deleteModalInstance: null,
            }
        },
      
@@ -196,10 +234,11 @@ import { required, email ,helpers} from '@vuelidate/validators'
         this.fetchSuppliers();
         this.created_at=hp.setToday();
         window.addEventListener('keydown', this.handleCtrl);
-
+        this.deleteModalInstance = new bootstrap.Modal('#deleteSupplierModal');
        },
        beforeUnmount() {
          window.removeEventListener('keydown', this.handleCtrl);
+         if (this.deleteModalInstance) this.deleteModalInstance.hide();
      },
        computed:{
            user(){
@@ -249,13 +288,18 @@ import { required, email ,helpers} from '@vuelidate/validators'
             this.searchSuppliers();
         },
         
-        async removeSupplier(s){     
-            const cf=confirm(`Are you sure, you want to delete the suppliers "${s.name}" ?`)
-            if(!cf) return false;
-            this.isDeleting=true;             
-            const document=doc(db, "suppliers", s.id)     
-            this.isRemoved(s.code);
-            await deleteDoc(document) 
+        setSupplierToDelete(s) {
+            this.supplierToDelete = s;
+            this.deleteModalInstance.show();
+        },
+        async confirmDelete() {
+            if (!this.supplierToDelete) return false;
+            this.isDeleting = true;
+            const document = doc(db, "suppliers", this.supplierToDelete.id);
+            this.isRemoved(this.supplierToDelete.code);
+            await deleteDoc(document);
+            this.deleteModalInstance.hide();
+            this.supplierToDelete = null;
         },
      
         checkAll(){
@@ -296,6 +340,7 @@ import { required, email ,helpers} from '@vuelidate/validators'
                     this.msg.info="The selected supplier has been updated"
                     this.msg.type="success"
                     this.editItem={}
+                    this.isUpdating=false;
                     unsub();
                 })
             })
@@ -364,10 +409,11 @@ import { required, email ,helpers} from '@vuelidate/validators'
         },
           
           async saveEdit(){    
+            // Only check for duplicate name when the name has actually changed
             const coll = collection(db, "suppliers");
             const q = query(coll, where("name_lower_case", "==", this.editItem.name.toLowerCase()));
             const isTaken = await getDocs(q);
-            if(!isTaken.empty){
+            if(!isTaken.empty && this.editName){
                 const docRef = doc(db, "suppliers", this.editItem.id);
                 const docSnapshot = await getDoc(docRef);
                 const docData = docSnapshot.data();
@@ -375,8 +421,10 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 this.suppliers[index].name=docData.name;
                 this.msg.info="This supplier name already exists"
                 this.msg.type="error"
+                this.editName=false;
                 return false;
-            }                  
+            }
+            this.editName=false;
                const updateDocument=doc(db, "suppliers", this.editItem.id)
                const data={
                 ...this.editItem,
@@ -384,11 +432,13 @@ import { required, email ,helpers} from '@vuelidate/validators'
                 name_keywords: this.generateKeywords(this.editItem.name),
                 company_keywords: this.generateKeywords(this.editItem.company),
             }
+            this.isUpdating=true;
             this.isUpdated(this.editItem.code);
             await updateDoc(updateDocument, data)           
            },
            setEdit(p){
                this.editItem={...p,  edit_user:  {uid:this.user.uid, type: "modified"}};
+               this.editName=false; // reset when switching to a new row
            },
            clearSearch(){
                this.search_by_code="";
@@ -497,5 +547,3 @@ import { required, email ,helpers} from '@vuelidate/validators'
    <style lang="">
        
    </style>
-   
-   
