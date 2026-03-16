@@ -33,7 +33,7 @@
                             <router-link class="nav-link py-2 px-3" :to="{name : 'Suppliers'}"><i class="fa-solid fa-person-walking-luggage"></i> {{t('suppliers')}}</router-link>
                           </li>
                           <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
-                            <router-link class="nav-link py-2 px-3" :to="{name : 'Customers'}"><i class="fa-solid fa-users"></i> {{t('customer')}}</router-link>
+                            <router-link class="nav-link py-2 px-3" :to="{name : 'Customers'}"><i class="fa-solid fa-users"></i> {{t('customers')}}</router-link>
                           </li>
                           <!--<li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
                             <router-link class="nav-link py-2 px-3" :to="{name : 'Transfers'}"><i class="fa-solid fa-right-left"></i> Transfer</router-link>

@@ -1,4 +1,28 @@
 export const lang={
+      select_report:{
+        eng:"Select Report",
+        mm:"အစီရင်ခံစာ ရွေးချယ်ရန်"
+    },
+    available_reports:{
+        eng:"Available Reports",
+        mm:"ရရှိနိုင်သော အစီရင်ခံစာများ"
+    },
+    report_filters:{
+        eng:"Report Filters",
+        mm:"အစီရင်ခံစာ စစ်ထုတ်မှုများ"
+    },
+    expense:{
+        eng:"Expense",
+        mm:"အသုံးစရိတ်များ"
+    },
+    advanced_filters:{
+        eng:"Advanced Filters",
+        mm:"အဆင့်မြင့်ရှာဖွေမှု"
+    },
+    select_unit:{
+        eng:"Select Unit",
+        mm:"ယူနစ်ရွေးပါ"
+    },
     confirm_delete:{
         eng:"Confirm Delete",
         mm:"အတည်ပြုရန်"
@@ -56,7 +80,7 @@ export const lang={
         mm:"ပေးငွေပမာဏ"
     },
     total_balance_due:{
-        eng: "Total Balance Due",
+        eng: "Total Balance",
         mm:"ကျန်ငွေစုစုပေါင်း"
     },
     pay_for:{

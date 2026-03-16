@@ -164,7 +164,7 @@
                 <div class="col-md-5 col-lg-4">
                     <div class="card shadow">
                         <div class="card-body p-2">
-                            <table class="table table-bordered mb-0 table-hover" v-if="Object.keys(editItem).length >0 && editItem.packing_size" >
+                            <table class="table table-bordered mb-0 table-hover" v-if="editItem && Object.keys(editItem).length >0 && editItem.packing_size" >
                                 <tbody>
                                     <tr class="">
                                         <td :colspan="[editItem.packing_size.largest_unit !=null ? 4 : 5]">
@@ -786,6 +786,10 @@ export default {
        
       
         setEdit(p){  
+            if (!p) {
+                this.editItem = {};
+                return;
+            }
          
             let  l=0, m=0, s=0;
 
@@ -859,7 +863,7 @@ export default {
                     }
                 }else {
                     this.products = this.productsData;
-                    if (this.products.length && Object.keys(this.editItem).length <= 0) {
+                    if (this.products.length && (!this.editItem || Object.keys(this.editItem).length <= 0)) {
                         this.setEdit(this.products[0]);
                     }
                 }
@@ -886,7 +890,7 @@ export default {
                 this.productsData=products;
                 this.products=products;                
                 this.isLoading=false;
-                if(Object.keys(this.editItem).length ==0 && products.length){
+                if((!this.editItem || Object.keys(this.editItem).length === 0) && products.length){
                     this.setEdit(this.products[0]) 
                 }
             });
@@ -935,7 +939,7 @@ export default {
                 this.msg.info="The selected product code has been deleted"
                 this.msg.type="success"                
                 setTimeout(()=>{
-                    this.editItem=this.products[0];
+                    this.editItem=this.products.length ? this.products[0] : {};
                     this.fetchProductCount();
                 }, 1000)
                 unsub();         

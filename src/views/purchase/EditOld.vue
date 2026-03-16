@@ -57,15 +57,17 @@
                        <div class="vh-50 overflow-y-auto">
                         <table class="table table-bordered mb-0  table-hover ">
                             <tbody>
-                                <tr class="text-center fw-bold table-secondary change-cursor"  data-bs-toggle="modal" data-bs-target="#searchCode" >
+                                <tr class="small text-center fw-bold table-secondary change-cursor"  data-bs-toggle="modal" data-bs-target="#searchCode" >
                                     <td class="col-0" colspan="2">{{t("number")}}</td>
+                                    <td class="col-1">{{t('barcode')}}</td>
                                     <td class="col-3 change-cursor" ><i class="fa-solid fa-circle-plus"></i>  {{t('item_name')}}</td>
                                     <!--<td class="col-1 table-info">Exp. Date</td>-->     
-                                    <td class="col-2">{{t('packing_size')}}</td>                              
-                                    <td class="col-1 table-primary" colspan="1">{{t('qty')}}</td>
-                                    <td class="col-2 table-info" colspan="2">{{t('unit_price')}}</td>     
+                                    <!--<td class="col-2">{{t('packing_size')}}</td> -->                             
+                                    <td class="col-2 table-primary" colspan="1">{{t('qty')}}</td>
+                                    <td class="col-1 table-info">{{t('unit_price')}}</td>     
+                                    <td class="col-1 table-success">{{t('sale_price')}}</td> 
                                     <td class="col-1">{{t('amount')}}</td>                               
-                                    <td class="col-2table-warning" colspan="2">{{t('discount')}}</td>                                    
+                                    <td class="col-2 table-warning" colspan="2">{{t('discount')}}</td>                                    
                                     <td class="col-1">{{t('unit_cost')}}</td>
                                 </tr>
                                 <tr class="small"v-if="storePurchase.length > 0" v-for="(st, i) in storePurchase.filter((f)=>!f.is_remove)" :key="st.id" @mouseenter="setEdit(i)"  >
@@ -73,24 +75,25 @@
                                         <a class="text-danger d-block " href="#!" @click="removeStoreItem(st)"><i class="fa-solid fa-square-minus"></i></a>                                                                                                                          
                                     </td>                 
                                     <td class="text-center">{{i+1}}</td>                   
+                                    <td class="text-center">{{st.code_no}}</td>
                                     <td class="">{{st.item_name}}</td>
                                     <!--<td class=" position-relative table-info" >
                                         <a v-if="st.tmp_exp_date" class="text-danger position-absolute top-50 start-0 translate-middle ps-2" href="#!" @click="removeExpDate(st)"><i class="fa-solid fa-square-minus"></i></a>                                                                                         
                                         <flat-pickr class="form-control-plaintext py-0 text-center" v-model="st.tmp_exp_date" @change="setExpDate(st.id)"  :config="config" />
                                     </td>-->
-                                    <td class="">
+                                    <!--<td class="">
                                          {{calPackingSize(st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit, st.packing_size.medium_qty, st.packing_size.smallest_qty)}}
-                                    </td>
-                                   <td class=" text-end table-primary change-cursor" data-bs-toggle="modal" data-bs-target="#setQtyModal">
+                                    </td>-->
+                                   <td class=" text-end table-primary change-cursor text-end" id="setQty" data-bs-toggle="modal" data-bs-target="#setQtyModal">
                                         {{calPackingQty(st.packing_size.medium_qty, st.packing_size.smallest_qty, st.pur_qty, st.packing_size.largest_unit, st.packing_size.medium_unit, st.packing_size.smallest_unit)}}                                            
                                    </td>
-                                   <td class=" table-info w-10">
-                                        <input @keyup="calEdit(i)" @change="calEdit(i)"   type="number"  v-model="st.qty_pur_price" class="form-control-plaintext py-0  text-center" placeholder="Price">                                        
+                                   <td class="table-info change-cursor text-end" data-bs-toggle="modal" data-bs-target="#setPricesModal">
+                                        <span v-if="st.packing_size.largest_unit"> {{st.pur_price.largest_unit}}' {{st.packing_size.largest_unit}}</span>
+                                        <span v-else>{{st.pur_price.medium_unit}}' {{st.packing_size.medium_unit}}</span>
                                     </td>
-                                    <td class=" table-info w-5">
-                                        <select @change="calEdit" class="form-control-plaintext py-0  text-center change-cursor" v-model="st.qty_pur_price_unit">
-                                            <option  v-for="pu in onlyString(st.packing_size)">{{pu}}</option>
-                                        </select>
+                                    <td class="table-success change-cursor text-end"  data-bs-toggle="modal" data-bs-target="#setPricesModal">
+                                       <span v-if="st.packing_size.largest_unit">{{st.retail_price.largest_unit}}' {{st.packing_size.largest_unit}} </span>
+                                        <span v-else>{{st.retail_price.medium_unit}}' {{st.packing_size.medium_unit}}</span>
                                     </td>
                                     <td class="text-end ">{{st.amount}}</td>
 
@@ -143,6 +146,7 @@
         </div>      
             <setQtyModal @setQty="setPurQty" :ei="editItem" />
             <setDiscountModal @saveDiscount="saveDiscount" :ei="editItem" />
+            <SetPrice :ei="editItem" @saveAutoCal="saveAutoCal" @savePrice="savePrice" />
     </div>
 </template>
 <script>
@@ -163,6 +167,7 @@ import setQtyModal from "@/views/modals/setQtyModal.vue";
 import setQtyModalOld from "@/views/modals/setQtyModalOld.vue";
 import setDiscountModal from "@/views/modals/setDiscountModal.vue";
 import setDiscountModalOld from "@/views/modals/setDiscountModalOld.vue";
+import SetPrice from "@/views/modals/stocks/SetPrice.vue";
 import FlatPickr from 'vue-flatpickr-component';
 import * as hc from "@/lib/handleCtrl"
 import {lang} from '@/lib/language'
@@ -173,9 +178,10 @@ export default {
         ProductModal: store.getters.theme === "new" ? ProductModal : ProductModalOld,
         SupplierModal: store.getters.theme === "new" ? SupplierModal : SupplierModalOld,
         Footer,
-        setQtyModal: store.getters.theme === "new" ? setQtyModal : setQtyModalOld,
+        setQtyModal: setQtyModal,
         setDiscountModal: store.getters.theme === "new" ? setDiscountModal : setDiscountModalOld,
-        FlatPickr
+        FlatPickr,
+        SetPrice,
     },
     setup () {
         return { v$: useVuelidate() }
@@ -250,7 +256,6 @@ export default {
    mounted() {
     this.voucher_no=this.$route.params.id;
      this.fetchPurchase();
-     this.checkDatabase();
      window.addEventListener('keydown', this.handleCtrl);
 
    },
@@ -267,6 +272,20 @@ export default {
                     }, 3000)
                 }
             },deep:true
+        },
+        'editItem.pur_price': {
+            handler(val) {
+                if (val && this.editItem.id) {
+                    this.savePrice();
+                }
+            }, deep: true
+        },
+        'editItem.retail_price': {
+            handler(val) {
+                if (val && this.editItem.id) {
+                    this.savePrice();
+                }
+            }, deep: true
         }
    },
     
@@ -309,6 +328,31 @@ export default {
         },
         calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit){
             return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
+        },
+        async saveAutoCal(){
+            const e=this.editItem;
+            this.storePurchase.map((p)=>{
+                if(p.id==e.id){
+                    p.auto_cal = e.auto_cal;
+                }
+            })
+        },
+        savePrice() {
+            const e = this.editItem;
+            this.storePurchase.map((f) => {
+                if (f.id === e.id) {
+                    f.pur_price = { ...e.pur_price };
+                    f.retail_price = { ...e.retail_price };
+
+                    const arr = Object.entries(f.packing_size);
+                    const units = arr.filter((ft) => ft[1] == f.qty_pur_price_unit);
+                    if (units.length > 0) {
+                        const pur_unit = units[0][0];
+                        f.qty_pur_price = f.pur_price[pur_unit];
+                    }
+                }
+            });
+            this.calEdit(e);
         },
         clearItems(){
             this.id=""
@@ -402,21 +446,26 @@ export default {
             }) && this.calTotal();
         },
        
-        setPurQty(){
-            const e=this.editItem;
-                let pur_qty=0;
-                pur_qty += e.input_l_qty ? e.input_l_qty * (e.packing_size.medium_qty* e.packing_size.smallest_qty) : 0;
-                pur_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty: 0;
-                pur_qty += e.input_s_qty ? e.input_s_qty : 0;
-               return this.storePurchase.map((f)=>{   
-                    if(f.id===e.id){
-                        f.pur_qty=pur_qty,
-                        f.input_l_qty =e.input_l_qty ? e.input_l_qty : 0,
-                        f.input_m_qty= e.input_m_qty ? e.input_m_qty : 0,
-                        f.input_s_qty= e.input_s_qty  ? e.input_s_qty  : 0
-                    }
-               }) &&
-               this.calEdit();
+        setPurQty() {
+            const e = this.editItem;
+            let pur_qty = 0;
+            pur_qty += e.input_l_qty ? e.input_l_qty * (e.packing_size.medium_qty * e.packing_size.smallest_qty) : 0;
+            pur_qty += e.input_m_qty ? e.input_m_qty * e.packing_size.smallest_qty : 0;
+            pur_qty += e.input_s_qty ? e.input_s_qty : 0;
+
+            const index = this.storePurchase.findIndex(f => f.id === e.id);
+            if (index !== -1) {
+                const item = { ...this.storePurchase[index] };
+                item.pur_qty = pur_qty;
+                item.input_l_qty = e.input_l_qty || 0;
+                item.input_m_qty = e.input_m_qty || 0;
+                item.input_s_qty = e.input_s_qty || 0;
+                item.qty_pur_price_unit = e.input_l_qty ? e.packing_size.largest_unit : e.input_m_qty ? e.packing_size.medium_unit : e.packing_size.smallest_unit;
+                item.qty_pur_price = e.input_l_qty ? (e.pur_price.largest_unit || 0) : e.input_m_qty ? (e.pur_price.medium_unit || 0) : (e.pur_price.smallest_unit  || 0);
+                this.storePurchase.splice(index, 1, item);
+                this.editItem = {...item};
+                this.calEdit(index);
+            }
         },
      
         setEdit(i){
@@ -427,8 +476,9 @@ export default {
                 input_s_qty: item.input_s_qty  ? item.input_s_qty  : 0
             };
         },
-        calEdit(i){
-            const oei=this.editItem;
+       calEdit(i){
+            const oei=typeof i === 'object' ? i : this.editItem;
+            if (!oei || !oei.id) return;
             this.storePurchase.map((f)=>{
                 if(f.id===oei.id){
                     if(f.qty_pur_price && f.qty_pur_price_unit){
@@ -437,6 +487,7 @@ export default {
                             return ft[1]==f.qty_pur_price_unit;
                         })  
                        const pur_unit=units[0][0]     
+                    
                        let amount=0;
                        if(pur_unit=="largest_unit"){
                            amount=Math.floor((f.qty_pur_price / (f.packing_size.medium_qty * f.packing_size.smallest_qty)) * f.pur_qty)
@@ -444,33 +495,10 @@ export default {
                             amount=Math.floor((f.qty_pur_price / f.packing_size.smallest_qty) * f.pur_qty)
                        }else if(pur_unit=="smallest_unit"){
                             amount=Math.floor(f.qty_pur_price  * f.pur_qty)
-                       }    
+                       }  
                         f.amount=amount;
-                        f.unit_cost=f.discount ? amount - f.discount : amount;
-
-                       let smallest_price=0;
-                       let medium_price=0;
-                       let largest_price=0; 
-                       if(pur_unit=="largest_unit"){
-                           smallest_price=Math.floor((f.qty_pur_price / (f.packing_size.medium_qty * f.packing_size.smallest_qty)))
-                           medium_price=smallest_price * f.packing_size.smallest_qty
-                           largest_price=medium_price * f.packing_size.medium_qty
-                       }else if(pur_unit=="medium_unit"){
-                            smallest_price=Math.floor((f.qty_pur_price / f.packing_size.smallest_qty))
-                            medium_price=smallest_price * f.packing_size.smallest_qty
-                            largest_price=medium_price * f.packing_size.medium_qty
-                       }else if(pur_unit=="smallest_unit"){
-                            smallest_price=Math.floor(f.qty_pur_price)
-                            medium_price=smallest_price * f.packing_size.smallest_qty
-                            largest_price=medium_price * f.packing_size.medium_qty
-                       }    
-
-                       const pur_price={
-                            largest_unit : largest_price,
-                            medium_unit: medium_price,
-                            smallest_unit: smallest_price
-                       }
-                       f.pur_price=pur_price;
+                        f.unit_cost=f.discount ? amount - f.discount : amount;                          
+                       
                       
                     }else{
                         f.amount=0
@@ -534,7 +562,7 @@ export default {
 
         async checkDatabase(){ 
             const query_url=query(collection(db, "purchases"), where("voucher_no", "==", this.voucher_no));           
-                onSnapshot(query_url, async(snapShot) =>{
+               const unsub= onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {    
                             if(change.type==="modified"){
                                 if(change.doc.data().voucher_no==this.voucher_no){
@@ -542,6 +570,7 @@ export default {
                                     this.msg.type="success";
                                     this.msg.info=hp.message(change.type, "purchase") 
                                     this.isLoading=false;
+                                    unsub();
                                 }
                             }
                             if(change.type==="removed"){
@@ -549,15 +578,14 @@ export default {
                                 this.msg.info="The voucher has been cancelled." 
                                 this.isLoading=false;
                                 this.clearItems();
+                                unsub();
                             }
                     });                                              
             });                              
         } ,
    
         async savePurchase(){         
-            const isNotReady= this.storePurchase.filter((f)=>!f.unit_cost)
-            if(isNotReady.length) return false;
-             
+          
             this.isLoading=true;
             this.msg.type="";
             this.msg.info="";
@@ -582,7 +610,7 @@ export default {
                 balance: this.balance,
                 remark: this.remark,
             }                        
-
+            this.checkDatabase();
             const saveDocument=doc(db, "purchases", this.id)
             if(this.storePurchase.length <=0){
                     await deleteDoc(saveDocument) //if no items delete document;
@@ -606,12 +634,16 @@ export default {
                         await updateDoc(updateDocument, {                      
                         qty : pur_qty > old_pur_qty ? increment(pur_qty-old_pur_qty) : increment(- (old_pur_qty - pur_qty)),
                         pur_price: p.pur_price,
+                        retail_price: p.retail_price,
+                        auto_cal : p.auto_cal,
                     })   
                     } 
                     if(this.location==="Main"){
                         await updateDoc(updateDocument, {                      
                         main_qty : pur_qty > old_pur_qty ? increment(pur_qty-old_pur_qty) : increment(- (old_pur_qty - pur_qty)),
                         pur_price: p.pur_price,
+                        retail_price: p.retail_price,
+                        auto_cal : p.auto_cal,
                     })   
                     } 
                 })               
