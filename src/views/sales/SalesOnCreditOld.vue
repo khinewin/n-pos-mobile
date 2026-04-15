@@ -251,13 +251,14 @@ export default {
         },
         async checkDatabase(){ 
             const query_url=query(collection(db, "sales"), where("voucher_no", "==",this.paid_for));           
-                onSnapshot(query_url, async(snapShot) =>{
+                const unsub=onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {   
                             if(change.type==="modified"){
                                         this.msg.info="Making debt payment has been saved"
                                         this.msg.type="success"                                        
                                         this.paid_amount=0;
                                         this.paid_for="";
+                                        unsub();
                                 
                             }
                     });                                              
@@ -300,7 +301,7 @@ export default {
             const cData=this.saleItems.filter((f)=>f.voucher_no == this.paid_for)
             const data={
                 credit: cData[0].credit - this.paid_amount,
-                debt_payments: [...cData[0].debt_payments, voucher]
+                debt_payments:  [...(cData[0].debt_payments || []), voucher]
             }
             const id=cData[0].id;
             const saveDocument=doc(db, "sales",id)
@@ -338,7 +339,7 @@ export default {
             let total_paid=0;
             let total_credit=0;
             this.saleItems=this.saleItems.map((s)=>{
-                    const dp=s.debt_payments.reduce((accu, cur)=>accu + cur.paid, 0)
+                    const dp=(s.debt_payments && s.debt_payments.length) ? s.debt_payments.reduce((accu, cur) => accu + cur.paid, 0) : 0;
                     total_amount += s.net_amount;
                     total_paid += (dp + s.paid);
                     total_credit += s.credit;

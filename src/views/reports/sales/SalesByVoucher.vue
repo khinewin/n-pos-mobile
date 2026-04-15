@@ -98,7 +98,7 @@
                                                     
                                         <td  class="text-end pe-2 rm-b-b fw-bold">Paid (Ks)</td>
                                         <td class="text-end">
-                                            {{fM(sale.paid)}}
+                                            {{fM(sale.paid + (sale.debt_payments && sale.debt_payments.length) ? sale.debt_payments.reduce((accu, cur) => accu + cur.paid, 0) : 0)}}
                                         </td>                                            
                                     </tr>
                                     <tr>
@@ -106,7 +106,7 @@
                                         <td class="text-end ">
                                             {{fM(sale.change)}}
                                         </td>        
-                                        <td  class="text-end   pe-2 fw-bold" >Credit (Ks)</td>
+                                        <td  class="text-end   pe-2 fw-bold" >Balance (Ks)</td>
                                         <td class="text-end ">
                                             {{fM(sale.credit)}}
                                         </td>
