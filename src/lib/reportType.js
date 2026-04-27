@@ -38,6 +38,9 @@ const displayReportType=(reportType)=>{
    }else
     if(reportType==='by_category'){
         return "by Category"
+   }else
+    if(reportType==='by_balance'){
+        return "by Balance Voucher"
    }
 }
    

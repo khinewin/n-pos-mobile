@@ -8,7 +8,13 @@
                         <input class="form-check-input" @change="setPos" v-model="print_on_save" type="checkbox" role="switch" id="flexSwitchCheckDisabled">
                         <label class="form-check-label ms-1" for="flexSwitchCheckDisabled" :class="[print_on_save ? 'text-success' : 'text-muted']"><i class="fa-solid fa-print"></i></label>
                       </div>
-                </div>                         
+                </div>     
+                <div class="col-6 col-sm-4 col-md-3 col-lg-1   d-flex flex-column justify-content-center">
+                    <div class="form-check form-switch  d-flex justify-content-center">
+                        <input class="form-check-input" @change="setOpenCustomerWindow" v-model="openCustomerWindow" type="checkbox" role="switch" id="flexSwitch">
+                        <label class="form-check-label ms-1" for="flexSwitch" :class="[openCustomerWindow ? 'text-success' : 'text-muted']"><i class="fa-solid fa-display"></i> </label>
+                      </div>
+                </div>                     
            
                 <!--<div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
                     <select  class="form-control-plaintext text-center small" @change="changeSaleType" :disabled="saleMode=='Sale / History'" v-model="sale_type">
@@ -308,6 +314,8 @@ export default {
             output: null,   
             scannerActive:false,     
             html5QrCode:null,
+            openCustomerWindow:false,
+
              
         }
     },
@@ -353,6 +361,21 @@ export default {
                     }, 2000)
                 }
             },deep:true
+        },
+        saleItems: {
+            deep: true,
+            handler() {
+                this.sendToCustomerDisplay()
+            }
+        },
+        net_amount() {
+            this.sendToCustomerDisplay()
+        },
+        paid() {
+            this.sendToCustomerDisplay()
+        },
+        change() {
+            this.sendToCustomerDisplay()
         }
     },
     computed:{
@@ -403,6 +426,27 @@ export default {
        
     },
     methods:{
+        setOpenCustomerWindow(){
+            if (window.AndroidBridge && window.AndroidBridge.openCustomerDisplay) {
+                window.AndroidBridge.openCustomerDisplay()
+            } else {
+                console.log("AndroidBridge.openCustomerDisplay is not available.");
+            }
+        },
+        sendToCustomerDisplay() {
+            if (this.saleMode == "Sale / History") return;
+
+            const payload = {
+                saleItems: JSON.parse(JSON.stringify(this.saleItems)),
+                net_amount: this.net_amount,
+                paid: this.paid,
+                change: this.change
+            };
+
+            if (window.AndroidBridge && window.AndroidBridge.updateCustomerData) {
+                window.AndroidBridge.updateCustomerData(JSON.stringify(payload));
+            }
+        },
         callBarcode(){
             const myModal = new bootstrap.Modal('#barcodeModal')
             myModal.show();
@@ -728,10 +772,11 @@ export default {
         },
         async checkDatabase(){ 
             const query_url=query(collection(db, "sales"), where("voucher_no", "==", this.voucher_no));           
-                onSnapshot(query_url, async(snapShot) =>{
+              const unsub=  onSnapshot(query_url, async(snapShot) =>{
                     snapShot.docChanges().forEach((change) => {        
                             if(change.type==="added"){
                                 if(change.doc.data().voucher_no==this.voucher_no){
+                                    unsub();
                                     this.updateProducts();
                                     this.printSale();
                                     this.msg.type="success";

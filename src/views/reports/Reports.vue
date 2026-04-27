@@ -284,6 +284,7 @@ export default {
                   { code: "by_date", name: "Purchase By Date", active: true },
                   { code: "by_description", name: "Purchase By Product", active: true },
                   { code: "by_voucher", name: "Purchase By Voucher", active: true },
+                  { code: "by_balance", name: "Purchase Balance", active: true },
                   { code: "by_supplier", name: "Purchase By Supplier", active: true },
                   { code: "by_supplier_date", name: "Supplier & Date", active: true },
               ]

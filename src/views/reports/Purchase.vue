@@ -48,6 +48,9 @@
                     <div v-if="reportType==='by_exp_date'">
                         <PurchaseByExpDate  :fromDate="fromDate"  :toDate="toDate" :supplier="supplier"  :location="location" :code_no="code_no" />
                     </div>
+                    <div v-if="reportType==='by_balance'">
+                        <PurchaseByBalance  :fromDate="fromDate"  :toDate="toDate" :voucher_no="voucher_no" :supplier="supplier"  :location="location" :code_no="code_no" />
+                    </div>
             </div>
         </div>
     </div>
@@ -61,13 +64,15 @@ import PurchaseByDescription from "@/views/reports/purchase/PurchaseByDescriptio
 import PurchaseBySupplier from "@/views/reports/purchase/PurchaseBySupplier.vue"
 import PurchaseBySupplierDate from "@/views/reports/purchase/PurchaseBySupplierDate.vue"
 import PurchaseByExpDate from "@/views/reports/purchase/PurchaseByExpDate.vue"
+import PurchaseByBalance from "@/views/reports/purchase/PurchaseByBalance.vue"
 import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
 import * as rt from "@/lib/reportType"
 
 export default {
     components: {
        PurchaseByDate, PurchaseByDescription, PurchaseByVoucher, PurchaseBySupplier,
-       PurchaseBySupplierDate, PurchaseByExpDate, LargePrintHeader
+       PurchaseBySupplierDate, PurchaseByExpDate, LargePrintHeader,
+       PurchaseByBalance
     },
   
     data(){

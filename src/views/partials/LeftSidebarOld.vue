@@ -17,9 +17,9 @@
                           <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
                             <router-link class="nav-link py-2 px-3" :to="{name : 'Sale'}" ><i class="fa-solid fa-cash-register"></i> {{t('sale')}}</router-link>
                           </li>
-                          <!--<li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
+                          <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
                             <router-link class="nav-link py-2 px-3" :to="{name : 'MobileSale'}" ><i class="fa-solid fa-cash-register"></i> Mobile Sale</router-link>
-                          </li>-->
+                          </li>
                           <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
                             <router-link class="nav-link py-2 px-3" :to="{name : 'Purchase'}"><i class="fa-solid fa-cart-shopping"></i> {{t('purchase')}}</router-link>
                           </li>     

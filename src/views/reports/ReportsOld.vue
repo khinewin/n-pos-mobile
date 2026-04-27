@@ -288,6 +288,7 @@ export default {
             { code: "by_date", name: "By Date", active: true , cashier: true},
             { code: "by_description", name: "By Product Name", active: true , cashier: true},
             { code: "by_voucher", name: "By Voucher", active: true , cashier: true},
+            { code: "by_balance", name: "By Balance", active: true , cashier: true},
             { code: "by_supplier", name: "By Supplier", active: true , cashier: true},
             { code: "by_supplier_date", name: "By Supplier & Date", active: true , cashier: true},
         ],
