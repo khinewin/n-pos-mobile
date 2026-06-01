@@ -12,10 +12,10 @@
                 </div>-->
             
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">
-                    <button :disabled="saleItems.length <=0 || saleMode=='Sale / Edit'" class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> {{t('print_link')}}</button>
+                    <button class="btn btn-sm"  @click="printSale"><i class="fa-solid fa-print" ></i> {{t('print_link')}}</button>
                 </div>
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 d-grid">                     
-                        <button v-if="saleMode =='Sale / Edit'" type="button" @click="saveSale" class="btn btn-sm" :disabled="isLoading || saleItems.length<=0" ><i class="fa-solid fa-hard-drive"></i> {{t('save_link')}}
+                        <button v-if="saleMode =='Sale / Edit'" type="button" data-bs-toggle="modal" data-bs-target="#cfModal" class="btn btn-sm" :disabled="isLoading || saleItems.length<=0" ><i class="fa-solid fa-hard-drive"></i> {{t('save_link')}}
                             <span class="spinner-border spinner-border-sm" aria-hidden="true" v-if="isLoading"></span>
                         </button>
                 </div>
@@ -172,6 +172,64 @@
                 </div>
             </div>
         </div> 
+        <div class="modal fade" id="cfModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">                
+                <div class="modal-body">
+                    <table class="table table-bordered table-hover mb-0" style="font-weight: bold;">
+                        <tbody class="">
+                            <tr>
+                                <td  class="text-end p-2 fw-bold col-6">{{t('customer')}}</td>
+                                <td class="text-end col-6 p-2">{{customer.name}}</td>    
+                            </tr>
+                            <tr>
+                                <td  class="text-end p-2 fw-bold col-6">{{t('subtotal')}}</td>
+                                <td class="text-end col-6 p-2">{{total_amount}}</td>    
+                            </tr>
+                            <tr>                                    
+                                <td  class="text-end col-6 p-2 fw-bold " >{{t('additional_discount')}}</td>
+                                <td class="text-end col-6 ">
+                                    <input @click="setInput" @mouseleave="setInput"  type="number"   @change="calTotal" @keyup="calTotal" v-model="extra_discount" class="form-control  text-end m-0">
+                                </td>
+                            </tr>
+                            <tr>      
+                                <td  class="text-end col-6 p-2 fw-bold">{{t('total')}}</td>
+                                <td class="text-end col-6 p-2">{{net_amount}}</td>  
+                            </tr>                 
+                            <tr>                                                                                    
+                                <td  class="text-end p-2 fw-bold">{{t('paid')}}</td>
+                                <td class="text-end">
+                                    <input @click="setInput" @mouseleave="setInput"  @change="calPaid" @keyup="calPaid" type="number" v-model="paid" class="form-control text-end m-0">
+                                </td>                                                                
+                            </tr>
+                            <tr>
+                                <td  class="text-end p-2 fw-bold">{{t('change')}}</td>
+                                <td class="text-end p-2">
+                                    {{change}}
+                                </td>  
+                            </tr>
+                            <tr>                             
+                                <td  class="text-end p-2 fw-bold">{{t('balance_due')}}</td>
+                                <td class="text-end p-2">
+                                    {{credit}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td  class="text-end p-2 fw-bold">{{t('notes')}}</td>
+                                <td class="text-end">
+                                    <textarea  type="text" v-model="remark" class="form-control"></textarea>
+                                </td>                                                                         
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="mt-2">
+                        <button type="button" class="btn  btn-lg" data-bs-dismiss="modal">{{t('close_link')}}</button>
+                        <button type="button" class="btn btn-primary btn-lg float-end" @click="saveSale">{{t('save_link')}}</button>
+                        </div>
+                </div>                
+            </div>
+            </div>
+        </div>
         <ProductModal @setCode="setCode" :sale_type="sale_type" :saleItems="saleItems"/>
         <SalesModal @setCode="setOldCode" />
         <CustomerModal @setCustomer="setCustomer" />
@@ -345,6 +403,11 @@ export default {
       
     },
     methods:{   
+        closeCfModal(){
+            const modalEl = document.getElementById('cfModal');
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modalInstance.hide();
+        },
         setBarcodeFocus(){
             const code_no=document.getElementById("code_no");
             code_no.focus();
@@ -559,7 +622,7 @@ export default {
             this.net_amount=s.net_amount;
             this.change=s.change;
             this.extra_discount=s.extra_discount;
-            this.paid=s.paid + (s.debt_payments && s.debt_payments.length) ? s.debt_payments.reduce((accu, cur) => accu + cur.paid, 0) : 0;
+            this.paid=s.paid + ((s.debt_payments && s.debt_payments.length) ? s.debt_payments.reduce((accu, cur) => accu + cur.paid, 0) : 0);
             this.sale_type=s.sale_type
             this.credit=s.credit
             this.remark=s.remark
@@ -597,6 +660,7 @@ export default {
         async saveSale(){                  
             const validattion = await this.v$.$validate()
             if(!validattion) return false;
+            this.closeCfModal();
           
             if(this.customer.code==123456789 && this.credit > 0){
                 this.msg.info="Cannot sale with credit for default customer"

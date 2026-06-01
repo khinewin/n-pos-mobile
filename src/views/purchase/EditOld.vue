@@ -398,8 +398,18 @@ export default {
                 this.extra_discount=p.extra_discount;
                 this.total=p.total;
                 this.grand_total=p.grand_total;
-                this.storePurchase=p.products;
-                this.tmpStorePurchase=p.products;// store for original item;
+                this.storePurchase=p.products.map((p)=>{
+                    return {
+                        ...p, 
+                       is_remove: false,
+                    };
+                });
+                this.tmpStorePurchase=p.products.map(()=>{
+                    return {
+                        ...p,
+                        is_remove: false,
+                    };
+                });// store for original item;
                 this.supplier=p.supplier;
                 this.id=p.id;
                 this.location=p.location;

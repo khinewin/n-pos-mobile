@@ -32,7 +32,7 @@ const options = {
       'scrollbars=yes'
     ],
     styles: [
-      './bootstrap.min.css',
+      '/bootstrap.min.css',
       '/kidlat.css',
      // './a5print.css',
      // "./thermalprint.css"

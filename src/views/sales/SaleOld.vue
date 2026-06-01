@@ -395,7 +395,7 @@ export default {
         const customerWindow=localStorage.getItem("openCustomerWindow");
         this.openCustomerWindow=customerWindow=="false" ? false : true;
         if(this.openCustomerWindow){
-            this.openCustomerDisplay();
+           // this.openCustomerDisplay();
         }
      
     },
@@ -849,7 +849,7 @@ export default {
             this.net_amount=s.net_amount;
             this.change=s.change;
             this.extra_discount=s.extra_discount;
-            this.paid=s.paid + (s.debt_payments && s.debt_payments.length) ? s.debt_payments.reduce((accu, cur) => accu + cur.paid, 0) : 0;
+            this.paid=s.paid + ((s.debt_payments && s.debt_payments.length) ? s.debt_payments.reduce((accu, cur) => accu + cur.paid, 0) : 0);
             this.sale_type=s.sale_type
             this.credit=s.credit
             this.sale_user=s.user;
