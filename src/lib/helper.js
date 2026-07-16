@@ -31,6 +31,10 @@ const showTimeHourShort=(t)=>{
     return formattedDate;
 };
 
+const longTimeFormat=(t)=>{
+    return showTimeHour(t);
+};
+
 const g_code=()=>{
         const d=new Date();
         //return `${d.getFullYear().toString().substring(2)}${(d.getMonth()+1)}${d.getDate()}${d.getHours()}${d.getMinutes()}${d.getSeconds()}`
@@ -246,4 +250,5 @@ export   {
     formattedAmountCurrency,
     setVoucherNo,
     generateKeywords,
+    longTimeFormat,
     };

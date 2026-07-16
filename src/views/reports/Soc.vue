@@ -14,14 +14,14 @@
             </div>
             <div class="col-12 text-center">
                 <h6>Reports SOC {{displayReportType(reportType)}}</h6>
-                <div class="row small">
-                    <div class="col-sm-6 col-lg-4">
+                <div class="d-flex justify-content-evenly small">
+                    <div class="">
                         <div class="" v-if="code_no">Code : {{item_name}}</div>
                     </div>
-                    <div class="col-sm-6 col-lg-4">
+                    <div class="">
                         <div class="" v-if="customer_name">Customer : {{customer_name}}</div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="">
                         <div v-if="displayFromDate || displayToDate">Date : From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</div>
                     </div>
                 </div>

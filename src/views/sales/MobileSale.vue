@@ -254,7 +254,7 @@
  import PageHeader from "@/views/partials/PageHeader.vue"
  import { useVuelidate  } from '@vuelidate/core'
 import { required, email ,helpers} from '@vuelidate/validators'
-import {disableNetwork, Timestamp, collection, addDoc, doc, increment, limit,  updateDoc, onSnapshot, query, where, orderBy, getDocs} from 'firebase/firestore'
+import {disableNetwork, Timestamp, collection, addDoc, doc, increment, limit,  updateDoc, onSnapshot, query, where, orderBy, getDocs, runTransaction} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 //import Products from "@/views/sales/Products.vue"
 import SalesModal from "@/views/modals/sales/SalesModal.vue"
@@ -770,23 +770,7 @@ export default {
             this.remark=s.remark;
             this.customer=s.customer;
         },
-        async checkDatabase(){ 
-            const query_url=query(collection(db, "sales"), where("voucher_no", "==", this.voucher_no));           
-              const unsub=  onSnapshot(query_url, async(snapShot) =>{
-                    snapShot.docChanges().forEach((change) => {        
-                            if(change.type==="added"){
-                                if(change.doc.data().voucher_no==this.voucher_no){
-                                    unsub();
-                                    this.updateProducts();
-                                    this.printSale();
-                                    this.msg.type="success";
-                                    this.msg.info=hp.message("added", "sale")   
-                                    this.clearSaleItem(); 
-                                }
-                            }
-                    });                                              
-            });                              
-        } ,
+
         async saveSale(){                
             if(this.saleMode=="Sale / History") return false;  
             const validattion = await this.v$.$validate()
@@ -816,20 +800,16 @@ export default {
                 return false;
             }           
 
-              this.isLoading=true;
-                this.msg.type="";
-                this.msg.info="";
+            this.isLoading=true;
+            this.msg.type="";
+            this.msg.info="";
 
-              /*  if(this.credit > 0){
-                    this.saveCredit();
-                }
-                    */
-
+            try {
                 const sale_date=hp.insertDate(this.sale_date)
-
+                const newSaleRef = doc(collection(db, "sales"));
                 const voucher={
                     voucher_no: this.voucher_no,
-                   sale_date: Timestamp.fromDate(sale_date),
+                    sale_date: Timestamp.fromDate(sale_date),
                     products : this.saleItems,
                     user : {uid: this.user.uid, displayName: this.user.displayName},
                     total_amount:this.total_amount,
@@ -842,11 +822,55 @@ export default {
                     credit: this.credit,
                     remark: this.remark,
                     payment_type: this.credit > 0 ? "Credit" : "Paid"
-                }                 
-                this.checkDatabase();          
-                const saveDocument=collection(db, "sales")
-                await addDoc(saveDocument, voucher)           
-                        
+                }
+
+                await runTransaction(db, async (transaction) => {
+                    // Read the latest document for each product to verify stock
+                    const productReads = [];
+                    for (const p of this.saleItems) {
+                        const productRef = doc(db, "products", p.id);
+                        productReads.push({
+                            ref: productRef,
+                            promise: transaction.get(productRef),
+                            sale_qty: p.sale_qty,
+                            item_name: p.item_name
+                        });
+                    }
+
+                    for (const read of productReads) {
+                        const productDoc = await read.promise;
+                        if (!productDoc.exists()) {
+                            throw new Error(`Product "${read.item_name}" does not exist.`);
+                        }
+                        const currentQty = productDoc.data().qty || 0;
+                        if (currentQty < read.sale_qty) {
+                            throw new Error(`Insufficient stock for "${read.item_name}". Only ${currentQty} units left.`);
+                        }
+                    }
+
+                    // Perform product quantity updates
+                    for (const read of productReads) {
+                        transaction.update(read.ref, {
+                            qty: increment(-read.sale_qty)
+                        });
+                    }
+
+                    // Save the sale voucher
+                    transaction.set(newSaleRef, voucher);
+                });
+
+                // On success
+                this.printSale();
+                this.msg.type="success";
+                this.msg.info=hp.message("added", "sale")   
+                this.clearSaleItem();
+            } catch (error) {
+                console.error("Failed to save sale: ", error);
+                this.msg.type="error";
+                this.msg.info=error.message || "Failed to save sale. Please try again.";
+            } finally {
+                this.isLoading=false;
+            }
         },
         async saveCredit(){
             let date=new Date();
@@ -870,16 +894,7 @@ export default {
                 const saveDocument=collection(db, "creditSales")
                 await addDoc(saveDocument, voucher)     
         },
-        updateProducts(){
-            this.saleItems.map(async (p)=>{
-                    const id=p.id;
-                    const sale_qty=p.sale_qty;               
-                    const updateDocument=doc(db, "products", id)
-                    await updateDoc(updateDocument, {
-                        qty : increment(-sale_qty)
-                    })    
-                })
-        },
+
         clearSaleItem(){
                 this.sale_user={}
                 this.editItem={},

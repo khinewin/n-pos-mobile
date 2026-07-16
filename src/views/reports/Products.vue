@@ -15,11 +15,11 @@
                     <LargePrintHeader />
                 </div>
                 <h6>Reports Products Code  {{displayReportType}}</h6>
-                <div class="row small">
-                    <div class="col-sm-6 col-md-3">
+                <div class="d-flex justify-content-evenly small">
+                    <div class="">
                         <div class="" v-if="code_no">Code : {{item_name}}</div>
                     </div>
-                    <div class="col-sm-6 col-md-3">
+                    <div class="">
                         <div class="" v-if="gt_equal || lt_equal">Balance : 
                             <span v-if="gt_equal">>= {{gt_equal}} </span> 
                             <span v-if="gt_equal && lt_equal"> and </span>
@@ -27,10 +27,11 @@
                             <span class="ms-2"> {{packing_unit}}</span>
                         </div>
                     </div> 
-                    <div class="col-sm-6 col-md-3">
+                    <!--
+                    <div class="">
                         <div class="d-none">Location : {{this.location}} </div>
-                    </div>                                       
-                    <div class="col-sm-6 col-md-3">
+                    </div>     -->                                  
+                    <div class="">
                         <div  class="" v-if="displayDate">Date : {{showTime(displayDate)}}</div>
                     </div>
                 </div>  

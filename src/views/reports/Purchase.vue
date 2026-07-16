@@ -14,17 +14,17 @@
             </div>
             <div class="col-12 text-center">
                 <h6>Reports Purchase {{displayReportType(reportType)}}</h6>
-                <div class="row small">
-                    <div class="col-sm-6 col-lg-4">
+                <div class="d-flex justify-content-evenly small">
+                    <div class="">
                         <div class="" v-if="code_no">Code : {{item_name}}</div>
                     </div>
-                    <div class="col-sm-6 col-lg-4">
+                    <div class="">
                         <div v-if="supplier" class="" v-is="supplier_name">Supplier : {{supplier_name}} ({{supplier_company}}), </div>
                     </div>
-                    <div class="col-sm-6 col-lg-4">
+                    <!--<div class="">
                         <div class="d-none">Location : {{this.location}}</div>
-                    </div>
-                    <div class="col-sm-6 col-lg-4">
+                    </div>-->
+                    <div class="">
                         <div v-if="displayFromDate || displayToDate">Date : From {{showTime(displayFromDate)}} - To {{showTime(displayToDate)}}</div>
                     </div>
                 </div>    
