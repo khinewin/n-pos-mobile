@@ -30,6 +30,9 @@
                             <router-link class="nav-link py-2 px-3" :to="{name : 'Products'}"><i class="fa-solid fa-list-check"></i> {{t('product_code')}}</router-link>
                           </li>
                           <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
+                            <router-link class="nav-link py-2 px-3" :to="{name : 'BarcodeSticker'}"><i class="fa-solid fa-barcode"></i> {{t('barcode_sticker')}}</router-link>
+                          </li>
+                          <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
                             <router-link class="nav-link py-2 px-3" :to="{name : 'Suppliers'}"><i class="fa-solid fa-person-walking-luggage"></i> {{t('suppliers')}}</router-link>
                           </li>
                           <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">

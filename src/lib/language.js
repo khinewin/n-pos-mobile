@@ -1,4 +1,8 @@
 export const lang={
+    barcode_sticker:{
+        eng: "Barcode Sticker",
+        mm: "ဘားကုဒ် စတေကာ"
+    },
       select_report:{
         eng:"Select Report",
         mm:"အစီရင်ခံစာ ရွေးချယ်ရန်"

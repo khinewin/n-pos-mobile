@@ -52,6 +52,8 @@ import Expense from '@/views/expenses/Expense.vue'
 import ExpenseOld from '@/views/expenses/ExpenseOld.vue'
 import EditExpenseOld from '@/views/expenses/EditExpenseOld.vue'
 
+import BarcodeSticker from '@/views/products/BarcodeSticker.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),  
   routes: [
@@ -138,6 +140,13 @@ const router = createRouter({
       name: 'Products',     
       component: store.getters.theme === "new" ? Products : ProductsOld,
       meta : {title: "N-POS | Product Code"}
+
+    },
+    {
+      path: '/barcode-sticker',
+      name: 'BarcodeSticker',     
+      component: BarcodeSticker,
+      meta : {title: "N-POS | Barcode Sticker"}
 
     },
     {
