@@ -271,6 +271,11 @@ export default {
         ],
         sales: () => [
             { code: "by_date", name: "By Date", active: true },
+            { code: "by_top_ten", name: "Top 10 By Date", active: true },
+            { code: "by_month", name: "By Month", active: true },
+            { code: "by_top_ten_month", name: "Top 10 By Month", active: true },
+            { code: "by_year", name: "By Year", active: true },
+            { code: "by_top_ten_year", name: "Top 10 By Year", active: true },
             { code: "by_description", name: "By Product Name", active: true },
             { code: "by_description_date", name: "By Product Name & Date", active: true },
             { code: "by_voucher", name: "By Voucher", active: true , cashier: true},

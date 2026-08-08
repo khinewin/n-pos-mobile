@@ -30,6 +30,21 @@
                     <div v-if="reportType==='by_date'">
                         <SalesByDate  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no" />
                     </div>
+                    <div v-if="reportType==='by_month'">
+                        <SalesByMonth  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no" />
+                    </div>
+                    <div v-if="reportType==='by_year'">
+                        <SalesByYear  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no" />
+                    </div>
+                    <div v-if="reportType==='by_top_ten'">
+                        <SalesByTopTen  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no" />
+                    </div>
+                    <div v-if="reportType==='by_top_ten_month'">
+                        <SalesByTopTenMonth  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no" />
+                    </div>
+                    <div v-if="reportType==='by_top_ten_year'">
+                        <SalesByTopTenYear  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no" />
+                    </div>
                     <div v-if="reportType==='by_voucher'">
                         <SalesByVoucher  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :voucher_no="voucher_no" />
                     </div>
@@ -56,6 +71,11 @@
 import {Timestamp, collection, addDoc, getDocs, doc, setDoc, where, updateDoc, orderBy, query} from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import SalesByDate from "@/views/reports/sales/SalesByDate.vue"
+import SalesByMonth from "@/views/reports/sales/SalesByMonth.vue"
+import SalesByYear from "@/views/reports/sales/SalesByYear.vue"
+import SalesByTopTen from "@/views/reports/sales/SalesByTopTen.vue"
+import SalesByTopTenMonth from "@/views/reports/sales/SalesByTopTenMonth.vue"
+import SalesByTopTenYear from "@/views/reports/sales/SalesByTopTenYear.vue"
 import SalesByVoucher from "@/views/reports/sales/SalesByVoucher.vue"
 import SalesByDescription from "@/views/reports/sales/SalesByDescription.vue"
 import SalesByCustomer from "@/views/reports/sales/SalesByCustomer.vue"
@@ -68,7 +88,7 @@ import * as rt from "@/lib/reportType"
 
 export default {
     components: {
-        SalesByDate,SalesByVoucher,SalesByDescription, SalesByCustomer, SalesByCustomerDate,SalesByChart, LargePrintHeader,
+        SalesByDate,SalesByMonth,SalesByYear,SalesByTopTen,SalesByTopTenMonth,SalesByTopTenYear,SalesByVoucher,SalesByDescription, SalesByCustomer, SalesByCustomerDate,SalesByChart, LargePrintHeader,
         SalesByDescriptionDate
     },
   

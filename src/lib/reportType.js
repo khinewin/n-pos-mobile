@@ -39,6 +39,21 @@ const displayReportType=(reportType)=>{
     if(reportType==='by_category'){
         return "by Category"
    }else
+    if(reportType==='by_month'){
+        return "by Month"
+    }else
+    if(reportType==='by_year'){
+        return "by Year"
+    }else
+    if(reportType==='by_top_ten'){
+        return "by Top 10 (Daily)"
+    }else
+    if(reportType==='by_top_ten_month'){
+        return "by Top 10 (Monthly)"
+    }else
+    if(reportType==='by_top_ten_year'){
+        return "by Top 10 (Yearly)"
+    }else
     if(reportType==='by_balance'){
         return "by Balance Voucher"
    }

@@ -264,15 +264,20 @@ export default {
               colorClass: 'bg-success-subtle text-success',
               defaultIcon: 'fa-solid fa-cash-register',
               handler: 'reportSales',
-              items: [
-                 { code: "by_date", name: "Sales By Date", active: true },
-                 { code: "by_description", name: "Sales By Product", active: true },
-                 { code: "by_description_date", name: "Product & Date", active: true },
-                 { code: "by_voucher", name: "Sales By Voucher", active: true },
-                 { code: "by_customer", name: "Sales By Customer", active: true },
-                 { code: "by_customer_date", name: "Customer & Date", active: true },
-                 { code: "by_chart", name: "Sales Chart", active: true, customIcon: "fa-solid fa-chart-line" },
-              ]
+               items: [
+                  { code: "by_date", name: "Sales By Date", active: true },
+                  { code: "by_top_ten", name: "Top 10 Sales By Date", active: true, customIcon: "fa-solid fa-trophy" },
+                  { code: "by_month", name: "Sales By Month", active: true, customIcon: "fa-solid fa-calendar-days" },
+                  { code: "by_top_ten_month", name: "Top 10 Sales By Month", active: true, customIcon: "fa-solid fa-award" },
+                  { code: "by_year", name: "Sales By Year", active: true, customIcon: "fa-solid fa-calendar" },
+                  { code: "by_top_ten_year", name: "Top 10 Sales By Year", active: true, customIcon: "fa-solid fa-crown" },
+                  { code: "by_description", name: "Sales By Product", active: true },
+                  { code: "by_description_date", name: "Product & Date", active: true },
+                  { code: "by_voucher", name: "Sales By Voucher", active: true },
+                  { code: "by_customer", name: "Sales By Customer", active: true },
+                  { code: "by_customer_date", name: "Customer & Date", active: true },
+                  { code: "by_chart", name: "Sales Chart", active: true, customIcon: "fa-solid fa-chart-line" },
+               ]
           },
           purchase: {
               id: 'purchase',
