@@ -14,7 +14,7 @@
                                            <div class="col-6 col-md-3 col-lg-12">
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
-                                                    <flat-pickr  class="form-control-plaintext border-bottom" v-model="search_by_from_sale_date" id="from_date" :config="config" />
+                                                    <flat-pickr  class="form-control-plaintext border-bottom" v-model="search_by_from_sale_date" id="from_date" :config="configFromDate" />
                                                     <label for="from_date">{{t('from_date')}}</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
@@ -23,7 +23,7 @@
                                            <div class="col-6 col-md-3 col-lg-12">
                                             <div class="input-group mb-2">
                                                 <div class="form-floating">
-                                                    <flat-pickr  class="form-control-plaintext border-bottom" v-model="search_by_to_sale_date" id="to_date" :config="config" />
+                                                    <flat-pickr  class="form-control-plaintext border-bottom" v-model="search_by_to_sale_date" id="to_date" :config="configToDate" />
                                                     <label for="to_date">{{t('to_date')}}</label>
                                                 </div>
                                                 <span class="input-group-text bg-white border-0 border-bottom"><i class="fa-solid fa-calendar-days"></i></span>
@@ -143,6 +143,12 @@ export default {
    computed:{
         config(){
             return this.$store.getters.flat_pickr_config;
+        },
+        configFromDate() {
+            return { ...this.$store.getters.flat_pickr_config };
+        },
+        configToDate() {
+            return { ...this.$store.getters.flat_pickr_config };
         },
        user(){
            return this.$store.getters.user;

@@ -42,7 +42,7 @@ import { lang } from "@/lib/language";
     user : state=> state.user,
     general_supplier:state=>state.general_supplier,
     default_customer:state=>state.default_customer,
-    flat_pickr_config:state=>state.flat_pickr_config,
+    flat_pickr_config:state=>({ ...state.flat_pickr_config }),
     products:state=>state.products,
     packingSizes:state=>state.packingSizes,
     printData:state=>state.printData,

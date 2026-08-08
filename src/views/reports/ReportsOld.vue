@@ -25,7 +25,7 @@
                       <label class="field-label">{{ t('from_date') }}</label>
                       <div class="input-wrapper">
                         <i class="fa-solid fa-calendar-days input-icon text-muted"></i>
-                        <flat-pickr class="form-control border-0" v-model="from_date" :config="config" />
+                        <flat-pickr class="form-control border-0" v-model="from_date" :config="configFromDate" />
                       </div>
                     </div>
                   </div>
@@ -34,7 +34,7 @@
                       <label class="field-label">{{ t('to_date') }}</label>
                       <div class="input-wrapper">
                         <i class="fa-solid fa-calendar-days input-icon text-muted"></i>
-                        <flat-pickr class="form-control border-0" v-model="to_date" :config="config" />
+                        <flat-pickr class="form-control border-0" v-model="to_date" :config="configToDate" />
                       </div>
                     </div>
                   </div>
@@ -304,6 +304,8 @@ export default {
         ],
         user() { return this.$store.getters.user; },
         config() { return this.$store.getters.flat_pickr_config; },
+        configFromDate() { return { ...this.$store.getters.flat_pickr_config }; },
+        configToDate() { return { ...this.$store.getters.flat_pickr_config }; },
         pageTitle() {
             const sl = this.$store.getters.currentLang;
             return sl == "mm" ? `${lang.reports.mm}` : `${lang.reports.eng}`;

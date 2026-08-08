@@ -25,7 +25,7 @@
                                                     class="form-control bg-light border-0 small" 
                                                     v-model="search_by_from_sale_date" 
                                                     id="from_date" 
-                                                    :config="config" />
+                                                    :config="configFromDate" />
                                             </div>
                                         </div>
                                         <div class="col-6">
@@ -38,7 +38,7 @@
                                                     class="form-control bg-light border-0 small" 
                                                     v-model="search_by_to_sale_date" 
                                                     id="to_date" 
-                                                    :config="config" />
+                                                    :config="configToDate" />
                                             </div>
                                         </div>
                                     </div>
@@ -208,6 +208,12 @@ export default {
    computed:{
         config(){
             return this.$store.getters.flat_pickr_config;
+        },
+        configFromDate() {
+            return { ...this.$store.getters.flat_pickr_config };
+        },
+        configToDate() {
+            return { ...this.$store.getters.flat_pickr_config };
         },
         user(){
             return this.$store.getters.user;

@@ -19,7 +19,7 @@
                   <flat-pickr
                     class="form-control border-0 bg-white ps-0"
                     v-model="from_date"
-                    :config="config"
+                    :config="configFromDate"
                     placeholder="Start Date"
                   />
                 </div>
@@ -30,7 +30,7 @@
                   <flat-pickr
                     class="form-control border-0 bg-white ps-0"
                     v-model="to_date"
-                    :config="config"
+                    :config="configToDate"
                     placeholder="End Date"
                   />
                 </div>
@@ -341,6 +341,12 @@ export default {
     },
     config() {
       return this.$store.getters.flat_pickr_config;
+    },
+    configFromDate() {
+      return { ...this.$store.getters.flat_pickr_config };
+    },
+    configToDate() {
+      return { ...this.$store.getters.flat_pickr_config };
     },
     pageTitle() {
       const sl = this.$store.getters.currentLang;
