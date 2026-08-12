@@ -99,12 +99,13 @@
                         </div>
                     </div>
                     <div class="col-12 col-md-5">
-                        <div class="card mb-3">
+                        <!-- Card 1: Single Voucher Payment -->
+                        <div class="card mb-3 shadow-sm">
                             <div class="card-header py-1 bg-secondary text-white fw-bold text-center small">
                                 {{t('pay_for')}} (Single Voucher)
                             </div>
                             <div class="card-body p-2">
-                                <table class="table table-hover table-bordered mb-0">
+                                <table class="table table-hover table-bordered mb-2">
                                     <tbody>
                                         <tr class="text-center fw-bold table-secondary">
                                             <td class="col-4">{{t('pay_for')}}</td>
@@ -114,18 +115,27 @@
                                         <tr>
                                             <td class="">
                                                 <select class="form-control-plaintext py-0 text-center" v-model="paid_for" v-if="saleItems.length" @change="calAmount">
-                                                    <option v-for="si in saleItems" :key="si.id">{{si.voucher_no}}</option>
+                                                    <option v-for="si in saleItems" :key="si.id" :value="si.voucher_no">{{si.voucher_no}}</option>
                                                 </select>
                                             </td>
                                             <td class="">
                                                 <flat-pickr :disabled="!paid_for" class="form-control-plaintext py-0 text-center" v-model="paid_date"  :config="config" />
-
                                             </td>
-                                            <td class=""><input @focus="setInput" @click="setInput" @blur="handleBlurPaid" @keypress.enter="savePaid" v-model="paid_amount" :disabled="!customer.id" type="number" class="form-control-plaintext py-0 text-end"></td>
+                                            <td class="">
+                                                <input @focus="setInput" @click="setInput" @blur="handleBlurPaid" @keypress.enter="savePaid" v-model="paid_amount" :disabled="!paid_for" type="number" class="form-control-plaintext py-0 text-end">
+                                            </td>
                                         </tr>
-                                      
                                     </tbody>
                                 </table>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <button type="button" @click="fillVoucherCredit" class="btn btn-sm btn-outline-secondary py-0" :disabled="!paid_for" title="Fill voucher balance due">
+                                        <small>{{t('balance_due')}}: {{selectedVoucherCredit}}</small>
+                                    </button>
+                                    <button type="button" @click="savePaid" class="btn btn-sm btn-success px-3" :disabled="!paid_for || !paid_amount || isLoading">
+                                        <i class="fa-solid fa-hard-drive me-1"></i> {{t('save_link')}}
+                                        <span class="spinner-border spinner-border-sm ms-1" aria-hidden="true" v-if="isLoading"></span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -271,9 +281,21 @@ export default {
          t() {
             return (key) => this.$store.getters.t(key);
         },
+        selectedVoucherCredit() {
+            if (!this.paid_for) return 0;
+            const found = this.saleItemsData.find(f => f.voucher_no == this.paid_for);
+            return found ? found.credit : 0;
+        }
       
     },
     methods:{
+        fillVoucherCredit() {
+            if (!this.paid_for) return;
+            const found = this.saleItemsData.find(f => f.voucher_no == this.paid_for);
+            if (found) {
+                this.paid_amount = found.credit;
+            }
+        },
         handleCtrl(event) {
             if (event.ctrlKey && event.key === 's') {
                 event.preventDefault(); // Prevent the default browser save dialog

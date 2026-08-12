@@ -109,7 +109,12 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="small text-muted text-uppercase fw-bold mb-1">{{t('paid_amount')}}</label>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="small text-muted text-uppercase fw-bold mb-0">{{t('paid_amount')}}</label>
+                                    <button type="button" @click="fillVoucherCredit" class="btn btn-sm btn-link p-0 text-decoration-none small text-success" :disabled="!paid_for">
+                                        Fill Voucher Due ({{fM(selectedVoucherCredit)}})
+                                    </button>
+                                </div>
                                 <div class="input-group shadow-sm">
                                     <span class="input-group-text bg-success text-white border-0"><i class="fa-solid fa-dollar-sign"></i></span>
                                     <input 
@@ -411,9 +416,21 @@ export default {
          t() {
             return (key) => this.$store.getters.t(key);
         },
+        selectedVoucherCredit() {
+            if (!this.paid_for) return 0;
+            const found = this.saleItemsData.find(f => f.voucher_no == this.paid_for);
+            return found ? found.credit : 0;
+        }
       
     },
     methods:{
+        fillVoucherCredit() {
+            if (!this.paid_for) return;
+            const found = this.saleItemsData.find(f => f.voucher_no == this.paid_for);
+            if (found) {
+                this.paid_amount = found.credit;
+            }
+        },
         fM(amount) {
             return hp.formattedAmount(amount)
         },
