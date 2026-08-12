@@ -91,6 +91,14 @@ export const lang={
         eng:"Pay For",
         mm:"ပေးဆောင်သည်"
     },
+    pay_all_vouchers:{
+        eng:"Pay All Vouchers (Auto FIFO)",
+        mm:"ဘောက်ချာအားလုံးအတွက် (အစဉ်လိုက်)"
+    },
+    bulk_pay:{
+        eng:"Bulk Pay (Earlier First)",
+        mm:"အစဉ်လိုက် ပေးချေရန်"
+    },
     total:{
         eng: "Total",
         mm:"စုစုပေါင်း"

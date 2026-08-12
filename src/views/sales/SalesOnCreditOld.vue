@@ -99,30 +99,67 @@
                         </div>
                     </div>
                     <div class="col-12 col-md-5">
-                        <div class="card">
-                            <div class="card-body p-2 max-vh-65 overflow-y-auto">
-                                <table class="table table-hover      table-bordered  mb-0">
+                        <div class="card mb-3">
+                            <div class="card-header py-1 bg-secondary text-white fw-bold text-center small">
+                                {{t('pay_for')}} (Single Voucher)
+                            </div>
+                            <div class="card-body p-2">
+                                <table class="table table-hover table-bordered mb-0">
                                     <tbody>
                                         <tr class="text-center fw-bold table-secondary">
-                                            <td class="col-1">{{t('pay_for')}}</td>
-                                            <td class="col-1">{{t('date')}}</td>
-                                            <td class="col-1">{{t('paid_amount')}}</td>
+                                            <td class="col-4">{{t('pay_for')}}</td>
+                                            <td class="col-4">{{t('date')}}</td>
+                                            <td class="col-4">{{t('paid_amount')}}</td>
                                         </tr>
                                         <tr>
                                             <td class="">
                                                 <select class="form-control-plaintext py-0 text-center" v-model="paid_for" v-if="saleItems.length" @change="calAmount">
-                                                    <option  v-for="si in saleItems" :key="si.id">{{si.voucher_no}}</option>
+                                                    <option v-for="si in saleItems" :key="si.id">{{si.voucher_no}}</option>
                                                 </select>
                                             </td>
                                             <td class="">
                                                 <flat-pickr :disabled="!paid_for" class="form-control-plaintext py-0 text-center" v-model="paid_date"  :config="config" />
 
                                             </td>
-                                            <td class=""><input @keypress.enter="savePaid" v-model="paid_amount" :disabled="!customer.id" type="number" class="form-control-plaintext py-0 text-end"></td>
+                                            <td class=""><input @focus="setInput" @click="setInput" @blur="handleBlurPaid" @keypress.enter="savePaid" v-model="paid_amount" :disabled="!customer.id" type="number" class="form-control-plaintext py-0 text-end"></td>
                                         </tr>
                                       
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Bulk Pay All Vouchers (FIFO) -->
+                        <div class="card shadow-sm">
+                            <div class="card-header py-1 bg-primary text-white fw-bold text-center small">
+                                <i class="fa-solid fa-layer-group me-1"></i> {{t('pay_all_vouchers')}}
+                            </div>
+                            <div class="card-body p-2">
+                                <table class="table table-hover table-bordered mb-2">
+                                    <tbody>
+                                        <tr class="text-center fw-bold table-secondary">
+                                            <td class="col-6">{{t('date')}}</td>
+                                            <td class="col-6">{{t('paid_amount')}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="">
+                                                <flat-pickr :disabled="!customer.id" class="form-control-plaintext py-0 text-center" v-model="bulk_paid_date" :config="config" />
+                                            </td>
+                                            <td class="">
+                                                <input @focus="setBulkInput" @click="setBulkInput" @blur="handleBlurBulkPaid" @keypress.enter="saveBulkPaid" v-model="bulk_paid_amount" :disabled="!customer.id" type="number" class="form-control-plaintext py-0 text-end" placeholder="0">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <button type="button" @click="fillTotalCredit" class="btn btn-sm btn-outline-secondary py-0" :disabled="!customer.id" title="Fill total balance due">
+                                        <small>{{t('total_balance_due')}}: {{total_credit}}</small>
+                                    </button>
+                                    <button type="button" @click="saveBulkPaid" class="btn btn-sm btn-primary px-3" :disabled="!customer.id || !bulk_paid_amount || isBulkLoading">
+                                        <i class="fa-solid fa-hard-drive me-1"></i> {{t('bulk_pay')}}
+                                        <span class="spinner-border spinner-border-sm ms-1" aria-hidden="true" v-if="isBulkLoading"></span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -188,7 +225,10 @@ export default {
 
             paid_date:"",
             paid_for:"",
-            paid_amount: 0
+            paid_amount: 0,
+            bulk_paid_date:"",
+            bulk_paid_amount: 0,
+            isBulkLoading: false
              
         }
     },
@@ -197,6 +237,7 @@ export default {
     mounted() {
         this.voucher_no=new Date().getTime();
         this.paid_date=hp.setToday();
+        this.bulk_paid_date=hp.setToday();
         window.addEventListener('keydown', this.handleCtrl);
     },
     beforeUnmount() {
@@ -308,6 +349,67 @@ export default {
             this.checkDatabase();
             await updateDoc(saveDocument, data)       
         },
+        fillTotalCredit() {
+            this.bulk_paid_amount = this.saleItemsData
+                .filter((f) => f.credit > 0)
+                .reduce((acc, cur) => acc + cur.credit, 0);
+        },
+        async saveBulkPaid() {
+            if (!this.customer.id || !this.bulk_paid_amount || Number(this.bulk_paid_amount) <= 0) return false;
+            this.isBulkLoading = true;
+            try {
+                const paid_date = hp.insertDate(this.bulk_paid_date);
+                const paidTimestamp = Timestamp.fromDate(paid_date);
+                const userObj = { uid: this.user.uid, displayName: this.user.displayName };
+                let remainingPaid = Number(this.bulk_paid_amount);
+
+                const creditVouchers = [...this.saleItemsData]
+                    .filter((f) => f.credit > 0)
+                    .sort((a, b) => {
+                        const dateA = a.sale_date?.toDate ? a.sale_date.toDate().getTime() : (new Date(a.sale_date).getTime() || 0);
+                        const dateB = b.sale_date?.toDate ? b.sale_date.toDate().getTime() : (new Date(b.sale_date).getTime() || 0);
+                        return dateA - dateB;
+                    });
+
+                if (creditVouchers.length === 0) {
+                    this.msg.info = "No unpaid credit vouchers found for this customer";
+                    this.msg.type = "warning";
+                    this.isBulkLoading = false;
+                    return;
+                }
+
+                for (const v of creditVouchers) {
+                    if (remainingPaid <= 0) break;
+
+                    const payForThisVoucher = Math.min(remainingPaid, v.credit);
+                    remainingPaid -= payForThisVoucher;
+
+                    const voucherRecord = {
+                        paid_date: paidTimestamp,
+                        user: userObj,
+                        paid: payForThisVoucher
+                    };
+
+                    const updateData = {
+                        credit: v.credit - payForThisVoucher,
+                        debt_payments: [...(v.debt_payments || []), voucherRecord]
+                    };
+
+                    const saveDocument = doc(db, "sales", v.id);
+                    await updateDoc(saveDocument, updateData);
+                }
+
+                this.msg.info = "Bulk debt payment has been saved";
+                this.msg.type = "success";
+                this.bulk_paid_amount = 0;
+            } catch (error) {
+                console.error("Error saving bulk payment:", error);
+                this.msg.info = "Failed to save bulk debt payment";
+                this.msg.type = "danger";
+            } finally {
+                this.isBulkLoading = false;
+            }
+        },
        
         filterData(){
             if(this.display_type=="Paid"){
@@ -365,6 +467,32 @@ export default {
                 }
             })
         },
+        setInput(e) {
+            if (this.paid_amount == 0 || e.target.value == 0) {
+                this.paid_amount = "";
+            }
+            try {
+                e.target.select();
+            } catch (err) {}
+        },
+        handleBlurPaid() {
+            if (this.paid_amount === "" || this.paid_amount === null || this.paid_amount === undefined) {
+                this.paid_amount = 0;
+            }
+        },
+        setBulkInput(e) {
+            if (this.bulk_paid_amount == 0 || e.target.value == 0) {
+                this.bulk_paid_amount = "";
+            }
+            try {
+                e.target.select();
+            } catch (err) {}
+        },
+        handleBlurBulkPaid() {
+            if (this.bulk_paid_amount === "" || this.bulk_paid_amount === null || this.bulk_paid_amount === undefined) {
+                this.bulk_paid_amount = 0;
+            }
+        },
         closePage(){
             this.customer={},
             this.saleItemsData=[]
@@ -375,6 +503,8 @@ export default {
             this.paid_amount=0;
             this.paid_for="";
             this.paid_date=hp.setToday();
+            this.bulk_paid_amount=0;
+            this.bulk_paid_date=hp.setToday();
           
             this.clearPrintData();
         },
@@ -382,6 +512,8 @@ export default {
             this.customer=c;
             this.fetchCreditSales();
             this.paid_date=hp.setToday();
+            this.bulk_paid_date=hp.setToday();
+            this.bulk_paid_amount=0;
             this.clearPrintData();
          //   this.checkDatabase();
        },   
