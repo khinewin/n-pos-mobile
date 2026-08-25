@@ -144,7 +144,7 @@ export default {
                 let purTotal = 0;
 
                 sale.products.forEach((p) => {
-                    if (!this.code_no || p.code_no === Number(this.code_no)) {
+                    if (!this.code_no || p.code_no === this.code_no) {
                         purTotal += (Number(p.pur_price?.smallest_unit) || 0) * (Number(p.sale_qty) || 0);
                     }
                 });

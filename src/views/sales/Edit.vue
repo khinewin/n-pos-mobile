@@ -464,7 +464,7 @@ export default {
             this.calTotal();
         },
         async setCodeOnPaste(){
-            const query_url = query(collection(db, "products"), where("code_no", "==", Number(this.code_no)));
+            const query_url = query(collection(db, "products"), where("code_no", "==", this.code_no));
            const unsub= onSnapshot(query_url, async(snapShot) =>{
                     const products=pd.products(snapShot)     
                     this.setCode(products[0])

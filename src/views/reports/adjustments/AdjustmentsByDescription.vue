@@ -146,7 +146,7 @@ export default {
                     })
             })          
             if(this.code_no){
-                stocks=stocks.filter((f)=>f.code_no === Number(this.code_no))
+                stocks=stocks.filter((f)=>f.code_no === this.code_no)
             }
             stocks=stocks.filter((f)=>{
                  if(this.adj_type) {

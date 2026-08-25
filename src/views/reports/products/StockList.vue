@@ -249,7 +249,7 @@
 
             if (this.code_no) {
                 queryConstraints = [
-                    where("code_no", "==", Number(this.code_no))
+                    where("code_no", "==", this.code_no)
                 ];
             }
 

@@ -241,6 +241,7 @@ export default {
               handler: 'reportProducts',
               items: [
                   { code: "stock_list", name: "Stock List", active: true, customIcon: "fa-solid fa-clipboard-list" },
+                  { code: "stock_valuation", name: "Stock Valuation", active: true, customIcon: "fa-solid fa-coins" },
                   { code: "stock_list_sale_price", name: "Sale Price List", active: true, customIcon: "fa-solid fa-tag" },
                   { code: "stock_list_pur_price", name: "Purchase Price List", active: true, customIcon: "fa-solid fa-tags" },
                   { code: "stock_list_pur_sale_price", name: "Full Price List", active: true, customIcon: "fa-solid fa-file-invoice-dollar" },
@@ -420,6 +421,10 @@ export default {
       });
     },
     reportProducts(r_type) {
+      if (r_type === "stock_valuation") {
+        this.$router.push({ name: "StockValuation" });
+        return;
+      }
       this.$router.push({
         name: "ReportsProduct",
         params: { reportType: r_type, location: this.location },

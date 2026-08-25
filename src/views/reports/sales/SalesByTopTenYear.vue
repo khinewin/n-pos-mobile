@@ -184,7 +184,7 @@ export default {
             });
 
             if (this.code_no) {
-                sales = sales.filter((f) => f.code_no === Number(this.code_no));
+                sales = sales.filter((f) => f.code_no === this.code_no);
             }
 
             // Group by year

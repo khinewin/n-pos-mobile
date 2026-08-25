@@ -199,7 +199,7 @@ export default {
                 }
             })
             if(this.code_no){
-                sales=sales.filter((f)=>f.code_no === Number(this.code_no))
+                sales=sales.filter((f)=>f.code_no === this.code_no)
             }
             sales.sort((a,b)=>Number(a.customer_code) - Number(b.customer_code))
             const gbc=Object.entries(hp.gb_customer(sales))       

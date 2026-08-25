@@ -156,7 +156,7 @@ export default {
                     })
             })         
             if(this.code_no){
-                stocks=stocks.filter((f)=>f.code_no === Number(this.code_no))
+                stocks=stocks.filter((f)=>f.code_no === this.code_no)
             }    
             if(this.location !="All"){
                 stocks=stocks.filter((f)=>f.location == this.location)

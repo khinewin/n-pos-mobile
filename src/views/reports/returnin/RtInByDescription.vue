@@ -153,7 +153,7 @@ export default {
                 }
             })  
             if(this.code_no){
-                sales=sales.filter((f)=>f.code_no === Number(this.code_no))
+                sales=sales.filter((f)=>f.code_no === this.code_no)
             }
             const res1=Object.entries(hp.gb_item_name_price(sales))   
           // const res1=Object.entries(Object.groupBy(sales, s=>s.item_name))

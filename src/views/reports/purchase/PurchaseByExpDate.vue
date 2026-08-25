@@ -141,7 +141,7 @@ export default {
                 }
             })
             if(this.code_no){
-                purchase =purchase.filter((f)=>f.code_no === Number(this.code_no))
+                purchase =purchase.filter((f)=>f.code_no === this.code_no)
             }  
             purchase.sort((a,b)=>a.expire_date - b.expire_date)
             const filter_purchase=purchase.filter((res)=>{

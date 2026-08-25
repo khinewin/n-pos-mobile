@@ -59,6 +59,7 @@ export default {
         { routeName: 'Sale', labelKey: 'sale', icon: 'fa-solid fa-cart-shopping' },
         { routeName: 'Purchase', labelKey: 'purchase', icon: 'fa-solid fa-truck-ramp-box' },
         { routeName: 'Stocks', labelKey: 'stocks', icon: 'fa-solid fa-boxes-stacked' },
+        { routeName: 'StockValuation', labelKey: 'stock_valuation', icon: 'fa-solid fa-coins' },
         { routeName: 'Products', labelKey: 'product_code', icon: 'fa-solid fa-barcode' },
         { routeName: 'Suppliers', labelKey: 'suppliers', icon: 'fa-solid fa-user-tie' },
         { routeName: 'Customers', labelKey: 'customer', icon: 'fa-solid fa-users' },

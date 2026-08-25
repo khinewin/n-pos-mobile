@@ -201,7 +201,7 @@ export default {
                 }
             })
             if(this.code_no){
-                purchase=purchase.filter((f)=>f.code_no === Number(this.code_no))
+                purchase=purchase.filter((f)=>f.code_no === this.code_no)
             }
 
             let total_amount=0;

@@ -31,6 +31,7 @@ import ReportExpenses from "@/views/reports/Expenses.vue"
 import ReportStocks from '@/views/reports/Stocks.vue'
 import ReportPurchase from '@/views/reports/Purchase.vue'
 import ReportProduct from '@/views/reports/Products.vue'
+import StockValuation from '@/views/reports/products/StockValuation.vue'
 import Customers from '@/views/customer/Customers.vue'
 import CustomersOld from '@/views/customer/CustomersOld.vue'
 import store from "@/store"
@@ -209,6 +210,12 @@ const router = createRouter({
       name: "ReportsProduct",
       component: ReportProduct,
       meta : {title: "N-POS | Report Medicine Code"}
+    },
+    {
+      path: "/reports/stock-valuation",
+      name: "StockValuation",
+      component: StockValuation,
+      meta : {title: "N-POS | Stock Valuation"}
     },
     
     {

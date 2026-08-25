@@ -25,6 +25,9 @@
                           </li>     
                           <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
                             <router-link class="nav-link py-2 px-3" :to="{name : 'Stocks'}"><i class="fa-solid fa-money-bill-trend-up"></i> {{t('stocks')}}</router-link>
+                          </li>
+                          <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
+                            <router-link class="nav-link py-2 px-3" :to="{name : 'StockValuation'}"><i class="fa-solid fa-coins"></i> {{t('stock_valuation')}}</router-link>
                           </li>               
                           <li class="list-group-item list-group-item-action p-0 bg-secondary-subtle border-0"  data-bs-dismiss="offcanvas" aria-label="Close">
                             <router-link class="nav-link py-2 px-3" :to="{name : 'Products'}"><i class="fa-solid fa-list-check"></i> {{t('product_code')}}</router-link>

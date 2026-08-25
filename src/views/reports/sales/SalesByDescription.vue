@@ -221,7 +221,7 @@ export default {
             });
 
             if (this.code_no) {
-                sales = sales.filter((f) => f.code_no === Number(this.code_no));
+                sales = sales.filter((f) => f.code_no === this.code_no);
             }
 
             this.hasCategory = sales.some(s => s.category_name && s.category_name.trim() !== '');

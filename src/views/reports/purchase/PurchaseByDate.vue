@@ -189,7 +189,7 @@ export default {
 
 
             if(this.code_no){
-                purchase =purchase.filter((f)=>f.code_no === Number(this.code_no))
+                purchase =purchase.filter((f)=>f.code_no === this.code_no)
             }  
             const gbd=Object.entries(hp.gb_date(purchase))
             const gbc=gbd.map((res)=>{

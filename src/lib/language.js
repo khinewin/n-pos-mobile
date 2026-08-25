@@ -1,4 +1,8 @@
 export const lang={
+    stock_valuation:{
+        eng: "Stock Valuation",
+        mm: "ကုန်ပစ္စည်း တန်ဖိုးသတ်မှတ်ချက်"
+    },
     barcode_sticker:{
         eng: "Barcode Sticker",
         mm: "ဘားကုဒ် စတေကာ"
