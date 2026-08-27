@@ -10,7 +10,7 @@
           <div class="card border-0 shadow-sm rounded-3 h-100">
             <div class="card-body p-3">
               <div class="d-flex justify-content-between align-items-center mb-1">
-                <small class="text-muted text-uppercase fw-bold">Total Asset Value (Cost)</small>
+                <small class="text-muted text-uppercase fw-bold">{{ t('total_asset_value') }}</small>
                 <i class="fa-solid fa-coins text-primary fs-5"></i>
               </div>
               <h4 class="fw-bolder text-primary mb-0 mt-1">{{ formatMoney(totalAssetValuation) }}</h4>
@@ -23,7 +23,7 @@
           <div class="card border-0 shadow-sm rounded-3 h-100">
             <div class="card-body p-3">
               <div class="d-flex justify-content-between align-items-center mb-1">
-                <small class="text-muted text-uppercase fw-bold">Potential Retail Value</small>
+                <small class="text-muted text-uppercase fw-bold">{{ t('potential_retail_value') }}</small>
                 <i class="fa-solid fa-tags text-success fs-5"></i>
               </div>
               <h4 class="fw-bolder text-success mb-0 mt-1">{{ formatMoney(totalRetailValuation) }}</h4>
@@ -39,10 +39,10 @@
                title="Click to fetch All Stock items from server">
             <div class="card-body p-3">
               <div class="d-flex justify-content-between align-items-center mb-1">
-                <small class="text-muted text-uppercase fw-bold">Total SKUs Tracked</small>
+                <small class="text-muted text-uppercase fw-bold">{{ t('total_skus_tracked') }}</small>
                 <i class="fa-solid fa-boxes-stacked text-dark fs-5"></i>
               </div>
-              <h4 class="fw-bolder text-dark mb-0 mt-1">{{ totalDbProductCount || stockItems.length }} Products</h4>
+              <h4 class="fw-bolder text-dark mb-0 mt-1">{{ totalDbProductCount || stockItems.length }} {{ t('products_count') }}</h4>
               <small class="text-muted"><i class="fa-solid fa-database me-1 text-primary"></i> Total DB: {{ totalDbProductCount }} (Showing {{ filteredStockItems.length }})</small>
             </div>
           </div>
@@ -53,24 +53,24 @@
                :class="{'border border-danger border-2': search_status === 'reorder' || search_status === 'outofstock' || search_status === 'alert_all'}">
             <div class="card-body p-3">
               <div class="d-flex justify-content-between align-items-center mb-1">
-                <small class="text-muted text-uppercase fw-bold cursor-pointer" @click="filterStatus('alert_all')" title="Click to fetch All Stock Alerts directly from server">Stock Alerts</small>
+                <small class="text-muted text-uppercase fw-bold cursor-pointer" @click="filterStatus('alert_all')" title="Click to fetch All Stock Alerts directly from server">{{ t('stock_alerts') }}</small>
                 <i class="fa-solid fa-triangle-exclamation text-danger fs-5"></i>
               </div>
               <h4 class="fw-bolder text-danger mb-0 mt-1 cursor-pointer hover-opacity"
                   @click="filterStatus('alert_all')"
                   title="Click to fetch ALL Stock Alerts (Out of Stock + Reorder Alerts) directly from server">
-                {{ displayLowStockCount }} Items
+                {{ displayLowStockCount }} {{ t('items') }}
               </h4>
               <div class="mt-2 pt-1 border-top d-flex justify-content-between align-items-center flex-wrap gap-1">
                 <span class="badge bg-danger text-white px-2 py-1 cursor-pointer hover-scale"
                       @click.stop="filterStatus('outofstock')"
                       title="Click to fetch Out of Stock items directly from server">
-                  <i class="fa-solid fa-circle-exclamation me-1"></i> {{ displayOutOfStockCount }} Out of Stock
+                  <i class="fa-solid fa-circle-exclamation me-1"></i> {{ displayOutOfStockCount }} {{ t('out_of_stock') }}
                 </span>
                 <span class="badge bg-warning-subtle text-warning-emphasis px-2 py-1 cursor-pointer hover-scale"
                       @click.stop="filterStatus('reorder')"
                       title="Click to fetch Reorder Alert items directly from server">
-                  {{ displayReorderCount }} Reorder
+                  {{ displayReorderCount }} {{ t('reorder_alert') }}
                 </span>
               </div>
             </div>
@@ -87,7 +87,7 @@
             <div class="col-md-3 col-lg-3">
               <div class="input-group input-group-sm">
                 <span class="input-group-text bg-light border-0"><i class="fa-solid fa-barcode text-secondary"></i></span>
-                <input type="search" v-model="search_code" @keyup.enter="handleSearch" class="form-control bg-light border-0 ps-1" placeholder="Code / SKU...">
+                <input type="search" v-model="search_code" @keyup.enter="handleSearch" class="form-control bg-light border-0 ps-1" :placeholder="t('barcode') + '...'">
                 <button v-if="search_code" class="btn btn-sm btn-light border-0 text-muted" type="button" @click="search_code = ''; handleSearch()" title="Clear Code">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -101,7 +101,7 @@
             <div class="col-md-3 col-lg-3">
               <div class="input-group input-group-sm">
                 <span class="input-group-text bg-light border-0"><i class="fa-solid fa-tag text-secondary"></i></span>
-                <input type="search" v-model="search_name" @keyup.enter="handleSearch" class="form-control bg-light border-0 ps-1" placeholder="Product Name...">
+                <input type="search" v-model="search_name" @keyup.enter="handleSearch" class="form-control bg-light border-0 ps-1" :placeholder="t('item_name') + '...'">
                 <button v-if="search_name" class="btn btn-sm btn-light border-0 text-muted" type="button" @click="search_name = ''; handleSearch()" title="Clear Name">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -114,7 +114,7 @@
             <!-- Category Filter -->
             <div class="col-md-2 col-lg-2">
               <select v-model="search_category" class="form-select form-select-sm bg-light border-0">
-                <option value="">All Categories</option>
+                <option value="">{{ t('all_categories') }}</option>
                 <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
               </select>
             </div>
@@ -122,18 +122,18 @@
             <!-- Status Filter -->
             <div class="col-md-2 col-lg-2">
               <select v-model="search_status" @change="fetchStockData" class="form-select form-select-sm bg-light border-0">
-                <option value="all">All Products</option>
-                <option value="alert_all">All Stock Alerts (Combined)</option>
-                <option value="reorder">Reorder Alert Only</option>
-                <option value="outofstock">Out of Stock Only</option>
-                <option value="optimal">Optimal Stock</option>
+                <option value="all">{{ t('all_products') }}</option>
+                <option value="alert_all">{{ t('stock_alerts') }}</option>
+                <option value="reorder">{{ t('reorder_alert') }}</option>
+                <option value="outofstock">{{ t('out_of_stock') }}</option>
+                <option value="optimal">{{ t('optimal_stock') }}</option>
               </select>
             </div>
 
             <!-- Action Buttons: Clear, Limit, Print -->
             <div class="col-md-2 col-lg-2 d-flex align-items-center gap-1 flex-wrap justify-content-end">
               <button class="btn btn-sm btn-light border shadow-sm text-muted text-nowrap px-2 fw-medium" @click="clearSearch" :disabled="isLoading" title="Clear Search & Filters">
-                <i class="fa-solid fa-rotate-left me-1"></i> Clear
+                <i class="fa-solid fa-rotate-left me-1"></i> {{ t('clear_link') }}
               </button>
 
               <select v-model="limitData" @change="fetchStockData" class="form-select form-select-sm bg-light border-0 flex-shrink-0" style="width: 75px;" title="Limit">
@@ -158,7 +158,7 @@
         <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
           <div class="d-flex align-items-center gap-2">
             <i class="fa-solid fa-calculator text-primary fs-5"></i>
-            <h6 class="mb-0 fw-bold text-dark">Real-Time Inventory Asset Valuation Breakdown</h6>
+            <h6 class="mb-0 fw-bold text-dark">{{ t('stock_valuation') }}</h6>
           </div>
           <div class="d-flex align-items-center gap-2">
             <span class="small text-muted">Costing Method:</span>
@@ -180,14 +180,14 @@
           <table class="table table-sm table-bordered table-hover align-middle mb-0 w-100" style="table-layout: fixed; width: 100%; font-size: 0.78rem;">
             <thead class="table-light text-muted small text-uppercase">
               <tr>
-                <th class="ps-1 text-center" style="width: 12%;">SKU / Code</th>
-                <th style="width: 25%;">Product Description</th>
-                <th style="width: 11%;">Category</th>
-                <th class="text-center" style="width: 10%;">On Hand Qty</th>
-                <th class="text-end" style="width: 11%;">Unit Cost (Ks)</th>
-                <th class="text-end" style="width: 11%;">Selling Price (Ks)</th>
-                <th class="text-end pe-1" style="width: 12%;">Asset Value (Cost)</th>
-                <th class="text-center" style="width: 8%;">Status</th>
+                <th class="ps-1 text-center" style="width: 12%;">{{ t('barcode') }}</th>
+                <th style="width: 25%;">{{ t('item_name') }}</th>
+                <th style="width: 11%;">{{ t('category') }}</th>
+                <th class="text-center" style="width: 10%;">{{ t('on_hand_qty') }}</th>
+                <th class="text-end" style="width: 11%;">{{ t('unit_cost') }}</th>
+                <th class="text-end" style="width: 11%;">{{ t('selling_price') }}</th>
+                <th class="text-end pe-1" style="width: 12%;">{{ t('asset_value') }}</th>
+                <th class="text-center" style="width: 8%;">{{ t('status') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -212,15 +212,15 @@
                 <td class="text-end font-monospace text-muted">{{ formatMoney(item.salePrice) }}</td>
                 <td class="text-end pe-1 font-monospace fw-bold text-primary">{{ formatMoney(Math.max(0, item.qty) * item.unitCost) }}</td>
                 <td class="text-center">
-                  <span v-if="item.qty <= 0" class="badge bg-danger text-white px-1 py-1" style="font-size: 0.62rem;">Out of Stock</span>
-                  <span v-else-if="item.qty <= item.minQty" class="badge bg-warning-subtle text-warning-emphasis px-1 py-1" style="font-size: 0.62rem;">Reorder Alert</span>
-                  <span v-else class="badge bg-success-subtle text-success px-1 py-1" style="font-size: 0.62rem;">Optimal</span>
+                  <span v-if="item.qty <= 0" class="badge bg-danger text-white px-1 py-1" style="font-size: 0.62rem;">{{ t('out_of_stock') }}</span>
+                  <span v-else-if="item.qty <= item.minQty" class="badge bg-warning-subtle text-warning-emphasis px-1 py-1" style="font-size: 0.62rem;">{{ t('reorder_alert') }}</span>
+                  <span v-else class="badge bg-success-subtle text-success px-1 py-1" style="font-size: 0.62rem;">{{ t('optimal_stock') }}</span>
                 </td>
               </tr>
             </tbody>
             <tfoot class="table-light fs-6 fw-bold">
               <tr>
-                <td colspan="6" class="text-end text-uppercase py-2" style="font-size: 0.75rem;">Filtered Total Inventory Asset Value:</td>
+                <td colspan="6" class="text-end text-uppercase py-2" style="font-size: 0.75rem;">{{ t('total') }}:</td>
                 <td class="text-end pe-1 font-monospace text-primary fs-6 py-2" style="font-size: 0.85rem;">{{ formatMoney(totalAssetValuation) }}</td>
                 <td></td>
               </tr>

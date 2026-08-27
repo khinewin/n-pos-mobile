@@ -10,19 +10,19 @@
           </div>
           <div>
             <h6 class="mb-0 fw-bolder text-dark tracking-tight">{{ t('sales_amount') }}</h6>
-            <small class="text-muted fw-medium" style="font-size: 0.68rem;">Revenue Analytics Summary</small>
+            <small class="text-muted fw-medium" style="font-size: 0.68rem;">{{ t('sales_summary') }}</small>
           </div>
         </div>
 
         <span class="badge bg-emerald-subtle text-emerald border border-emerald-subtle rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.68rem;">
-          <i class="fa-solid fa-arrow-trend-up me-1"></i> Sales
+          <i class="fa-solid fa-arrow-trend-up me-1"></i> {{ t('sale') }}
         </span>
       </div>
 
       <!-- Main Value Metric Box -->
       <div class="valuation-display-box p-3 rounded-3 mb-3 text-center position-relative overflow-hidden">
         <span class="text-uppercase fw-bold text-muted d-block tracking-wider mb-1" style="font-size: 0.62rem; letter-spacing: 0.5px;">
-          Monthly Total Sales Revenue
+          {{ t('monthly_total_sales') }}
         </span>
         
         <div class="h3 fw-bolder text-emerald mb-0 font-monospace tracking-tight">

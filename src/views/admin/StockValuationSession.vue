@@ -10,19 +10,19 @@
           </div>
           <div>
             <h6 class="mb-0 fw-bolder text-dark tracking-tight">{{ t('stock_valuation') }}</h6>
-            <small class="text-muted fw-medium" style="font-size: 0.68rem;">Inventory Asset Overview</small>
+            <small class="text-muted fw-medium" style="font-size: 0.68rem;">{{ t('inventory_asset_overview') }}</small>
           </div>
         </div>
         
         <router-link :to="{ name: 'StockValuation' }" class="btn btn-sm btn-light border rounded-pill px-3 py-1 fw-bold view-btn text-primary" style="font-size: 0.72rem;">
-          View Report <i class="fa-solid fa-arrow-right-long ms-1"></i>
+          {{ t('view_report') }} <i class="fa-solid fa-arrow-right-long ms-1"></i>
         </router-link>
       </div>
 
       <!-- Main Valuation Amount Container -->
       <div class="valuation-display-box p-3 rounded-3 mb-3 text-center position-relative overflow-hidden">
         <span class="text-uppercase fw-bold text-muted d-block tracking-wider mb-1" style="font-size: 0.62rem; letter-spacing: 0.5px;">
-          Total Asset Valuation (Cost)
+          {{ t('total_asset_value') }}
         </span>
         
         <div class="h3 fw-bolder text-primary mb-0 font-monospace tracking-tight">
@@ -42,14 +42,14 @@
 
         <div class="col-4">
           <div class="metric-pill p-2 rounded-3 bg-rose-subtle">
-            <span class="d-block text-rose fw-bold text-uppercase" style="font-size: 0.6rem;">Out of Stock</span>
+            <span class="d-block text-rose fw-bold text-uppercase" style="font-size: 0.6rem;">{{ t('out_of_stock') }}</span>
             <span class="fw-bolder text-rose fs-6 font-monospace">{{ outOfStockCount }}</span>
           </div>
         </div>
 
         <div class="col-4">
           <div class="metric-pill p-2 rounded-3 bg-amber-subtle">
-            <span class="d-block text-amber fw-bold text-uppercase" style="font-size: 0.6rem;">Reorder</span>
+            <span class="d-block text-amber fw-bold text-uppercase" style="font-size: 0.6rem;">{{ t('reorder_alert') }}</span>
             <span class="fw-bolder text-amber fs-6 font-monospace">{{ reorderCount }}</span>
           </div>
         </div>

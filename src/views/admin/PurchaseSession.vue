@@ -10,19 +10,19 @@
           </div>
           <div>
             <h6 class="mb-0 fw-bolder text-dark tracking-tight">{{ t('pur_amount') }}</h6>
-            <small class="text-muted fw-medium" style="font-size: 0.68rem;">Purchase Expenditure Summary</small>
+            <small class="text-muted fw-medium" style="font-size: 0.68rem;">{{ t('purchase_summary') }}</small>
           </div>
         </div>
 
         <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.68rem;">
-          <i class="fa-solid fa-truck-ramp-box me-1"></i> Purchases
+          <i class="fa-solid fa-truck-ramp-box me-1"></i> {{ t('purchase') }}
         </span>
       </div>
 
       <!-- Main Value Metric Box -->
       <div class="valuation-display-box p-3 rounded-3 mb-3 text-center position-relative overflow-hidden">
         <span class="text-uppercase fw-bold text-muted d-block tracking-wider mb-1" style="font-size: 0.62rem; letter-spacing: 0.5px;">
-          Monthly Total Purchase Expense
+          {{ t('monthly_total_purchase') }}
         </span>
         
         <div class="h3 fw-bolder text-primary mb-0 font-monospace tracking-tight">

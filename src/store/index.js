@@ -32,10 +32,10 @@ import { lang } from "@/lib/language";
     products:[],
     packingSizes:[],
     printData:{},
-    setLanguage: "eng",
-     currentLang: "eng", // default language
-     translations: lang,
-     theme: "old", // default theme
+    setLanguage: localStorage.getItem("lang") || "eng",
+    currentLang: localStorage.getItem("lang") || "eng", // default language
+    translations: lang,
+    theme: "old", // default theme
   },
 
   getters: {
@@ -46,7 +46,7 @@ import { lang } from "@/lib/language";
     products:state=>state.products,
     packingSizes:state=>state.packingSizes,
     printData:state=>state.printData,
-    setLanguage: state=>state.setLanguage,
+    setLanguage: state=>state.currentLang,
     t: (state) => (key) => {
       // find translation safely
       return state.translations[key]?.[state.currentLang] || key;
@@ -69,8 +69,10 @@ import { lang } from "@/lib/language";
           state.printData=payload;
         },
         SET_LANGUAGE(state, langCode) {
-        state.currentLang = langCode;
-      },
+          state.currentLang = langCode;
+          state.setLanguage = langCode;
+          localStorage.setItem("lang", langCode);
+        },
         SET_THEME(state, theme) {
           state.theme = theme;
         }
@@ -92,6 +94,9 @@ import { lang } from "@/lib/language";
           context.commit("SET_PRINT_DATA", payload)
         },
         changeLanguage({ commit }, langCode) {
+          commit("SET_LANGUAGE", langCode);
+        },
+        setLanguage({ commit }, langCode) {
           commit("SET_LANGUAGE", langCode);
         },
         setTheme({ commit }, theme) {

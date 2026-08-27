@@ -1,6 +1,6 @@
 <template lang="">        
     <div>             
-        <PageHeader :page-title="pageTitle" page-code="dashboard"/>
+        <PageHeader :page-title="t('dashboard')" page-code="dashboard"/>
         <div class="container-fluid my-2 vh-80 overflow-y-auto">
             <div class="row mb-2">
                 <div class="col-12">

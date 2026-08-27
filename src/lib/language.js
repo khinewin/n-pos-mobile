@@ -436,6 +436,90 @@ export const lang={
     old_theme : {
         eng : "Old Version",
         mm: "ဗားရှင်းအဟောင်း"
+    },
+    total_asset_value: {
+        eng: "Total Asset Value (Cost)",
+        mm: "စုစုပေါင်း ကုန်ပစ္စည်းတန်ဖိုး (ဝယ်စျေး)"
+    },
+    potential_retail_value: {
+        eng: "Potential Retail Value",
+        mm: "ခန့်မှန်း ရောင်းရငွေတန်ဖိုး (ရောင်းစျေး)"
+    },
+    total_skus_tracked: {
+        eng: "Total SKUs Tracked",
+        mm: "ကုန်ပစ္စည်း အမျိုးအစား စုစုပေါင်း"
+    },
+    stock_alerts: {
+        eng: "Stock Alerts",
+        mm: "စတော့ သတိပေးချက်များ"
+    },
+    out_of_stock: {
+        eng: "Out of Stock",
+        mm: "ပစ္စည်းပြတ်နေသော စာရင်း"
+    },
+    reorder_alert: {
+        eng: "Reorder Alert",
+        mm: "ပြန်လည်မှာယူရန် သတိပေးချက်"
+    },
+    optimal_stock: {
+        eng: "Optimal Stock",
+        mm: "လက်ကျန် ပုံမှန်ရှိသော စာရင်း"
+    },
+    view_report: {
+        eng: "View Report",
+        mm: "အစီရင်ခံစာ ကြည့်မည်"
+    },
+    inventory_asset_overview: {
+        eng: "Inventory Asset Overview",
+        mm: "ကုန်ပစ္စည်း တန်ဖိုး အကျဉ်းချုပ်"
+    },
+    on_hand_qty: {
+        eng: "On Hand Qty",
+        mm: "လက်ရှိ စတော့ အရေအတွက်"
+    },
+    selling_price: {
+        eng: "Selling Price",
+        mm: "ရောင်းစျေး"
+    },
+    asset_value: {
+        eng: "Asset Value (Cost)",
+        mm: "ကုန်ပစ္စည်း တန်ဖိုး (ဝယ်စျေး)"
+    },
+    status: {
+        eng: "Status",
+        mm: "အခြေအနေ"
+    },
+    all_categories: {
+        eng: "All Categories",
+        mm: "အမျိုးအစား အားလုံး"
+    },
+    all_products: {
+        eng: "All Products",
+        mm: "ကုန်ပစ္စည်း အားလုံး"
+    },
+    items: {
+        eng: "Items",
+        mm: "ခု"
+    },
+    products_count: {
+        eng: "Products",
+        mm: "မျိုး"
+    },
+    sales_summary: {
+        eng: "Revenue Analytics Summary",
+        mm: "အရောင်းဝင်ငွေ အကျဉ်းချုပ်"
+    },
+    monthly_total_sales: {
+        eng: "Monthly Total Sales Revenue",
+        mm: "ယခုလ စုစုပေါင်း အရောင်းပမာဏ"
+    },
+    purchase_summary: {
+        eng: "Purchase Expenditure Summary",
+        mm: "ဝယ်ယူမှု အသုံးစရိတ် အကျဉ်းချုပ်"
+    },
+    monthly_total_purchase: {
+        eng: "Monthly Total Purchase Expense",
+        mm: "ယခုလ စုစုပေါင်း ဝယ်ယူမှုပမာဏ"
     }
 
 }
