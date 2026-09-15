@@ -26,7 +26,7 @@
         </span>
         
         <div class="h3 fw-bolder text-primary mb-0 font-monospace tracking-tight">
-          <span v-if="purchaseYearlyData.length">{{ fM(purchase_this_month) }}</span>
+          <span v-if="!isLoading">{{ fM(purchase_this_month) }}</span>
           <div v-else class="spinner-border spinner-border-sm text-primary" role="status"></div>
         </div>
       </div>
@@ -36,24 +36,24 @@
         <div class="col-4">
           <div class="metric-pill p-2 rounded-3 bg-light border">
             <span class="d-block text-muted fw-bold text-uppercase mb-1" style="font-size: 0.6rem;">{{ t('today') }}</span>
-            <span v-if="purchaseYearlyData.length" class="fw-bolder text-dark font-monospace" style="font-size: 0.8rem;">{{ fM(purchase_today) }}</span>
-            <span v-else @click="fetchPurchaseYearly" class="cursor-pointer text-muted"><i class="fa-solid fa-rotate-right fa-spin"></i></span>
+            <span v-if="!isLoading" class="fw-bolder text-dark font-monospace" style="font-size: 0.8rem;">{{ fM(purchase_today) }}</span>
+            <span v-else class="text-muted"><i class="fa-solid fa-rotate-right fa-spin"></i></span>
           </div>
         </div>
 
         <div class="col-4">
           <div class="metric-pill p-2 rounded-3 bg-light border">
             <span class="d-block text-muted fw-bold text-uppercase mb-1" style="font-size: 0.6rem;">{{ t('this_week') }}</span>
-            <span v-if="purchaseYearlyData.length" class="fw-bolder text-dark font-monospace" style="font-size: 0.8rem;">{{ fM(purchase_this_week) }}</span>
-            <span v-else @click="fetchPurchaseYearly" class="cursor-pointer text-muted"><i class="fa-solid fa-rotate-right fa-spin"></i></span>
+            <span v-if="!isLoading" class="fw-bolder text-dark font-monospace" style="font-size: 0.8rem;">{{ fM(purchase_this_week) }}</span>
+            <span v-else class="text-muted"><i class="fa-solid fa-rotate-right fa-spin"></i></span>
           </div>
         </div>
 
         <div class="col-4">
           <div class="metric-pill p-2 rounded-3 bg-primary-light border border-primary-subtle">
             <span class="d-block text-primary fw-bold text-uppercase mb-1" style="font-size: 0.6rem;">{{ t('this_month') }}</span>
-            <span v-if="purchaseYearlyData.length" class="fw-bolder text-primary font-monospace" style="font-size: 0.8rem;">{{ fM(purchase_this_month) }}</span>
-            <span v-else @click="fetchPurchaseYearly" class="cursor-pointer text-primary"><i class="fa-solid fa-rotate-right fa-spin"></i></span>
+            <span v-if="!isLoading" class="fw-bolder text-primary font-monospace" style="font-size: 0.8rem;">{{ fM(purchase_this_month) }}</span>
+            <span v-else class="text-primary"><i class="fa-solid fa-rotate-right fa-spin"></i></span>
           </div>
         </div>
       </div>
@@ -76,7 +76,9 @@ export default {
       purchase_this_month: 0,
       purchase_this_week: 0,
       purchase_this_year: 0,
-      purchase_today: 0
+      purchase_today: 0,
+      isLoading: true,
+      unsub: null,
     }
   },
   computed: {
@@ -89,6 +91,9 @@ export default {
   },
   mounted() {
     this.fetchPurchaseYearly();
+  },
+  beforeUnmount() {
+    if (this.unsub) this.unsub();
   },
   methods: {
     fM(amount) {
@@ -152,6 +157,7 @@ export default {
       });
     },
     async fetchPurchaseYearly() {
+      this.isLoading = true;
       const currentDate = new Date();
       const theFirst = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1, 0, 0, 0);
       const theLast = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59);
@@ -165,10 +171,15 @@ export default {
         orderBy("pur_date")
       );
 
-      onSnapshot(query_url, (snapShot) => {
+      if (this.unsub) this.unsub();
+      this.unsub = onSnapshot(query_url, (snapShot) => {
         let items = ss.purchases(snapShot);           
         this.purchaseYearlyData = items;
         this.monthlyPurchaseReport();
+        this.isLoading = false;
+      }, (error) => {
+        console.error("Error fetching purchases yearly:", error);
+        this.isLoading = false;
       });
     }
   }

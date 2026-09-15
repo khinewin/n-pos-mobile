@@ -33,10 +33,10 @@
                     <td class="text-center">{{p.code_no}}</td>
                     <td>{{p.item_name}}</td>
                     <td>
-                        {{calPackingSize(p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit, p.packing_size.medium_qty, p.packing_size.smallest_qty)}}
+                        {{calPackingSize(p.packing_size?.largest_unit, p.packing_size?.medium_unit, p.packing_size?.smallest_unit, p.packing_size?.medium_qty, p.packing_size?.smallest_qty)}}
                     </td>
                     <td class="text-end">
-                        {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.sale_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}
+                        {{calPackingQty(p.packing_size?.medium_qty, p.packing_size?.smallest_qty, p.sale_qty, p.packing_size?.largest_unit, p.packing_size?.medium_unit, p.packing_size?.smallest_unit)}}
                     </td>
                     <td class="text-end">{{fM(p.final_amount)}}</td>
                     <td class="text-end">{{fM(p.pur_amount)}}</td>
@@ -64,10 +64,10 @@
                     <td class="text-center">{{p.code_no}}</td>
                     <td>{{p.item_name}}</td>
                     <td class="">
-                        {{calPackingSize(p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit, p.packing_size.medium_qty, p.packing_size.smallest_qty)}}
+                        {{calPackingSize(p.packing_size?.largest_unit, p.packing_size?.medium_unit, p.packing_size?.smallest_unit, p.packing_size?.medium_qty, p.packing_size?.smallest_qty)}}
                     </td>
                     <td class="text-end">
-                        {{calPackingQty(p.packing_size.medium_qty, p.packing_size.smallest_qty, p.sale_qty, p.packing_size.largest_unit, p.packing_size.medium_unit, p.packing_size.smallest_unit)}}
+                        {{calPackingQty(p.packing_size?.medium_qty, p.packing_size?.smallest_qty, p.sale_qty, p.packing_size?.largest_unit, p.packing_size?.medium_unit, p.packing_size?.smallest_unit)}}
                     </td>
                     <td class="text-end">{{fM(p.final_amount)}}</td>
                     <td class="text-end">{{fM(p.pur_amount)}}</td>
@@ -169,9 +169,11 @@ export default {
         },
         total_pur_amount() {
             return this.salesData.reduce((total, sale) => {
-                sale.products.forEach(product => {
-                    total += Number(product.pur_price.smallest_unit) * product.sale_qty;
-                });
+                if (Array.isArray(sale.products)) {
+                    sale.products.forEach(product => {
+                        total += Number(product.pur_price?.smallest_unit || 0) * (Number(product.sale_qty) || 0);
+                    });
+                }
                 return total;
             }, 0);
         },
@@ -214,10 +216,12 @@ export default {
             });        
 
             sales = sales.map((s) => {
-                const { retail_price, pur_price, packing_size } = s;
+                const retail_price = s.retail_price || {};
+                const pur_price = s.pur_price || {};
+                const packing_size = s.packing_size || {};
                 const unitType = packing_size.largest_unit ? 'largest_unit' : 'smallest_unit';
-                const group_price = `${retail_price[unitType]}, ${pur_price[unitType]}`;
-                return { ...s, group_price };
+                const group_price = `${retail_price[unitType] || 0}, ${pur_price[unitType] || 0}`;
+                return { ...s, packing_size, retail_price, pur_price, group_price };
             });
 
             if (this.code_no) {
@@ -260,8 +264,9 @@ export default {
                             item.final_amount += renItem.final_amount;
                             item.sale_qty += renItem.sale_qty;
                             item.code_no = renItem.code_no;                  
-                            item.pur_amount += renItem.pur_price.smallest_unit * renItem.sale_qty;
-                            item.profit += renItem.final_amount - (renItem.pur_price.smallest_unit * renItem.sale_qty);                                
+                            const purSmallest = Number(renItem.pur_price?.smallest_unit) || 0;
+                            item.pur_amount += purSmallest * renItem.sale_qty;
+                            item.profit += renItem.final_amount - (purSmallest * renItem.sale_qty);                                
                             item.extra_discount += Number(renItem.extra_discount);
                         });
                         return item;
@@ -302,8 +307,9 @@ export default {
                         item.final_amount += ren.final_amount;
                         item.sale_qty += ren.sale_qty;
                         item.code_no = ren.code_no;                  
-                        item.pur_amount += ren.pur_price.smallest_unit * ren.sale_qty;
-                        item.profit += ren.final_amount - (ren.pur_price.smallest_unit * ren.sale_qty);                                
+                        const purSmallest = Number(ren.pur_price?.smallest_unit) || 0;
+                        item.pur_amount += purSmallest * ren.sale_qty;
+                        item.profit += ren.final_amount - (purSmallest * ren.sale_qty);                                
                         item.extra_discount += Number(ren.extra_discount);
                     });
                     return item;

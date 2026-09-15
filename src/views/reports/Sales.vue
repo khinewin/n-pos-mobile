@@ -54,6 +54,9 @@
                     <div v-if="reportType==='by_description_date'">
                         <SalesByDescriptionDate  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no"/>
                     </div>
+                    <div v-if="reportType==='by_description_month'">
+                        <SalesByDescriptionMonth  :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no"/>
+                    </div>
                     <div v-if="reportType==='by_customer_date'">
                         <SalesByCustomerDate :customer_code="customer_code" :fromDate="fromDate"  :toDate="toDate" :code_no="code_no"/>
                     </div>
@@ -82,6 +85,7 @@ import SalesByCustomer from "@/views/reports/sales/SalesByCustomer.vue"
 import SalesByCustomerDate from "@/views/reports/sales/SalesByCustomerDate.vue"
 import SalesByChart from "@/views/reports/sales/SalesByChart.vue"
 import SalesByDescriptionDate from "@/views/reports/sales/SalesByDescriptionDate.vue"
+import SalesByDescriptionMonth from "@/views/reports/sales/SalesByDescriptionMonth.vue"
 
 import LargePrintHeader from "@/views/partials/LargePrintHeader.vue"
 import * as rt from "@/lib/reportType"
@@ -89,7 +93,7 @@ import * as rt from "@/lib/reportType"
 export default {
     components: {
         SalesByDate,SalesByMonth,SalesByYear,SalesByTopTen,SalesByTopTenMonth,SalesByTopTenYear,SalesByVoucher,SalesByDescription, SalesByCustomer, SalesByCustomerDate,SalesByChart, LargePrintHeader,
-        SalesByDescriptionDate
+        SalesByDescriptionDate, SalesByDescriptionMonth
     },
   
     data(){

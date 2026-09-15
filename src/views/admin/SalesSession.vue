@@ -26,7 +26,7 @@
         </span>
         
         <div class="h3 fw-bolder text-emerald mb-0 font-monospace tracking-tight">
-          <span v-if="salesYearlyData.length">{{ fM(sales_this_month) }}</span>
+          <span v-if="!isLoading">{{ fM(sales_this_month) }}</span>
           <div v-else class="spinner-border spinner-border-sm text-emerald" role="status"></div>
         </div>
       </div>
@@ -36,24 +36,24 @@
         <div class="col-4">
           <div class="metric-pill p-2 rounded-3 bg-light border">
             <span class="d-block text-muted fw-bold text-uppercase mb-1" style="font-size: 0.6rem;">{{ t('today') }}</span>
-            <span v-if="salesYearlyData.length" class="fw-bolder text-dark font-monospace" style="font-size: 0.8rem;">{{ fM(sales_today) }}</span>
-            <span v-else @click="fetchSalesYearly" class="cursor-pointer text-muted"><i class="fa-solid fa-rotate-right fa-spin"></i></span>
+            <span v-if="!isLoading" class="fw-bolder text-dark font-monospace" style="font-size: 0.8rem;">{{ fM(sales_today) }}</span>
+            <span v-else class="text-muted"><i class="fa-solid fa-rotate-right fa-spin"></i></span>
           </div>
         </div>
 
         <div class="col-4">
           <div class="metric-pill p-2 rounded-3 bg-light border">
             <span class="d-block text-muted fw-bold text-uppercase mb-1" style="font-size: 0.6rem;">{{ t('this_week') }}</span>
-            <span v-if="salesYearlyData.length" class="fw-bolder text-dark font-monospace" style="font-size: 0.8rem;">{{ fM(sales_this_week) }}</span>
-            <span v-else @click="fetchSalesYearly" class="cursor-pointer text-muted"><i class="fa-solid fa-rotate-right fa-spin"></i></span>
+            <span v-if="!isLoading" class="fw-bolder text-dark font-monospace" style="font-size: 0.8rem;">{{ fM(sales_this_week) }}</span>
+            <span v-else class="text-muted"><i class="fa-solid fa-rotate-right fa-spin"></i></span>
           </div>
         </div>
 
         <div class="col-4">
           <div class="metric-pill p-2 rounded-3 bg-emerald-light border border-emerald-subtle">
             <span class="d-block text-emerald fw-bold text-uppercase mb-1" style="font-size: 0.6rem;">{{ t('this_month') }}</span>
-            <span v-if="salesYearlyData.length" class="fw-bolder text-emerald font-monospace" style="font-size: 0.8rem;">{{ fM(sales_this_month) }}</span>
-            <span v-else @click="fetchSalesYearly" class="cursor-pointer text-emerald"><i class="fa-solid fa-rotate-right fa-spin"></i></span>
+            <span v-if="!isLoading" class="fw-bolder text-emerald font-monospace" style="font-size: 0.8rem;">{{ fM(sales_this_month) }}</span>
+            <span v-else class="text-emerald"><i class="fa-solid fa-rotate-right fa-spin"></i></span>
           </div>
         </div>
       </div>
@@ -77,7 +77,8 @@ export default {
       sales_this_week: 0,
       sales_this_month: 0,
       sales_today: 0,
-      isLoading: false,
+      isLoading: true,
+      unsub: null,
     }
   },
   computed: {
@@ -90,6 +91,9 @@ export default {
   },
   mounted() {
     this.fetchSalesYearly();
+  },
+  beforeUnmount() {
+    if (this.unsub) this.unsub();
   },
   methods: {
     fM(amount) {
@@ -175,10 +179,14 @@ export default {
         orderBy("sale_date")
       );
       
-      onSnapshot(query_url, (snapShot) => {
+      if (this.unsub) this.unsub();
+      this.unsub = onSnapshot(query_url, (snapShot) => {
         let saleItems = ss.sales(snapShot);           
         this.salesYearlyData = saleItems;
         this.yearlyReports();
+        this.isLoading = false;
+      }, (error) => {
+        console.error("Error fetching sales yearly:", error);
         this.isLoading = false;
       });
     }

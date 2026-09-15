@@ -11,6 +11,9 @@ const displayReportType=(reportType)=>{
     if(reportType==='by_description_date'){
         return "by Product Name and Date"
     }else
+    if(reportType==='by_description_month'){
+        return "by Product Name and Month"
+    }else
     if(reportType==='by_customer'){
         return "by Customer"
     }else

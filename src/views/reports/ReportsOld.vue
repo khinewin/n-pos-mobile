@@ -278,6 +278,7 @@ export default {
             { code: "by_top_ten_year", name: "Top 10 By Year", active: true },
             { code: "by_description", name: "By Product Name", active: true },
             { code: "by_description_date", name: "By Product Name & Date", active: true },
+            { code: "by_description_month", name: "By Product Name & Month", active: true },
             { code: "by_voucher", name: "By Voucher", active: true , cashier: true},
             { code: "by_customer", name: "By Customer", active: true },
             { code: "by_customer_date", name: "By Customer & Date", active: true },

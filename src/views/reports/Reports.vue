@@ -274,6 +274,7 @@ export default {
                   { code: "by_top_ten_year", name: "Top 10 Sales By Year", active: true, customIcon: "fa-solid fa-crown" },
                   { code: "by_description", name: "Sales By Product", active: true },
                   { code: "by_description_date", name: "Product & Date", active: true },
+                  { code: "by_description_month", name: "Product & Month", active: true, customIcon: "fa-solid fa-calendar-week" },
                   { code: "by_voucher", name: "Sales By Voucher", active: true },
                   { code: "by_customer", name: "Sales By Customer", active: true },
                   { code: "by_customer_date", name: "Customer & Date", active: true },
@@ -378,6 +379,7 @@ export default {
             'stock_list': 'View current stock levels',
             'by_date': 'Report filtered by date range',
             'by_chart': 'Visual analytics graph',
+            'by_description_month': 'Monthly breakdown by product',
             // Add more descriptions as needed
         }
         return descriptions[code] || 'Generate detailed report';
