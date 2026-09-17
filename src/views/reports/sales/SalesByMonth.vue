@@ -1,178 +1,311 @@
-<template lang="">
-    <div class="overflow-x-auto">
-        <table class="table table-bordered mb-0 border-dark table-hover inside-table">
-            <tbody class="fw-bold text-center">
-                <tr><td rowspan="2" class="col-1">Month</td></tr>
-                <tr class="">
-                    <td class="col-1">Code</td>
-                    <td class="col-4">Product Name</td>
-                    <td class="col-1 text-center">Packing Size</td>                                                                                    
-                    <td class="col-1 text-center">Qty</td>
-                    <td class="col-1 text-center">Sale Amount</td>
-                    <td class="col-1 text-center">Pur Amount</td>
-                    <td class="col-2 text-center">Profit</td>
-                </tr>
-            </tbody>
-            <tbody v-if="!isLoading && reports.length === 0">
-                <tr><td colspan="8" class="text-center text-muted py-4">No data available</td></tr>
-            </tbody>
-            <tbody v-if="reports.length > 0" v-for="r in reports" :key="r[0]" class="table-group-divider">    
-                <tr><td class="text-center fw-bold" :rowspan="r[1].length + 4">{{r[0]}}</td></tr>                                        
-                <tr v-for="p in r[1]" :key="p.code_no">
-                    <td class="col-1 text-center">{{p.code_no}}</td>
-                    <td class="col-4">{{p.item_name}}</td>
-                    <td class="">
-                        {{calPackingSize(p.packing_size?.largest_unit, p.packing_size?.medium_unit, p.packing_size?.smallest_unit, p.packing_size?.medium_qty, p.packing_size?.smallest_qty)}}
-                    </td>
-                    <td class="text-end">
-                        {{calPackingQty(p.packing_size?.medium_qty, p.packing_size?.smallest_qty, p.sale_qty, p.packing_size?.largest_unit, p.packing_size?.medium_unit, p.packing_size?.smallest_unit)}}                                            
-                    </td>
-                    <td class="text-end">{{fM(p.final_amount)}}</td>
-                    <td class="text-end">
-                        {{fM(p.pur_amount)}}
-                    </td>
-                    <td class="text-end">
-                        {{fM(p.profit)}}
-                    </td>
-                </tr>
-                <tr class="text-end">
-                    <td colspan="4" class="fw-bold rm-b-b border-0 border-bottom pe-2">Total (Ks)</td>
-                    <td> {{fM(r[2].sale_amount)}}</td>
-                    <td> {{fM(r[2].pur_amount)}}</td>
-                    <td> {{fM(r[2].profit_amount)}}</td>
-                </tr>
-                <tr>
-                    <td colspan="6" class="text-end fw-bold rm-b-b border-0 border-bottom pe-2">Total Extra Discount (Ks)</td>
-                    <td class="text-end"> {{fM(r[2].extra_discount)}}</td>                  
-                </tr>
-                <tr>
-                    <td colspan="6" class="text-end fw-bold border-0 pe-2">Net Profit (Ks)</td>
-                    <td class="text-end"> {{fM(r[2].profit_amount - r[2].extra_discount)}}</td>                  
-                </tr>
-            </tbody>
-            <tbody v-if="reports.length > 0" class="table-group-divider">
-                <tr>
-                    <td class="text-end fw-bold rm-b-b border-bottom pe-2" colspan="7">Grand Total Sale Amount (Ks)</td>
-                    <td class="text-end"> {{fM(total_sale_amount)}}</td>
-                </tr>                     
-                <tr>
-                    <td class="text-end fw-bold rm-b-b border-bottom pe-2" colspan="7">Grand Total Pur Amount (Ks)</td>
-                    <td class="text-end"> {{fM(total_pur_amount)}}</td>
-                </tr>
-                <tr>
-                    <td class="text-end fw-bold rm-b-b border-bottom pe-2" colspan="7">Grand Total Extra Discount (Ks)</td>
-                    <td class="text-end"> {{fM(total_extra_discount)}}</td>
-                </tr>
-                <tr>
-                    <td class="text-end fw-bold pe-2" colspan="7">Grand Total Profit (Ks)</td>
-                    <td class="text-end"> {{fM(total_profit)}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <div v-if="isLoading">
-            <div class="d-flex justify-content-center my-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+<template>
+    <div class="sales-by-month">
+        <!-- Controls Toolbar (Hidden on Print) -->
+        <div class="d-print-none mb-2 p-1 bg-light rounded-3 border shadow-sm">
+            <div class="row g-2 align-items-center justify-content-between">
+                <!-- Left: Group by Category & Category Filter Pills -->
+                <div class="col-auto d-flex flex-wrap align-items-center gap-3">
+                    <!-- Group by Category Switch (OFF by default) -->
+                    <div class="form-check form-switch mb-0" v-if="hasCategory">
+                        <input 
+                            class="form-check-input" 
+                            type="checkbox" 
+                            id="groupByCatSwitchMonth" 
+                            v-model="groupByCategory"
+                        >
+                        <label class="form-check-label small fw-semibold" for="groupByCatSwitchMonth">
+                            Group by Category
+                        </label>
+                    </div>
+
+                    <!-- Category Filter Pills -->
+                    <div class="d-flex flex-wrap align-items-center gap-1 border-start ps-3" v-if="allCategories.length > 1">
+                        <span class="small text-muted me-1 fw-semibold"><i class="fa-solid fa-tags me-1"></i>Categories:</span>
+                        <button 
+                            type="button" 
+                            class="btn btn-xs py-0 px-2 rounded-pill me-1" 
+                            :class="selectedCategories.length === allCategories.length ? 'btn-primary' : 'btn-outline-secondary'"
+                            @click="selectAllCategories"
+                        >
+                            All
+                        </button>
+                        <button 
+                            v-for="cat in allCategories" 
+                            :key="cat"
+                            type="button" 
+                            class="btn btn-xs py-0 px-2 rounded-pill"
+                            :class="selectedCategories.includes(cat) ? 'btn-primary' : 'btn-outline-secondary'"
+                            @click="toggleCategory(cat)"
+                        >
+                            {{ cat }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right: Search Input -->
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            v-model="searchQuery" 
+                            placeholder="Filter by code or name..."
+                        >
+                        <button 
+                            v-if="searchQuery" 
+                            class="btn btn-outline-secondary" 
+                            type="button" 
+                            @click="searchQuery = ''"
+                        >
+                            <i class="fa-solid fa-times"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>                                                                                                                       
+        </div>
+
+        <!-- Main Report Table -->
+        <div class="overflow-x-auto">
+            <table class="table table-bordered border-dark table-hover inside-table align-middle mb-0">
+                <!-- Table Header -->
+                <thead class="fw-bold text-center table-light align-middle">
+                    <tr v-if="groupByCategory && hasCategory">
+                        <th class="col-1 align-top">Month</th>
+                        <th class="col-1 align-top">Category</th>
+                        <th class="col-code" style="width: 100px;">Code</th>
+                        <th class="text-start">Product Name</th>
+                        <th class="col-pack text-center" style="width: 120px;">Packing Size</th>
+                        <th class="col-qty text-center" style="width: 90px;">Qty</th>
+                        <th class="text-end" style="width: 110px;">Sale Amount</th>
+                        <th class="text-end" style="width: 110px;">Pur Amount</th>
+                        <th class="text-end" style="width: 110px;">Profit</th>
+                    </tr>
+                    <tr v-else>
+                        <th class="col-1 align-top">Month</th>
+                        <th class="col-code" style="width: 100px;">Code</th>
+                        <th class="text-start">Product Name</th>
+                        <th class="col-pack text-center" style="width: 120px;">Packing Size</th>
+                        <th class="col-qty text-center" style="width: 90px;">Qty</th>
+                        <th class="text-end" style="width: 110px;">Sale Amount</th>
+                        <th class="text-end" style="width: 110px;">Pur Amount</th>
+                        <th class="text-end" style="width: 110px;">Profit</th>
+                    </tr>
+                </thead>
+
+                <!-- Empty State -->
+                <tbody v-if="!isLoading && monthGroups.length === 0">
+                    <tr>
+                        <td :colspan="groupByCategory && hasCategory ? 9 : 8" class="text-center text-muted py-5">
+                            <i class="fa-regular fa-folder-open fa-2x d-block mb-2 opacity-50"></i>
+                            No sales data available for the selected period.
+                        </td>
+                    </tr>
+                </tbody>
+
+                <!-- Grouped by Category View (When Switch ON) -->
+                <template v-if="groupByCategory && hasCategory && monthGroups.length > 0">
+                    <tbody v-for="r in monthGroups" :key="r.month" class="table-group-divider">
+                        <template v-for="(cat, cIndex) in r.categories" :key="cat.categoryName">
+                            <tr v-for="(p, pIndex) in cat.items" :key="p.code_no + '-' + p.item_name + '-' + pIndex">
+                                <!-- Month cell on the very first row of the month group -->
+                                <td 
+                                    v-if="cIndex === 0 && pIndex === 0" 
+                                    class="text-center fw-bold align-top bg-light-subtle" 
+                                    :rowspan="r.totalGroupRows"
+                                >
+                                    {{ r.month }}
+                                </td>
+
+                                <!-- Category cell on the first row of this category -->
+                                <td 
+                                    v-if="pIndex === 0" 
+                                    class="text-center fw-semibold align-top bg-light text-primary" 
+                                    :rowspan="cat.items.length + 1"
+                                >
+                                    {{ cat.categoryName }}
+                                </td>
+
+                                <td class="text-center fw-semibold font-monospace">{{ p.code_no }}</td>
+                                <td>{{ p.item_name }}</td>
+                                <td class="text-center small text-muted">
+                                    {{ formatPackingSize(p.packing_size) }}
+                                </td>
+                                <td class="text-end">
+                                    {{ formatPackingQty(p.packing_size, p.sale_qty) }}
+                                </td>
+                                <td class="text-end">{{ fM(p.final_amount) }}</td>
+                                <td class="text-end">{{ fM(p.pur_amount) }}</td>
+                                <td class="text-end" :class="{'text-danger': p.profit < 0}">{{ fM(p.profit) }}</td>
+                            </tr>
+
+                            <!-- Category Subtotal Row -->
+                            <tr class="table-light text-end">
+                                <td colspan="4" class="pe-3 text-muted fw-semibold">
+                                    Subtotal {{ cat.categoryName }} (Ks)
+                                </td>
+                                <td>{{ fM(cat.sale_amount) }}</td>
+                                <td>{{ fM(cat.pur_amount) }}</td>
+                                <td class="text-primary fw-bold">{{ fM(cat.profit_amount) }}</td>
+                            </tr>
+                        </template>
+
+                        <!-- Month Summary Rows -->
+                        <tr class="table-secondary fw-bold text-end">
+                            <td colspan="5" class="pe-3">Total {{ r.month }} (Ks)</td>
+                            <td>{{ fM(r.sale_amount) }}</td>
+                            <td>{{ fM(r.pur_amount) }}</td>
+                            <td>{{ fM(r.profit_amount) }}</td>
+                        </tr>
+                        <tr class="table-secondary text-end">
+                            <td colspan="7" class="fw-semibold pe-3 text-muted">Total Extra Discount (Ks)</td>
+                            <td>{{ fM(r.extra_discount) }}</td>
+                        </tr>
+                        <tr class="table-secondary text-end fw-bold">
+                            <td colspan="7" class="pe-3 text-muted">Net Profit (Ks)</td>
+                            <td class="text-success">{{ fM(r.net_profit) }}</td>
+                        </tr>
+                    </tbody>
+                </template>
+
+                <!-- Standard Month View (When Group by Category is OFF - default) -->
+                <template v-else-if="monthGroups.length > 0">
+                    <tbody v-for="r in monthGroups" :key="r.month" class="table-group-divider">
+                        <tr v-for="(p, index) in r.items" :key="p.code_no + '-' + p.item_name + '-' + index">
+                            <!-- Month cell on first product row -->
+                            <td 
+                                v-if="index === 0" 
+                                class="text-center fw-bold align-top bg-light-subtle" 
+                                :rowspan="r.items.length + 3"
+                            >
+                                {{ r.month }}
+                            </td>
+
+                            <td class="text-center fw-semibold font-monospace">{{ p.code_no }}</td>
+                            <td>{{ p.item_name }}</td>
+                            <td class="text-center small text-muted">
+                                {{ formatPackingSize(p.packing_size) }}
+                            </td>
+                            <td class="text-end">
+                                {{ formatPackingQty(p.packing_size, p.sale_qty) }}
+                            </td>
+                            <td class="text-end">{{ fM(p.final_amount) }}</td>
+                            <td class="text-end">{{ fM(p.pur_amount) }}</td>
+                            <td class="text-end" :class="{'text-danger': p.profit < 0}">{{ fM(p.profit) }}</td>
+                        </tr>
+
+                        <!-- Month Summary Rows -->
+                        <tr class="table-secondary fw-bold text-end">
+                            <td colspan="4" class="pe-3">Total {{ r.month }} (Ks)</td>
+                            <td>{{ fM(r.sale_amount) }}</td>
+                            <td>{{ fM(r.pur_amount) }}</td>
+                            <td>{{ fM(r.profit_amount) }}</td>
+                        </tr>
+                        <tr class="table-secondary text-end">
+                            <td colspan="6" class="fw-semibold pe-3 text-muted">Total Extra Discount (Ks)</td>
+                            <td>{{ fM(r.extra_discount) }}</td>
+                        </tr>
+                        <tr class="table-secondary text-end fw-bold">
+                            <td colspan="6" class="pe-3 text-muted">Net Profit (Ks)</td>
+                            <td class="text-success">{{ fM(r.net_profit) }}</td>
+                        </tr>
+                    </tbody>
+                </template>
+
+                <!-- Grand Totals Footer -->
+                <tbody v-if="monthGroups.length > 0" class="table-group-divider">
+                    <tr class="table-secondary fw-bold">
+                        <td :colspan="groupByCategory && hasCategory ? 8 : 7" class="text-end pe-3">Grand Total Sale Amount (Ks)</td>
+                        <td class="text-end">{{ fM(total_sale_amount) }}</td>
+                    </tr>
+                    <tr class="table-secondary fw-bold">
+                        <td :colspan="groupByCategory && hasCategory ? 8 : 7" class="text-end pe-3">Grand Total Pur Amount (Ks)</td>
+                        <td class="text-end">{{ fM(total_pur_amount) }}</td>
+                    </tr>
+                    <tr class="table-secondary fw-bold">
+                        <td :colspan="groupByCategory && hasCategory ? 8 : 7" class="text-end pe-3">Grand Total Extra Discount (Ks)</td>
+                        <td class="text-end">{{ fM(total_extra_discount) }}</td>
+                    </tr>
+                    <tr class="table-secondary fw-bold">
+                        <td :colspan="groupByCategory && hasCategory ? 8 : 7" class="text-end pe-3">Grand Total Profit (Ks)</td>
+                        <td class="text-end text-success fs-6">{{ fM(total_profit) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div v-if="isLoading" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
     </div>
 </template>
+
 <script>
-import { Timestamp, collection, getDocs, query, where, orderBy, onSnapshot } from 'firebase/firestore'
+import { Timestamp, collection, where, orderBy, query, onSnapshot } from 'firebase/firestore'
 import db from '@/firebase/firestore'
 import * as hp from "@/lib/helper.js"
 import * as ss from "@/lib/snapshot/sales"
 
 export default {
-    props: ['fromDate', 'toDate', 'customer_code', 'code_no'],   
-    data() {
-        return {                  
-            reports: [],
-            salesData: [],          
-            isLoading: false,
-            unsub: null,
-            msg: {
-                type: "",
-                info: "",
-            },        
+    name: "SalesByMonth",
+    props: {
+        fromDate: {
+            type: String,
+            required: true
+        },
+        toDate: {
+            type: String,
+            required: true
+        },
+        customer_code: {
+            type: [String, Number],
+            default: null
+        },
+        code_no: {
+            type: String,
+            default: null
         }
     },
-    mounted() {    
-        this.isLoading = true;
-        this.fetchSales();
-    },
-    beforeUnmount() {
-        if (this.unsub) this.unsub();
-    },
-    watch: {
-        msg: {
-            handler(val) {
-                if (val.type) {
-                    setTimeout(() => {
-                        this.msg.type = "";
-                        this.msg.info = "";
-                    }, 5000)
-                }
-            },
-            deep: true
-        },
+    data() {
+        return {
+            salesData: [],
+            isLoading: false,
+            unsub: null,
+            searchQuery: '',
+            groupByCategory: false,
+            selectedCategories: []
+        };
     },
     computed: {
         user() {
             return this.$store.getters.user;
         },
-        total_sale_amount() {
-            return this.salesData.reduce((total, sale) => total + Number(sale.total_amount), 0);
-        },
-        total_pur_amount() {
-            return this.salesData.reduce((total, sale) => {
-                if (Array.isArray(sale.products)) {
-                    sale.products.forEach(product => {
-                        total += Number(product.pur_price?.smallest_unit || 0) * (Number(product.sale_qty) || 0);
-                    });
-                }
-                return total;
-            }, 0);
-        },
-        total_extra_discount() {
-            return this.salesData.reduce((total, sale) => total + Number(sale.extra_discount), 0);
-        },
-        total_profit() {
-            return (this.total_sale_amount - this.total_pur_amount) - this.total_extra_discount;
-        }
-    },
-    methods: {
-        fM(amount) {
-            return hp.formattedAmount(amount);
-        },
-        monthlyShowTime(t) {
-            if (!t) return "";
-            const date = t.toDate ? t.toDate() : new Date(t);
-            const options = { year: 'numeric', month: 'short' };
-            return new Intl.DateTimeFormat('en-UK', options).format(date);
-        },
-        displayPrice(l_unit, m_unit, s_unit) {
-            return hp.displayPrice(l_unit, m_unit, s_unit);
-        },
-        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty) {
-            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
-        },
-        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit) {
-            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
-        },
-        goBack() {
-            this.$router.go(-1);
-        },      
-        displayReports() {                 
+        processedSales() {
             let sales = [];
-            this.salesData.forEach((res) => {                                
+            this.salesData.forEach((res) => {
+                if (!Array.isArray(res.products)) return;
                 res.products.forEach((data) => {
                     let index = sales.findIndex((item) => item.voucher_no == res.voucher_no);
+                    const categoryName = (data.category?.cat_name || data.category_name || (typeof data.category === 'string' ? data.category : '') || '').trim() || 'No Category';
                     if (index === -1) {
-                        sales.push({ ...data, group_month: this.monthlyShowTime(res.sale_date), voucher_no: res.voucher_no, extra_discount: res.extra_discount });
+                        sales.push({ 
+                            ...data, 
+                            group_month: this.monthlyShowTime(res.sale_date), 
+                            voucher_no: res.voucher_no, 
+                            extra_discount: Number(res.extra_discount) || 0,
+                            category_name: categoryName
+                        });
                     } else {
-                        sales.push({ ...data, group_month: this.monthlyShowTime(res.sale_date), voucher_no: res.voucher_no, extra_discount: 0 });
+                        sales.push({ 
+                            ...data, 
+                            group_month: this.monthlyShowTime(res.sale_date), 
+                            voucher_no: res.voucher_no, 
+                            extra_discount: 0,
+                            category_name: categoryName
+                        });
                     }
                 });
             });
@@ -189,79 +322,273 @@ export default {
             if (this.code_no) {
                 sales = sales.filter((f) => f.code_no === this.code_no);
             }
+            return sales;
+        },
+        hasCategory() {
+            return this.processedSales.some(s => s.category_name && s.category_name !== 'No Category');
+        },
+        allCategories() {
+            const set = new Set();
+            this.processedSales.forEach(s => {
+                if (s.category_name && s.category_name !== 'No Category') {
+                    set.add(s.category_name);
+                }
+            });
+            return Array.from(set).sort((a, b) => a.localeCompare(b));
+        },
+        filteredSales() {
+            let list = this.processedSales;
 
-            const gbm = Object.entries(hp.gb_month(sales));
-          
-            const gbc = gbm.map((ren) => {
-                const res1 = Object.entries(hp.gb_item_name_price(ren[1]));
-                const res2 = res1.map((res) => {
-                    const item_name = res[1][0].item_name;
+            // Category filter pills
+            if (this.hasCategory && this.selectedCategories.length > 0 && this.selectedCategories.length < this.allCategories.length) {
+                list = list.filter(p => this.selectedCategories.includes(p.category_name));
+            }
+
+            // Search query filter
+            if (this.searchQuery) {
+                const q = this.searchQuery.toLowerCase().trim();
+                list = list.filter(p => 
+                    (p.item_name && String(p.item_name).toLowerCase().includes(q)) || 
+                    (p.code_no && String(p.code_no).toLowerCase().includes(q)) ||
+                    (p.category_name && String(p.category_name).toLowerCase().includes(q))
+                );
+            }
+            return list;
+        },
+        monthGroups() {
+            const monthMap = {};
+            this.filteredSales.forEach(s => {
+                const month = s.group_month || '-';
+                if (!monthMap[month]) {
+                    monthMap[month] = [];
+                }
+                monthMap[month].push(s);
+            });
+
+            return Object.entries(monthMap).map(([month, salesInMonth]) => {
+                const res1 = Object.entries(hp.gb_item_name_price(salesInMonth));
+                const items = res1.map(res => {
+                    const first = res[1][0];
                     let item = {
-                        item_name: item_name,
+                        item_name: String(first.item_name || '-'),
+                        category_name: String(first.category_name || 'No Category'),
+                        code_no: first.code_no ? String(first.code_no) : "-",
                         sale_qty: 0,
-                        code_no: "",
-                        profit: 0,               
+                        profit: 0,
                         extra_discount: 0,
-                        packing_size: {},
-                        retail_price: {},
-                        whole_sale_price: {},
-                        pur_price: {},
+                        packing_size: first.packing_size || {},
+                        retail_price: first.retail_price || {},
+                        whole_sale_price: first.whole_sale_price || {},
+                        pur_price: first.pur_price || {},
                         pur_amount: 0,
                         final_amount: 0,
-                    };               
-                    res[1].map((renItem) => {
-                        item.packing_size = renItem.packing_size;
-                        item.retail_price = renItem.retail_price;
-                        item.whole_sale_price = renItem.whole_sale_price;
-                        item.pur_price = renItem.pur_price;
-                        item.final_amount += renItem.final_amount;
-                        item.sale_qty += renItem.sale_qty;
-                        item.code_no = renItem.code_no;                  
-                        const purSmallest = Number(renItem.pur_price?.smallest_unit) || 0;
-                        item.pur_amount += purSmallest * renItem.sale_qty;
-                        item.profit += renItem.final_amount - (purSmallest * renItem.sale_qty);                                
-                        item.extra_discount += Number(renItem.extra_discount);
+                    };
+                    res[1].forEach(ren => {
+                        item.packing_size = ren.packing_size;
+                        item.retail_price = ren.retail_price;
+                        item.whole_sale_price = ren.whole_sale_price;
+                        item.pur_price = ren.pur_price;
+                        item.final_amount += Number(ren.final_amount) || 0;
+                        item.sale_qty += Number(ren.sale_qty) || 0;
+                        if (ren.code_no) item.code_no = String(ren.code_no);
+                        const purSmallest = Number(ren.pur_price?.smallest_unit) || 0;
+                        const purAmount = purSmallest * (Number(ren.sale_qty) || 0);
+                        item.pur_amount += purAmount;
+                        item.profit += (Number(ren.final_amount) || 0) - purAmount;
+                        item.extra_discount += Number(ren.extra_discount) || 0;
+                        if (ren.category_name && ren.category_name !== 'No Category') {
+                            item.category_name = String(ren.category_name);
+                        }
                     });
                     return item;
-                }).sort((a, b) => a.item_name.toUpperCase() < b.item_name.toUpperCase() ? -1 : 1);              
-           
-                let sale_amount = res2.reduce((accu, item) => Number(accu) + Number(item.final_amount), 0);
-                let pur_amount = res2.reduce((accu, item) => Number(accu) + Number(item.pur_amount), 0);
-                let profit_amount = sale_amount - pur_amount;
-                let extra_discount = res2.reduce((accu, item) => { return this.code_no ? Number(accu) : Number(accu) + Number(item.extra_discount) }, 0);
-           
-                const res4 = { sale_amount, pur_amount, profit_amount, extra_discount };
-                const newData = [ren[0], [...res2], res4];    
-                return newData;                             
-            });           
-          
-            this.reports = gbc;        
-        },   
-        async fetchSales() {           
+                }).sort((a, b) => (a.item_name || '').localeCompare(b.item_name || ''));
+
+                const sale_amount = items.reduce((acc, it) => acc + it.final_amount, 0);
+                const pur_amount = items.reduce((acc, it) => acc + it.pur_amount, 0);
+                const profit_amount = sale_amount - pur_amount;
+                const extra_discount = this.code_no ? 0 : items.reduce((acc, it) => acc + it.extra_discount, 0);
+                const net_profit = profit_amount - extra_discount;
+
+                const catGroups = {};
+                items.forEach(it => {
+                    const cat = it.category_name || 'No Category';
+                    if (!catGroups[cat]) {
+                        catGroups[cat] = {
+                            categoryName: cat,
+                            items: [],
+                            sale_amount: 0,
+                            pur_amount: 0,
+                            profit_amount: 0,
+                        };
+                    }
+                    catGroups[cat].items.push(it);
+                    catGroups[cat].sale_amount += it.final_amount;
+                    catGroups[cat].pur_amount += it.pur_amount;
+                    catGroups[cat].profit_amount += it.profit;
+                });
+                const categories = Object.values(catGroups).sort((a, b) => a.categoryName.localeCompare(b.categoryName));
+
+                const totalGroupRows = categories.reduce((sum, c) => sum + c.items.length + 1, 0) + 3;
+
+                return {
+                    month,
+                    items,
+                    categories,
+                    sale_amount,
+                    pur_amount,
+                    profit_amount,
+                    extra_discount,
+                    net_profit,
+                    totalGroupRows
+                };
+            });
+        },
+        total_sale_amount() {
+            return this.monthGroups.reduce((sum, mg) => sum + mg.sale_amount, 0);
+        },
+        total_pur_amount() {
+            return this.monthGroups.reduce((sum, mg) => sum + mg.pur_amount, 0);
+        },
+        total_extra_discount() {
+            return this.monthGroups.reduce((sum, mg) => sum + mg.extra_discount, 0);
+        },
+        total_profit() {
+            return (this.total_sale_amount - this.total_pur_amount) - this.total_extra_discount;
+        }
+    },
+    watch: {
+        fromDate() { this.fetchSales(); },
+        toDate() { this.fetchSales(); },
+        customer_code() { this.fetchSales(); },
+        code_no() { this.fetchSales(); },
+        allCategories: {
+            immediate: true,
+            handler(cats) {
+                if (cats && cats.length > 0) {
+                    const valid = this.selectedCategories.filter(c => cats.includes(c));
+                    if (valid.length === 0) {
+                        this.selectedCategories = [...cats];
+                    } else {
+                        this.selectedCategories = valid;
+                    }
+                }
+            }
+        }
+    },
+    mounted() {
+        this.isLoading = true;
+        this.fetchSales();
+    },
+    beforeUnmount() {
+        if (this.unsub) this.unsub();
+    },
+    methods: {
+        fM(amount) {
+            return hp.formattedAmount(amount || 0);
+        },
+        monthlyShowTime(t) {
+            if (!t) return "";
+            const date = t.toDate ? t.toDate() : new Date(t);
+            const options = { year: 'numeric', month: 'short' };
+            return new Intl.DateTimeFormat('en-UK', options).format(date);
+        },
+        displayPrice(l_unit, m_unit, s_unit) {
+            return hp.displayPrice(l_unit, m_unit, s_unit);
+        },
+        calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty) {
+            return hp.calPackingSize(l_unit, m_unit, s_unit, m_unit_qty, s_unit_qty);
+        },
+        calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit) {
+            return hp.calPackingQty(m_unit_qty, s_unit_qty, qty, l_unit, m_unit, s_unit);
+        },
+        formatPackingSize(ps) {
+            if (!ps) return '-';
+            return hp.calPackingSize(ps.largest_unit, ps.medium_unit, ps.smallest_unit, ps.medium_qty, ps.smallest_qty);
+        },
+        formatPackingQty(ps, qty) {
+            if (!ps) return qty || 0;
+            const res = hp.calPackingQty(ps.medium_qty, ps.smallest_qty, qty, ps.largest_unit, ps.medium_unit, ps.smallest_unit);
+            return res || qty || '0';
+        },
+        selectAllCategories() {
+            this.selectedCategories = [...this.allCategories];
+        },
+        toggleCategory(cat) {
+            if (this.selectedCategories.length === this.allCategories.length) {
+                this.selectedCategories = [cat];
+            } else if (this.selectedCategories.includes(cat)) {
+                if (this.selectedCategories.length > 1) {
+                    this.selectedCategories = this.selectedCategories.filter(c => c !== cat);
+                } else {
+                    this.selectedCategories = [...this.allCategories];
+                }
+            } else {
+                this.selectedCategories.push(cat);
+            }
+        },
+        goBack() {
+            this.$router.go(-1);
+        },
+        async fetchSales() {
+            if (this.unsub) {
+                this.unsub();
+                this.unsub = null;
+            }
+            this.isLoading = true;
+
             let fDate = new Date(this.fromDate);
-            fDate.setHours("0", "0", "0");
+            fDate.setHours(0, 0, 0, 0);
             const from_date = Timestamp.fromDate(fDate);
+
             let tDate = new Date(this.toDate);
-            tDate.setHours("23", "59", "59");
+            tDate.setHours(23, 59, 59, 999);
             const to_date = Timestamp.fromDate(tDate);
 
-            let query_url = query(collection(db, "sales"), 
-                where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), orderBy("sale_date", "desc"));
+            let query_url = query(
+                collection(db, "sales"),
+                where("sale_date", ">=", from_date),
+                where("sale_date", "<=", to_date),
+                orderBy("sale_date", "desc")
+            );
 
             if (this.customer_code) {
-                query_url = query(collection(db, "sales"), 
-                    where("sale_date", ">=", from_date), where("sale_date", "<=", to_date), where("customer.code", "==", Number(this.customer_code)), orderBy("sale_date", "desc"));
+                query_url = query(
+                    collection(db, "sales"),
+                    where("sale_date", ">=", from_date),
+                    where("sale_date", "<=", to_date),
+                    where("customer.code", "==", Number(this.customer_code)),
+                    orderBy("sale_date", "desc")
+                );
             }
+
             this.unsub = onSnapshot(query_url, (snapShot) => {
                 const saleItems = ss.sales(snapShot);
                 this.salesData = saleItems;
-                this.displayReports();
+                this.isLoading = false;
+            }, (error) => {
+                console.error("Error fetching sales by month:", error);
                 this.isLoading = false;
             });
         }
     }
-}
+};
 </script>
-<style lang="">
-    
+
+<style scoped>
+.inside-table {
+    font-size: 0.85rem;
+}
+.inside-table th {
+    white-space: nowrap;
+    vertical-align: middle;
+}
+.btn-xs {
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+@media print {
+    .inside-table {
+        font-size: 10px !important;
+    }
+}
 </style>

@@ -24,7 +24,7 @@
                         <button 
                             type="button" 
                             class="btn btn-xs py-0 px-2 rounded-pill me-1" 
-                            :class="selectedMonthKeys.length === allMonths.length ? 'btn-dark' : 'btn-outline-secondary'"
+                            :class="selectedMonthKeys.length === allMonths.length ? 'btn-primary' : 'btn-outline-secondary'"
                             @click="selectAllMonths"
                         >
                             All
@@ -327,9 +327,9 @@ export default {
 
                     if (!productMap[prodId]) {
                         productMap[prodId] = {
-                            code_no: p.code_no || '-',
-                            item_name: p.item_name || '-',
-                            category_name: categoryName,
+                            code_no: p.code_no ? String(p.code_no) : '-',
+                            item_name: p.item_name ? String(p.item_name) : '-',
+                            category_name: String(categoryName),
                             packing_size: p.packing_size || {},
                             monthlySales: {},
                             total_amount: 0,
@@ -357,9 +357,9 @@ export default {
             if (this.searchQuery) {
                 const q = this.searchQuery.toLowerCase().trim();
                 list = list.filter(p => 
-                    (p.item_name && p.item_name.toLowerCase().includes(q)) || 
-                    (p.code_no && p.code_no.toLowerCase().includes(q)) ||
-                    (p.category_name && p.category_name.toLowerCase().includes(q))
+                    (p.item_name && String(p.item_name).toLowerCase().includes(q)) || 
+                    (p.code_no && String(p.code_no).toLowerCase().includes(q)) ||
+                    (p.category_name && String(p.category_name).toLowerCase().includes(q))
                 );
             }
             return list;
