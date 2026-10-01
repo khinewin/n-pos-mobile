@@ -1,29 +1,24 @@
-# pos
+# N-POS Android POS Application
 
-This template should help get you started developing with Vue 3 in Vite.
+Android POS application wrapping the N-POS web application (`https://n-pos.web.app`) with native hardware integrations:
 
-## Recommended IDE Setup
+## Key Features
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+1. **Integrated Web View**:
+   - Seamlessly loads `https://n-pos.web.app` with hardware acceleration, cookie management, responsive scaling, and offline fallback handling.
+   - Quick Login Autofill for test account (`n1@web.app` / `password`).
 
-## Customize configuration
+2. **Direct Thermal Bluetooth Silent Printing**:
+   - Intercepts Sales page printing (`https://print?data=...`, `AndroidBridge.printThermal(json)`).
+   - Direct ESC/POS silent printing to paired 58mm / 80mm Bluetooth thermal receipt printers without blocking OS print dialogs.
+   - Printer management dialog with paired device selection, paper width customization (58mm/80mm), and instant test printing.
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+3. **Android POS Dual Screen Customer Display**:
+   - Supports dual-screen Android POS terminals (Sunmi, iMin, Telpo, external HDMI/USB-C displays) using Android's `Presentation` API.
+   - Automatically synchronizes cart items, subtotal, discount, net total, paid amount, and change to the customer-facing secondary display.
+   - In-app preview modal for single-screen devices to test and preview customer screen data.
 
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
+4. **Technical Specifications**:
+   - Kotlin + Jetpack Compose
+   - Target SDK: 36 (Android 16), Min SDK: 24 (Android 7.0)
+   - Gradle 9.3.1 with Android Gradle Plugin 9.1.1

@@ -1,0 +1,10 @@
+<resources>
+    <color name="primary_blue">#0D6EFD</color>
+    <color name="primary_dark">#0A58CA</color>
+    <color name="secondary_dark">#212529</color>
+    <color name="background_light">#F8F9FA</color>
+    <color name="surface_card">#FFFFFF</color>
+    <color name="accent_green">#198754</color>
+    <color name="warning_orange">#FD7E14</color>
+    <color name="text_primary">#1C1B1F</color>
+</resources>

@@ -1,0 +1,8 @@
+{
+  "name": "N-POS",
+  "description": "N-POS Mobile & Web POS with Thermal Bluetooth Direct Silent Printing and Dual Screen Customer Display",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

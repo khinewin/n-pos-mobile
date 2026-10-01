@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.NPOS" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#0D6EFD</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">#F8F9FA</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+</resources>
