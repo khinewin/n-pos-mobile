@@ -17,18 +17,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material.icons.filled.PointOfSale
 import androidx.compose.material.icons.filled.Print
+import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.TabletAndroid
 import androidx.compose.material.icons.filled.Tv
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -49,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.npos.app.data.model.DeviceViewMode
 import com.npos.app.data.model.UserSalesSummary
 import com.npos.app.data.model.UserSession
+import com.npos.app.ui.theme.LocalStrings
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -64,14 +60,17 @@ fun DashboardScreen(
     currentViewMode: DeviceViewMode = DeviceViewMode.AUTO,
     onRefreshSummary: () -> Unit = {},
     onGoToSales: () -> Unit = {},
+    onGoToVouchers: () -> Unit = {},
     onOpenCustomerDisplay: () -> Unit = {},
     onOpenPrinterSettings: () -> Unit = {},
     onOpenViewModeSettings: () -> Unit = {}
 ) {
+    val s = LocalStrings.current
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF8F9FA))
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -113,7 +112,7 @@ fun DashboardScreen(
 
                         Column {
                             Text(
-                                text = "မင်္ဂလာပါ, ${user.displayName}",
+                                text = "${s.cashier}: ${user.displayName}",
                                 color = Color.White,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
@@ -139,7 +138,7 @@ fun DashboardScreen(
                         } else {
                             Icon(
                                 Icons.Default.Refresh,
-                                contentDescription = "Refresh",
+                                contentDescription = s.refresh,
                                 tint = Color.White
                             )
                         }
@@ -148,7 +147,7 @@ fun DashboardScreen(
             }
         }
 
-        // Section Title: Logged-in User's Sales Amount
+        // Section Title: Summary Overview
         item {
             Row(
                 modifier = Modifier
@@ -158,14 +157,14 @@ fun DashboardScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "SALES AMOUNT (${user.displayName.uppercase()})",
+                    text = s.summaryOverview.uppercase(),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.DarkGray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 if (isLoadingSummary) {
                     Text(
-                        text = "Updating...",
+                        text = s.loading,
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold
@@ -194,26 +193,26 @@ fun DashboardScreen(
             }
         }
 
-        // Section Title: Hardware Settings
+        // Quick Actions Section
         item {
             Text(
-                text = "HARDWARE TOOLS",
+                text = s.quickActions.uppercase(),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
             )
         }
 
-        // Customer Display View Card
+        // Go to Sales Card
         item {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onOpenCustomerDisplay() }
-                    .testTag("dashboard_customer_display_card"),
+                    .clickable { onGoToSales() }
+                    .testTag("dashboard_go_to_sales_card"),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Row(
@@ -229,14 +228,14 @@ fun DashboardScreen(
                     ) {
                         Surface(
                             shape = CircleShape,
-                            color = Color(0xFFE3F2FD),
+                            color = MaterialTheme.colorScheme.primaryContainer,
                             modifier = Modifier.size(46.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
-                                    imageVector = Icons.Default.Tv,
-                                    contentDescription = "Customer Display View",
-                                    tint = Color(0xFF0D6EFD),
+                                    imageVector = Icons.Default.PointOfSale,
+                                    contentDescription = s.sales,
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -246,29 +245,182 @@ fun DashboardScreen(
 
                         Column {
                             Text(
-                                text = "Customer Display View",
+                                text = s.sales,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp,
-                                color = Color.DarkGray
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = if (isSecondaryDisplayActive) "Secondary Display: Active" else "Preview Customer Display Window",
+                                text = s.newSale,
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
 
                     Surface(
                         shape = RoundedCornerShape(8.dp),
-                        color = if (isSecondaryDisplayActive) Color(0xFFE8F5E9) else Color(0xFFE3F2FD)
+                        color = MaterialTheme.colorScheme.primaryContainer
                     ) {
                         Text(
-                            text = if (isSecondaryDisplayActive) "Active" else "Preview Mode",
+                            text = s.sales,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (isSecondaryDisplayActive) Color(0xFF2E7D32) else Color(0xFF0D6EFD),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        // Vouchers History & Reprint Card
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onGoToVouchers() }
+                    .testTag("dashboard_go_to_vouchers_card"),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Surface(
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            modifier = Modifier.size(46.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Default.ReceiptLong,
+                                    contentDescription = s.vouchersTitle,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.width(14.dp))
+
+                        Column {
+                            Text(
+                                text = s.vouchersTitle,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = s.reprintReceipt,
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Print,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = s.reprintReceipt,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Customer Display View Card
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onOpenCustomerDisplay() }
+                    .testTag("dashboard_customer_display_card"),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Surface(
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            modifier = Modifier.size(46.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Default.Tv,
+                                    contentDescription = s.customerDisplay,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.width(14.dp))
+
+                        Column {
+                            Text(
+                                text = s.customerDisplay,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = if (isSecondaryDisplayActive) s.dualScreenActive else s.previewDisplayMode,
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = if (isSecondaryDisplayActive) Color(0xFFE8F5E9) else MaterialTheme.colorScheme.primaryContainer
+                    ) {
+                        Text(
+                            text = if (isSecondaryDisplayActive) "Active" else "Preview",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isSecondaryDisplayActive) Color(0xFF2E7D32) else MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
                         )
                     }
@@ -284,7 +436,7 @@ fun DashboardScreen(
                     .clickable { onOpenPrinterSettings() }
                     .testTag("dashboard_printer_setting_card"),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Row(
@@ -300,13 +452,13 @@ fun DashboardScreen(
                     ) {
                         Surface(
                             shape = CircleShape,
-                            color = if (isPrinterConnected) Color(0xFFE8F5E9) else Color(0xFFFFF3CD),
+                            color = if (isPrinterConnected) Color(0xFFE8F5E9) else MaterialTheme.colorScheme.surfaceVariant,
                             modifier = Modifier.size(46.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     imageVector = Icons.Default.Print,
-                                    contentDescription = "Printer Setting",
+                                    contentDescription = s.thermalPrinter,
                                     tint = if (isPrinterConnected) Color(0xFF198754) else Color(0xFFFD7E14),
                                     modifier = Modifier.size(24.dp)
                                 )
@@ -317,29 +469,29 @@ fun DashboardScreen(
 
                         Column {
                             Text(
-                                text = "Printer Setting",
+                                text = s.thermalPrinter,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp,
-                                color = Color.DarkGray
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = if (isPrinterConnected) "Connected: $printerName" else "Configure Bluetooth Thermal Printer",
+                                text = if (isPrinterConnected) "${s.printerConnected}: $printerName" else s.selectBluetoothPrinter,
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
 
                     Surface(
                         shape = RoundedCornerShape(8.dp),
-                        color = if (isPrinterConnected) Color(0xFFE8F5E9) else Color(0xFFFFF3CD)
+                        color = if (isPrinterConnected) Color(0xFFE8F5E9) else MaterialTheme.colorScheme.surfaceVariant
                     ) {
                         Text(
-                            text = if (isPrinterConnected) "Connected" else "Settings",
+                            text = if (isPrinterConnected) s.printerConnected else s.edit,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (isPrinterConnected) Color(0xFF198754) else Color(0xFF664D03),
+                            color = if (isPrinterConnected) Color(0xFF198754) else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
                         )
                     }
@@ -357,12 +509,14 @@ private fun formatMoney(amount: Double): String {
 
 @Composable
 private fun TodaySalesCard(salesSummary: UserSalesSummary, modifier: Modifier = Modifier) {
+    val s = LocalStrings.current
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .testTag("dashboard_today_sales_card"),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -377,13 +531,13 @@ private fun TodaySalesCard(salesSummary: UserSalesSummary, modifier: Modifier = 
             ) {
                 Surface(
                     shape = CircleShape,
-                    color = Color(0xFFE8F5E9),
+                    color = Color(0xFF2E7D32).copy(alpha = 0.15f),
                     modifier = Modifier.size(40.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Default.MonetizationOn,
-                            contentDescription = "Today Sales",
+                            contentDescription = s.todaySales,
                             tint = Color(0xFF2E7D32),
                             modifier = Modifier.size(24.dp)
                         )
@@ -392,7 +546,7 @@ private fun TodaySalesCard(salesSummary: UserSalesSummary, modifier: Modifier = 
 
                 Surface(
                     shape = RoundedCornerShape(6.dp),
-                    color = Color(0xFFE8F5E9)
+                    color = Color(0xFF2E7D32).copy(alpha = 0.15f)
                 ) {
                     Text(
                         text = "TODAY",
@@ -410,22 +564,22 @@ private fun TodaySalesCard(salesSummary: UserSalesSummary, modifier: Modifier = 
                 text = "${formatMoney(salesSummary.todayAmount)} MMK",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Black,
-                color = Color(0xFF1B5E20)
+                color = Color(0xFF2E7D32)
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "Today's Sales (ယနေ့ ရောင်းရငွေ)",
+                text = s.todaySales,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color.DarkGray
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
-                text = "${salesSummary.todayCount} Vouchers Completed",
+                text = "${salesSummary.todayCount} ${s.todayVouchers}",
                 fontSize = 11.sp,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -433,12 +587,14 @@ private fun TodaySalesCard(salesSummary: UserSalesSummary, modifier: Modifier = 
 
 @Composable
 private fun MonthSalesCard(salesSummary: UserSalesSummary, modifier: Modifier = Modifier) {
+    val s = LocalStrings.current
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .testTag("dashboard_month_sales_card"),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -453,14 +609,14 @@ private fun MonthSalesCard(salesSummary: UserSalesSummary, modifier: Modifier = 
             ) {
                 Surface(
                     shape = CircleShape,
-                    color = Color(0xFFE3F2FD),
+                    color = MaterialTheme.colorScheme.primaryContainer,
                     modifier = Modifier.size(40.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Default.CalendarMonth,
-                            contentDescription = "This Month Sales",
-                            tint = Color(0xFF0D6EFD),
+                            contentDescription = s.thisMonthSales,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -468,13 +624,13 @@ private fun MonthSalesCard(salesSummary: UserSalesSummary, modifier: Modifier = 
 
                 Surface(
                     shape = RoundedCornerShape(6.dp),
-                    color = Color(0xFFE3F2FD)
+                    color = MaterialTheme.colorScheme.primaryContainer
                 ) {
                     Text(
                         text = "THIS MONTH",
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF0D6EFD),
+                        color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                     )
                 }
@@ -486,22 +642,22 @@ private fun MonthSalesCard(salesSummary: UserSalesSummary, modifier: Modifier = 
                 text = "${formatMoney(salesSummary.thisMonthAmount)} MMK",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Black,
-                color = Color(0xFF0A58CA)
+                color = MaterialTheme.colorScheme.primary
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "This Month (ဒီလ ရောင်းရငွေ)",
+                text = s.thisMonthSales,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color.DarkGray
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
-                text = "${salesSummary.thisMonthCount} Vouchers Completed",
+                text = "${salesSummary.thisMonthCount} ${s.thisMonthVouchers}",
                 fontSize = 11.sp,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

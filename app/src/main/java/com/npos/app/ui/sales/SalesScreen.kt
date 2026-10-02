@@ -92,6 +92,7 @@ import com.npos.app.data.model.DeviceViewMode
 import com.npos.app.data.model.Product
 import com.npos.app.data.model.SaleRecord
 import com.npos.app.data.model.UserSession
+import com.npos.app.ui.theme.LocalStrings
 import kotlinx.coroutines.flow.SharedFlow
 import org.json.JSONArray
 import org.json.JSONObject
@@ -121,12 +122,13 @@ fun SalesScreen(
     currentViewMode: DeviceViewMode = DeviceViewMode.AUTO
 ) {
     val context = LocalContext.current
+    val s = LocalStrings.current
     val cartItems = remember { mutableStateListOf<CartItem>() }
     var selectedCustomer by remember { mutableStateOf(customers.firstOrNull { it.code == "123456789" } ?: Customer.DEFAULT) }
     var searchQuery by remember { mutableStateOf("") }
     var barcodeInput by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("All") }
-    var extraDiscount by remember { mutableDoubleStateOf(0.0) }
+    val extraDiscount = 0.0
     var paidAmount by remember { mutableDoubleStateOf(0.0) }
     var autoPrint by remember { mutableStateOf(autoPrintDefault) }
     var voucherNo by remember { mutableStateOf(generateVoucherNo(user.email)) }
@@ -157,7 +159,7 @@ fun SalesScreen(
         derivedStateOf { cartItems.sumOf { it.finalAmount } }
     }
     val netAmount by remember {
-        derivedStateOf { (subtotal - extraDiscount).coerceAtLeast(0.0) }
+        derivedStateOf { subtotal }
     }
     val changeAmount by remember {
         derivedStateOf { if (paidAmount > netAmount) paidAmount - netAmount else 0.0 }
@@ -256,7 +258,6 @@ fun SalesScreen(
 
     fun clearCart() {
         cartItems.clear()
-        extraDiscount = 0.0
         paidAmount = 0.0
         voucherNo = generateVoucherNo(user.email)
     }
@@ -272,7 +273,7 @@ fun SalesScreen(
             return false
         }
 
-        val saleDateStr = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
+        val saleDateStr = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault()).format(Date())
         val record = SaleRecord(
             voucherNo = voucherNo,
             saleDate = saleDateStr,
@@ -344,7 +345,7 @@ fun SalesScreen(
                     modifier = Modifier
                         .width(1.dp)
                         .fillMaxHeight()
-                        .background(Color(0xFFDEE2E6))
+                        .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                 )
 
                 // Cart Pane
@@ -369,7 +370,7 @@ fun SalesScreen(
                         autoPrint = autoPrint,
                         isSaving = isSavingSale,
                         onCustomerChange = { selectedCustomer = it },
-                        onDiscountChange = { extraDiscount = it },
+                        onDiscountChange = {},
                         onPaidChange = { paidAmount = it },
                         onAutoPrintToggle = { autoPrint = it },
                         onIncreaseQty = { item ->
@@ -438,12 +439,16 @@ fun SalesScreen(
             var selectedTab by remember { mutableIntStateOf(0) }
 
             Column(modifier = Modifier.fillMaxSize()) {
-                TabRow(selectedTabIndex = selectedTab) {
+                TabRow(
+                    selectedTabIndex = selectedTab,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary
+                ) {
                     Tab(
                         selected = selectedTab == 0,
                         onClick = { selectedTab = 0 },
-                        text = { Text("Products") },
-                        icon = { Icon(Icons.Default.PointOfSale, contentDescription = "Products") }
+                        text = { Text(s.sales) },
+                        icon = { Icon(Icons.Default.PointOfSale, contentDescription = s.sales) }
                     )
                     Tab(
                         selected = selectedTab == 1,
@@ -456,10 +461,10 @@ fun SalesScreen(
                                     }
                                 }
                             ) {
-                                Text("Cart (${formatMoney(netAmount)} MMK)")
+                                Text("${s.cart} (${formatMoney(netAmount)} MMK)")
                             }
                         },
-                        icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Cart") }
+                        icon = { Icon(Icons.Default.ShoppingCart, contentDescription = s.cart) }
                     )
                 }
 
@@ -505,7 +510,7 @@ fun SalesScreen(
                         autoPrint = autoPrint,
                         isSaving = isSavingSale,
                         onCustomerChange = { selectedCustomer = it },
-                        onDiscountChange = { extraDiscount = it },
+                        onDiscountChange = {},
                         onPaidChange = { paidAmount = it },
                         onAutoPrintToggle = { autoPrint = it },
                         onIncreaseQty = { item ->
@@ -603,8 +608,8 @@ private fun ProductsCatalogPane(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
                 // Total Count & Display Limit Selector Row (Scrollable with 20, 50, 100, 200, 300, 400, 500, All)
@@ -618,7 +623,7 @@ private fun ProductsCatalogPane(
                     // Cloud Live Count Badge
                     Surface(
                         shape = RoundedCornerShape(8.dp),
-                        color = Color(0xFFE3F2FD)
+                        color = MaterialTheme.colorScheme.primaryContainer
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
@@ -635,7 +640,7 @@ private fun ProductsCatalogPane(
                                 text = "Cloud စုစုပေါင်း: ${if (totalProductsCount > 0) "$totalProductsCount ခု" else "ရေတွက်နေသည်..."}",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         }
                     }
@@ -669,7 +674,7 @@ private fun ProductsCatalogPane(
                             }
                             Surface(
                                 shape = RoundedCornerShape(6.dp),
-                                color = if (isSelected) MaterialTheme.colorScheme.primary else Color(0xFFF1F3F5),
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
                                 modifier = Modifier
                                     .clickable { onLimitChanged(limitOption) }
                                     .testTag("limit_option_$label")
@@ -678,7 +683,7 @@ private fun ProductsCatalogPane(
                                     text = label,
                                     fontSize = 11.sp,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                    color = if (isSelected) Color.White else Color.DarkGray,
+                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                                 )
                             }
@@ -717,7 +722,7 @@ private fun ProductsCatalogPane(
                         },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = Color(0xFFCED4DA)
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
                         ),
                         modifier = Modifier
                             .weight(1f)
@@ -882,7 +887,7 @@ private fun ProductsCatalogPane(
                 Card(
                     modifier = Modifier.padding(24.dp),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(
@@ -891,24 +896,24 @@ private fun ProductsCatalogPane(
                     ) {
                         Surface(
                             shape = CircleShape,
-                            color = Color(0xFFF1F3F5),
+                            color = MaterialTheme.colorScheme.surfaceVariant,
                             modifier = Modifier.size(56.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
-                                Icon(Icons.Default.Inventory, contentDescription = "Empty", tint = Color.Gray, modifier = Modifier.size(28.dp))
+                                Icon(Icons.Default.Inventory, contentDescription = "Empty", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(28.dp))
                             }
                         }
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             text = "No products found in Cloud",
-                            color = Color.DarkGray,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "အမည် သို့မဟုတ် ဘားကုဒ် ရိုက်ထည့်၍ 'ရှာမည်' ခလုတ်ကို နှိပ်ပါ",
-                            color = Color.Gray,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 12.sp,
                             textAlign = TextAlign.Center
                         )
@@ -943,7 +948,7 @@ private fun ProductItemRow(product: Product, onClick: () -> Unit) {
             .clickable { onClick() }
             .testTag("product_item_${product.codeNo}"),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -1050,8 +1055,8 @@ private fun CartPane(
     Card(
         modifier = Modifier.fillMaxSize(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
             modifier = Modifier
@@ -1089,7 +1094,7 @@ private fun CartPane(
                     .fillMaxWidth()
                     .clickable { showCustomerPicker = !showCustomerPicker },
                 shape = RoundedCornerShape(8.dp),
-                color = Color(0xFFF1F3F5)
+                color = MaterialTheme.colorScheme.surfaceVariant
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
@@ -1198,7 +1203,7 @@ private fun CartPane(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(Color(0xFFF8F9FA), RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
                                 .padding(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -1318,21 +1323,12 @@ private fun CartPane(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(10.dp),
-                color = Color(0xFFF1F3F5)
+                color = MaterialTheme.colorScheme.surfaceVariant
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Text(text = "Subtotal:", fontSize = 13.sp)
                         Text(text = "${formatMoney(subtotal)} MMK", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = "Extra Discount:", fontSize = 13.sp)
-                        Text(text = "-${formatMoney(extraDiscount)} MMK", fontSize = 13.sp, color = Color(0xFFDC3545))
                     }
 
                     Row(
@@ -1400,8 +1396,8 @@ private fun CartPane(
                                     .weight(1f)
                                     .clickable { onPaidChange(amt) },
                                 shape = RoundedCornerShape(6.dp),
-                                color = Color.White,
-                                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFCED4DA))
+                                color = MaterialTheme.colorScheme.surface,
+                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
                             ) {
                                 Text(
                                     text = if (amt == netAmount) "Exact" else "${amt.toInt() / 1000}K",

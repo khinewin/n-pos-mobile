@@ -1,5 +1,6 @@
 package com.npos.app.ui.navigation
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,17 +15,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Devices
-import androidx.compose.material.icons.filled.Inventory
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.PointOfSale
 import androidx.compose.material.icons.filled.Print
+import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.filled.SettingsBrightness
 import androidx.compose.material.icons.filled.TabletAndroid
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.HorizontalDivider
@@ -46,13 +52,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.npos.app.R
+import com.npos.app.data.AppLanguage
+import com.npos.app.data.AppThemeMode
 import com.npos.app.data.model.DeviceViewMode
 import com.npos.app.data.model.UserSession
+import com.npos.app.ui.theme.LocalStrings
 
-enum class PosScreen(val title: String, val icon: ImageVector) {
-    SALES("Sales (အရောင်း)", Icons.Default.PointOfSale),
-    DASHBOARD("Dashboard (ပင်မ)", Icons.Default.Dashboard),
-    CUSTOMERS("Customers (ဖောက်သည်များ)", Icons.Default.People)
+enum class PosScreen(val icon: ImageVector) {
+    SALES(Icons.Default.PointOfSale),
+    DASHBOARD(Icons.Default.Dashboard),
+    VOUCHERS(Icons.Default.ReceiptLong),
+    CUSTOMERS(Icons.Default.People);
+
+    @Composable
+    fun getLocalizedTitle(): String {
+        val s = LocalStrings.current
+        return when (this) {
+            SALES -> s.sales
+            DASHBOARD -> s.dashboard
+            VOUCHERS -> s.vouchersTitle
+            CUSTOMERS -> s.customers
+        }
+    }
 }
 
 @Composable
@@ -63,17 +84,24 @@ fun PosSidebarContent(
     isPrinterConnected: Boolean,
     printerName: String,
     currentViewMode: DeviceViewMode = DeviceViewMode.AUTO,
+    currentThemeMode: AppThemeMode = AppThemeMode.SYSTEM,
+    onSelectThemeMode: (AppThemeMode) -> Unit = {},
+    currentLanguage: AppLanguage = AppLanguage.MM,
+    onSelectLanguage: (AppLanguage) -> Unit = {},
     onSelectScreen: (PosScreen) -> Unit,
     onOpenPrinterSettings: () -> Unit,
     onOpenCustomerDisplay: () -> Unit,
     onOpenViewModeSettings: () -> Unit = {},
     onLogout: () -> Unit
 ) {
+    val s = LocalStrings.current
+
     Column(
         modifier = Modifier
             .width(300.dp)
             .fillMaxHeight()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
+            .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
         // App / Store Brand Header
@@ -106,45 +134,46 @@ fun PosSidebarContent(
 
                 Column {
                     Text(
-                        text = "N-POS",
+                        text = s.appName,
                         fontWeight = FontWeight.Black,
                         fontSize = 18.sp,
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = "Cashier: ${user.displayName}",
+                        text = "${s.cashier}: ${user.displayName}",
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 13.sp,
-                        color = Color.DarkGray
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = user.email,
                         fontSize = 11.sp,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-        HorizontalDivider(color = Color(0xFFEEEEEE))
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(14.dp))
+        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+        Spacer(modifier = Modifier.height(10.dp))
 
         // Main Navigation Items
         Text(
-            text = "MAIN MENU",
+            text = s.mainMenu,
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Gray,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         )
 
         PosScreen.values().forEach { screen ->
             val isSelected = currentScreen == screen
+            val screenTitle = screen.getLocalizedTitle()
             NavigationDrawerItem(
                 label = {
                     Text(
-                        text = screen.title,
+                        text = screenTitle,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                         fontSize = 14.sp
                     )
@@ -152,15 +181,17 @@ fun PosSidebarContent(
                 icon = {
                     Icon(
                         imageVector = screen.icon,
-                        contentDescription = screen.title,
-                        tint = if (isSelected) MaterialTheme.colorScheme.primary else Color(0xFF495057)
+                        contentDescription = screenTitle,
+                        tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
                 selected = isSelected,
                 onClick = { onSelectScreen(screen) },
                 colors = NavigationDrawerItemDefaults.colors(
                     selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    unselectedContainerColor = Color.Transparent
+                    unselectedContainerColor = Color.Transparent,
+                    selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurface
                 ),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier
@@ -170,16 +201,16 @@ fun PosSidebarContent(
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-        HorizontalDivider(color = Color(0xFFEEEEEE))
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(14.dp))
+        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+        Spacer(modifier = Modifier.height(10.dp))
 
         // POS Hardware Actions
         Text(
-            text = "POS HARDWARE",
+            text = s.posHardware,
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Gray,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         )
 
@@ -189,7 +220,7 @@ fun PosSidebarContent(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(10.dp))
                 .clickable { onOpenCustomerDisplay() }
-                .padding(vertical = 4.dp),
+                .padding(vertical = 2.dp),
             color = Color.Transparent
         ) {
             Row(
@@ -200,21 +231,22 @@ fun PosSidebarContent(
             ) {
                 Icon(
                     imageVector = Icons.Default.Tv,
-                    contentDescription = "Customer Display",
-                    tint = if (isSecondaryDisplayActive) Color(0xFF198754) else Color(0xFF0D6EFD),
+                    contentDescription = s.customerDisplay,
+                    tint = if (isSecondaryDisplayActive) Color(0xFF198754) else MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(22.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Customer Display Screen",
+                        text = s.customerDisplay,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 13.sp
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = if (isSecondaryDisplayActive) "Dual Screen Active" else "Preview Display Mode",
+                        text = if (isSecondaryDisplayActive) s.dualScreenActive else s.previewDisplayMode,
                         fontSize = 11.sp,
-                        color = if (isSecondaryDisplayActive) Color(0xFF198754) else Color.Gray
+                        color = if (isSecondaryDisplayActive) Color(0xFF198754) else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -226,30 +258,31 @@ fun PosSidebarContent(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(10.dp))
                 .clickable { onOpenPrinterSettings() }
-                .padding(vertical = 4.dp),
+                .padding(vertical = 2.dp),
             color = Color.Transparent
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     imageVector = Icons.Default.Print,
-                    contentDescription = "Thermal Printer",
+                    contentDescription = s.thermalPrinter,
                     tint = if (isPrinterConnected) Color(0xFF198754) else Color(0xFFFD7E14),
                     modifier = Modifier.size(22.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Thermal Printer",
+                        text = s.thermalPrinter,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 13.sp
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = if (isPrinterConnected) printerName else "Select Bluetooth Printer",
+                        text = if (isPrinterConnected) printerName else s.selectBluetoothPrinter,
                         fontSize = 11.sp,
                         color = if (isPrinterConnected) Color(0xFF198754) else Color(0xFFDC3545)
                     )
@@ -263,7 +296,7 @@ fun PosSidebarContent(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(10.dp))
                 .clickable { onOpenViewModeSettings() }
-                .padding(vertical = 4.dp),
+                .padding(vertical = 2.dp),
             color = Color.Transparent
         ) {
             Row(
@@ -278,19 +311,20 @@ fun PosSidebarContent(
                         DeviceViewMode.TABLET -> Icons.Default.TabletAndroid
                         DeviceViewMode.AUTO -> Icons.Default.Devices
                     },
-                    contentDescription = "Device View Mode",
+                    contentDescription = s.deviceViewMode,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(22.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Device View (မျက်နှာပြင် မုဒ်)",
+                        text = s.deviceViewMode,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 13.sp
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "${currentViewMode.titleEn} (${currentViewMode.titleMm})",
+                        text = if (currentLanguage.isBurmese) currentViewMode.titleMm else currentViewMode.titleEn,
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium
@@ -299,10 +333,114 @@ fun PosSidebarContent(
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(14.dp))
+        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        HorizontalDivider(color = Color(0xFFEEEEEE))
-        Spacer(modifier = Modifier.height(12.dp))
+        // THEME & LANGUAGE SETTINGS
+        Text(
+            text = "${s.theme} & ${s.language}".uppercase(),
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        )
+
+        // Language Switcher Chips
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            AppLanguage.values().forEach { lang ->
+                val isSelected = currentLanguage == lang
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                    border = BorderStroke(
+                        1.dp,
+                        if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { onSelectLanguage(lang) }
+                        .testTag("sidebar_lang_${lang.code}")
+                ) {
+                    Row(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "${lang.flag} ${lang.displayName}",
+                            fontSize = 12.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        // Theme Mode Selector Chips
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            AppThemeMode.values().forEach { mode ->
+                val isSelected = currentThemeMode == mode
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                    border = BorderStroke(
+                        1.dp,
+                        if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { onSelectThemeMode(mode) }
+                        .testTag("sidebar_theme_${mode.id}")
+                ) {
+                    Column(
+                        modifier = Modifier.padding(vertical = 6.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = when (mode) {
+                                AppThemeMode.LIGHT -> Icons.Default.LightMode
+                                AppThemeMode.DARK -> Icons.Default.DarkMode
+                                AppThemeMode.SYSTEM -> Icons.Default.SettingsBrightness
+                            },
+                            contentDescription = mode.id,
+                            tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = when (mode) {
+                                AppThemeMode.LIGHT -> if (currentLanguage.isBurmese) "အလင်း" else "Light"
+                                AppThemeMode.DARK -> if (currentLanguage.isBurmese) "အမှောင်" else "Dark"
+                                AppThemeMode.SYSTEM -> if (currentLanguage.isBurmese) "စနစ်" else "System"
+                            },
+                            fontSize = 11.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+        Spacer(modifier = Modifier.height(10.dp))
 
         // Logout
         Surface(
@@ -310,7 +448,7 @@ fun PosSidebarContent(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(10.dp))
                 .clickable { onLogout() },
-            color = Color(0xFFFDF2F2)
+            color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
         ) {
             Row(
                 modifier = Modifier
@@ -320,25 +458,25 @@ fun PosSidebarContent(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Logout,
-                    contentDescription = "Logout",
-                    tint = Color(0xFFDC3545),
+                    contentDescription = s.logout,
+                    tint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
-                    text = "Logout (ထွက်ရန်)",
-                    color = Color(0xFFDC3545),
+                    text = s.logout,
+                    color = MaterialTheme.colorScheme.error,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         Text(
-            text = "N-POS v1.0 • NTG",
+            text = "${s.appName} v1.0",
             fontSize = 11.sp,
-            color = Color.LightGray,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
     }

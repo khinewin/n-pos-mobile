@@ -1,7 +1,6 @@
 package com.npos.app.ui.customers
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,6 +56,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.npos.app.data.model.Customer
+import com.npos.app.ui.theme.LocalStrings
 
 @Composable
 fun CustomersScreen(
@@ -67,6 +67,7 @@ fun CustomersScreen(
     onDeleteCustomer: (Customer) -> Unit = {},
     onRefresh: () -> Unit = {}
 ) {
+    val s = LocalStrings.current
     var searchQuery by remember { mutableStateOf("") }
     var customerToEdit by remember { mutableStateOf<Customer?>(null) }
     var showAddDialog by remember { mutableStateOf(false) }
@@ -87,18 +88,18 @@ fun CustomersScreen(
             FloatingActionButton(
                 onClick = { showAddDialog = true },
                 containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = CircleShape,
                 modifier = Modifier.testTag("add_customer_fab")
             ) {
-                Icon(Icons.Default.PersonAdd, contentDescription = "Add Customer")
+                Icon(Icons.Default.PersonAdd, contentDescription = s.addCustomer)
             }
         }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF8F9FA))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
@@ -110,15 +111,15 @@ fun CustomersScreen(
             ) {
                 Column {
                     Text(
-                        text = "Customer Management",
+                        text = s.customersTitle,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
-                        color = Color.DarkGray
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
-                        text = "ဖောက်သည်များ စီမံခန့်ခွဲမှု (စုစုပေါင်း: ${customers.size} ဦး)",
+                        text = "${s.total}: ${customers.size}",
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 
@@ -129,7 +130,7 @@ fun CustomersScreen(
                     ) {
                         Icon(
                             Icons.Default.Refresh,
-                            contentDescription = "Refresh Customers",
+                            contentDescription = s.refresh,
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -142,12 +143,12 @@ fun CustomersScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Search name / phone / code / address...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = MaterialTheme.colorScheme.primary) },
+                placeholder = { Text(s.searchCustomerPlaceholder) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = s.search, tint = MaterialTheme.colorScheme.primary) },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
                         IconButton(onClick = { searchQuery = "" }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Clear", tint = Color.Gray)
+                            Icon(Icons.Default.Clear, contentDescription = s.cancel, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 },
@@ -170,17 +171,17 @@ fun CustomersScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Surface(
                             shape = CircleShape,
-                            color = Color(0xFFE9ECEF),
+                            color = MaterialTheme.colorScheme.surfaceVariant,
                             modifier = Modifier.size(64.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
-                                Icon(Icons.Default.Person, contentDescription = "Empty", tint = Color.Gray, modifier = Modifier.size(32.dp))
+                                Icon(Icons.Default.Person, contentDescription = "Empty", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(32.dp))
                             }
                         }
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text("No customers found", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color.DarkGray)
+                        Text(s.noCustomersFound, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = MaterialTheme.colorScheme.onBackground)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text("ဖောက်သည်အသစ် ထည့်သွင်းရန် '+ Add New' ကိုနှိပ်ပါ", fontSize = 12.sp, color = Color.Gray)
+                        Text(s.addCustomer, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             } else {
@@ -231,13 +232,13 @@ fun CustomersScreen(
         AlertDialog(
             onDismissRequest = { customerToDelete = null },
             title = {
-                Text(text = "Delete Customer (ဖျက်ရန် အတည်ပြုပါ)", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(text = s.deleteCustomer, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             },
             text = {
                 Text(
-                    text = "Customer '${delTarget.name}' ကို ဖျက်ရန် သေချာပါသလား? ဤလုပ်ဆောင်ချက်ကို ပြန်လည်ပြင်ဆင်၍ မရနိုင်ပါ။",
+                    text = "${s.deleteCustomerConfirm}\n'${delTarget.name}'",
                     fontSize = 13.sp,
-                    color = Color.DarkGray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             confirmButton = {
@@ -246,10 +247,10 @@ fun CustomersScreen(
                         onDeleteCustomer(delTarget)
                         customerToDelete = null
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC3545)),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Delete (ဖျက်မည်)", fontWeight = FontWeight.Bold)
+                    Text(s.delete, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
@@ -257,7 +258,7 @@ fun CustomersScreen(
                     onClick = { customerToDelete = null },
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Cancel (မလုပ်တော့ပါ)")
+                    Text(s.cancel)
                 }
             }
         )
@@ -270,6 +271,7 @@ private fun CustomerItemCard(
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
+    val s = LocalStrings.current
     val isDefaultCustomer = customer.code == "123456789" || customer.id == "123456789"
 
     Card(
@@ -277,7 +279,7 @@ private fun CustomerItemCard(
             .fillMaxWidth()
             .testTag("customer_card_${customer.code}"),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -289,7 +291,7 @@ private fun CustomerItemCard(
             // Avatar
             Surface(
                 shape = CircleShape,
-                color = if (isDefaultCustomer) Color(0xFFE2E8F0) else MaterialTheme.colorScheme.primaryContainer,
+                color = if (isDefaultCustomer) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primaryContainer,
                 modifier = Modifier.size(46.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
@@ -299,7 +301,7 @@ private fun CustomerItemCard(
                             text = initials,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            color = if (isDefaultCustomer) Color.DarkGray else MaterialTheme.colorScheme.primary
+                            color = if (isDefaultCustomer) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     } else {
                         Icon(
@@ -317,21 +319,22 @@ private fun CustomerItemCard(
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = customer.name,
+                        text = if (isDefaultCustomer) s.walkInCustomer else customer.name,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp
+                        fontSize = 15.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     if (isDefaultCustomer) {
                         Spacer(modifier = Modifier.width(6.dp))
                         Surface(
                             shape = RoundedCornerShape(4.dp),
-                            color = Color(0xFFE0E7FF)
+                            color = MaterialTheme.colorScheme.primaryContainer
                         ) {
                             Text(
                                 text = "Default",
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF3730A3),
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
                             )
                         }
@@ -344,42 +347,42 @@ private fun CustomerItemCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Phone,
-                        contentDescription = "Phone",
-                        tint = Color.Gray,
+                        contentDescription = s.customerPhone,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(13.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = customer.phone.ifEmpty { "N/A" },
+                        text = customer.phone.ifBlank { s.none },
                         fontSize = 12.sp,
-                        color = Color.DarkGray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 
-                // Address (if present)
+                // Address
                 if (customer.address.isNotBlank()) {
                     Spacer(modifier = Modifier.height(2.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.LocationOn,
-                            contentDescription = "Address",
-                            tint = Color.Gray,
+                            contentDescription = s.customerAddress,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(13.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = customer.address,
-                            fontSize = 12.sp,
-                            color = Color.Gray
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "Code: ${customer.code}",
+                    text = "${s.customerCode}: ${customer.code}",
                     fontSize = 11.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -391,7 +394,7 @@ private fun CustomerItemCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit Customer",
+                        contentDescription = s.editCustomer,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(18.dp)
                     )
@@ -404,8 +407,8 @@ private fun CustomerItemCard(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete Customer",
-                            tint = Color(0xFFDC3545),
+                            contentDescription = s.deleteCustomer,
+                            tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -422,6 +425,7 @@ private fun CustomerEditDialog(
     onDismiss: () -> Unit,
     onSave: (Customer) -> Unit
 ) {
+    val s = LocalStrings.current
     val isEdit = customer != null
     var name by remember { mutableStateOf(customer?.name.orEmpty()) }
     var phone by remember { mutableStateOf(customer?.phone.orEmpty()) }
@@ -434,7 +438,7 @@ private fun CustomerEditDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = if (isEdit) "Edit Customer (ဖောက်သည်ပြင်ဆင်မည်)" else "Add New Customer (ဖောက်သည်အသစ်ထည့်မည်)",
+                text = if (isEdit) s.editCustomer else s.addCustomer,
                 fontWeight = FontWeight.Bold,
                 fontSize = 17.sp
             )
@@ -447,7 +451,7 @@ private fun CustomerEditDialog(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Customer Name (အမည်) *") },
+                    label = { Text("${s.customerName} *") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp)
@@ -456,7 +460,7 @@ private fun CustomerEditDialog(
                 OutlinedTextField(
                     value = phone,
                     onValueChange = { phone = it },
-                    label = { Text("Phone Number (ဖုန်းနံပါတ်)") },
+                    label = { Text(s.customerPhone) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     modifier = Modifier.fillMaxWidth(),
@@ -466,7 +470,7 @@ private fun CustomerEditDialog(
                 OutlinedTextField(
                     value = address,
                     onValueChange = { address = it },
-                    label = { Text("Address (လိပ်စာ/မြို့နယ်)") },
+                    label = { Text(s.customerAddress) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp)
@@ -475,7 +479,7 @@ private fun CustomerEditDialog(
                 OutlinedTextField(
                     value = code,
                     onValueChange = { code = it },
-                    label = { Text("Customer Code (ကုဒ်)") },
+                    label = { Text(s.customerCode) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp)
@@ -505,9 +509,9 @@ private fun CustomerEditDialog(
                 shape = RoundedCornerShape(8.dp)
             ) {
                 if (isSaving) {
-                    CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White)
+                    CircularProgressIndicator(modifier = Modifier.size(16.dp), color = MaterialTheme.colorScheme.onPrimary)
                 } else {
-                    Text(if (isEdit) "Update" else "Save")
+                    Text(if (isEdit) s.save else s.save)
                 }
             }
         },
@@ -516,7 +520,7 @@ private fun CustomerEditDialog(
                 onClick = onDismiss,
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Text("Cancel")
+                Text(s.cancel)
             }
         }
     )

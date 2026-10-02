@@ -68,9 +68,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.ui.draw.clip
 import androidx.core.content.ContextCompat
+import com.npos.app.data.AppLanguage
+import com.npos.app.data.AppThemeMode
+import com.npos.app.data.AppSettingsManager
 import com.npos.app.data.FirebaseConfigManager
 import com.npos.app.data.FirebaseService
+import com.npos.app.ui.theme.LocalStrings
 import com.npos.app.data.model.Customer
 import com.npos.app.data.model.DeviceViewMode
 import com.npos.app.data.model.Product
@@ -80,6 +89,7 @@ import com.npos.app.data.model.UserSession
 import com.npos.app.pos.BarcodeScannerManager
 import com.npos.app.pos.CustomerDisplayManager
 import com.npos.app.pos.ThermalPrinterManager
+import androidx.activity.compose.BackHandler
 import com.npos.app.ui.CustomerDisplayPreviewDialog
 import com.npos.app.ui.PrinterSettingsDialog
 import com.npos.app.ui.customers.CustomersScreen
@@ -89,6 +99,7 @@ import com.npos.app.ui.navigation.PosScreen
 import com.npos.app.ui.navigation.PosSidebarContent
 import com.npos.app.ui.sales.SalesScreen
 import com.npos.app.ui.settings.ViewModeDialog
+import com.npos.app.ui.vouchers.VouchersScreen
 import com.npos.app.ui.splash.SplashScreen
 import com.npos.app.ui.theme.NPOSTheme
 import kotlinx.coroutines.launch
@@ -128,9 +139,16 @@ class MainActivity : ComponentActivity() {
 
         val savedSession = getSavedUserSession()
         val savedViewMode = getSavedViewMode()
+        val settingsManager = AppSettingsManager(this)
 
         setContent {
-            NPOSTheme {
+            var currentThemeMode by remember { mutableStateOf(settingsManager.getThemeMode()) }
+            var currentLanguage by remember { mutableStateOf(settingsManager.getLanguage()) }
+
+            NPOSTheme(
+                themeMode = currentThemeMode,
+                language = currentLanguage
+            ) {
                 MainAppHost(
                     initialSession = savedSession,
                     initialViewMode = savedViewMode,
@@ -138,6 +156,16 @@ class MainActivity : ComponentActivity() {
                     printerManager = printerManager,
                     customerDisplayManager = customerDisplayManager,
                     barcodeScannerManager = barcodeScannerManager,
+                    currentThemeMode = currentThemeMode,
+                    onChangeThemeMode = { mode ->
+                        currentThemeMode = mode
+                        settingsManager.setThemeMode(mode)
+                    },
+                    currentLanguage = currentLanguage,
+                    onChangeLanguage = { lang ->
+                        currentLanguage = lang
+                        settingsManager.setLanguage(lang)
+                    },
                     onSaveSession = { session -> saveUserSession(session) },
                     onClearSession = { clearUserSession() },
                     onSaveViewMode = { mode -> saveViewMode(mode) }
@@ -203,12 +231,17 @@ fun MainAppHost(
     printerManager: ThermalPrinterManager,
     customerDisplayManager: CustomerDisplayManager,
     barcodeScannerManager: BarcodeScannerManager,
+    currentThemeMode: AppThemeMode = AppThemeMode.SYSTEM,
+    onChangeThemeMode: (AppThemeMode) -> Unit = {},
+    currentLanguage: AppLanguage = AppLanguage.MM,
+    onChangeLanguage: (AppLanguage) -> Unit = {},
     onSaveSession: (UserSession) -> Unit,
     onClearSession: () -> Unit,
     onSaveViewMode: (DeviceViewMode) -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val s = LocalStrings.current
     val configManager = remember { FirebaseConfigManager(context) }
     var firebaseConfig by remember { mutableStateOf(configManager.getConfig()) }
 
@@ -310,11 +343,30 @@ fun MainAppHost(
         }
     }
 
+    var recentVouchers by remember { mutableStateOf<List<SaleRecord>>(emptyList()) }
+    var isLoadingVouchers by remember { mutableStateOf(false) }
+
+    fun loadSalesVouchers(token: String) {
+        isLoadingVouchers = true
+        scope.launch {
+            val res = firebaseService.fetchSalesHistory(token)
+            isLoadingVouchers = false
+            res.onSuccess { list ->
+                val combined = (recentVouchers.filter { rv -> list.none { it.voucherNo == rv.voucherNo } } + list)
+                    .sortedByDescending { it.saleDate }
+                recentVouchers = combined
+            }.onFailure { err ->
+                Log.e("NPOS", "Failed to load vouchers: ${err.message}")
+            }
+        }
+    }
+
     // Load initial data if logged in
     LaunchedEffect(currentUser) {
         currentUser?.let {
             loadFirebaseData(it.idToken, displayLimit)
             loadUserSalesSummary(it.idToken, it)
+            loadSalesVouchers(it.idToken)
         }
     }
 
@@ -346,11 +398,25 @@ fun MainAppHost(
             isLoading = isLoggingIn,
             errorMessage = loginError,
             currentFirebaseConfig = firebaseConfig,
+            currentThemeMode = currentThemeMode,
+            onToggleTheme = {
+                val isDark = when (currentThemeMode) {
+                    AppThemeMode.DARK -> true
+                    AppThemeMode.LIGHT -> false
+                    AppThemeMode.SYSTEM -> false
+                }
+                onChangeThemeMode(if (isDark) AppThemeMode.LIGHT else AppThemeMode.DARK)
+            },
+            currentLanguage = currentLanguage,
+            onToggleLanguage = {
+                val nextLang = if (currentLanguage == AppLanguage.MM) AppLanguage.EN else AppLanguage.MM
+                onChangeLanguage(nextLang)
+            },
             onSaveFirebaseConfig = { newProj, newKey ->
                 val saved = configManager.saveConfig(newProj, newKey)
                 firebaseService.updateConfig(saved.projectId, saved.apiKey)
                 firebaseConfig = saved
-                Toast.makeText(context, if (saved.isConfigured) "Connected: ${saved.projectId}" else "Database settings saved", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, if (saved.isConfigured) "${s.connected}: ${saved.projectId}" else s.databaseSetting, Toast.LENGTH_SHORT).show()
             },
             onLoginSubmit = { email, password ->
                 isLoggingIn = true
@@ -361,10 +427,10 @@ fun MainAppHost(
                         isLoggingIn = false
                         currentUser = session
                         onSaveSession(session)
-                        Toast.makeText(context, "Welcome, ${session.displayName}!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "${s.success}: ${session.displayName}!", Toast.LENGTH_SHORT).show()
                     }.onFailure { err ->
                         isLoggingIn = false
-                        loginError = err.message ?: "Authentication failed"
+                        loginError = err.message ?: s.error
                     }
                 }
             }
@@ -384,6 +450,10 @@ fun MainAppHost(
                         isPrinterConnected = selectedPrinter != null,
                         printerName = printerManager.getPrinterDisplayName(),
                         currentViewMode = currentViewMode,
+                        currentThemeMode = currentThemeMode,
+                        onSelectThemeMode = { onChangeThemeMode(it) },
+                        currentLanguage = currentLanguage,
+                        onSelectLanguage = { onChangeLanguage(it) },
                         onSelectScreen = { screen ->
                             currentScreen = screen
                             scope.launch { drawerState.close() }
@@ -413,48 +483,93 @@ fun MainAppHost(
             Scaffold(
                 topBar = {
                     CenterAlignedTopAppBar(
-                            navigationIcon = {
-                                IconButton(
-                                    onClick = { scope.launch { drawerState.open() } },
-                                    modifier = Modifier.testTag("sidebar_menu_button")
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Menu,
-                                        contentDescription = "Menu Sidebar"
-                                    )
-                                }
-                            },
-                            title = {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Surface(
-                                        shape = RoundedCornerShape(8.dp),
-                                        color = MaterialTheme.colorScheme.primaryContainer,
-                                        modifier = Modifier.size(32.dp)
-                                    ) {
-                                        Box(contentAlignment = Alignment.Center) {
-                                            Image(
-                                                painter = painterResource(id = R.drawable.ic_pos_logo),
-                                                contentDescription = "Logo",
-                                                modifier = Modifier.size(24.dp)
-                                            )
-                                        }
-                                    }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = currentScreen.title,
-                                        fontWeight = FontWeight.Bold,
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
-                                }
-                            },
-                            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                                containerColor = MaterialTheme.colorScheme.surface,
-                                titleContentColor = MaterialTheme.colorScheme.onSurface
-                            ),
-                            actions = {
-                                // Clean TopAppBar - Actions accessible via Sidebar and Dashboard
+                        navigationIcon = {
+                            IconButton(
+                                onClick = { scope.launch { drawerState.open() } },
+                                modifier = Modifier.testTag("sidebar_menu_button")
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = s.mainMenu
+                                )
                             }
-                        )
+                        },
+                        title = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_pos_logo),
+                                            contentDescription = "Logo",
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = currentScreen.getLocalizedTitle(),
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                            }
+                        },
+                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            titleContentColor = MaterialTheme.colorScheme.onSurface
+                        ),
+                        actions = {
+                            // Quick Language Switcher Button (1-tap toggle)
+                            Surface(
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .clickable {
+                                        val nextLang = if (currentLanguage == AppLanguage.MM) AppLanguage.EN else AppLanguage.MM
+                                        onChangeLanguage(nextLang)
+                                    }
+                                    .testTag("top_bar_language_toggle")
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "${currentLanguage.flag} ${currentLanguage.shortName}",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(4.dp))
+
+                            // Quick Dark / Light Theme Toggle Button
+                            val isDark = when (currentThemeMode) {
+                                AppThemeMode.DARK -> true
+                                AppThemeMode.LIGHT -> false
+                                AppThemeMode.SYSTEM -> isSystemInDarkTheme()
+                            }
+                            IconButton(
+                                onClick = {
+                                    val nextMode = if (isDark) AppThemeMode.LIGHT else AppThemeMode.DARK
+                                    onChangeThemeMode(nextMode)
+                                },
+                                modifier = Modifier.testTag("top_bar_theme_toggle")
+                            ) {
+                                Icon(
+                                    imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                                    contentDescription = s.theme,
+                                    tint = if (isDark) Color(0xFFFFD54F) else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    )
                 }
             ) { innerPadding ->
                 Box(
@@ -504,6 +619,7 @@ fun MainAppHost(
                                         isSavingSale = false
                                         result.onSuccess { voucherId ->
                                             Toast.makeText(context, "Sale saved: $voucherId", Toast.LENGTH_SHORT).show()
+                                            recentVouchers = listOf(saleRecord) + recentVouchers.filter { it.voucherNo != saleRecord.voucherNo }
                                             userSalesSummary = userSalesSummary.copy(
                                                 todayAmount = userSalesSummary.todayAmount + saleRecord.netAmount,
                                                 thisMonthAmount = userSalesSummary.thisMonthAmount + saleRecord.netAmount,
@@ -534,13 +650,28 @@ fun MainAppHost(
                                 currentViewMode = currentViewMode,
                                 onRefreshSummary = { loadUserSalesSummary(user.idToken, user) },
                                 onGoToSales = { currentScreen = PosScreen.SALES },
+                                onGoToVouchers = { currentScreen = PosScreen.VOUCHERS },
                                 onOpenPrinterSettings = { showPrinterDialog = true },
                                 onOpenCustomerDisplay = { showCustomerDialog = true },
                                 onOpenViewModeSettings = { showViewModeDialog = true }
                             )
                         }
 
+                        PosScreen.VOUCHERS -> {
+                            BackHandler { currentScreen = PosScreen.SALES }
+                            VouchersScreen(
+                                vouchers = recentVouchers,
+                                isLoading = isLoadingVouchers,
+                                onRefresh = { loadSalesVouchers(user.idToken) },
+                                onPrintVoucher = { voucher ->
+                                    val receiptPayload = buildSaleReceiptJson(voucher)
+                                    executeSilentPrint(receiptPayload)
+                                }
+                            )
+                        }
+
                         PosScreen.CUSTOMERS -> {
+                            BackHandler { currentScreen = PosScreen.SALES }
                             CustomersScreen(
                                 customers = customers,
                                 isSaving = isSavingCustomer,

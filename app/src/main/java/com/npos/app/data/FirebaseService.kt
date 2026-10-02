@@ -782,4 +782,224 @@ class FirebaseService {
             Result.success(UserSalesSummary())
         }
     }
+
+    private fun parseFirestoreDate(doc: JSONObject, fields: JSONObject): String {
+        val saleDateObj = fields.optJSONObject("sale_date")
+        val createdAtObj = fields.optJSONObject("created_at")
+        val dateObj = fields.optJSONObject("date")
+
+        var rawDate = ""
+        val candidateObjects = listOfNotNull(saleDateObj, createdAtObj, dateObj)
+        for (obj in candidateObjects) {
+            if (obj.has("timestampValue")) {
+                val v = obj.optString("timestampValue", "").trim()
+                if (v.isNotEmpty()) { rawDate = v; break }
+            }
+            if (obj.has("stringValue")) {
+                val v = obj.optString("stringValue", "").trim()
+                if (v.isNotEmpty()) { rawDate = v; break }
+            }
+            if (obj.has("integerValue")) {
+                val millis = obj.optLong("integerValue", 0L)
+                if (millis > 0) {
+                    val epochMillis = if (millis < 100000000000L) millis * 1000 else millis
+                    val outFmt = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
+                    return outFmt.format(Date(epochMillis))
+                }
+            }
+        }
+
+        // Fallback to Firestore doc metadata createTime or updateTime
+        if (rawDate.isEmpty()) {
+            val createTime = doc.optString("createTime", "").trim()
+            if (createTime.isNotEmpty()) {
+                rawDate = createTime
+            } else {
+                val updateTime = doc.optString("updateTime", "").trim()
+                if (updateTime.isNotEmpty()) rawDate = updateTime
+            }
+        }
+
+        // Fallback to first item's created_at
+        if (rawDate.isEmpty()) {
+            val productsArr = fields.optJSONObject("products")?.optJSONObject("arrayValue")?.optJSONArray("values")
+                ?: fields.optJSONObject("saleItems")?.optJSONObject("arrayValue")?.optJSONArray("values")
+            if (productsArr != null && productsArr.length() > 0) {
+                val firstItem = productsArr.optJSONObject(0)?.optJSONObject("mapValue")?.optJSONObject("fields")
+                val itemCreatedAt = firstItem?.optJSONObject("created_at")?.optString("timestampValue", "")?.trim()
+                if (!itemCreatedAt.isNullOrEmpty()) rawDate = itemCreatedAt
+            }
+        }
+
+        if (rawDate.isEmpty()) {
+            return SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault()).format(Date())
+        }
+
+        return try {
+            if (rawDate.contains("T")) {
+                val clean = rawDate.substringBefore(".").substringBefore("Z")
+                val inFmt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).apply {
+                    timeZone = TimeZone.getTimeZone("UTC")
+                }
+                val outFmt = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
+                inFmt.parse(clean)?.let { outFmt.format(it) } ?: rawDate
+            } else if (rawDate.length >= 10 && rawDate.indexOf("-") == 4) {
+                val inFmt = if (rawDate.length >= 16) {
+                    SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US)
+                } else {
+                    SimpleDateFormat("yyyy-MM-dd", Locale.US)
+                }
+                val outFmt = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
+                inFmt.parse(rawDate.take(16))?.let { outFmt.format(it) } ?: rawDate
+            } else {
+                rawDate
+            }
+        } catch (_: Exception) {
+            rawDate
+        }
+    }
+
+    private fun parseSaleRecordDocument(doc: JSONObject): SaleRecord? {
+        val fields = doc.optJSONObject("fields") ?: return null
+        val voucherNo = fields.optJSONObject("voucher_no")?.optString("stringValue") ?: "---"
+        val formattedDate = parseFirestoreDate(doc, fields)
+
+        fun parseNum(key: String): Double {
+            val obj = fields.optJSONObject(key) ?: return 0.0
+            return obj.optLong("integerValue").toDouble().takeIf { it != 0.0 }
+                ?: obj.optDouble("doubleValue", 0.0).takeIf { it != 0.0 }
+                ?: obj.optString("stringValue").toDoubleOrNull()
+                ?: 0.0
+        }
+
+        val totalAmount = parseNum("total_amount")
+        val extraDiscount = parseNum("extra_discount")
+        val netAmount = parseNum("net_amount").takeIf { it > 0.0 } ?: (totalAmount - extraDiscount)
+        val paid = parseNum("paid")
+        val change = parseNum("change")
+        val credit = parseNum("credit")
+        val paymentType = fields.optJSONObject("payment_type")?.optString("stringValue") ?: "Cash"
+        val saleType = fields.optJSONObject("sale_type")?.optString("stringValue") ?: "retail"
+        val remark = fields.optJSONObject("remark")?.optString("stringValue") ?: ""
+
+        val custFields = fields.optJSONObject("customer")?.optJSONObject("mapValue")?.optJSONObject("fields")
+        val customer = if (custFields != null) {
+            Customer(
+                id = custFields.optJSONObject("id")?.optString("integerValue")
+                    ?: custFields.optJSONObject("id")?.optString("stringValue") ?: "123456789",
+                name = custFields.optJSONObject("name")?.optString("stringValue") ?: "General",
+                phone = custFields.optJSONObject("phone")?.optString("stringValue") ?: "",
+                code = custFields.optJSONObject("code")?.optString("integerValue")
+                    ?: custFields.optJSONObject("code")?.optString("stringValue") ?: "",
+                address = custFields.optJSONObject("address")?.optString("stringValue") ?: ""
+            )
+        } else {
+            Customer.DEFAULT
+        }
+
+        val userFields = fields.optJSONObject("user")?.optJSONObject("mapValue")?.optJSONObject("fields")
+        val userSession = UserSession(
+            uid = userFields?.optJSONObject("uid")?.optString("stringValue") ?: "",
+            email = "",
+            displayName = userFields?.optJSONObject("displayName")?.optString("stringValue") ?: "Cashier",
+            idToken = ""
+        )
+
+        val items = mutableListOf<CartItem>()
+        val prodArray = fields.optJSONObject("products")?.optJSONObject("arrayValue")?.optJSONArray("values")
+        if (prodArray != null) {
+            for (i in 0 until prodArray.length()) {
+                val itemObj = prodArray.getJSONObject(i).optJSONObject("mapValue")?.optJSONObject("fields") ?: continue
+                val itemName = itemObj.optJSONObject("item_name")?.optString("stringValue") ?: "Item"
+                val codeNo = itemObj.optJSONObject("code_no")?.optString("integerValue")
+                    ?: itemObj.optJSONObject("code_no")?.optString("stringValue") ?: ""
+                val qty = itemObj.optJSONObject("sale_qty")?.optString("integerValue")?.toIntOrNull()
+                    ?: itemObj.optJSONObject("sale_qty")?.optInt("integerValue", 1) ?: 1
+                val unitPrice = itemObj.optJSONObject("qty_sale_price")?.optString("integerValue")?.toDoubleOrNull()
+                    ?: itemObj.optJSONObject("qty_sale_price")?.optDouble("doubleValue", 0.0) ?: 0.0
+                val itemDiscount = itemObj.optJSONObject("discount")?.optString("integerValue")?.toDoubleOrNull()
+                    ?: itemObj.optJSONObject("discount")?.optDouble("doubleValue", 0.0) ?: 0.0
+                val finalAmount = itemObj.optJSONObject("final_amount")?.optString("integerValue")?.toDoubleOrNull()
+                    ?: itemObj.optJSONObject("final_amount")?.optDouble("doubleValue", (unitPrice * qty) - itemDiscount)
+                    ?: ((unitPrice * qty) - itemDiscount)
+                val unit = itemObj.optJSONObject("qty_sale_price_unit")?.optString("stringValue") ?: ""
+
+                val product = Product(
+                    id = itemObj.optJSONObject("id")?.optString("stringValue") ?: "",
+                    codeNo = codeNo,
+                    itemName = itemName,
+                    qty = qty,
+                    retailPrice = unitPrice,
+                    categoryName = "",
+                    barcode = "",
+                    unit = unit
+                )
+                items.add(
+                    CartItem(
+                        product = product,
+                        qty = qty,
+                        unitPrice = unitPrice,
+                        discount = itemDiscount,
+                        finalAmount = finalAmount
+                    )
+                )
+            }
+        }
+
+        return SaleRecord(
+            voucherNo = voucherNo,
+            saleDate = formattedDate,
+            totalAmount = totalAmount,
+            extraDiscount = extraDiscount,
+            netAmount = netAmount,
+            paid = paid,
+            change = change,
+            credit = credit,
+            paymentType = paymentType,
+            saleType = saleType,
+            remark = remark,
+            customer = customer,
+            user = userSession,
+            items = items
+        )
+    }
+
+    suspend fun fetchSalesHistory(idToken: String, limit: Int = 100): Result<List<SaleRecord>> = withContext(Dispatchers.IO) {
+        try {
+            val list = mutableListOf<SaleRecord>()
+            val url = "$firestoreBase/sales?pageSize=$limit"
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer $idToken")
+                .get()
+                .build()
+
+            val response = client.newCall(request).execute()
+            val body = response.body?.string().orEmpty()
+            if (response.isSuccessful) {
+                val root = JSONObject(body)
+                val docs = root.optJSONArray("documents")
+                if (docs != null) {
+                    for (i in 0 until docs.length()) {
+                        val doc = docs.getJSONObject(i)
+                        parseSaleRecordDocument(doc)?.let { list.add(it) }
+                    }
+                }
+            } else {
+                Log.w(TAG, "fetchSalesHistory unsuccessful: ${response.code} $body")
+            }
+            val parseSdf = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
+            list.sortByDescending {
+                try {
+                    parseSdf.parse(it.saleDate)?.time ?: 0L
+                } catch (_: Exception) {
+                    0L
+                }
+            }
+            Result.success(list)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching sales history", e)
+            Result.failure(e)
+        }
+    }
 }

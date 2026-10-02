@@ -1,8 +1,10 @@
 package com.npos.app.ui.login
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +23,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Storage
@@ -60,60 +64,127 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.npos.app.R
+import com.npos.app.data.AppLanguage
+import com.npos.app.data.AppThemeMode
 import com.npos.app.data.FirebaseConfig
+import com.npos.app.ui.theme.LocalStrings
 
 @Composable
 fun LoginScreen(
     isLoading: Boolean,
     errorMessage: String?,
     currentFirebaseConfig: FirebaseConfig,
+    currentThemeMode: AppThemeMode,
+    onToggleTheme: () -> Unit,
+    currentLanguage: AppLanguage,
+    onToggleLanguage: () -> Unit,
     onSaveFirebaseConfig: (String, String) -> Unit,
     onLoginSubmit: (String, String) -> Unit
 ) {
-    // Autofill removed - clean and empty fields
+    val s = LocalStrings.current
+
+    // Empty fields - no autofill
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    // Dialog state for editing - only accessible from top button
+    // Dialog state for editing - accessible ONLY from top button
     var showDbDialog by remember { mutableStateOf(false) }
+
+    val isDark = when (currentThemeMode) {
+        AppThemeMode.DARK -> true
+        AppThemeMode.LIGHT -> false
+        AppThemeMode.SYSTEM -> isSystemInDarkTheme()
+    }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF4F6F9))
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        // TOP BAR: The ONLY place to edit database configuration
+        // TOP BAR: Only Language Toggle (MM/EN) + Dark/Light Theme Toggle + Database Setting
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 14.dp),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Language Switcher (MM / EN)
             Surface(
                 shape = RoundedCornerShape(20.dp),
-                color = Color.White,
-                shadowElevation = 2.dp,
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
+                shadowElevation = 1.dp,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp))
+                    .clickable { onToggleLanguage() }
+                    .testTag("login_language_toggle")
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "${currentLanguage.flag} ${currentLanguage.shortName}",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // Theme Toggle (Light / Dark)
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
+                shadowElevation = 1.dp,
+                modifier = Modifier
+                    .size(34.dp)
+                    .clip(CircleShape)
+                    .clickable { onToggleTheme() }
+                    .testTag("login_theme_toggle")
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                        contentDescription = "Toggle Theme",
+                        tint = if (isDark) Color(0xFFFFD54F) else Color(0xFF5C6BC0),
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // Database Setting
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
+                shadowElevation = 1.dp,
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
                     .clickable { showDbDialog = true }
                     .testTag("top_database_settings_button")
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
                         contentDescription = "Database Settings",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(15.dp)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Database Setting",
-                        fontSize = 12.sp,
+                        text = s.databaseSetting,
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -129,8 +200,8 @@ fun LoginScreen(
                 .padding(16.dp)
                 .testTag("login_card"),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -155,16 +226,16 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "N-POS",
+                    text = s.appName,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.primary
                 )
 
                 Text(
-                    text = "Cloud Point of Sale",
+                    text = s.appTagline,
                     fontSize = 14.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -176,11 +247,11 @@ fun LoginScreen(
                             .fillMaxWidth()
                             .padding(bottom = 16.dp),
                         shape = RoundedCornerShape(8.dp),
-                        color = Color(0xFFF8D7DA)
+                        color = if (isDark) Color(0xFF491217) else Color(0xFFF8D7DA)
                     ) {
                         Text(
                             text = errorMessage,
-                            color = Color(0xFF842029),
+                            color = if (isDark) Color(0xFFFF8A80) else Color(0xFF842029),
                             fontSize = 13.sp,
                             modifier = Modifier.padding(12.dp),
                             textAlign = TextAlign.Center
@@ -192,8 +263,8 @@ fun LoginScreen(
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Email Address") },
-                    placeholder = { Text("Enter your email") },
+                    label = { Text(s.emailLabel) },
+                    placeholder = { Text(s.emailPlaceholder) },
                     leadingIcon = {
                         Icon(Icons.Default.Email, contentDescription = "Email", tint = MaterialTheme.colorScheme.primary)
                     },
@@ -214,8 +285,8 @@ fun LoginScreen(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Password") },
-                    placeholder = { Text("Enter your password") },
+                    label = { Text(s.passwordLabel) },
+                    placeholder = { Text(s.passwordPlaceholder) },
                     leadingIcon = {
                         Icon(Icons.Default.Lock, contentDescription = "Password", tint = MaterialTheme.colorScheme.primary)
                     },
@@ -262,12 +333,12 @@ fun LoginScreen(
                     if (isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             strokeWidth = 2.dp
                         )
                     } else {
                         Text(
-                            text = "Login to N-POS",
+                            text = s.loginButton,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -276,14 +347,25 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(18.dp))
 
-                // FORM အောက်: Connected ဖြစ်/မဖြစ်ပဲ ပြပေးခြင်း (No editing here - purely status display)
+                // Connection status indicator (status only, non-editable)
                 val isConnected = currentFirebaseConfig.isConfigured
+                val statusBg = if (isConnected) {
+                    if (isDark) Color(0xFF1B3820) else Color(0xFFE8F5E9)
+                } else {
+                    if (isDark) Color(0xFF262A30) else Color(0xFFF1F3F5)
+                }
+                val statusText = if (isConnected) {
+                    if (isDark) Color(0xFF81C784) else Color(0xFF1B5E20)
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+
                 Surface(
                     shape = RoundedCornerShape(10.dp),
-                    color = if (isConnected) Color(0xFFE8F5E9) else Color(0xFFF1F3F5),
-                    border = androidx.compose.foundation.BorderStroke(
+                    color = statusBg,
+                    border = BorderStroke(
                         1.dp,
-                        if (isConnected) Color(0xFFC8E6C9) else Color(0xFFDEE2E6)
+                        if (isConnected) Color(0xFF4CAF50).copy(alpha = 0.5f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
                     ),
                     modifier = Modifier.testTag("connection_status_badge")
                 ) {
@@ -291,7 +373,6 @@ fun LoginScreen(
                         modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Status Indicator Dot / Icon
                         Box(
                             modifier = Modifier
                                 .size(10.dp)
@@ -303,20 +384,20 @@ fun LoginScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Icon(
                             imageVector = if (isConnected) Icons.Default.CloudDone else Icons.Default.CloudOff,
-                            contentDescription = if (isConnected) "Connected" else "Not Connected",
-                            tint = if (isConnected) Color(0xFF2E7D32) else Color(0xFF868E96),
+                            contentDescription = if (isConnected) s.connected else s.notConnected,
+                            tint = if (isConnected) Color(0xFF4CAF50) else Color(0xFF868E96),
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = if (isConnected) {
-                                "Connected: ${currentFirebaseConfig.projectId}"
+                                "${s.connected}: ${currentFirebaseConfig.projectId}"
                             } else {
-                                "Database: Not Connected"
+                                "${s.databaseSetting}: ${s.notConnected}"
                             },
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = if (isConnected) Color(0xFF1B5E20) else Color(0xFF495057)
+                            color = statusText
                         )
                     }
                 }
@@ -325,8 +406,6 @@ fun LoginScreen(
     }
 
     // FIREBASE DATABASE SETTINGS DIALOG (Accessed ONLY from top bar)
-    // No default hardcoding - starts with current value or empty
-    // databaseId input removed entirely as requested
     if (showDbDialog) {
         var editProjectId by remember { mutableStateOf(currentFirebaseConfig.projectId) }
         var editApiKey by remember { mutableStateOf(currentFirebaseConfig.apiKey) }
@@ -343,7 +422,7 @@ fun LoginScreen(
             },
             title = {
                 Text(
-                    text = "Firebase Database Setting",
+                    text = s.databaseSettingTitle,
                     fontWeight = FontWeight.Bold,
                     fontSize = 17.sp,
                     textAlign = TextAlign.Center
@@ -354,17 +433,11 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text(
-                        text = "ဤဖုန်းအတွက် အသုံးပြုမည့် Firebase Project ID နှင့် Web API Key ကို သတ်မှတ်ပေးပါ။",
-                        fontSize = 12.sp,
-                        color = Color.DarkGray
-                    )
-
                     OutlinedTextField(
                         value = editProjectId,
                         onValueChange = { editProjectId = it },
-                        label = { Text("Firebase Project ID") },
-                        placeholder = { Text("Project ID ရိုက်ထည့်ပါ") },
+                        label = { Text(s.projectIdLabel) },
+                        placeholder = { Text(s.projectIdPlaceholder) },
                         singleLine = true,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -375,8 +448,8 @@ fun LoginScreen(
                     OutlinedTextField(
                         value = editApiKey,
                         onValueChange = { editApiKey = it },
-                        label = { Text("Web API Key") },
-                        placeholder = { Text("API Key ရိုက်ထည့်ပါ") },
+                        label = { Text(s.apiKeyLabel) },
+                        placeholder = { Text(s.apiKeyPlaceholder) },
                         singleLine = true,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -394,12 +467,12 @@ fun LoginScreen(
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.testTag("dialog_save_db_button")
                 ) {
-                    Text("Save & Connect (သိမ်းမည်)", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    Text(s.saveAndConnect, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDbDialog = false }) {
-                    Text("Cancel", fontSize = 12.sp)
+                    Text(s.cancel, fontSize = 12.sp)
                 }
             }
         )

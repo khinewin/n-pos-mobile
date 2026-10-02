@@ -31,7 +31,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.npos.app.data.model.DeviceViewMode
+import com.npos.app.ui.theme.LocalStrings
 
 @Composable
 fun ViewModeDialog(
@@ -46,6 +46,8 @@ fun ViewModeDialog(
     onSelectMode: (DeviceViewMode) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val s = LocalStrings.current
+
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
@@ -76,7 +78,7 @@ fun ViewModeDialog(
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     imageVector = Icons.Default.Devices,
-                                    contentDescription = "Device View",
+                                    contentDescription = s.deviceViewMode,
                                     tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(20.dp)
                                 )
@@ -85,20 +87,21 @@ fun ViewModeDialog(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = "Device View Setting",
+                                text = s.deviceViewMode,
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "မျက်နှာပြင် မုဒ် ရွေးချယ်ရန်",
+                                text = "Screen Layout Setting",
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
 
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Close")
+                        Icon(Icons.Default.Close, contentDescription = s.close)
                     }
                 }
 
@@ -146,7 +149,7 @@ fun ViewModeDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Close (ပိတ်မည်)", fontWeight = FontWeight.Bold)
+                        Text(s.close, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -171,11 +174,11 @@ private fun ViewModeOptionCard(
             .testTag("view_mode_option_${mode.name.lowercase()}"),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f) else Color.White
+            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f) else MaterialTheme.colorScheme.surface
         ),
         border = BorderStroke(
             width = if (isSelected) 2.dp else 1.dp,
-            color = if (isSelected) MaterialTheme.colorScheme.primary else Color(0xFFE2E8F0)
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
         )
     ) {
         Row(
@@ -186,14 +189,14 @@ private fun ViewModeOptionCard(
         ) {
             Surface(
                 shape = CircleShape,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else Color(0xFFF1F5F9),
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
                 modifier = Modifier.size(42.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = icon,
                         contentDescription = title,
-                        tint = if (isSelected) Color.White else Color(0xFF475569),
+                        tint = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(22.dp)
                     )
                 }
@@ -206,19 +209,19 @@ private fun ViewModeOptionCard(
                     text = title,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.DarkGray
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = subtitleBurmese,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 12.sp,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Black
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = description,
                     fontSize = 11.sp,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 15.sp
                 )
             }

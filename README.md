@@ -59,19 +59,28 @@ A modern, high-performance **Native Android Cloud POS** application designed for
 - **Single-Screen Preview Dialog**:
   - Interactive in-app customer display preview modal for cashiers using single-screen devices or tablets.
 
-### 6. 🔍 Hardware & Live Barcode Scanner Support
+### 6. 🌓 Dark Theme & Light Theme + 🌐 Dual Language (MM & EN) Support
+- **Light & Dark Mode**:
+  - Instant 1-tap switching between Light Mode, Dark Mode, and System Default.
+  - High-contrast, polished Material 3 dark palette optimized for nighttime mart/store operations.
+  - Theme mode choice is remembered per device across app restarts.
+- **Bilingual Interface (Myanmar 🇲🇲 & English 🇬🇧)**:
+  - Complete, natural localization across all screens (Sales, Cart, Checkout, Cashier Dashboard, Customers Directory, and POS Hardware Setup).
+  - Quick language switcher accessible from the Top Bar, Login screen, and Navigation Sidebar.
+
+### 7. 🔍 Hardware & Live Barcode Scanner Support
 - **USB & Bluetooth HID Scanner Support**:
   - Intercepts keystroke events from handheld and tabletop hardware barcode scanners with automatic ENTER key detection for rapid scanning.
 - **Live Scanner Status Indicator**:
   - Real-time visual status indicator showing scanner readiness.
 
-### 7. 👥 Customer Relationship Management (CRM)
+### 8. 👥 Customer Relationship Management (CRM)
 - **Customer Selection at Checkout**:
   - Assign sales to existing customers or default Walk-in Customer.
 - **Customer Directory**:
   - View, search, create, and edit customer details (Name, Phone, Code, Address) with direct Firestore synchronization.
 
-### 8. 📊 Cashier Sales Dashboard & Summary
+### 9. 📊 Cashier Sales Dashboard & Summary
 - **Shift & Daily Metrics**:
   - Real-time tracking of today's total revenue and transaction count.
   - Monthly sales volume and cashier performance summary.
