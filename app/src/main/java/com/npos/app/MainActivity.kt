@@ -30,6 +30,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PhoneAndroid
@@ -37,7 +39,10 @@ import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.TabletAndroid
 import androidx.compose.material.icons.filled.Tv
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -71,6 +76,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.ui.draw.clip
@@ -80,6 +86,9 @@ import com.npos.app.data.AppThemeMode
 import com.npos.app.data.AppSettingsManager
 import com.npos.app.data.FirebaseConfigManager
 import com.npos.app.data.FirebaseService
+import com.npos.app.data.offline.NetworkMonitor
+import com.npos.app.data.offline.PosLocalDatabaseHelper
+import com.npos.app.data.offline.OfflineSyncManager
 import com.npos.app.ui.theme.LocalStrings
 import com.npos.app.data.model.Customer
 import com.npos.app.data.model.DeviceViewMode
@@ -269,6 +278,20 @@ fun MainAppHost(
     var userSalesSummary by remember { mutableStateOf(UserSalesSummary()) }
     var isLoadingSummary by remember { mutableStateOf(false) }
 
+    val networkMonitor = remember { NetworkMonitor(context) }
+    val dbHelper = remember { PosLocalDatabaseHelper(context) }
+    val offlineSyncManager = remember { OfflineSyncManager(context, dbHelper, networkMonitor) }
+    val isOnline by networkMonitor.isOnline.collectAsState()
+    val pendingSalesCount by offlineSyncManager.pendingSalesCount.collectAsState()
+    val isSyncing by offlineSyncManager.isSyncing.collectAsState()
+
+    DisposableEffect(Unit) {
+        onDispose {
+            networkMonitor.release()
+            dbHelper.close()
+        }
+    }
+
     var showPrinterDialog by remember { mutableStateOf(false) }
     var showCustomerDialog by remember { mutableStateOf(false) }
     var showViewModeDialog by remember { mutableStateOf(false) }
@@ -324,25 +347,6 @@ fun MainAppHost(
         }
     }
 
-    LaunchedEffect(Unit) {
-        checkAndRequestBluetooth()
-        // Initialize FirebaseService auth state with saved session
-        firebaseService.setSession(initialSession)
-        // Automatically verify or seamlessly relogin the current user on launch
-        if (initialSession != null) {
-            val reloginResult = firebaseService.verifyOrRelogin(initialSession)
-            reloginResult.onSuccess { activeSession ->
-                if (activeSession != null) {
-                    currentUser = activeSession
-                    onSaveSession(activeSession)
-                    Log.d("NPOS", "Auto relogin on startup succeeded for ${activeSession.displayName}")
-                }
-            }.onFailure { err ->
-                Log.w("NPOS", "Auto relogin on startup failed: ${err.message}")
-            }
-        }
-    }
-
     fun loadFirebaseData(token: String, limit: Int = displayLimit) {
         isLoadingData = true
         // Cancel prior snapshot listener before starting a new one
@@ -350,26 +354,34 @@ fun MainAppHost(
         productsUnsubscribe = null
 
         scope.launch {
-            // 1. Fetch total products count with aggregation
-            firebaseService.fetchTotalProductsCount(token).onSuccess {
-                totalProductsCount = it
-            }
+            if (networkMonitor.isOnline.value) {
+                // 1. Fetch total products count with aggregation
+                firebaseService.fetchTotalProductsCount(token).onSuccess {
+                    totalProductsCount = it
+                }
 
-            // 2. Fetch categories from Firestore 'category' collection
-            firebaseService.fetchCategories(token).onSuccess {
-                categories = listOf("All") + it
-            }
+                // 2. Fetch categories from Firestore 'category' collection
+                firebaseService.fetchCategories(token).onSuccess {
+                    val catList = listOf("All") + it
+                    categories = catList
+                    offlineSyncManager.cacheCategories(catList)
+                }
 
-            // 3. Initial load of products ordered by created_at DESC
-            val prodResult = firebaseService.fetchProducts(token, limit)
-            prodResult.onSuccess {
-                products = it
-                Log.d("NPOS", "Loaded ${it.size} products from Firebase Firestore (orderBy created_at DESC)")
-            }.onFailure { err ->
-                Log.e("NPOS", "Failed to load products: ${err.message}")
-                if (err.message?.contains("401") == true || err.message?.contains("UNAUTHENTICATED") == true) {
-                    // Token expired - trigger relogin current user via onAuthStateChange
-                    scope.launch {
+                // 3. Initial load of products ordered by created_at DESC
+                val prodResult = firebaseService.fetchProducts(token, limit)
+                prodResult.onSuccess {
+                    products = it
+                    offlineSyncManager.cacheProducts(it)
+                    Log.d("NPOS", "Loaded ${it.size} products from Firebase Firestore & cached locally")
+                }.onFailure { err ->
+                    Log.e("NPOS", "Failed to load products from cloud: ${err.message}. Loading from local SQLite cache...")
+                    val cachedProds = offlineSyncManager.getCachedProducts()
+                    if (cachedProds.isNotEmpty()) {
+                        products = cachedProds
+                        totalProductsCount = cachedProds.size
+                    }
+                    if (err.message?.contains("401") == true || err.message?.contains("UNAUTHENTICATED") == true) {
+                        // Token expired - trigger relogin current user via onAuthStateChange
                         currentUser?.let { user ->
                             val relogRes = firebaseService.reloginCurrentUser(user)
                             relogRes.onSuccess { refreshedSession ->
@@ -380,28 +392,102 @@ fun MainAppHost(
                         }
                     }
                 }
-            }
 
-            // 4. Register real-time snapshot listener with unsub handle (orderBy created_at DESC)
-            productsUnsubscribe = firebaseService.onProductsSnapshot(
-                idToken = token,
-                limit = limit,
-                intervalMs = 10000L,
-                onSnapshot = { liveProducts ->
-                    products = liveProducts
-                    Log.d("NPOS", "onProductsSnapshot received update: ${liveProducts.size} items (orderBy created_at DESC)")
-                },
-                onError = { err ->
-                    Log.w("NPOS", "onProductsSnapshot warning: ${err.message}")
+                // 4. Register real-time snapshot listener with unsub handle (orderBy created_at DESC)
+                productsUnsubscribe = firebaseService.onProductsSnapshot(
+                    idToken = token,
+                    limit = limit,
+                    intervalMs = 10000L,
+                    onSnapshot = { liveProducts ->
+                        products = liveProducts
+                        scope.launch { offlineSyncManager.cacheProducts(liveProducts) }
+                    },
+                    onError = { err ->
+                        Log.w("NPOS", "onProductsSnapshot warning: ${err.message}")
+                    }
+                )
+
+                val custResult = firebaseService.fetchCustomers(token)
+                custResult.onSuccess {
+                    customers = it
+                    offlineSyncManager.cacheCustomers(it)
                 }
-            )
-
-            val custResult = firebaseService.fetchCustomers(token)
-            custResult.onSuccess {
-                customers = it
+            } else {
+                // OFFLINE MODE: Load directly from SQLite cache!
+                val cachedProds = offlineSyncManager.getCachedProducts()
+                val cachedCats = offlineSyncManager.getCachedCategories()
+                val cachedCusts = offlineSyncManager.getCachedCustomers()
+                if (cachedProds.isNotEmpty()) {
+                    products = cachedProds
+                    totalProductsCount = cachedProds.size
+                }
+                if (cachedCats.isNotEmpty()) {
+                    categories = cachedCats
+                }
+                if (cachedCusts.isNotEmpty()) {
+                    customers = cachedCusts
+                }
             }
 
             isLoadingData = false
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        checkAndRequestBluetooth()
+        // Initialize FirebaseService auth state with saved session
+        firebaseService.setSession(initialSession)
+        // Automatically verify or seamlessly relogin the current user on launch
+        if (initialSession != null) {
+            if (networkMonitor.isOnline.value) {
+                val reloginResult = firebaseService.verifyOrRelogin(initialSession)
+                reloginResult.onSuccess { activeSession ->
+                    if (activeSession != null) {
+                        currentUser = activeSession
+                        onSaveSession(activeSession)
+                        Log.d("NPOS", "Auto relogin on startup succeeded for ${activeSession.displayName}")
+                    }
+                }.onFailure { err ->
+                    Log.w("NPOS", "Auto relogin on startup failed: ${err.message}. Using offline session.")
+                    currentUser = initialSession
+                }
+            } else {
+                currentUser = initialSession
+                Log.d("NPOS", "Offline startup: using cached session for ${initialSession.displayName}")
+            }
+        }
+    }
+
+    // React to network connectivity changes (Automatic sync when back online)
+    LaunchedEffect(isOnline) {
+        if (isOnline) {
+            currentUser?.let { user ->
+                scope.launch {
+                    val syncRes = offlineSyncManager.syncPendingSales(firebaseService, user.idToken)
+                    syncRes.onSuccess { count ->
+                        if (count > 0) {
+                            Toast.makeText(context, "✅ Offline အရောင်းဘောက်ချာ ($count) စောင်ကို Cloud ပေါ်သို့ Sync လုပ်ပြီးပါပြီ!", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    loadFirebaseData(user.idToken)
+                }
+            }
+        } else {
+            scope.launch {
+                val cachedProds = offlineSyncManager.getCachedProducts()
+                val cachedCats = offlineSyncManager.getCachedCategories()
+                val cachedCusts = offlineSyncManager.getCachedCustomers()
+                if (products.isEmpty() && cachedProds.isNotEmpty()) {
+                    products = cachedProds
+                    totalProductsCount = cachedProds.size
+                }
+                if (categories.size <= 1 && cachedCats.isNotEmpty()) {
+                    categories = cachedCats
+                }
+                if (customers.isEmpty() && cachedCusts.isNotEmpty()) {
+                    customers = cachedCusts
+                }
+            }
         }
     }
 
@@ -511,6 +597,8 @@ fun MainAppHost(
     } else {
         // Authenticated: Wrap with Sidebar Drawer and Top App Bar
         val user = currentUser!!
+        val isScannerConnected by barcodeScannerManager.isScannerConnected.collectAsState()
+        val scannerDeviceName by barcodeScannerManager.connectedDeviceName.collectAsState()
 
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -558,6 +646,23 @@ fun MainAppHost(
                                 }
                             }
                         },
+                        isOnline = isOnline,
+                        pendingSalesCount = pendingSalesCount,
+                        onManualSync = {
+                            scope.launch {
+                                val syncRes = offlineSyncManager.syncPendingSales(firebaseService, user.idToken)
+                                syncRes.onSuccess { count ->
+                                    if (count > 0) {
+                                        Toast.makeText(context, "✅ Offline အရောင်း ($count) စောင် Cloud သို့ Sync လုပ်ပြီးပါပြီ!", Toast.LENGTH_LONG).show()
+                                    } else {
+                                        Toast.makeText(context, "ဒေတာများ Cloud နှင့် ချိတ်ဆက်ပြီးဖြစ်ပါသည် (All Synced)", Toast.LENGTH_SHORT).show()
+                                    }
+                                }.onFailure { err ->
+                                    Toast.makeText(context, "Sync မအောင်မြင်ပါ (${err.message})", Toast.LENGTH_LONG).show()
+                                }
+                                loadFirebaseData(user.idToken)
+                            }
+                        },
                         onLogout = {
                             productsUnsubscribe?.invoke()
                             productsUnsubscribe = null
@@ -573,7 +678,7 @@ fun MainAppHost(
         ) {
             Scaffold(
                 topBar = {
-                    CenterAlignedTopAppBar(
+                    TopAppBar(
                         navigationIcon = {
                             IconButton(
                                 onClick = { scope.launch { drawerState.open() } },
@@ -608,56 +713,64 @@ fun MainAppHost(
                                 )
                             }
                         },
-                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        colors = TopAppBarDefaults.topAppBarColors(
                             containerColor = MaterialTheme.colorScheme.surface,
                             titleContentColor = MaterialTheme.colorScheme.onSurface
                         ),
                         actions = {
-                            // Quick Language Switcher Button (1-tap toggle)
+                            // Online / Offline Mode Indicator (Icon only)
                             Surface(
-                                shape = RoundedCornerShape(16.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                shape = CircleShape,
+                                color = if (isOnline) Color(0xFFE8F5E9) else Color(0xFFFFF3E0),
+                                border = BorderStroke(1.dp, if (isOnline) Color(0xFF4CAF50).copy(alpha = 0.5f) else Color(0xFFFF9800).copy(alpha = 0.5f)),
                                 modifier = Modifier
-                                    .clip(RoundedCornerShape(16.dp))
+                                    .size(36.dp)
+                                    .clip(CircleShape)
                                     .clickable {
-                                        val nextLang = if (currentLanguage == AppLanguage.MM) AppLanguage.EN else AppLanguage.MM
-                                        onChangeLanguage(nextLang)
+                                        if (isOnline) {
+                                            scope.launch {
+                                                val res = offlineSyncManager.syncPendingSales(firebaseService, user.idToken)
+                                                res.onSuccess { count ->
+                                                    val msg = if (count > 0) "Offline ဘောက်ချာ ($count) စောင် Cloud သို့ Sync လုပ်ပြီးပါပြီ" else "Online Mode: ဒေတာအားလုံး Cloud ပေါ်တွင် သိမ်းဆည်းပြီးဖြစ်ပါသည်"
+                                                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                                                }.onFailure { err ->
+                                                    Toast.makeText(context, "Sync error: ${err.message}", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                        } else {
+                                            Toast.makeText(context, "⚠️ Offline Mode: အင်တာနက်မရှိသော်လည်း ပုံမှန်အတိုင်း ဆက်လက်ရောင်းချနိုင်ပါသည် (လိုင်းရပါက Auto-Sync လုပ်မည်)", Toast.LENGTH_LONG).show()
+                                        }
                                     }
-                                    .testTag("top_bar_language_toggle")
+                                    .testTag("network_mode_badge")
                             ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "${currentLanguage.flag} ${currentLanguage.shortName}",
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                Box(contentAlignment = Alignment.Center) {
+                                    if (pendingSalesCount > 0) {
+                                        BadgedBox(
+                                            badge = {
+                                                Badge(
+                                                    containerColor = Color(0xFFE65100),
+                                                    contentColor = Color.White
+                                                ) {
+                                                    Text(text = "$pendingSalesCount", fontSize = 9.sp)
+                                                }
+                                            }
+                                        ) {
+                                            Icon(
+                                                imageVector = if (isOnline) Icons.Default.CloudDone else Icons.Default.CloudOff,
+                                                contentDescription = if (isOnline) "Online" else "Offline",
+                                                tint = if (isOnline) Color(0xFF2E7D32) else Color(0xFFE65100),
+                                                modifier = Modifier.size(19.dp)
+                                            )
+                                        }
+                                    } else {
+                                        Icon(
+                                            imageVector = if (isOnline) Icons.Default.CloudDone else Icons.Default.CloudOff,
+                                            contentDescription = if (isOnline) "Online" else "Offline",
+                                            tint = if (isOnline) Color(0xFF2E7D32) else Color(0xFFE65100),
+                                            modifier = Modifier.size(19.dp)
+                                        )
+                                    }
                                 }
-                            }
-
-                            Spacer(modifier = Modifier.width(4.dp))
-
-                            // Quick Dark / Light Theme Toggle Button
-                            val isDark = when (currentThemeMode) {
-                                AppThemeMode.DARK -> true
-                                AppThemeMode.LIGHT -> false
-                                AppThemeMode.SYSTEM -> isSystemInDarkTheme()
-                            }
-                            IconButton(
-                                onClick = {
-                                    val nextMode = if (isDark) AppThemeMode.LIGHT else AppThemeMode.DARK
-                                    onChangeThemeMode(nextMode)
-                                },
-                                modifier = Modifier.testTag("top_bar_theme_toggle")
-                            ) {
-                                Icon(
-                                    imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
-                                    contentDescription = s.theme,
-                                    tint = if (isDark) Color(0xFFFFD54F) else MaterialTheme.colorScheme.onSurfaceVariant
-                                )
                             }
                         }
                     )
@@ -685,6 +798,9 @@ fun MainAppHost(
                                 isSavingSale = isSavingSale,
                                 autoPrintDefault = true,
                                 autoScannedBarcodeFlow = barcodeScannerManager.scannedCodeFlow,
+                                isScannerConnected = isScannerConnected,
+                                scannerDeviceName = scannerDeviceName,
+                                onRefreshScannerCheck = { barcodeScannerManager.updateScannerConnectionStatus() },
                                 onSearchCloud = { query, category, limit ->
                                     isLoadingData = true
                                     scope.launch {
@@ -703,13 +819,21 @@ fun MainAppHost(
                                 onSilentPrintDirect = { jsonReceipt ->
                                     executeSilentPrint(jsonReceipt)
                                 },
-                                onCheckout = { saleRecord, autoPrint ->
+                                 onCheckout = { saleRecord, autoPrint ->
                                     isSavingSale = true
                                     scope.launch {
-                                        val result = firebaseService.saveSaleRecord(user.idToken, saleRecord)
+                                        val (result, savedOffline) = offlineSyncManager.processSale(
+                                            firebaseService = firebaseService,
+                                            idToken = user.idToken,
+                                            sale = saleRecord
+                                        )
                                         isSavingSale = false
                                         result.onSuccess { voucherId ->
-                                            Toast.makeText(context, "Sale saved: $voucherId", Toast.LENGTH_SHORT).show()
+                                            if (savedOffline) {
+                                                Toast.makeText(context, "⚠️ Offline Mode: ဘောက်ချာ $voucherId ကို စက်ထဲတွင် သိမ်းဆည်းထားပါသည် (လိုင်းရပါက Auto-Sync လုပ်မည်)", Toast.LENGTH_LONG).show()
+                                            } else {
+                                                Toast.makeText(context, "✅ Sale saved: $voucherId (Cloud Synced)", Toast.LENGTH_SHORT).show()
+                                            }
 
                                             // Deduct sold quantities from in-memory products list so POS UI updates stock immediately
                                             val soldMap = mutableMapOf<String, Int>()

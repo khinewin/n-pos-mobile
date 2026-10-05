@@ -22,6 +22,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.LightMode
@@ -95,6 +97,9 @@ fun PosSidebarContent(
     onOpenCustomerDisplay: () -> Unit,
     onOpenViewModeSettings: () -> Unit = {},
     onReloginCurrentUser: () -> Unit = {},
+    isOnline: Boolean = true,
+    pendingSalesCount: Int = 0,
+    onManualSync: () -> Unit = {},
     onLogout: () -> Unit
 ) {
     val s = LocalStrings.current
@@ -153,18 +158,43 @@ fun PosSidebarContent(
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(if (isOnline) Color(0xFFE8F5E9) else Color(0xFFFFF3E0))
+                            .clickable { onManualSync() }
+                            .padding(horizontal = 6.dp, vertical = 3.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (isOnline) Icons.Default.CloudDone else Icons.Default.CloudOff,
+                            contentDescription = if (isOnline) "Online" else "Offline",
+                            tint = if (isOnline) Color(0xFF2E7D32) else Color(0xFFE65100),
+                            modifier = Modifier.size(14.dp)
+                        )
+                        if (pendingSalesCount > 0) {
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Text(
+                                text = "$pendingSalesCount",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isOnline) Color(0xFF2E7D32) else Color(0xFFE65100)
+                            )
+                        }
+                    }
                 }
 
                 IconButton(
-                    onClick = onReloginCurrentUser,
+                    onClick = onManualSync,
                     modifier = Modifier
                         .size(34.dp)
                         .testTag("relogin_current_user_button")
                 ) {
                     Icon(
                         imageVector = Icons.Default.Sync,
-                        contentDescription = s.reloginSession,
-                        tint = MaterialTheme.colorScheme.primary,
+                        contentDescription = "Sync",
+                        tint = if (pendingSalesCount > 0) Color(0xFFE65100) else MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(18.dp)
                     )
                 }

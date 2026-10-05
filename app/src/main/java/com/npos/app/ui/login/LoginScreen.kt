@@ -160,33 +160,24 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Database Setting
+            // Database Setting (Icon only)
             Surface(
-                shape = RoundedCornerShape(20.dp),
+                shape = CircleShape,
                 color = MaterialTheme.colorScheme.surface,
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
                 shadowElevation = 1.dp,
                 modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
+                    .size(36.dp)
+                    .clip(CircleShape)
                     .clickable { showDbDialog = true }
                     .testTag("top_database_settings_button")
             ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.Settings,
                         contentDescription = "Database Settings",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(15.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = s.databaseSetting,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }

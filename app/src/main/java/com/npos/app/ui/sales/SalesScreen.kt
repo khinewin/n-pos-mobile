@@ -26,6 +26,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -127,7 +128,10 @@ fun SalesScreen(
     onCheckout: (SaleRecord, Boolean) -> Unit,
     onSilentPrintDirect: (String) -> Unit,
     onCustomerDataUpdated: (String) -> Unit,
-    currentViewMode: DeviceViewMode = DeviceViewMode.AUTO
+    currentViewMode: DeviceViewMode = DeviceViewMode.AUTO,
+    isScannerConnected: Boolean = false,
+    scannerDeviceName: String? = null,
+    onRefreshScannerCheck: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val s = LocalStrings.current
@@ -348,7 +352,10 @@ fun SalesScreen(
                             searchQuery = ""
                             selectedCategory = "All"
                             onSearchCloud("", "All", currentLimit)
-                        }
+                        },
+                        isScannerConnected = isScannerConnected,
+                        scannerDeviceName = scannerDeviceName,
+                        onRefreshScannerCheck = onRefreshScannerCheck
                     )
                 }
 
@@ -509,7 +516,10 @@ fun SalesScreen(
                             searchQuery = ""
                             selectedCategory = "All"
                             onSearchCloud("", "All", currentLimit)
-                        }
+                        },
+                        isScannerConnected = isScannerConnected,
+                        scannerDeviceName = scannerDeviceName,
+                        onRefreshScannerCheck = onRefreshScannerCheck
                     )
                 } else {
                     CartPane(
@@ -623,8 +633,12 @@ private fun ProductsCatalogPane(
     onBarcodeSubmit: (String) -> Unit,
     onSelectCategory: (String) -> Unit,
     onProductClick: (Product) -> Unit,
-    onRefreshAll: () -> Unit
+    onRefreshAll: () -> Unit,
+    isScannerConnected: Boolean = false,
+    scannerDeviceName: String? = null,
+    onRefreshScannerCheck: (() -> Unit)? = null
 ) {
+    val context = LocalContext.current
     Column(modifier = Modifier.fillMaxSize()) {
         // High-End Search & Barcode Card
         Card(
@@ -724,7 +738,7 @@ private fun ProductsCatalogPane(
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = onSearchChange,
-                        placeholder = { Text("Search product name / code in Cloud...") },
+                        placeholder = { Text("Search product name") },
                         leadingIcon = {
                             Icon(
                                 Icons.Default.Search,
@@ -814,19 +828,50 @@ private fun ProductsCatalogPane(
 
                     Surface(
                         shape = RoundedCornerShape(10.dp),
-                        color = Color(0xFFE8F5E9),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFC8E6C9)),
-                        modifier = Modifier.size(54.dp)
+                        color = if (isScannerConnected) Color(0xFFE8F5E9) else Color(0xFFFFEBEE),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.5.dp,
+                            if (isScannerConnected) Color(0xFF4CAF50) else Color(0xFFEF5350)
+                        ),
+                        modifier = Modifier
+                            .size(54.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .clickable {
+                                onRefreshScannerCheck?.invoke()
+                                val msg = if (isScannerConnected) {
+                                    val dev = if (!scannerDeviceName.isNullOrBlank()) " ($scannerDeviceName)" else ""
+                                    "🟢 Barcode Scanner ချိတ်ဆက်ထားပါသည်$dev"
+                                } else {
+                                    "🔴 Scanner မချိတ်ထားပါ (USB သို့မဟုတ် Bluetooth ဖြင့် ချိတ်ဆက်နိုင်ပါသည်)"
+                                }
+                                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                            }
+                            .testTag("barcode_scanner_status_indicator")
                     ) {
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(12.dp)
-                                    .background(Color(0xFF2E7D32), CircleShape)
-                            )
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.QrCodeScanner,
+                                    contentDescription = if (isScannerConnected) "Scanner Connected" else "Scanner Disconnected",
+                                    tint = if (isScannerConnected) Color(0xFF2E7D32) else Color(0xFFC62828),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .size(6.dp)
+                                        .background(
+                                            if (isScannerConnected) Color(0xFF2E7D32) else Color(0xFFC62828),
+                                            CircleShape
+                                        )
+                                )
+                            }
                         }
                     }
                 }

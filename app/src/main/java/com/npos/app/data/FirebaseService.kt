@@ -479,6 +479,10 @@ class FirebaseService {
                     return@withContext Result.success(products)
                 }
             } else {
+                if (response.code == 429) {
+                    Log.w(TAG, "runQuery returned 429 (Resource Exhausted / Quota Exceeded)")
+                    return@withContext Result.failure(Exception("429 Quota Exceeded: Firebase Firestore နေ့စဉ် Read Quota (50,000 reads) ပြည့်သွားပါပြီ"))
+                }
                 Log.w(TAG, "orderBy created_at runQuery returned code ${response.code}, falling back to documents API")
             }
         } catch (e: Exception) {
@@ -511,7 +515,12 @@ class FirebaseService {
                     if (products.isNotEmpty()) {
                         return@withContext Result.success(products)
                     }
-                    return@withContext Result.failure(Exception("Failed to fetch products: ${response.code}"))
+                    val errMsg = if (response.code == 429) {
+                        "429 Quota Exceeded: Firebase Firestore နေ့စဉ် Read Quota (50,000 reads) ပြည့်သွားပါပြီ (Local Cache ဖြင့် ဆက်လက်အသုံးပြုနိုင်ပါသည်)"
+                    } else {
+                        "Failed to fetch products: ${response.code}"
+                    }
+                    return@withContext Result.failure(Exception(errMsg))
                 }
 
                 val root = JSONObject(responseBody)
