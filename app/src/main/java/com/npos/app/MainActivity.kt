@@ -51,6 +51,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -115,6 +116,7 @@ class MainActivity : ComponentActivity() {
         private const val KEY_EMAIL = "auth_email"
         private const val KEY_NAME = "auth_name"
         private const val KEY_TOKEN = "auth_token"
+        private const val KEY_REFRESH_TOKEN = "auth_refresh_token"
         private const val KEY_VIEW_MODE = "pref_device_view_mode"
     }
 
@@ -133,7 +135,7 @@ class MainActivity : ComponentActivity() {
             updateConfig(initialConfig.projectId, initialConfig.apiKey)
         }
         printerManager = ThermalPrinterManager(this)
-        customerDisplayManager = CustomerDisplayManager(this)
+        customerDisplayManager = CustomerDisplayManager(this, printerManager)
         barcodeScannerManager = BarcodeScannerManager(this)
         authPrefs = getSharedPreferences(PREFS_AUTH, Context.MODE_PRIVATE)
 
@@ -199,7 +201,8 @@ class MainActivity : ComponentActivity() {
         val email = authPrefs.getString(KEY_EMAIL, "n1@web.app") ?: "n1@web.app"
         val name = authPrefs.getString(KEY_NAME, "N1 Cashier") ?: "N1 Cashier"
         val token = authPrefs.getString(KEY_TOKEN, null) ?: return null
-        return UserSession(uid, email, name, token)
+        val refreshToken = authPrefs.getString(KEY_REFRESH_TOKEN, "") ?: ""
+        return UserSession(uid, email, name, token, refreshToken)
     }
 
     private fun saveUserSession(session: UserSession) {
@@ -208,6 +211,7 @@ class MainActivity : ComponentActivity() {
             .putString(KEY_EMAIL, session.email)
             .putString(KEY_NAME, session.displayName)
             .putString(KEY_TOKEN, session.idToken)
+            .putString(KEY_REFRESH_TOKEN, session.refreshToken)
             .apply()
     }
 
@@ -268,6 +272,14 @@ fun MainAppHost(
     var showPrinterDialog by remember { mutableStateOf(false) }
     var showCustomerDialog by remember { mutableStateOf(false) }
     var showViewModeDialog by remember { mutableStateOf(false) }
+    var productsUnsubscribe by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    DisposableEffect(currentUser?.idToken) {
+        onDispose {
+            productsUnsubscribe?.invoke()
+            productsUnsubscribe = null
+        }
+    }
 
     val isSecondaryScreenActive by customerDisplayManager.isSecondaryDisplayConnected.collectAsState()
     val lastCustomerData by customerDisplayManager.lastData.collectAsState()
@@ -297,12 +309,46 @@ fun MainAppHost(
         }
     }
 
+    // Subscribe to onAuthStateChange for automatic session synchronization
+    DisposableEffect(firebaseService) {
+        val unsubscribe = firebaseService.onAuthStateChange { session ->
+            currentUser = session
+            if (session != null) {
+                onSaveSession(session)
+            } else {
+                onClearSession()
+            }
+        }
+        onDispose {
+            unsubscribe()
+        }
+    }
+
     LaunchedEffect(Unit) {
         checkAndRequestBluetooth()
+        // Initialize FirebaseService auth state with saved session
+        firebaseService.setSession(initialSession)
+        // Automatically verify or seamlessly relogin the current user on launch
+        if (initialSession != null) {
+            val reloginResult = firebaseService.verifyOrRelogin(initialSession)
+            reloginResult.onSuccess { activeSession ->
+                if (activeSession != null) {
+                    currentUser = activeSession
+                    onSaveSession(activeSession)
+                    Log.d("NPOS", "Auto relogin on startup succeeded for ${activeSession.displayName}")
+                }
+            }.onFailure { err ->
+                Log.w("NPOS", "Auto relogin on startup failed: ${err.message}")
+            }
+        }
     }
 
     fun loadFirebaseData(token: String, limit: Int = displayLimit) {
         isLoadingData = true
+        // Cancel prior snapshot listener before starting a new one
+        productsUnsubscribe?.invoke()
+        productsUnsubscribe = null
+
         scope.launch {
             // 1. Fetch total products count with aggregation
             firebaseService.fetchTotalProductsCount(token).onSuccess {
@@ -314,14 +360,41 @@ fun MainAppHost(
                 categories = listOf("All") + it
             }
 
-            // 3. Fetch products with limit
+            // 3. Initial load of products ordered by created_at DESC
             val prodResult = firebaseService.fetchProducts(token, limit)
             prodResult.onSuccess {
                 products = it
-                Log.d("NPOS", "Loaded ${it.size} products from Firebase Firestore")
+                Log.d("NPOS", "Loaded ${it.size} products from Firebase Firestore (orderBy created_at DESC)")
             }.onFailure { err ->
                 Log.e("NPOS", "Failed to load products: ${err.message}")
+                if (err.message?.contains("401") == true || err.message?.contains("UNAUTHENTICATED") == true) {
+                    // Token expired - trigger relogin current user via onAuthStateChange
+                    scope.launch {
+                        currentUser?.let { user ->
+                            val relogRes = firebaseService.reloginCurrentUser(user)
+                            relogRes.onSuccess { refreshedSession ->
+                                currentUser = refreshedSession
+                                onSaveSession(refreshedSession)
+                                loadFirebaseData(refreshedSession.idToken, limit)
+                            }
+                        }
+                    }
+                }
             }
+
+            // 4. Register real-time snapshot listener with unsub handle (orderBy created_at DESC)
+            productsUnsubscribe = firebaseService.onProductsSnapshot(
+                idToken = token,
+                limit = limit,
+                intervalMs = 10000L,
+                onSnapshot = { liveProducts ->
+                    products = liveProducts
+                    Log.d("NPOS", "onProductsSnapshot received update: ${liveProducts.size} items (orderBy created_at DESC)")
+                },
+                onError = { err ->
+                    Log.w("NPOS", "onProductsSnapshot warning: ${err.message}")
+                }
+            )
 
             val custResult = firebaseService.fetchCustomers(token)
             custResult.onSuccess {
@@ -463,6 +536,7 @@ fun MainAppHost(
                             scope.launch { drawerState.close() }
                         },
                         onOpenCustomerDisplay = {
+                            customerDisplayManager.showCustomerDisplayManually()
                             showCustomerDialog = true
                             scope.launch { drawerState.close() }
                         },
@@ -470,7 +544,24 @@ fun MainAppHost(
                             showViewModeDialog = true
                             scope.launch { drawerState.close() }
                         },
+                        onReloginCurrentUser = {
+                            scope.launch {
+                                Toast.makeText(context, s.reloginSession, Toast.LENGTH_SHORT).show()
+                                val reloginRes = firebaseService.reloginCurrentUser(user)
+                                reloginRes.onSuccess { updatedSession ->
+                                    currentUser = updatedSession
+                                    onSaveSession(updatedSession)
+                                    Toast.makeText(context, "${s.reloginSuccess}: ${updatedSession.displayName}", Toast.LENGTH_SHORT).show()
+                                    loadFirebaseData(updatedSession.idToken, displayLimit)
+                                }.onFailure { err ->
+                                    Toast.makeText(context, "${s.reloginFailed} (${err.message})", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        },
                         onLogout = {
+                            productsUnsubscribe?.invoke()
+                            productsUnsubscribe = null
+                            firebaseService.logout()
                             onClearSession()
                             currentUser = null
                             products = emptyList()
@@ -619,6 +710,21 @@ fun MainAppHost(
                                         isSavingSale = false
                                         result.onSuccess { voucherId ->
                                             Toast.makeText(context, "Sale saved: $voucherId", Toast.LENGTH_SHORT).show()
+
+                                            // Deduct sold quantities from in-memory products list so POS UI updates stock immediately
+                                            val soldMap = mutableMapOf<String, Int>()
+                                            saleRecord.items.forEach { item ->
+                                                soldMap[item.product.id] = (soldMap[item.product.id] ?: 0) + item.qty
+                                            }
+                                            products = products.map { prod ->
+                                                val sold = soldMap[prod.id]
+                                                if (sold != null && sold > 0) {
+                                                    prod.copy(qty = maxOf(0, prod.qty - sold))
+                                                } else {
+                                                    prod
+                                                }
+                                            }
+
                                             recentVouchers = listOf(saleRecord) + recentVouchers.filter { it.voucherNo != saleRecord.voucherNo }
                                             userSalesSummary = userSalesSummary.copy(
                                                 todayAmount = userSalesSummary.todayAmount + saleRecord.netAmount,
@@ -756,6 +862,11 @@ fun MainAppHost(
     if (showCustomerDialog) {
         CustomerDisplayPreviewDialog(
             jsonData = lastCustomerData,
+            printerManager = printerManager,
+            isSecondaryDisplayConnected = isSecondaryScreenActive,
+            onReconnectSecondaryDisplay = {
+                customerDisplayManager.showCustomerDisplayManually()
+            },
             onDismiss = { showCustomerDialog = false }
         )
     }

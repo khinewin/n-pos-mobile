@@ -67,6 +67,9 @@ data class AppStrings(
     val connected: String,
     val notConnected: String,
     val requireDbConfig: String,
+    val reloginSession: String,
+    val reloginSuccess: String,
+    val reloginFailed: String,
 
     // Sales Screen & Cart
     val searchProductPlaceholder: String,
@@ -233,6 +236,9 @@ val StringsMm = AppStrings(
     connected = "ချိတ်ဆက်ထားသည်",
     notConnected = "မချိတ်ဆက်ရသေးပါ",
     requireDbConfig = "ကျေးဇူးပြု၍ အပေါ်ရှိ Database Setting တွင် Project ID နှင့် Web API Key အရင်ထည့်သွင်းပေးပါ",
+    reloginSession = "အကောင့်စစ်ဆေး/ပြန်လည်ဝင်မည် (Relogin)",
+    reloginSuccess = "လက်ရှိအသုံးပြုသူ အကောင့်စစ်ဆေးမှု အောင်မြင်ပါသည်",
+    reloginFailed = "အကောင့်ပြန်လည်ဝင်ရောက်မှု မအောင်မြင်ပါ၊ စကားဝှက်ဖြင့် ပြန်ဝင်ပါ",
 
     searchProductPlaceholder = "ပစ္စည်းအမည် / ဘားကုဒ် / ကုဒ်နံပါတ်ဖြင့် ရှာပါ...",
     allCategories = "အားလုံး",
@@ -393,6 +399,9 @@ val StringsEn = AppStrings(
     connected = "Connected",
     notConnected = "Not Connected",
     requireDbConfig = "Please configure Project ID & Web API Key in Database Setting first.",
+    reloginSession = "Relogin Current User",
+    reloginSuccess = "Session verified & relogged in successfully",
+    reloginFailed = "Session expired, please login with password",
 
     searchProductPlaceholder = "Search by item name / barcode / code...",
     allCategories = "All",

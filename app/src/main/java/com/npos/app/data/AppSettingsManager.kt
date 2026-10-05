@@ -2,6 +2,9 @@ package com.npos.app.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 enum class AppThemeMode(val id: String) {
     SYSTEM("system"),
@@ -28,6 +31,17 @@ class AppSettingsManager(context: Context) {
     companion object {
         private const val KEY_THEME_MODE = "app_theme_mode"
         private const val KEY_LANGUAGE = "app_language"
+
+        private val _globalThemeMode = MutableStateFlow(AppThemeMode.SYSTEM)
+        val globalThemeMode: StateFlow<AppThemeMode> = _globalThemeMode.asStateFlow()
+
+        private val _globalLanguage = MutableStateFlow(AppLanguage.MM)
+        val globalLanguage: StateFlow<AppLanguage> = _globalLanguage.asStateFlow()
+    }
+
+    init {
+        _globalThemeMode.value = getThemeMode()
+        _globalLanguage.value = getLanguage()
     }
 
     fun getThemeMode(): AppThemeMode {
@@ -36,6 +50,7 @@ class AppSettingsManager(context: Context) {
     }
 
     fun setThemeMode(mode: AppThemeMode) {
+        _globalThemeMode.value = mode
         prefs.edit().putString(KEY_THEME_MODE, mode.id).apply()
     }
 
@@ -45,6 +60,7 @@ class AppSettingsManager(context: Context) {
     }
 
     fun setLanguage(language: AppLanguage) {
+        _globalLanguage.value = language
         prefs.edit().putString(KEY_LANGUAGE, language.code).apply()
     }
 }

@@ -31,10 +31,12 @@ import androidx.compose.material.icons.filled.PointOfSale
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.SettingsBrightness
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.TabletAndroid
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
@@ -92,6 +94,7 @@ fun PosSidebarContent(
     onOpenPrinterSettings: () -> Unit,
     onOpenCustomerDisplay: () -> Unit,
     onOpenViewModeSettings: () -> Unit = {},
+    onReloginCurrentUser: () -> Unit = {},
     onLogout: () -> Unit
 ) {
     val s = LocalStrings.current
@@ -132,7 +135,7 @@ fun PosSidebarContent(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = s.appName,
                         fontWeight = FontWeight.Black,
@@ -149,6 +152,20 @@ fun PosSidebarContent(
                         text = user.email,
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                IconButton(
+                    onClick = onReloginCurrentUser,
+                    modifier = Modifier
+                        .size(34.dp)
+                        .testTag("relogin_current_user_button")
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Sync,
+                        contentDescription = s.reloginSession,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }

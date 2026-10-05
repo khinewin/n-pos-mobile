@@ -7,8 +7,18 @@ import com.npos.app.data.model.Product
 import com.npos.app.data.model.SaleRecord
 import com.npos.app.data.model.UserSalesSummary
 import com.npos.app.data.model.UserSession
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.FormBody
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -55,6 +65,48 @@ class FirebaseService {
         .writeTimeout(20, TimeUnit.SECONDS)
         .build()
 
+    private val _authState = MutableStateFlow<UserSession?>(null)
+    val authState: StateFlow<UserSession?> = _authState.asStateFlow()
+
+    private val authListeners = mutableListOf<(UserSession?) -> Unit>()
+
+    /**
+     * Registers a callback listener for authentication state changes (login, relogin, logout).
+     * Automatically dispatches the current session immediately to the new listener.
+     * Returns an unsubscribe function to safely detach the listener.
+     */
+    fun onAuthStateChange(listener: (UserSession?) -> Unit): () -> Unit {
+        synchronized(authListeners) {
+            authListeners.add(listener)
+        }
+        listener(_authState.value)
+        return {
+            synchronized(authListeners) {
+                authListeners.remove(listener)
+            }
+        }
+    }
+
+    private fun setAuthState(session: UserSession?) {
+        _authState.value = session
+        val currentListeners = synchronized(authListeners) { authListeners.toList() }
+        currentListeners.forEach { listener ->
+            try {
+                listener(session)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in onAuthStateChange listener", e)
+            }
+        }
+    }
+
+    fun setSession(session: UserSession?) {
+        setAuthState(session)
+    }
+
+    fun logout() {
+        setAuthState(null)
+    }
+
     suspend fun login(email: String, password: String): Result<UserSession> = withContext(Dispatchers.IO) {
         if (!isConfigured) {
             return@withContext Result.failure(Exception("ကျေးဇူးပြု၍ အပေါ်ရှိ Database Setting တွင် Firebase Project ID နှင့် Web API Key အရင်ထည့်သွင်းပေးပါ"))
@@ -85,13 +137,162 @@ class FirebaseService {
                 uid = respJson.optString("localId", ""),
                 email = respJson.optString("email", email),
                 displayName = respJson.optString("displayName", "N1 Cashier"),
-                idToken = respJson.optString("idToken", "")
+                idToken = respJson.optString("idToken", ""),
+                refreshToken = respJson.optString("refreshToken", "")
             )
+            setAuthState(session)
             Result.success(session)
         } catch (e: Exception) {
             Log.e(TAG, "Login error", e)
             Result.failure(e)
         }
+    }
+
+    /**
+     * Refreshes the authentication session using Firebase Secure Token Service.
+     * This re-authenticates/re-logs in the current user seamlessly without requiring a password.
+     */
+    suspend fun reloginWithRefreshToken(refreshToken: String, existingUser: UserSession? = null): Result<UserSession> = withContext(Dispatchers.IO) {
+        if (!isConfigured) {
+            return@withContext Result.failure(Exception("Firebase is not configured"))
+        }
+        if (refreshToken.isBlank()) {
+            return@withContext Result.failure(Exception("No refresh token available for relogin"))
+        }
+
+        try {
+            val refreshUrl = "https://securetoken.googleapis.com/v1/token?key=$apiKey"
+            val formBody = FormBody.Builder()
+                .add("grant_type", "refresh_token")
+                .add("refresh_token", refreshToken)
+                .build()
+
+            val request = Request.Builder()
+                .url(refreshUrl)
+                .post(formBody)
+                .build()
+
+            val response = client.newCall(request).execute()
+            val responseBody = response.body?.string().orEmpty()
+
+            if (!response.isSuccessful) {
+                Log.w(TAG, "Relogin failed: HTTP ${response.code} $responseBody")
+                setAuthState(null)
+                return@withContext Result.failure(Exception("Session expired, please login again"))
+            }
+
+            val json = JSONObject(responseBody)
+            val newIdToken = json.optString("id_token", "")
+            val newRefreshToken = json.optString("refresh_token", refreshToken)
+            val userId = json.optString("user_id", existingUser?.uid ?: "")
+
+            // Attempt to fetch fresh profile details
+            val lookupResult = lookupUser(newIdToken)
+            val updatedUser = if (lookupResult.isSuccess) {
+                val info = lookupResult.getOrNull()
+                UserSession(
+                    uid = info?.optString("localId", userId) ?: userId,
+                    email = info?.optString("email", existingUser?.email ?: "") ?: existingUser?.email ?: "",
+                    displayName = info?.optString("displayName", existingUser?.displayName ?: "Cashier") ?: existingUser?.displayName ?: "Cashier",
+                    idToken = newIdToken,
+                    refreshToken = newRefreshToken
+                )
+            } else {
+                UserSession(
+                    uid = userId,
+                    email = existingUser?.email ?: "",
+                    displayName = existingUser?.displayName ?: "Cashier",
+                    idToken = newIdToken,
+                    refreshToken = newRefreshToken
+                )
+            }
+
+            setAuthState(updatedUser)
+            Log.d(TAG, "Relogin successful for ${updatedUser.displayName} (${updatedUser.email})")
+            Result.success(updatedUser)
+        } catch (e: Exception) {
+            Log.e(TAG, "Relogin error", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Looks up user profile information using the current idToken.
+     */
+    suspend fun lookupUser(idToken: String): Result<JSONObject> = withContext(Dispatchers.IO) {
+        try {
+            val url = "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=$apiKey"
+            val jsonBody = JSONObject().apply {
+                put("idToken", idToken)
+            }.toString()
+
+            val request = Request.Builder()
+                .url(url)
+                .post(jsonBody.toRequestBody(JSON_MEDIA_TYPE))
+                .build()
+
+            val response = client.newCall(request).execute()
+            val responseBody = response.body?.string().orEmpty()
+
+            if (!response.isSuccessful) {
+                return@withContext Result.failure(Exception("User lookup failed: ${response.code}"))
+            }
+
+            val respJson = JSONObject(responseBody)
+            val usersArr = respJson.optJSONArray("users")
+            if (usersArr != null && usersArr.length() > 0) {
+                Result.success(usersArr.getJSONObject(0))
+            } else {
+                Result.failure(Exception("User profile not found"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Relogins the current user using their saved session credentials.
+     */
+    suspend fun reloginCurrentUser(session: UserSession): Result<UserSession> {
+        val tokenToUse = session.refreshToken.ifBlank { session.idToken }
+        return reloginWithRefreshToken(tokenToUse, session)
+    }
+
+    /**
+     * Verifies if the session is still active or seamlessly re-authenticates with refresh token.
+     */
+    suspend fun verifyOrRelogin(session: UserSession?): Result<UserSession?> {
+        if (session == null) {
+            setAuthState(null)
+            return Result.success(null)
+        }
+
+        // 1. Try quick profile lookup to see if idToken is currently valid
+        val lookup = lookupUser(session.idToken)
+        if (lookup.isSuccess) {
+            val userObj = lookup.getOrNull()
+            val validSession = UserSession(
+                uid = userObj?.optString("localId", session.uid) ?: session.uid,
+                email = userObj?.optString("email", session.email) ?: session.email,
+                displayName = userObj?.optString("displayName", session.displayName) ?: session.displayName,
+                idToken = session.idToken,
+                refreshToken = session.refreshToken
+            )
+            setAuthState(validSession)
+            return Result.success(validSession)
+        }
+
+        // 2. If idToken has expired, attempt silent relogin using refreshToken
+        if (session.refreshToken.isNotBlank()) {
+            val reloginResult = reloginWithRefreshToken(session.refreshToken, session)
+            if (reloginResult.isSuccess) {
+                return Result.success(reloginResult.getOrNull())
+            }
+        }
+
+        // 3. Both failed - session is terminated
+        setAuthState(null)
+        return Result.failure(Exception("Session expired"))
     }
 
     private fun parseProductDocument(doc: JSONObject): Product? {
@@ -243,6 +444,48 @@ class FirebaseService {
     }
 
     suspend fun fetchProducts(idToken: String, limit: Int = 100): Result<List<Product>> = withContext(Dispatchers.IO) {
+        // Method 1: Firestore runQuery with orderBy("created_at", "DESCENDING")
+        try {
+            val runQueryUrl = "$firestoreBase:runQuery"
+            val structuredQuery = JSONObject().apply {
+                put("from", JSONArray().put(JSONObject().put("collectionId", "products")))
+                put("orderBy", JSONArray().put(JSONObject().apply {
+                    put("field", JSONObject().put("fieldPath", "created_at"))
+                    put("direction", "DESCENDING")
+                }))
+                put("limit", limit)
+            }
+            val queryPayload = JSONObject().put("structuredQuery", structuredQuery)
+
+            val request = Request.Builder()
+                .url(runQueryUrl)
+                .addHeader("Authorization", "Bearer $idToken")
+                .post(queryPayload.toString().toRequestBody(JSON_MEDIA_TYPE))
+                .build()
+
+            val response = client.newCall(request).execute()
+            val respStr = response.body?.string().orEmpty()
+
+            if (response.isSuccessful && respStr.startsWith("[")) {
+                val products = mutableListOf<Product>()
+                val arr = JSONArray(respStr)
+                for (i in 0 until arr.length()) {
+                    val itemObj = arr.getJSONObject(i)
+                    val doc = itemObj.optJSONObject("document") ?: continue
+                    parseProductDocument(doc)?.let { products.add(it) }
+                }
+                if (products.isNotEmpty()) {
+                    Log.d(TAG, "Successfully fetched ${products.size} products ordered by created_at DESC via runQuery")
+                    return@withContext Result.success(products)
+                }
+            } else {
+                Log.w(TAG, "orderBy created_at runQuery returned code ${response.code}, falling back to documents API")
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "orderBy created_at runQuery failed, falling back to documents API", e)
+        }
+
+        // Method 2 (Fallback): Standard documents paging if runQuery is unavailable
         try {
             val products = mutableListOf<Product>()
             var nextPageToken: String? = null
@@ -287,6 +530,60 @@ class FirebaseService {
         } catch (e: Exception) {
             Log.e(TAG, "Error fetching products", e)
             Result.failure(e)
+        }
+    }
+
+    /**
+     * Real-time Snapshot Listener for products with orderBy("created_at", "DESCENDING").
+     * Invokes [onSnapshot] with latest list of products whenever changes or updates occur.
+     * Returns an unsubscribe function `() -> Unit` (unsub) to cancel and stop listening immediately.
+     */
+    fun onProductsSnapshot(
+        idToken: String,
+        limit: Int = 100,
+        intervalMs: Long = 8000L,
+        scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+        onError: ((Exception) -> Unit)? = null,
+        onSnapshot: (List<Product>) -> Unit
+    ): () -> Unit {
+        var lastProductsSignature: String = ""
+        val job = scope.launch {
+            while (isActive) {
+                try {
+                    val result = fetchProducts(idToken, limit)
+                    result.onSuccess { freshProducts ->
+                        val signature = freshProducts.joinToString("|") { "${it.id}_${it.qty}_${it.retailPrice}_${it.codeNo}" }
+                        if (signature != lastProductsSignature) {
+                            lastProductsSignature = signature
+                            withContext(Dispatchers.Main) {
+                                onSnapshot(freshProducts)
+                            }
+                        }
+                    }.onFailure { err ->
+                        Log.w(TAG, "onProductsSnapshot fetch failure: ${err.message}")
+                        onError?.let { callback ->
+                            withContext(Dispatchers.Main) {
+                                callback(err as? Exception ?: Exception(err))
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    if (e is CancellationException) throw e
+                    Log.w(TAG, "onProductsSnapshot loop error", e)
+                    onError?.let { callback ->
+                        withContext(Dispatchers.Main) {
+                            callback(e)
+                        }
+                    }
+                }
+                delay(intervalMs)
+            }
+        }
+
+        // Return unsubscribe lambda
+        return {
+            Log.d(TAG, "Unsubscribing from onProductsSnapshot")
+            job.cancel()
         }
     }
 
@@ -703,11 +1000,120 @@ class FirebaseService {
 
             val respJson = JSONObject(body)
             val createdId = respJson.optString("name", "").substringAfterLast("/")
+
+            // Automatically deduct sold quantities from original products in Firestore
+            try {
+                deductSaleProductsStock(idToken, sale.items)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to deduct product stock after sale", e)
+            }
+
             Result.success(createdId.ifEmpty { sale.voucherNo })
         } catch (e: Exception) {
             Log.e(TAG, "Error saving sale to Firestore", e)
             Result.failure(e)
         }
+    }
+
+    /**
+     * Deducts sold quantity from a single product's stock in Firestore.
+     */
+    suspend fun deductProductStock(
+        idToken: String,
+        productId: String,
+        soldQty: Int,
+        currentKnownQty: Int
+    ): Result<Int> = withContext(Dispatchers.IO) {
+        if (!isConfigured || productId.isBlank()) {
+            return@withContext Result.failure(Exception("Invalid product or config"))
+        }
+
+        try {
+            var liveQty = currentKnownQty
+            val getUrl = "$firestoreBase/products/$productId"
+            val getReq = Request.Builder()
+                .url(getUrl)
+                .addHeader("Authorization", "Bearer $idToken")
+                .get()
+                .build()
+
+            val getResp = client.newCall(getReq).execute()
+            val getBody = getResp.body?.string().orEmpty()
+            if (getResp.isSuccessful && getBody.isNotBlank()) {
+                try {
+                    val docJson = JSONObject(getBody)
+                    val fields = docJson.optJSONObject("fields")
+                    val firestoreQty = fields?.optJSONObject("qty")?.optString("integerValue")?.toIntOrNull()
+                        ?: fields?.optJSONObject("qty")?.optString("stringValue")?.toIntOrNull()
+                    if (firestoreQty != null) {
+                        liveQty = firestoreQty
+                    }
+                } catch (_: Exception) {}
+            }
+
+            val newQty = maxOf(0, liveQty - soldQty)
+
+            val patchUrl = "$firestoreBase/products/$productId?updateMask.fieldPaths=qty"
+            val patchFields = JSONObject().apply {
+                put("qty", JSONObject().apply {
+                    put("integerValue", newQty.toLong().toString())
+                })
+            }
+            val payload = JSONObject().apply { put("fields", patchFields) }.toString()
+
+            val patchReq = Request.Builder()
+                .url(patchUrl)
+                .addHeader("Authorization", "Bearer $idToken")
+                .patch(payload.toRequestBody(JSON_MEDIA_TYPE))
+                .build()
+
+            val patchResp = client.newCall(patchReq).execute()
+            val patchBody = patchResp.body?.string().orEmpty()
+            if (!patchResp.isSuccessful) {
+                Log.w(TAG, "Stock deduction failed for product $productId: code=${patchResp.code} body=$patchBody")
+                return@withContext Result.failure(Exception("Failed to update product stock: ${patchResp.code}"))
+            }
+
+            Log.d(TAG, "Stock deducted for product $productId: $liveQty - $soldQty = $newQty")
+            Result.success(newQty)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error deducting stock for product $productId", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Deducts sold quantities for all items in a completed sale.
+     */
+    suspend fun deductSaleProductsStock(
+        idToken: String,
+        items: List<CartItem>
+    ): Map<String, Int> = withContext(Dispatchers.IO) {
+        val updatedStockMap = mutableMapOf<String, Int>()
+        val aggregatedSold = mutableMapOf<String, Pair<Product, Int>>()
+
+        for (item in items) {
+            val prodId = item.product.id
+            if (prodId.isBlank()) continue
+            val existing = aggregatedSold[prodId]
+            if (existing != null) {
+                aggregatedSold[prodId] = Pair(item.product, existing.second + item.qty)
+            } else {
+                aggregatedSold[prodId] = Pair(item.product, item.qty)
+            }
+        }
+
+        aggregatedSold.forEach { (prodId, pair) ->
+            val (product, soldQty) = pair
+            val result = deductProductStock(idToken, prodId, soldQty, product.qty)
+            if (result.isSuccess) {
+                updatedStockMap[prodId] = result.getOrDefault(maxOf(0, product.qty - soldQty))
+            } else {
+                updatedStockMap[prodId] = maxOf(0, product.qty - soldQty)
+            }
+        }
+
+        updatedStockMap
     }
 
     suspend fun fetchUserSalesSummary(idToken: String, user: UserSession): Result<UserSalesSummary> = withContext(Dispatchers.IO) {

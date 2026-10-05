@@ -22,18 +22,24 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.LocalOffer
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.PointOfSale
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.QrCodeScanner
@@ -42,6 +48,8 @@ import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -182,13 +190,17 @@ fun SalesScreen(
 
     fun addItemToCart(product: Product) {
         if (product.qty <= 0) {
-            Toast.makeText(context, "\"${product.itemName}\" is out of stock", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "\"${product.itemName}\" ပစ္စည်းလက်ကျန်မရှိပါ (Out of stock)", Toast.LENGTH_SHORT).show()
             return
         }
 
         val existingIndex = cartItems.indexOfFirst { it.product.id == product.id }
         if (existingIndex >= 0) {
             val current = cartItems[existingIndex]
+            if (current.qty >= product.qty) {
+                Toast.makeText(context, "\"${product.itemName}\" လက်ကျန် (${product.qty} ${product.unit}) ထက် ပို၍ မထည့်နိုင်ပါ", Toast.LENGTH_SHORT).show()
+                return
+            }
             val newQty = current.qty + 1
             val maxDisc = current.unitPrice * newQty
             val cappedDisc = current.discount.coerceAtMost(maxDisc)
@@ -376,14 +388,19 @@ fun SalesScreen(
                         onIncreaseQty = { item ->
                             val idx = cartItems.indexOf(item)
                             if (idx >= 0) {
-                                val nq = item.qty + 1
-                                val maxDisc = item.unitPrice * nq
-                                val cappedDisc = item.discount.coerceAtMost(maxDisc)
-                                cartItems[idx] = item.copy(
-                                    qty = nq,
-                                    discount = cappedDisc,
-                                    finalAmount = (item.unitPrice * nq) - cappedDisc
-                                )
+                                val currentProd = products.find { it.id == item.product.id } ?: item.product
+                                if (item.qty >= currentProd.qty) {
+                                    Toast.makeText(context, "\"${item.product.itemName}\" လက်ကျန် (${currentProd.qty} ${currentProd.unit}) ထက် ပိုမရောင်းနိုင်ပါ", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    val nq = item.qty + 1
+                                    val maxDisc = item.unitPrice * nq
+                                    val cappedDisc = item.discount.coerceAtMost(maxDisc)
+                                    cartItems[idx] = item.copy(
+                                        qty = nq,
+                                        discount = cappedDisc,
+                                        finalAmount = (item.unitPrice * nq) - cappedDisc
+                                    )
+                                }
                             }
                         },
                         onDecreaseQty = { item ->
@@ -516,14 +533,19 @@ fun SalesScreen(
                         onIncreaseQty = { item ->
                             val idx = cartItems.indexOf(item)
                             if (idx >= 0) {
-                                val nq = item.qty + 1
-                                val maxDisc = item.unitPrice * nq
-                                val cappedDisc = item.discount.coerceAtMost(maxDisc)
-                                cartItems[idx] = item.copy(
-                                    qty = nq,
-                                    discount = cappedDisc,
-                                    finalAmount = (item.unitPrice * nq) - cappedDisc
-                                )
+                                val currentProd = products.find { it.id == item.product.id } ?: item.product
+                                if (item.qty >= currentProd.qty) {
+                                    Toast.makeText(context, "\"${item.product.itemName}\" လက်ကျန် (${currentProd.qty} ${currentProd.unit}) ထက် ပိုမရောင်းနိုင်ပါ", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    val nq = item.qty + 1
+                                    val maxDisc = item.unitPrice * nq
+                                    val cappedDisc = item.discount.coerceAtMost(maxDisc)
+                                    cartItems[idx] = item.copy(
+                                        qty = nq,
+                                        discount = cappedDisc,
+                                        finalAmount = (item.unitPrice * nq) - cappedDisc
+                                    )
+                                }
                             }
                         },
                         onDecreaseQty = { item ->
@@ -1038,8 +1060,21 @@ private fun CartPane(
     onPrintDirect: () -> Unit,
     onCheckout: () -> Unit
 ) {
-    var showCustomerPicker by remember { mutableStateOf(false) }
+    var showCustomerModal by remember { mutableStateOf(false) }
     var discountDialogItem by remember { mutableStateOf<CartItem?>(null) }
+
+    // Modal dialog to search and pick customer
+    if (showCustomerModal) {
+        CustomerSelectionModal(
+            customers = customers,
+            selectedCustomer = selectedCustomer,
+            onDismiss = { showCustomerModal = false },
+            onSelectCustomer = { customer ->
+                onCustomerChange(customer)
+                showCustomerModal = false
+            }
+        )
+    }
 
     // Dialog for individual item discount
     discountDialogItem?.let { item ->
@@ -1088,29 +1123,81 @@ private fun CartPane(
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Customer selector chip
+            // Customer selector chip (Click to open Customer Search Modal)
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { showCustomerPicker = !showCustomerPicker },
-                shape = RoundedCornerShape(8.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant
+                    .clickable { showCustomerModal = true }
+                    .testTag("select_customer_button"),
+                shape = RoundedCornerShape(10.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = "Customer: ${selectedCustomer.name}",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = if (showCustomerPicker) "▲" else "▼",
-                        fontSize = 10.sp,
-                        color = Color.Gray
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Surface(
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            modifier = Modifier.size(28.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = "Customer",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column {
+                            Text(
+                                text = selectedCustomer.name,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            if (selectedCustomer.phone.isNotBlank() && selectedCustomer.code != "123456789") {
+                                Text(
+                                    text = selectedCustomer.phone,
+                                    fontSize = 10.sp,
+                                    color = Color.Gray
+                                )
+                            }
+                        }
+                    }
+
+                    Surface(
+                        shape = RoundedCornerShape(6.dp),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(12.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "ရွေးရန်",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
                 }
             }
 
@@ -1140,32 +1227,6 @@ private fun CartPane(
                             color = Color(0xFFD32F2F),
                             fontWeight = FontWeight.Bold
                         )
-                    }
-                }
-            }
-
-            if (showCustomerPicker) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(110.dp)
-                        .background(Color.White, RoundedCornerShape(8.dp))
-                ) {
-                    items(customers) { c ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onCustomerChange(c)
-                                    showCustomerPicker = false
-                                }
-                                .padding(8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(text = c.name, fontSize = 12.sp, fontWeight = if (c.id == selectedCustomer.id) FontWeight.Bold else FontWeight.Normal)
-                            Text(text = c.phone, fontSize = 11.sp, color = Color.Gray)
-                        }
-                        HorizontalDivider(color = Color(0xFFF1F3F5))
                     }
                 }
             }
@@ -1326,17 +1387,12 @@ private fun CartPane(
                 color = MaterialTheme.colorScheme.surfaceVariant
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(text = "Subtotal:", fontSize = 13.sp)
-                        Text(text = "${formatMoney(subtotal)} MMK", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                    }
-
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "Net Total:", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text(text = "Total:", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Text(
                             text = "${formatMoney(netAmount)} MMK",
                             fontWeight = FontWeight.Black,
@@ -1455,6 +1511,304 @@ private fun CartPane(
                         CircularProgressIndicator(modifier = Modifier.size(18.dp), color = Color.White)
                     } else {
                         Text("Pay & Save", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Modal Dialog for searching and selecting customers in the Sales Cart.
+ */
+@Composable
+fun CustomerSelectionModal(
+    customers: List<Customer>,
+    selectedCustomer: Customer,
+    onDismiss: () -> Unit,
+    onSelectCustomer: (Customer) -> Unit
+) {
+    var searchQuery by remember { mutableStateOf("") }
+
+    val filteredCustomers = remember(searchQuery, customers) {
+        if (searchQuery.isBlank()) {
+            customers
+        } else {
+            val q = searchQuery.trim().lowercase()
+            customers.filter {
+                it.name.lowercase().contains(q) ||
+                it.phone.lowercase().contains(q) ||
+                it.code.lowercase().contains(q) ||
+                it.address.lowercase().contains(q)
+            }
+        }
+    }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(0.92f)
+                .heightIn(max = 600.dp)
+                .padding(vertical = 16.dp)
+                .testTag("customer_selection_modal"),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                // Header
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Surface(
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            modifier = Modifier.size(38.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
+                            Text(
+                                text = "ဖောက်သည် ရွေးချယ်ပါ (Select Customer)",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "ဖောက်သည် အမည် (သို့) ဖုန်းနံပါတ်ဖြင့် အလွယ်တကူ ရှာဖွေနိုင်ပါသည်",
+                                fontSize = 11.sp,
+                                color = Color.Gray
+                            )
+                        }
+                    }
+
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Search Box with Auto-Focus feel & Instant Filtering
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("customer_search_input"),
+                    placeholder = {
+                        Text(
+                            text = "ဖောက်သည် အမည် (သို့) ဖုန်းနံပါတ် ရိုက်ထည့်ရှာပါ...",
+                            fontSize = 13.sp
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    },
+                    trailingIcon = {
+                        if (searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { searchQuery = "" }) {
+                                Icon(
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = "Clear",
+                                    tint = Color.Gray
+                                )
+                            }
+                        }
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Search Result Count
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (searchQuery.isBlank()) "ဖောက်သည် စုစုပေါင်း: ${customers.size} ဦး" else "တွေ့ရှိသော ဖောက်သည်: ${filteredCustomers.size} ဦး",
+                        fontSize = 11.sp,
+                        color = Color.Gray,
+                        fontWeight = FontWeight.Medium
+                    )
+                    if (searchQuery.isNotEmpty()) {
+                        Text(
+                            text = "ရှာဖွေမှု ရှင်းရန်",
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.clickable { searchQuery = "" }
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // Customer List or Empty Search State
+                if (filteredCustomers.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.padding(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = null,
+                                tint = Color.LightGray,
+                                modifier = Modifier.size(44.dp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "ရှာဖွေမှုနှင့် ကိုက်ညီသော ဖောက်သည် မတွေ့ပါ",
+                                fontSize = 14.sp,
+                                color = Color.Gray,
+                                fontWeight = FontWeight.Medium,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "အမည် (သို့) ဖုန်းနံပါတ် မှန်ကန်မှုရှိမရှိ ပြန်လည်စစ်ဆေးပါ",
+                                fontSize = 12.sp,
+                                color = Color.LightGray,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) {
+                        items(filteredCustomers) { customer ->
+                            val isSelected = customer.id == selectedCustomer.id
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                                    .clickable {
+                                        onSelectCustomer(customer)
+                                    },
+                                shape = RoundedCornerShape(12.dp),
+                                color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                border = if (isSelected) BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary) else null
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Surface(
+                                            shape = CircleShape,
+                                            color = if (isSelected) MaterialTheme.colorScheme.primary else Color(0xFF6C757D),
+                                            modifier = Modifier.size(36.dp)
+                                        ) {
+                                            Box(contentAlignment = Alignment.Center) {
+                                                Text(
+                                                    text = customer.name.take(1).uppercase(),
+                                                    color = Color.White,
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 15.sp
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.width(12.dp))
+
+                                        Column {
+                                            Text(
+                                                text = customer.name,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 14.sp,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                            Spacer(modifier = Modifier.height(2.dp))
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Phone,
+                                                    contentDescription = null,
+                                                    tint = Color.Gray,
+                                                    modifier = Modifier.size(12.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text(
+                                                    text = if (customer.phone.isNotBlank()) customer.phone else "ဖုန်းနံပါတ် မရှိပါ",
+                                                    fontSize = 12.sp,
+                                                    color = Color.Gray
+                                                )
+                                                if (customer.code.isNotBlank() && customer.code != "123456789") {
+                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    Text(
+                                                        text = "• Code: ${customer.code}",
+                                                        fontSize = 11.sp,
+                                                        color = Color.Gray
+                                                    )
+                                                }
+                                            }
+                                            if (customer.address.isNotBlank()) {
+                                                Text(
+                                                    text = customer.address,
+                                                    fontSize = 11.sp,
+                                                    color = Color.Gray,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    if (isSelected) {
+                                        Icon(
+                                            imageVector = Icons.Default.CheckCircle,
+                                            contentDescription = "Selected",
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(22.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

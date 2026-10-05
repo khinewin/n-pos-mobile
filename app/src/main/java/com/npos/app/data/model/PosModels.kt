@@ -6,7 +6,8 @@ data class UserSession(
     val uid: String,
     val email: String,
     val displayName: String,
-    val idToken: String
+    val idToken: String,
+    val refreshToken: String = ""
 )
 
 data class Product(
