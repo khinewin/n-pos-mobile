@@ -568,13 +568,13 @@ class FirebaseService {
 
     /**
      * Real-time Snapshot Listener for products with orderBy("created_at", "DESCENDING").
-     * Invokes [onSnapshot] with latest list of products whenever changes or updates occur.
+     * Invokes [onSnapshot] immediately on startup and as soon as any product changes or updates occur.
      * Returns an unsubscribe function `() -> Unit` (unsub) to cancel and stop listening immediately.
      */
     fun onProductsSnapshot(
         idToken: String,
         limit: Int = 100,
-        intervalMs: Long = 60000L, // Optimized default: 60s to minimize Firestore read quota
+        intervalMs: Long = 4000L, // High responsiveness (4s) for immediate realtime updates
         scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
         onError: ((Exception) -> Unit)? = null,
         onSnapshot: (List<Product>) -> Unit
@@ -582,8 +582,6 @@ class FirebaseService {
         var lastProductsSignature: String = ""
         val job = scope.launch {
             while (isActive) {
-                delay(intervalMs) // Wait for next sync cycle
-                if (!isActive) break
                 try {
                     val result = fetchProducts(idToken, limit)
                     result.onSuccess { freshProducts ->
@@ -611,12 +609,117 @@ class FirebaseService {
                         }
                     }
                 }
+                delay(intervalMs) // Fast polling delay between checks
             }
         }
 
         // Return unsubscribe lambda
         return {
             Log.d(TAG, "Unsubscribing from onProductsSnapshot")
+            job.cancel()
+        }
+    }
+
+    /**
+     * Real-time Snapshot Listener for categories from Firestore 'category' collection.
+     * Invokes [onSnapshot] immediately and on any changes in category data.
+     * Returns an unsubscribe function `() -> Unit` to cancel listening.
+     */
+    fun onCategoriesSnapshot(
+        idToken: String,
+        intervalMs: Long = 4000L,
+        scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+        onError: ((Exception) -> Unit)? = null,
+        onSnapshot: (List<String>) -> Unit
+    ): () -> Unit {
+        var lastCategoriesSignature: String = ""
+        val job = scope.launch {
+            while (isActive) {
+                try {
+                    val result = fetchCategories(idToken)
+                    result.onSuccess { freshCategories ->
+                        val signature = freshCategories.joinToString("|")
+                        if (signature != lastCategoriesSignature) {
+                            lastCategoriesSignature = signature
+                            withContext(Dispatchers.Main) {
+                                onSnapshot(freshCategories)
+                            }
+                        }
+                    }.onFailure { err ->
+                        Log.w(TAG, "onCategoriesSnapshot check notice: ${err.message}")
+                        onError?.let { callback ->
+                            withContext(Dispatchers.Main) {
+                                callback(err as? Exception ?: Exception(err))
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    if (e is CancellationException) throw e
+                    Log.w(TAG, "onCategoriesSnapshot check error", e)
+                    onError?.let { callback ->
+                        withContext(Dispatchers.Main) {
+                            callback(e)
+                        }
+                    }
+                }
+                delay(intervalMs)
+            }
+        }
+
+        return {
+            Log.d(TAG, "Unsubscribing from onCategoriesSnapshot")
+            job.cancel()
+        }
+    }
+
+    /**
+     * Real-time Snapshot Listener for customers from Firestore 'customers' collection.
+     * Invokes [onSnapshot] immediately and on any changes in customers data.
+     * Returns an unsubscribe function `() -> Unit` to cancel listening.
+     */
+    fun onCustomersSnapshot(
+        idToken: String,
+        intervalMs: Long = 4000L,
+        scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+        onError: ((Exception) -> Unit)? = null,
+        onSnapshot: (List<Customer>) -> Unit
+    ): () -> Unit {
+        var lastCustomersSignature: String = ""
+        val job = scope.launch {
+            while (isActive) {
+                try {
+                    val result = fetchCustomers(idToken)
+                    result.onSuccess { freshCustomers ->
+                        val signature = freshCustomers.joinToString("|") { "${it.id}_${it.name}_${it.phone}_${it.code}_${it.address}" }
+                        if (signature != lastCustomersSignature) {
+                            lastCustomersSignature = signature
+                            withContext(Dispatchers.Main) {
+                                onSnapshot(freshCustomers)
+                            }
+                        }
+                    }.onFailure { err ->
+                        Log.w(TAG, "onCustomersSnapshot check notice: ${err.message}")
+                        onError?.let { callback ->
+                            withContext(Dispatchers.Main) {
+                                callback(err as? Exception ?: Exception(err))
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    if (e is CancellationException) throw e
+                    Log.w(TAG, "onCustomersSnapshot check error", e)
+                    onError?.let { callback ->
+                        withContext(Dispatchers.Main) {
+                            callback(e)
+                        }
+                    }
+                }
+                delay(intervalMs)
+            }
+        }
+
+        return {
+            Log.d(TAG, "Unsubscribing from onCustomersSnapshot")
             job.cancel()
         }
     }

@@ -299,11 +299,17 @@ fun MainAppHost(
     var showViewModeDialog by remember { mutableStateOf(false) }
     var initialDataLoaded by remember { mutableStateOf(false) }
     var productsUnsubscribe by remember { mutableStateOf<(() -> Unit)?>(null) }
+    var categoriesUnsubscribe by remember { mutableStateOf<(() -> Unit)?>(null) }
+    var customersUnsubscribe by remember { mutableStateOf<(() -> Unit)?>(null) }
 
     DisposableEffect(currentUser?.idToken) {
         onDispose {
             productsUnsubscribe?.invoke()
             productsUnsubscribe = null
+            categoriesUnsubscribe?.invoke()
+            categoriesUnsubscribe = null
+            customersUnsubscribe?.invoke()
+            customersUnsubscribe = null
         }
     }
 
@@ -405,7 +411,7 @@ fun MainAppHost(
                     productsUnsubscribe = firebaseService.onProductsSnapshot(
                         idToken = token,
                         limit = limit,
-                        intervalMs = 60000L,
+                        intervalMs = 3000L,
                         onSnapshot = { liveProducts ->
                             products = liveProducts
                             scope.launch { offlineSyncManager.cacheProducts(liveProducts) }
@@ -416,13 +422,35 @@ fun MainAppHost(
                     )
                 }
 
-                // 5. Fetch customers only one time on initial load or manual forceRefresh
-                if (!initialDataLoaded || forceRefresh || customers.isEmpty()) {
-                    val custResult = firebaseService.fetchCustomers(token)
-                    custResult.onSuccess {
-                        customers = it
-                        offlineSyncManager.cacheCustomers(it)
-                    }
+                // Register real-time categories snapshot listener
+                if (categoriesUnsubscribe == null) {
+                    categoriesUnsubscribe = firebaseService.onCategoriesSnapshot(
+                        idToken = token,
+                        intervalMs = 3500L,
+                        onSnapshot = { liveCategories ->
+                            val catList = listOf("All") + liveCategories
+                            categories = catList
+                            scope.launch { offlineSyncManager.cacheCategories(catList) }
+                        },
+                        onError = { err ->
+                            Log.w("NPOS", "onCategoriesSnapshot notice: ${err.message}")
+                        }
+                    )
+                }
+
+                // Register real-time customers snapshot listener
+                if (customersUnsubscribe == null) {
+                    customersUnsubscribe = firebaseService.onCustomersSnapshot(
+                        idToken = token,
+                        intervalMs = 3500L,
+                        onSnapshot = { liveCustomers ->
+                            customers = liveCustomers
+                            scope.launch { offlineSyncManager.cacheCustomers(liveCustomers) }
+                        },
+                        onError = { err ->
+                            Log.w("NPOS", "onCustomersSnapshot notice: ${err.message}")
+                        }
+                    )
                 }
             } else {
                 // OFFLINE MODE: Load directly from SQLite cache!
@@ -685,6 +713,10 @@ fun MainAppHost(
                         onLogout = {
                             productsUnsubscribe?.invoke()
                             productsUnsubscribe = null
+                            categoriesUnsubscribe?.invoke()
+                            categoriesUnsubscribe = null
+                            customersUnsubscribe?.invoke()
+                            customersUnsubscribe = null
                             initialDataLoaded = false
                             firebaseService.logout()
                             onClearSession()
