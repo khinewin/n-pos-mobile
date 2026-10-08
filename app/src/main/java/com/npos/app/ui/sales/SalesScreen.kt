@@ -1,6 +1,7 @@
 package com.npos.app.ui.sales
 
 import android.widget.Toast
+import com.npos.app.data.AppSettingsManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,7 +27,12 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -123,6 +129,8 @@ fun SalesScreen(
     isLoadingProducts: Boolean,
     isSavingSale: Boolean,
     autoPrintDefault: Boolean,
+    onAutoPrintToggle: ((Boolean) -> Unit)? = null,
+    onRefreshData: (() -> Unit)? = null,
     autoScannedBarcodeFlow: SharedFlow<String>? = null,
     onSearchCloud: (String, String, Int) -> Unit,
     onCheckout: (SaleRecord, Boolean) -> Unit,
@@ -134,7 +142,10 @@ fun SalesScreen(
     onRefreshScannerCheck: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
     val s = LocalStrings.current
+    val settingsManager = remember { AppSettingsManager(context) }
     val cartItems = remember { mutableStateListOf<CartItem>() }
     var selectedCustomer by remember { mutableStateOf(customers.firstOrNull { it.code == "123456789" } ?: Customer.DEFAULT) }
     var searchQuery by remember { mutableStateOf("") }
@@ -152,13 +163,14 @@ fun SalesScreen(
         }
     }
 
-    // Dynamic instant filtering by selectedCategory
+    // Dynamic instant filtering by selectedCategory, excluding stock <= 0 and no sale price
     val displayedProducts by remember(products, selectedCategory) {
         derivedStateOf {
+            val validProducts = products.filter { it.qty > 0 && it.retailPrice > 0.0 }
             if (selectedCategory.isBlank() || selectedCategory == "All") {
-                products
+                validProducts
             } else {
-                products.filter { p ->
+                validProducts.filter { p ->
                     p.categoryName.equals(selectedCategory, ignoreCase = true) ||
                     p.itemName.contains(selectedCategory, ignoreCase = true)
                 }
@@ -233,17 +245,33 @@ fun SalesScreen(
     fun handleBarcodeScan(barcode: String) {
         val cleanBarcode = barcode.trim()
         if (cleanBarcode.isEmpty()) return
+        keyboardController?.hide()
+        focusManager.clearFocus()
         val match = products.find {
-            it.barcode.equals(cleanBarcode, ignoreCase = true) ||
-                    it.codeNo.equals(cleanBarcode, ignoreCase = true)
+            (it.barcode.equals(cleanBarcode, ignoreCase = true) ||
+                    it.codeNo.equals(cleanBarcode, ignoreCase = true)) &&
+                    it.qty > 0 && it.retailPrice > 0.0
         }
         if (match != null) {
             addItemToCart(match)
             barcodeInput = ""
         } else {
-            // Trigger Cloud direct search for barcode
-            onSearchCloud(cleanBarcode, "All", currentLimit)
-            Toast.makeText(context, "Searching Cloud for barcode: $cleanBarcode", Toast.LENGTH_SHORT).show()
+            val invalidMatch = products.find {
+                it.barcode.equals(cleanBarcode, ignoreCase = true) ||
+                        it.codeNo.equals(cleanBarcode, ignoreCase = true)
+            }
+            if (invalidMatch != null) {
+                if (invalidMatch.qty <= 0) {
+                    Toast.makeText(context, "⚠️ \"${invalidMatch.itemName}\" ပစ္စည်းလက်ကျန် (Stock) မရှိပါ", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "⚠️ \"${invalidMatch.itemName}\" ရောင်းစျေးနှုန်း မသတ်မှတ်ရသေးပါ", Toast.LENGTH_SHORT).show()
+                }
+                barcodeInput = ""
+            } else {
+                // Trigger Cloud direct search for barcode
+                onSearchCloud(cleanBarcode, "All", currentLimit)
+                Toast.makeText(context, "Searching Cloud for barcode: $cleanBarcode", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -258,8 +286,9 @@ fun SalesScreen(
     LaunchedEffect(products) {
         if (barcodeInput.isNotEmpty()) {
             val match = products.find {
-                it.barcode.equals(barcodeInput, ignoreCase = true) ||
-                        it.codeNo.equals(barcodeInput, ignoreCase = true)
+                (it.barcode.equals(barcodeInput, ignoreCase = true) ||
+                        it.codeNo.equals(barcodeInput, ignoreCase = true)) &&
+                        it.qty > 0 && it.retailPrice > 0.0
             }
             if (match != null) {
                 addItemToCart(match)
@@ -269,7 +298,21 @@ fun SalesScreen(
     }
 
     fun triggerCloudSearch() {
+        keyboardController?.hide()
+        focusManager.clearFocus()
         onSearchCloud(searchQuery.trim(), selectedCategory, currentLimit)
+    }
+
+    fun triggerFullRefresh() {
+        keyboardController?.hide()
+        focusManager.clearFocus()
+        searchQuery = ""
+        selectedCategory = "All"
+        if (onRefreshData != null) {
+            onRefreshData()
+        } else {
+            onSearchCloud("", "All", currentLimit)
+        }
     }
 
     fun clearCart() {
@@ -348,11 +391,7 @@ fun SalesScreen(
                             onSearchCloud(searchQuery.trim(), cat, currentLimit)
                         },
                         onProductClick = { addItemToCart(it) },
-                        onRefreshAll = {
-                            searchQuery = ""
-                            selectedCategory = "All"
-                            onSearchCloud("", "All", currentLimit)
-                        },
+                        onRefreshAll = { triggerFullRefresh() },
                         isScannerConnected = isScannerConnected,
                         scannerDeviceName = scannerDeviceName,
                         onRefreshScannerCheck = onRefreshScannerCheck
@@ -391,7 +430,11 @@ fun SalesScreen(
                         onCustomerChange = { selectedCustomer = it },
                         onDiscountChange = {},
                         onPaidChange = { paidAmount = it },
-                        onAutoPrintToggle = { autoPrint = it },
+                        onAutoPrintToggle = { enabled ->
+                            autoPrint = enabled
+                            settingsManager.setAutoPrint(enabled)
+                            onAutoPrintToggle?.invoke(enabled)
+                        },
                         onIncreaseQty = { item ->
                             val idx = cartItems.indexOf(item)
                             if (idx >= 0) {
@@ -512,11 +555,7 @@ fun SalesScreen(
                             onSearchCloud(searchQuery.trim(), cat, currentLimit)
                         },
                         onProductClick = { addItemToCart(it) },
-                        onRefreshAll = {
-                            searchQuery = ""
-                            selectedCategory = "All"
-                            onSearchCloud("", "All", currentLimit)
-                        },
+                        onRefreshAll = { triggerFullRefresh() },
                         isScannerConnected = isScannerConnected,
                         scannerDeviceName = scannerDeviceName,
                         onRefreshScannerCheck = onRefreshScannerCheck
@@ -539,7 +578,11 @@ fun SalesScreen(
                         onCustomerChange = { selectedCustomer = it },
                         onDiscountChange = {},
                         onPaidChange = { paidAmount = it },
-                        onAutoPrintToggle = { autoPrint = it },
+                        onAutoPrintToggle = { enabled ->
+                            autoPrint = enabled
+                            settingsManager.setAutoPrint(enabled)
+                            onAutoPrintToggle?.invoke(enabled)
+                        },
                         onIncreaseQty = { item ->
                             val idx = cartItems.indexOf(item)
                             if (idx >= 0) {
@@ -617,6 +660,7 @@ fun SalesScreen(
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 private fun ProductsCatalogPane(
     products: List<Product>,
     isLoading: Boolean,
@@ -639,7 +683,19 @@ private fun ProductsCatalogPane(
     onRefreshScannerCheck: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
-    Column(modifier = Modifier.fillMaxSize()) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable(
+                indication = null,
+                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+            ) {
+                keyboardController?.hide()
+                focusManager.clearFocus()
+            }
+    ) {
         // High-End Search & Barcode Card
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -749,6 +805,8 @@ private fun ProductsCatalogPane(
                         trailingIcon = {
                             if (searchQuery.isNotEmpty()) {
                                 IconButton(onClick = {
+                                    keyboardController?.hide()
+                                    focusManager.clearFocus()
                                     onSearchChange("")
                                     onSearchSubmit()
                                 }) {
@@ -765,12 +823,20 @@ private fun ProductsCatalogPane(
                             .testTag("product_search_input"),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                        keyboardActions = KeyboardActions(onSearch = { onSearchSubmit() }),
+                        keyboardActions = KeyboardActions(onSearch = {
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                            onSearchSubmit()
+                        }),
                         shape = RoundedCornerShape(12.dp)
                     )
 
                     Button(
-                        onClick = onSearchSubmit,
+                        onClick = {
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                            onSearchSubmit()
+                        },
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                         contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
@@ -822,7 +888,11 @@ private fun ProductsCatalogPane(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done
                         ),
-                        keyboardActions = KeyboardActions(onDone = { onBarcodeSubmit(barcodeInput) }),
+                        keyboardActions = KeyboardActions(onDone = {
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                            onBarcodeSubmit(barcodeInput)
+                        }),
                         shape = RoundedCornerShape(10.dp)
                     )
 
@@ -889,7 +959,11 @@ private fun ProductsCatalogPane(
                 val isSelected = cat == selectedCategory
                 FilterChip(
                     selected = isSelected,
-                    onClick = { onSelectCategory(cat) },
+                    onClick = {
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                        onSelectCategory(cat)
+                    },
                     label = {
                         Text(
                             text = cat,
@@ -929,7 +1003,11 @@ private fun ProductsCatalogPane(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .clickable { onRefreshAll() }
+                    .clickable {
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                        onRefreshAll()
+                    }
                     .padding(4.dp)
             ) {
                 Icon(Icons.Default.Refresh, contentDescription = "Refresh", modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.primary)
@@ -940,67 +1018,95 @@ private fun ProductsCatalogPane(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        // Product List
-        if (isLoading) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text("Cloud မှ ပစ္စည်းများ ရှာဖွေနေပါသည်...", fontSize = 13.sp, color = Color.Gray)
+        // Product List with Pull to Refresh
+        PullToRefreshBox(
+            isRefreshing = isLoading,
+            onRefresh = {
+                keyboardController?.hide()
+                focusManager.clearFocus()
+                onRefreshAll()
+            },
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            if (isLoading && products.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text("Cloud မှ ပစ္စည်းများ ရှာဖွေနေပါသည်...", fontSize = 13.sp, color = Color.Gray)
+                    }
                 }
-            }
-        } else if (products.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Card(
-                    modifier = Modifier.padding(24.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            } else if (products.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Column(
+                    Card(
                         modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
-                        Surface(
-                            shape = CircleShape,
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            modifier = Modifier.size(56.dp)
+                        Column(
+                            modifier = Modifier.padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(Icons.Default.Inventory, contentDescription = "Empty", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(28.dp))
+                            Surface(
+                                shape = CircleShape,
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                modifier = Modifier.size(56.dp)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(Icons.Default.Inventory, contentDescription = "Empty", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(28.dp))
+                                }
                             }
-                        }
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text = "No products found in Cloud",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "အမည် သို့မဟုတ် ဘားကုဒ် ရိုက်ထည့်၍ 'ရှာမည်' ခလုတ်ကို နှိပ်ပါ",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 12.sp,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Button(
-                            onClick = onRefreshAll,
-                            shape = RoundedCornerShape(10.dp)
-                        ) {
-                            Text("ပစ္စည်းအားလုံး ပြန်လည်ပြသမည်")
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = "No products found in Cloud",
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "အမည် သို့မဟုတ် ဘားကုဒ် ရိုက်ထည့်၍ 'ရှာမည်' ခလုတ်ကို နှိပ်ပါ",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Button(
+                                onClick = {
+                                    keyboardController?.hide()
+                                    focusManager.clearFocus()
+                                    onRefreshAll()
+                                },
+                                shape = RoundedCornerShape(10.dp)
+                            ) {
+                                Text("ပစ္စည်းအားလုံး ပြန်လည်ပြသမည်")
+                            }
                         }
                     }
                 }
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(products, key = { it.id }) { product ->
-                    ProductItemRow(product = product, onClick = { onProductClick(product) })
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(products, key = { it.id }) { product ->
+                        ProductItemRow(
+                            product = product,
+                            onClick = {
+                                keyboardController?.hide()
+                                focusManager.clearFocus()
+                                onProductClick(product)
+                            }
+                        )
+                    }
                 }
             }
         }

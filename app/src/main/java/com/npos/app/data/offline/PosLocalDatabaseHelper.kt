@@ -21,7 +21,7 @@ class PosLocalDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATAB
     companion object {
         private const val TAG = "PosLocalDatabaseHelper"
         private const val DATABASE_NAME = "npos_local.db"
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 2
 
         // Tables
         const val TABLE_PRODUCTS = "cached_products"
@@ -109,20 +109,21 @@ class PosLocalDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATAB
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        // Purge old cached data tables so obsolete, deleted, or old-project items never linger
         db.execSQL("DROP TABLE IF EXISTS $TABLE_PRODUCTS")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_CATEGORIES")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_CUSTOMERS")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_OFFLINE_SALES")
         onCreate(db)
     }
 
     // ----------------------------------------------------
     // Products Caching & Offline Retrieval
     // ----------------------------------------------------
-    fun cacheProducts(products: List<Product>) {
+    fun replaceProductsCache(products: List<Product>) {
         val db = writableDatabase
         db.beginTransaction()
         try {
+            db.delete(TABLE_PRODUCTS, null, null)
             val now = System.currentTimeMillis()
             for (p in products) {
                 val cv = ContentValues().apply {
@@ -140,18 +141,22 @@ class PosLocalDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATAB
                 db.insertWithOnConflict(TABLE_PRODUCTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE)
             }
             db.setTransactionSuccessful()
-            Log.d(TAG, "Successfully cached ${products.size} products to local SQLite")
+            Log.d(TAG, "Successfully replaced cached products with ${products.size} fresh items")
         } catch (e: Exception) {
-            Log.e(TAG, "Error caching products", e)
+            Log.e(TAG, "Error replacing products cache", e)
         } finally {
             db.endTransaction()
         }
     }
 
+    fun cacheProducts(products: List<Product>) {
+        replaceProductsCache(products)
+    }
+
     fun getAllCachedProducts(): List<Product> {
         val list = mutableListOf<Product>()
         val db = readableDatabase
-        val cursor = db.query(TABLE_PRODUCTS, null, null, null, null, null, "item_name ASC")
+        val cursor = db.query(TABLE_PRODUCTS, null, "qty > 0 AND retail_price > 0", null, null, null, "rowid ASC")
         cursor.use { c ->
             val idIdx = c.getColumnIndexOrThrow("id")
             val codeNoIdx = c.getColumnIndexOrThrow("code_no")
@@ -202,28 +207,34 @@ class PosLocalDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATAB
     // ----------------------------------------------------
     // Categories Caching & Offline Retrieval
     // ----------------------------------------------------
-    fun cacheCategories(categories: List<String>) {
+    fun replaceCategoriesCache(categories: List<String>) {
         val db = writableDatabase
         db.beginTransaction()
         try {
+            db.delete(TABLE_CATEGORIES, null, null)
             for (cat in categories) {
                 if (cat.isNotBlank() && cat != "All") {
                     val cv = ContentValues().apply { put("name", cat) }
-                    db.insertWithOnConflict(TABLE_CATEGORIES, null, cv, SQLiteDatabase.CONFLICT_IGNORE)
+                    db.insertWithOnConflict(TABLE_CATEGORIES, null, cv, SQLiteDatabase.CONFLICT_REPLACE)
                 }
             }
             db.setTransactionSuccessful()
+            Log.d(TAG, "Successfully replaced cached categories with ${categories.size} items")
         } catch (e: Exception) {
-            Log.e(TAG, "Error caching categories", e)
+            Log.e(TAG, "Error replacing categories cache", e)
         } finally {
             db.endTransaction()
         }
     }
 
+    fun cacheCategories(categories: List<String>) {
+        replaceCategoriesCache(categories)
+    }
+
     fun getAllCachedCategories(): List<String> {
         val list = mutableListOf("All")
         val db = readableDatabase
-        val cursor = db.query(TABLE_CATEGORIES, arrayOf("name"), null, null, null, null, "name ASC")
+        val cursor = db.query(TABLE_CATEGORIES, arrayOf("name"), null, null, null, null, "rowid ASC")
         cursor.use { c ->
             val nameIdx = c.getColumnIndexOrThrow("name")
             while (c.moveToNext()) {
@@ -236,10 +247,11 @@ class PosLocalDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATAB
     // ----------------------------------------------------
     // Customers Caching & Offline Retrieval
     // ----------------------------------------------------
-    fun cacheCustomers(customers: List<Customer>) {
+    fun replaceCustomersCache(customers: List<Customer>) {
         val db = writableDatabase
         db.beginTransaction()
         try {
+            db.delete(TABLE_CUSTOMERS, null, null)
             for (cust in customers) {
                 val cv = ContentValues().apply {
                     put("id", cust.id)
@@ -252,7 +264,27 @@ class PosLocalDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATAB
             }
             db.setTransactionSuccessful()
         } catch (e: Exception) {
-            Log.e(TAG, "Error caching customers", e)
+            Log.e(TAG, "Error replacing customers cache", e)
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    fun cacheCustomers(customers: List<Customer>) {
+        replaceCustomersCache(customers)
+    }
+
+    fun clearAllCachedData() {
+        val db = writableDatabase
+        db.beginTransaction()
+        try {
+            db.delete(TABLE_PRODUCTS, null, null)
+            db.delete(TABLE_CATEGORIES, null, null)
+            db.delete(TABLE_CUSTOMERS, null, null)
+            db.setTransactionSuccessful()
+            Log.d(TAG, "Cleared all local cached products, categories, and customers")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error clearing cached data", e)
         } finally {
             db.endTransaction()
         }

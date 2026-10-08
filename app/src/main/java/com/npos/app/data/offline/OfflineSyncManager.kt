@@ -6,6 +6,7 @@ import com.npos.app.data.FirebaseService
 import com.npos.app.data.model.Customer
 import com.npos.app.data.model.Product
 import com.npos.app.data.model.SaleRecord
+import com.npos.app.data.model.UserSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -65,41 +66,111 @@ class OfflineSyncManager(
         dbHelper.getAllCachedCustomers()
     }
 
+    suspend fun clearAllCachedData() = withContext(Dispatchers.IO) {
+        dbHelper.clearAllCachedData()
+    }
+
     /**
-     * Intelligent hybrid sale save:
-     * - If Online: saves directly to Firebase Firestore Cloud; caches locally as SYNCED.
-     *   (If Firestore call encounters network timeout, immediately falls back to Offline Queue).
-     * - If Offline: saves directly to SQLite Offline Queue as PENDING.
+     * Intelligent sale save:
+     * - Primary requirement: Always update to Firebase Firestore Cloud when internet is available.
+     * - Checks and refreshes token if expired or close to expiry.
+     * - Retries Cloud save cleanly with detailed error logging.
+     * - Fallback: Use Firebase offline mode ONLY when internet is truly unavailable or completely unreachable.
      */
     suspend fun processSale(
         firebaseService: FirebaseService,
         idToken: String,
         sale: SaleRecord,
-        forceOffline: Boolean = false
+        forceOffline: Boolean = false,
+        onSessionRefreshed: ((UserSession) -> Unit)? = null
     ): Pair<Result<String>, Boolean> = withContext(Dispatchers.IO) {
-        val online = !forceOffline && networkMonitor.isOnline.value
+        var activeToken = idToken
 
-        if (online && idToken.isNotBlank()) {
-            // Attempt cloud save
-            val cloudResult = firebaseService.saveSaleRecord(idToken, sale)
-            if (cloudResult.isSuccess) {
-                // Record cached copy as SYNCED
-                dbHelper.saveOfflineSale(sale, PosLocalDatabaseHelper.STATUS_SYNCED)
-                refreshPendingCount()
-                return@withContext Pair(cloudResult, false) // false = saved online
-            } else {
-                Log.w(TAG, "Cloud save failed (${cloudResult.exceptionOrNull()?.message}). Falling back to Offline Queue.")
+        // If not forced offline and Firebase is configured, ALWAYS attempt and prioritize Firebase Cloud update!
+        if (!forceOffline && firebaseService.isConfigured) {
+            val session = firebaseService.authState.value
+            // If token is blank but session exists, try to get fresh token first
+            if (activeToken.isBlank() && session != null) {
+                val relogRes = firebaseService.reloginCurrentUser(session)
+                if (relogRes.isSuccess) {
+                    val refreshedSession = relogRes.getOrThrow()
+                    activeToken = refreshedSession.idToken
+                    onSessionRefreshed?.invoke(refreshedSession)
+                }
+            }
+
+            var lastError: Exception? = null
+
+            // First attempt to save directly to Firebase Firestore Cloud
+            if (activeToken.isNotBlank()) {
+                val cloudResult = firebaseService.saveSaleRecord(activeToken, sale)
+                if (cloudResult.isSuccess) {
+                    dbHelper.saveOfflineSale(sale, PosLocalDatabaseHelper.STATUS_SYNCED)
+                    refreshPendingCount()
+                    NetworkMonitor.notifySuccess()
+                    return@withContext Pair(cloudResult, false) // Online save to Firebase succeeded!
+                }
+
+                val err = cloudResult.exceptionOrNull()
+                val errMsg = err?.message.orEmpty()
+                lastError = err as? Exception ?: Exception(errMsg)
+                Log.w(TAG, "First Cloud save attempt failed: $errMsg")
+
+                // If error is 401 / UNAUTHENTICATED / Token expired, automatically refresh token & retry immediately
+                if (errMsg.contains("401") || errMsg.contains("UNAUTHENTICATED") || errMsg.contains("expired", ignoreCase = true)) {
+                    val currentSession = firebaseService.authState.value
+                    if (currentSession != null) {
+                        Log.i(TAG, "Token expired during sale. Silently refreshing Firebase session...")
+                        val relogRes = firebaseService.reloginCurrentUser(currentSession)
+                        if (relogRes.isSuccess) {
+                            val refreshedSession = relogRes.getOrThrow()
+                            activeToken = refreshedSession.idToken
+                            onSessionRefreshed?.invoke(refreshedSession)
+
+                            val retryResult = firebaseService.saveSaleRecord(activeToken, sale)
+                            if (retryResult.isSuccess) {
+                                dbHelper.saveOfflineSale(sale, PosLocalDatabaseHelper.STATUS_SYNCED)
+                                refreshPendingCount()
+                                NetworkMonitor.notifySuccess()
+                                return@withContext Pair(retryResult, false) // Online save succeeded after token refresh!
+                            } else {
+                                lastError = retryResult.exceptionOrNull() as? Exception ?: lastError
+                                Log.e(TAG, "Retry with refreshed token also failed: ${lastError?.message}")
+                            }
+                        }
+                    }
+                }
+            }
+
+            // If we have internet connectivity (or device has network), try 1 more immediate attempt
+            val hasNetwork = networkMonitor.isOnline.value || networkMonitor.checkActualConnectivityFast()
+            if (hasNetwork && activeToken.isNotBlank()) {
+                try {
+                    val retryResult = firebaseService.saveSaleRecord(activeToken, sale)
+                    if (retryResult.isSuccess) {
+                        dbHelper.saveOfflineSale(sale, PosLocalDatabaseHelper.STATUS_SYNCED)
+                        refreshPendingCount()
+                        NetworkMonitor.notifySuccess()
+                        return@withContext Pair(retryResult, false)
+                    } else {
+                        lastError = retryResult.exceptionOrNull() as? Exception ?: lastError
+                    }
+                } catch (e: Exception) {
+                    lastError = e
+                    Log.w(TAG, "Secondary online attempt threw exception: ${e.message}")
+                }
             }
         }
 
-        // Save in local SQLite Offline Queue
+        // Only when internet is truly disconnected or Cloud is unreachable, use Firebase Offline Mode
+        Log.i(TAG, "No internet or Cloud unreachable -> Saving sale in Firebase Offline Mode (${sale.voucherNo})")
         val saved = dbHelper.saveOfflineSale(sale, PosLocalDatabaseHelper.STATUS_PENDING)
         refreshPendingCount()
 
         if (saved) {
-            Pair(Result.success(sale.voucherNo), true) // true = saved offline
+            Pair(Result.success(sale.voucherNo), true) // true = saved in offline mode
         } else {
-            Pair(Result.failure(Exception("Failed to save sale to local offline database")), true)
+            Pair(Result.failure(Exception("Failed to save sale to offline storage")), true)
         }
     }
 
@@ -110,7 +181,7 @@ class OfflineSyncManager(
         firebaseService: FirebaseService,
         idToken: String
     ): Result<Int> = withContext(Dispatchers.IO) {
-        if (!networkMonitor.isOnline.value) {
+        if (!networkMonitor.isOnline.value && !networkMonitor.checkActualConnectivityFast()) {
             return@withContext Result.failure(Exception("အင်တာနက် မရှိပါ (Offline ဖြစ်နေပါသည်)"))
         }
         if (idToken.isBlank()) {

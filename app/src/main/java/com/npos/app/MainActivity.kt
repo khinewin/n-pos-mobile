@@ -271,7 +271,9 @@ fun MainAppHost(
     var customers by remember { mutableStateOf<List<Customer>>(emptyList()) }
     var categories by remember { mutableStateOf<List<String>>(listOf("All")) }
     var totalProductsCount by remember { mutableIntStateOf(0) }
-    var displayLimit by remember { mutableIntStateOf(50) }
+    val settingsManager = remember { AppSettingsManager(context) }
+    var displayLimit by remember { mutableIntStateOf(settingsManager.getDisplayLimit()) }
+    var autoPrintDefault by remember { mutableStateOf(settingsManager.getAutoPrint()) }
     var isLoadingData by remember { mutableStateOf(false) }
     var isSavingSale by remember { mutableStateOf(false) }
     var isSavingCustomer by remember { mutableStateOf(false) }
@@ -295,6 +297,7 @@ fun MainAppHost(
     var showPrinterDialog by remember { mutableStateOf(false) }
     var showCustomerDialog by remember { mutableStateOf(false) }
     var showViewModeDialog by remember { mutableStateOf(false) }
+    var initialDataLoaded by remember { mutableStateOf(false) }
     var productsUnsubscribe by remember { mutableStateOf<(() -> Unit)?>(null) }
 
     DisposableEffect(currentUser?.idToken) {
@@ -347,70 +350,79 @@ fun MainAppHost(
         }
     }
 
-    fun loadFirebaseData(token: String, limit: Int = displayLimit) {
+    fun loadFirebaseData(token: String, limit: Int = displayLimit, forceRefresh: Boolean = false) {
         isLoadingData = true
-        // Cancel prior snapshot listener before starting a new one
-        productsUnsubscribe?.invoke()
-        productsUnsubscribe = null
 
         scope.launch {
             if (networkMonitor.isOnline.value) {
-                // 1. Fetch total products count with aggregation
-                firebaseService.fetchTotalProductsCount(token).onSuccess {
-                    totalProductsCount = it
-                }
-
-                // 2. Fetch categories from Firestore 'category' collection
-                firebaseService.fetchCategories(token).onSuccess {
-                    val catList = listOf("All") + it
-                    categories = catList
-                    offlineSyncManager.cacheCategories(catList)
-                }
-
-                // 3. Initial load of products ordered by created_at DESC
-                val prodResult = firebaseService.fetchProducts(token, limit)
-                prodResult.onSuccess {
-                    products = it
-                    offlineSyncManager.cacheProducts(it)
-                    Log.d("NPOS", "Loaded ${it.size} products from Firebase Firestore & cached locally")
-                }.onFailure { err ->
-                    Log.e("NPOS", "Failed to load products from cloud: ${err.message}. Loading from local SQLite cache...")
-                    val cachedProds = offlineSyncManager.getCachedProducts()
-                    if (cachedProds.isNotEmpty()) {
-                        products = cachedProds
-                        totalProductsCount = cachedProds.size
+                // 1. Fetch total products count with aggregation only on initial load or manual forceRefresh
+                if (!initialDataLoaded || forceRefresh) {
+                    firebaseService.fetchTotalProductsCount(token).onSuccess {
+                        totalProductsCount = it
                     }
-                    if (err.message?.contains("401") == true || err.message?.contains("UNAUTHENTICATED") == true) {
-                        // Token expired - trigger relogin current user via onAuthStateChange
-                        currentUser?.let { user ->
-                            val relogRes = firebaseService.reloginCurrentUser(user)
-                            relogRes.onSuccess { refreshedSession ->
-                                currentUser = refreshedSession
-                                onSaveSession(refreshedSession)
-                                loadFirebaseData(refreshedSession.idToken, limit)
+                }
+
+                // 2. Fetch categories from Firestore 'category' collection only on initial load or manual forceRefresh
+                if (!initialDataLoaded || forceRefresh || categories.size <= 1) {
+                    firebaseService.fetchCategories(token).onSuccess {
+                        val catList = listOf("All") + it
+                        categories = catList
+                        offlineSyncManager.cacheCategories(catList)
+                    }
+                }
+
+                // 3. Initial load of products ordered by created_at DESC (fetch only one time if not loaded or forceRefresh)
+                if (!initialDataLoaded || forceRefresh || products.isEmpty()) {
+                    val prodResult = firebaseService.fetchProducts(token, limit)
+                    prodResult.onSuccess {
+                        products = it
+                        offlineSyncManager.cacheProducts(it)
+                        initialDataLoaded = true
+                        Log.d("NPOS", "Loaded ${it.size} products from Firebase Firestore & cached locally")
+                    }.onFailure { err ->
+                        Log.e("NPOS", "Failed to load products from cloud: ${err.message}. Loading from local SQLite cache...")
+                        val cachedProds = offlineSyncManager.getCachedProducts()
+                        if (cachedProds.isNotEmpty()) {
+                            products = cachedProds
+                            totalProductsCount = cachedProds.size
+                        }
+                        if (err.message?.contains("401") == true || err.message?.contains("UNAUTHENTICATED") == true) {
+                            // Token expired - trigger relogin current user via onAuthStateChange
+                            currentUser?.let { user ->
+                                val relogRes = firebaseService.reloginCurrentUser(user)
+                                relogRes.onSuccess { refreshedSession ->
+                                    currentUser = refreshedSession
+                                    onSaveSession(refreshedSession)
+                                    loadFirebaseData(refreshedSession.idToken, limit, forceRefresh = true)
+                                }
                             }
                         }
                     }
                 }
 
-                // 4. Register real-time snapshot listener with unsub handle (orderBy created_at DESC)
-                productsUnsubscribe = firebaseService.onProductsSnapshot(
-                    idToken = token,
-                    limit = limit,
-                    intervalMs = 10000L,
-                    onSnapshot = { liveProducts ->
-                        products = liveProducts
-                        scope.launch { offlineSyncManager.cacheProducts(liveProducts) }
-                    },
-                    onError = { err ->
-                        Log.w("NPOS", "onProductsSnapshot warning: ${err.message}")
-                    }
-                )
+                // 4. Register real-time snapshot listener once with unsub handle (updates data via onSnapshot)
+                if (productsUnsubscribe == null) {
+                    productsUnsubscribe = firebaseService.onProductsSnapshot(
+                        idToken = token,
+                        limit = limit,
+                        intervalMs = 60000L,
+                        onSnapshot = { liveProducts ->
+                            products = liveProducts
+                            scope.launch { offlineSyncManager.cacheProducts(liveProducts) }
+                        },
+                        onError = { err ->
+                            Log.w("NPOS", "onProductsSnapshot notice: ${err.message}")
+                        }
+                    )
+                }
 
-                val custResult = firebaseService.fetchCustomers(token)
-                custResult.onSuccess {
-                    customers = it
-                    offlineSyncManager.cacheCustomers(it)
+                // 5. Fetch customers only one time on initial load or manual forceRefresh
+                if (!initialDataLoaded || forceRefresh || customers.isEmpty()) {
+                    val custResult = firebaseService.fetchCustomers(token)
+                    custResult.onSuccess {
+                        customers = it
+                        offlineSyncManager.cacheCustomers(it)
+                    }
                 }
             } else {
                 // OFFLINE MODE: Load directly from SQLite cache!
@@ -575,6 +587,13 @@ fun MainAppHost(
                 val saved = configManager.saveConfig(newProj, newKey)
                 firebaseService.updateConfig(saved.projectId, saved.apiKey)
                 firebaseConfig = saved
+                initialDataLoaded = false
+                scope.launch {
+                    offlineSyncManager.clearAllCachedData()
+                }
+                products = emptyList()
+                categories = listOf("All")
+                customers = emptyList()
                 Toast.makeText(context, if (saved.isConfigured) "${s.connected}: ${saved.projectId}" else s.databaseSetting, Toast.LENGTH_SHORT).show()
             },
             onLoginSubmit = { email, password ->
@@ -666,11 +685,17 @@ fun MainAppHost(
                         onLogout = {
                             productsUnsubscribe?.invoke()
                             productsUnsubscribe = null
+                            initialDataLoaded = false
                             firebaseService.logout()
                             onClearSession()
                             currentUser = null
                             products = emptyList()
-                            scope.launch { drawerState.close() }
+                            categories = listOf("All")
+                            customers = emptyList()
+                            scope.launch {
+                                offlineSyncManager.clearAllCachedData()
+                                drawerState.close()
+                            }
                         }
                     )
                 }
@@ -792,15 +817,21 @@ fun MainAppHost(
                                 currentLimit = displayLimit,
                                 onLimitChanged = { newLimit ->
                                     displayLimit = newLimit
-                                    loadFirebaseData(user.idToken, newLimit)
+                                    settingsManager.setDisplayLimit(newLimit)
+                                    loadFirebaseData(user.idToken, newLimit, forceRefresh = true)
                                 },
                                 isLoadingProducts = isLoadingData,
                                 isSavingSale = isSavingSale,
-                                autoPrintDefault = true,
+                                autoPrintDefault = autoPrintDefault,
+                                onAutoPrintToggle = { enabled ->
+                                    autoPrintDefault = enabled
+                                    settingsManager.setAutoPrint(enabled)
+                                },
                                 autoScannedBarcodeFlow = barcodeScannerManager.scannedCodeFlow,
                                 isScannerConnected = isScannerConnected,
                                 scannerDeviceName = scannerDeviceName,
                                 onRefreshScannerCheck = { barcodeScannerManager.updateScannerConnectionStatus() },
+                                onRefreshData = { loadFirebaseData(user.idToken, displayLimit, forceRefresh = true) },
                                 onSearchCloud = { query, category, limit ->
                                     isLoadingData = true
                                     scope.launch {
@@ -825,7 +856,11 @@ fun MainAppHost(
                                         val (result, savedOffline) = offlineSyncManager.processSale(
                                             firebaseService = firebaseService,
                                             idToken = user.idToken,
-                                            sale = saleRecord
+                                            sale = saleRecord,
+                                            onSessionRefreshed = { refreshedSession ->
+                                                currentUser = refreshedSession
+                                                onSaveSession(refreshedSession)
+                                            }
                                         )
                                         isSavingSale = false
                                         result.onSuccess { voucherId ->

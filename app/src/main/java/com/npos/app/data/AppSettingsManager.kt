@@ -31,6 +31,8 @@ class AppSettingsManager(context: Context) {
     companion object {
         private const val KEY_THEME_MODE = "app_theme_mode"
         private const val KEY_LANGUAGE = "app_language"
+        private const val KEY_DISPLAY_LIMIT = "app_display_limit"
+        private const val KEY_AUTO_PRINT = "app_auto_print"
 
         private val _globalThemeMode = MutableStateFlow(AppThemeMode.SYSTEM)
         val globalThemeMode: StateFlow<AppThemeMode> = _globalThemeMode.asStateFlow()
@@ -62,5 +64,21 @@ class AppSettingsManager(context: Context) {
     fun setLanguage(language: AppLanguage) {
         _globalLanguage.value = language
         prefs.edit().putString(KEY_LANGUAGE, language.code).apply()
+    }
+
+    fun getDisplayLimit(): Int {
+        return prefs.getInt(KEY_DISPLAY_LIMIT, 50)
+    }
+
+    fun setDisplayLimit(limit: Int) {
+        prefs.edit().putInt(KEY_DISPLAY_LIMIT, limit).apply()
+    }
+
+    fun getAutoPrint(): Boolean {
+        return prefs.getBoolean(KEY_AUTO_PRINT, true)
+    }
+
+    fun setAutoPrint(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_AUTO_PRINT, enabled).apply()
     }
 }

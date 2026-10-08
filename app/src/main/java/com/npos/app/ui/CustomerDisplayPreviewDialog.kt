@@ -16,6 +16,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,8 +40,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Refresh
@@ -59,7 +62,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -114,11 +119,15 @@ fun CustomerDisplayPreviewDialog(
 
     // Determine current theme mode (Light vs Dark)
     val currentTheme = LocalThemeMode.current
-    val isDark = when (currentTheme) {
+    val systemIsDark = isSystemInDarkTheme()
+    val defaultIsDark = when (currentTheme) {
         AppThemeMode.DARK -> true
         AppThemeMode.LIGHT -> false
-        AppThemeMode.SYSTEM -> isSystemInDarkTheme()
+        AppThemeMode.SYSTEM -> systemIsDark
     }
+    // Allow cashier to preview both Light and Dark themes directly within the dialog
+    var previewDarkOverride by remember(defaultIsDark) { mutableStateOf<Boolean?>(null) }
+    val activeIsDark = previewDarkOverride ?: defaultIsDark
 
     // Determine current language (Myanmar vs English)
     val currentLanguage = LocalAppLanguage.current
@@ -156,33 +165,31 @@ fun CustomerDisplayPreviewDialog(
         ?: prefs.getString("footer_note", "Thank you for shopping with us!")?.ifEmpty { "Thank you for shopping with us!" } ?: "Thank you for shopping with us!"
 
     // Dynamic Colors for Light vs Dark Theme
-    val leftGradientColors = if (isDark) {
-        listOf(Color(0xFF0B0F19), Color(0xFF151C2C), Color(0xFF0B0F19))
-    } else {
-        listOf(Color(0xFF0A2540), Color(0xFF13395E), Color(0xFF0A2540))
-    }
-    val leftBorderColor = if (isDark) Color(0xFF263248) else Color.Transparent
-    val cardSurfaceBg = if (isDark) Color(0xFF171B22) else Color.White
-    val cardSurfaceBorder = if (isDark) Color(0xFF2B303C) else Color(0xFFE9ECEF)
-    val tableHeaderBg = if (isDark) Color(0xFF1E40AF) else Color(0xFF0D6EFD)
-    val totalCardBg = if (isDark) Color(0xFF0D0F14) else Color(0xFF212529)
-    val totalCardBorder = if (isDark) Color(0xFF262C38) else Color.Transparent
-    val itemTextColor = if (isDark) Color(0xFFF1F5F9) else Color(0xFF212529)
-    val itemSubTextColor = if (isDark) Color(0xFF94A3B8) else Color.DarkGray
-    val itemAmountColor = if (isDark) Color(0xFF60A5FA) else Color(0xFF0D6EFD)
-    val zebraBg = if (isDark) Color(0xFF1D222B) else Color(0xFFF8F9FA)
-    val dividerColor = if (isDark) Color(0xFF262C38) else Color(0xFFEEEEEE)
+    val dialogBg = if (activeIsDark) Color(0xFF13171F) else Color.White
+    val dialogBorder = if (activeIsDark) Color(0xFF262C38) else Color(0xFFE2E8F0)
 
-    val statusBannerBg = if (isSecondaryDisplayConnected) {
-        if (isDark) Color(0xFF143E2B) else Color(0xFFD1E7DD)
+    val leftGradientColors = if (activeIsDark) {
+        listOf(Color(0xFF0F141C), Color(0xFF182030), Color(0xFF0F141C))
     } else {
-        if (isDark) Color(0xFF3B2E0A) else Color(0xFFFFF3CD)
+        listOf(Color(0xFFF1F6FF), Color(0xFFE2EDFD), Color(0xFFF1F6FF))
     }
-    val statusBannerTextColor = if (isSecondaryDisplayConnected) {
-        if (isDark) Color(0xFF75B798) else Color(0xFF0F5132)
-    } else {
-        if (isDark) Color(0xFFFFDA6A) else Color(0xFF664D03)
-    }
+    val leftBorderColor = if (activeIsDark) Color(0xFF263248) else Color(0xFFE2E8F0)
+
+    val shopNameColor = if (activeIsDark) Color(0xFFF8FAFC) else Color(0xFF0F172A)
+    val shopTaglineBg = if (activeIsDark) Color(0xFF1E3A8A).copy(alpha = 0.45f) else Color(0xFFDBEAFE)
+    val shopTaglineBorder = if (activeIsDark) Color(0xFF3B82F6).copy(alpha = 0.5f) else Color(0xFF93C5FD)
+    val shopTaglineTextColor = if (activeIsDark) Color(0xFF93C5FD) else Color(0xFF1D4ED8)
+    val leftDividerColor = if (activeIsDark) Color(0xFF334155) else Color(0xFFCBD5E1)
+
+    val addressCardBg = if (activeIsDark) Color(0xFF1E293B).copy(alpha = 0.7f) else Color.White
+    val addressCardBorder = if (activeIsDark) Color(0xFF334155) else Color(0xFFE2E8F0)
+    val addressIconColor = if (activeIsDark) Color(0xFF60A5FA) else Color(0xFF2563EB)
+    val addressTextColor = if (activeIsDark) Color(0xFFE2E8F0) else Color(0xFF334155)
+
+    val phoneCardBg = if (activeIsDark) Color(0xFF854D0E).copy(alpha = 0.25f) else Color(0xFFFEF3C7)
+    val phoneCardBorder = if (activeIsDark) Color(0xFFEAB308).copy(alpha = 0.35f) else Color(0xFFFDE68A)
+    val phoneIconColor = if (activeIsDark) Color(0xFFFFD166) else Color(0xFFD97706)
+    val phoneTextColor = if (activeIsDark) Color(0xFFFFD166) else Color(0xFF92400E)
 
     // Animations for empty cart floating & greeting card glow
     val infiniteTransition = rememberInfiniteTransition(label = "CustomerPreviewAnimations")
@@ -205,6 +212,52 @@ fun CustomerDisplayPreviewDialog(
         label = "greetingGlow"
     )
 
+    val greetingCardBg = if (activeIsDark) Color(0xFF1E293B).copy(alpha = 0.85f * greetingGlow) else Color.White.copy(alpha = 0.95f * greetingGlow)
+    val greetingCardBorder = if (activeIsDark) Color(0xFF334155) else Color(0xFFE2E8F0)
+    val greetingTextColor = if (activeIsDark) Color(0xFFF8FAFC) else Color(0xFF1E293B)
+    val greetingSubtextColor = if (activeIsDark) Color(0xFFCBD5E1) else Color(0xFF64748B)
+
+    val brandTitleColor = if (activeIsDark) Color(0xFFE2E8F0) else Color(0xFF334155)
+    val brandSubtextColor = if (activeIsDark) Color(0xFF94A3B8) else Color(0xFF64748B)
+
+    // Right Column Elements
+    val cardSurfaceBg = if (activeIsDark) Color(0xFF171B22) else Color.White
+    val cardSurfaceBorder = if (activeIsDark) Color(0xFF2B303C) else Color(0xFFE2E8F0)
+    val tableHeaderBg = if (activeIsDark) Color(0xFF1E40AF) else Color(0xFF1D4ED8)
+    val itemTextColor = if (activeIsDark) Color(0xFFF1F5F9) else Color(0xFF0F172A)
+    val itemSubTextColor = if (activeIsDark) Color(0xFF94A3B8) else Color(0xFF64748B)
+    val itemAmountColor = if (activeIsDark) Color(0xFF60A5FA) else Color(0xFF1D4ED8)
+    val zebraBg = if (activeIsDark) Color(0xFF1D222B) else Color(0xFFF8FAFC)
+    val dividerColor = if (activeIsDark) Color(0xFF262C38) else Color(0xFFF1F5F9)
+
+    val emptyCircleBg = if (activeIsDark) Color(0xFF0D47A1).copy(alpha = 0.35f) else Color(0xFFDBEAFE)
+    val emptyIconTint = if (activeIsDark) Color(0xFF64B5F6) else Color(0xFF2563EB)
+
+    // Total Card Elements
+    val totalCardBg = if (activeIsDark) Color(0xFF0D0F14) else Color.White
+    val totalCardBorder = if (activeIsDark) Color(0xFF262C38) else Color(0xFFCBD5E1)
+    val totalTitleColor = if (activeIsDark) Color(0xFFFFD166) else Color(0xFF1E3A8A)
+    val totalSubtextColor = if (activeIsDark) Color(0xFF94A3B8) else Color(0xFF64748B)
+    val totalAmountColor = if (activeIsDark) Color(0xFFFFD166) else Color(0xFF1D4ED8)
+    val totalDividerColor = if (activeIsDark) Color(0xFF262C38) else Color(0xFFE2E8F0)
+    val discountLabelColor = if (activeIsDark) Color(0xFF94A3B8) else Color(0xFF64748B)
+    val discountValueColor = if (activeIsDark) Color(0xFFFF6B6B) else Color(0xFFDC2626)
+    val paidLabelColor = if (activeIsDark) Color(0xFFCBD5E1) else Color(0xFF475569)
+    val paidValueColor = if (activeIsDark) Color.White else Color(0xFF0F172A)
+    val changeLabelColor = if (activeIsDark) Color(0xFF6EE7B7) else Color(0xFF047857)
+    val changeValueColor = if (activeIsDark) Color(0xFF06D6A0) else Color(0xFF059669)
+
+    val statusBannerBg = if (isSecondaryDisplayConnected) {
+        if (activeIsDark) Color(0xFF143E2B) else Color(0xFFD1E7DD)
+    } else {
+        if (activeIsDark) Color(0xFF3B2E0A) else Color(0xFFFFF3CD)
+    }
+    val statusBannerTextColor = if (isSecondaryDisplayConnected) {
+        if (activeIsDark) Color(0xFF75B798) else Color(0xFF0F5132)
+    } else {
+        if (activeIsDark) Color(0xFFFFDA6A) else Color(0xFF664D03)
+    }
+
     val listState = rememberLazyListState()
     LaunchedEffect(parsedData.items.size) {
         if (parsedData.items.isNotEmpty()) {
@@ -223,7 +276,8 @@ fun CustomerDisplayPreviewDialog(
                 .padding(vertical = 12.dp)
                 .testTag("customer_display_preview_dialog"),
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            colors = CardDefaults.cardColors(containerColor = dialogBg),
+            border = BorderStroke(1.dp, dialogBorder),
             elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
         ) {
             Column(
@@ -231,7 +285,7 @@ fun CustomerDisplayPreviewDialog(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                // Dialog Top Header Bar
+                // Dialog Top Header Bar with Quick Light/Dark Theme Switcher
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -241,7 +295,7 @@ fun CustomerDisplayPreviewDialog(
                         Icon(
                             imageVector = Icons.Default.Tv,
                             contentDescription = "Customer Screen",
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = if (activeIsDark) Color(0xFF64B5F6) else Color(0xFF1D4ED8),
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -249,18 +303,50 @@ fun CustomerDisplayPreviewDialog(
                             text = if (isMm) "Customer Display စခရင် အစမ်းကြည့်ခြင်း" else "Customer Display Preview",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = if (activeIsDark) Color(0xFFF8FAFC) else Color(0xFF0F172A)
                         )
                     }
-                    IconButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.testTag("close_customer_display_button")
-                    ) {
-                        Icon(
-                            Icons.Default.Close,
-                            contentDescription = if (isMm) "ပိတ်ရန်" else "Close",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        // Quick Theme Toggle Button for Previewing Light/Dark Appearance
+                        Surface(
+                            shape = RoundedCornerShape(20.dp),
+                            color = if (activeIsDark) Color(0xFF1E293B) else Color(0xFFF1F5F9),
+                            border = BorderStroke(1.dp, if (activeIsDark) Color(0xFF334155) else Color(0xFFCBD5E1)),
+                            modifier = Modifier.padding(end = 4.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .clickable { previewDarkOverride = !activeIsDark }
+                                    .padding(horizontal = 10.dp, vertical = 5.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = if (activeIsDark) Icons.Default.DarkMode else Icons.Default.LightMode,
+                                    contentDescription = if (activeIsDark) "Dark Mode" else "Light Mode",
+                                    tint = if (activeIsDark) Color(0xFFFFD166) else Color(0xFFD97706),
+                                    modifier = Modifier.size(15.dp)
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Text(
+                                    text = if (activeIsDark) (if (isMm) "အမှောင် (Dark)" else "Dark Theme") else (if (isMm) "အလင်း (Light)" else "Light Theme"),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = if (activeIsDark) Color(0xFFE2E8F0) else Color(0xFF1E293B)
+                                )
+                            }
+                        }
+
+                        IconButton(
+                            onClick = onDismiss,
+                            modifier = Modifier.testTag("close_customer_display_button")
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = if (isMm) "ပိတ်ရန်" else "Close",
+                                tint = if (activeIsDark) Color(0xFFCBD5E1) else Color(0xFF475569)
+                            )
+                        }
                     }
                 }
 
@@ -331,7 +417,7 @@ fun CustomerDisplayPreviewDialog(
                             .fillMaxHeight(),
                         shape = RoundedCornerShape(12.dp),
                         color = Color.Transparent,
-                        border = if (isDark) BorderStroke(1.dp, leftBorderColor) else null
+                        border = BorderStroke(1.dp, leftBorderColor)
                     ) {
                         Column(
                             modifier = Modifier
@@ -352,7 +438,7 @@ fun CustomerDisplayPreviewDialog(
                                     text = shopName,
                                     fontWeight = FontWeight.Black,
                                     fontSize = 18.sp,
-                                    color = Color.White,
+                                    color = shopNameColor,
                                     textAlign = TextAlign.Center,
                                     lineHeight = 22.sp
                                 )
@@ -363,8 +449,8 @@ fun CustomerDisplayPreviewDialog(
                                 if (shopTagline.isNotBlank()) {
                                     Surface(
                                         shape = RoundedCornerShape(12.dp),
-                                        color = if (isDark) Color(0xFF1E3A8A).copy(alpha = 0.4f) else Color(0xFF0D6EFD).copy(alpha = 0.25f),
-                                        border = BorderStroke(1.dp, if (isDark) Color(0xFF3B82F6).copy(alpha = 0.5f) else Color(0xFF0D6EFD).copy(alpha = 0.5f))
+                                        color = shopTaglineBg,
+                                        border = BorderStroke(1.dp, shopTaglineBorder)
                                     ) {
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,
@@ -373,7 +459,7 @@ fun CustomerDisplayPreviewDialog(
                                             Icon(
                                                 imageVector = Icons.Default.Tune,
                                                 contentDescription = null,
-                                                tint = if (isDark) Color(0xFF93C5FD) else Color(0xFF90CDF4),
+                                                tint = shopTaglineTextColor,
                                                 modifier = Modifier.size(11.dp)
                                             )
                                             Spacer(modifier = Modifier.width(4.dp))
@@ -381,7 +467,7 @@ fun CustomerDisplayPreviewDialog(
                                                 text = shopTagline,
                                                 fontSize = 10.sp,
                                                 fontWeight = FontWeight.Bold,
-                                                color = if (isDark) Color(0xFF93C5FD) else Color(0xFF90CDF4),
+                                                color = shopTaglineTextColor,
                                                 textAlign = TextAlign.Center
                                             )
                                         }
@@ -389,14 +475,15 @@ fun CustomerDisplayPreviewDialog(
                                 }
 
                                 Spacer(modifier = Modifier.height(10.dp))
-                                HorizontalDivider(color = Color.White.copy(alpha = 0.2f))
+                                HorizontalDivider(color = leftDividerColor)
                                 Spacer(modifier = Modifier.height(8.dp))
 
                                 // လိပ်စာ (Address)
                                 if (shopAddress.isNotBlank()) {
                                     Surface(
                                         shape = RoundedCornerShape(8.dp),
-                                        color = if (isDark) Color(0xFF1E293B).copy(alpha = 0.65f) else Color.White.copy(alpha = 0.08f),
+                                        color = addressCardBg,
+                                        border = BorderStroke(1.dp, addressCardBorder),
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Row(
@@ -406,14 +493,14 @@ fun CustomerDisplayPreviewDialog(
                                             Icon(
                                                 imageVector = Icons.Default.LocationOn,
                                                 contentDescription = "Address",
-                                                tint = if (isDark) Color(0xFF93C5FD) else Color(0xFF90CDF4),
+                                                tint = addressIconColor,
                                                 modifier = Modifier.size(14.dp)
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
                                             Text(
                                                 text = shopAddress,
                                                 fontSize = 10.sp,
-                                                color = Color.White.copy(alpha = 0.9f),
+                                                color = addressTextColor,
                                                 lineHeight = 14.sp
                                             )
                                         }
@@ -426,7 +513,8 @@ fun CustomerDisplayPreviewDialog(
                                 if (shopPhone.isNotBlank()) {
                                     Surface(
                                         shape = RoundedCornerShape(8.dp),
-                                        color = Color(0xFFFFD166).copy(alpha = if (isDark) 0.12f else 0.15f),
+                                        color = phoneCardBg,
+                                        border = BorderStroke(1.dp, phoneCardBorder),
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Row(
@@ -436,7 +524,7 @@ fun CustomerDisplayPreviewDialog(
                                             Icon(
                                                 imageVector = Icons.Default.Phone,
                                                 contentDescription = "Phone",
-                                                tint = Color(0xFFFFD166),
+                                                tint = phoneIconColor,
                                                 modifier = Modifier.size(14.dp)
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
@@ -444,7 +532,7 @@ fun CustomerDisplayPreviewDialog(
                                                 text = shopPhone,
                                                 fontSize = 11.sp,
                                                 fontWeight = FontWeight.Bold,
-                                                color = Color(0xFFFFD166)
+                                                color = phoneTextColor
                                             )
                                         }
                                     }
@@ -455,8 +543,8 @@ fun CustomerDisplayPreviewDialog(
                                 // နှုတ်ဆက်စာသား (Greeting & Note)
                                 Surface(
                                     shape = RoundedCornerShape(10.dp),
-                                    color = if (isDark) Color(0xFF1E293B).copy(alpha = 0.75f * greetingGlow) else Color.White.copy(alpha = 0.12f * greetingGlow),
-                                    border = BorderStroke(1.dp, if (isDark) Color(0xFF334155) else Color.White.copy(alpha = 0.2f)),
+                                    color = greetingCardBg,
+                                    border = BorderStroke(1.dp, greetingCardBorder),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Column(
@@ -478,7 +566,7 @@ fun CustomerDisplayPreviewDialog(
                                                 text = footerGreeting,
                                                 fontSize = 10.sp,
                                                 fontWeight = FontWeight.Bold,
-                                                color = Color.White,
+                                                color = greetingTextColor,
                                                 textAlign = TextAlign.Center
                                             )
                                         }
@@ -487,7 +575,7 @@ fun CustomerDisplayPreviewDialog(
                                             Text(
                                                 text = footerNote,
                                                 fontSize = 9.sp,
-                                                color = Color.White.copy(alpha = 0.8f),
+                                                color = greetingSubtextColor,
                                                 textAlign = TextAlign.Center
                                             )
                                         }
@@ -501,7 +589,7 @@ fun CustomerDisplayPreviewDialog(
                                     text = "New Tech Group",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.ExtraBold,
-                                    color = if (isDark) Color(0xFFE2E8F0) else Color.White,
+                                    color = brandTitleColor,
                                     letterSpacing = 0.8.sp,
                                     lineHeight = 13.sp
                                 )
@@ -509,7 +597,7 @@ fun CustomerDisplayPreviewDialog(
                                     text = "Your Trusted Partner",
                                     fontSize = 8.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = if (isDark) Color(0xFF94A3B8) else Color.White.copy(alpha = 0.7f),
+                                    color = brandSubtextColor,
                                     letterSpacing = 0.8.sp,
                                     lineHeight = 10.sp
                                 )
@@ -567,7 +655,7 @@ fun CustomerDisplayPreviewDialog(
                                     ) {
                                         Surface(
                                             shape = CircleShape,
-                                            color = if (isDark) Color(0xFF0D47A1).copy(alpha = 0.35f) else Color(0xFFE7F1FF),
+                                            color = emptyCircleBg,
                                             modifier = Modifier
                                                 .size(56.dp)
                                                 .offset { IntOffset(0, cartOffsetY.toInt() * 2) }
@@ -576,7 +664,7 @@ fun CustomerDisplayPreviewDialog(
                                                 Icon(
                                                     imageVector = Icons.Default.ShoppingCart,
                                                     contentDescription = "Cart",
-                                                    tint = if (isDark) Color(0xFF64B5F6) else Color(0xFF0D6EFD),
+                                                    tint = emptyIconTint,
                                                     modifier = Modifier.size(28.dp)
                                                 )
                                             }
@@ -644,8 +732,8 @@ fun CustomerDisplayPreviewDialog(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(10.dp),
                             color = totalCardBg,
-                            border = if (isDark) BorderStroke(1.dp, totalCardBorder) else null,
-                            shadowElevation = if (isDark) 2.dp else 4.dp
+                            border = BorderStroke(1.dp, totalCardBorder),
+                            shadowElevation = if (activeIsDark) 2.dp else 4.dp
                         ) {
                             Column(modifier = Modifier.padding(12.dp)) {
                                 // Net Total Headline with animated number transition
@@ -659,12 +747,12 @@ fun CustomerDisplayPreviewDialog(
                                             text = labelTotalMain,
                                             fontWeight = FontWeight.Black,
                                             fontSize = 13.sp,
-                                            color = Color(0xFFFFD166)
+                                            color = totalTitleColor
                                         )
                                         Text(
                                             text = labelTotalSub,
                                             fontSize = 10.sp,
-                                            color = Color.LightGray
+                                            color = totalSubtextColor
                                         )
                                     }
 
@@ -680,7 +768,7 @@ fun CustomerDisplayPreviewDialog(
                                             text = "${formatMoney(netAmount)} MMK",
                                             fontWeight = FontWeight.Black,
                                             fontSize = 22.sp,
-                                            color = Color(0xFFFFD166)
+                                            color = totalAmountColor
                                         )
                                     }
                                 }
@@ -691,13 +779,13 @@ fun CustomerDisplayPreviewDialog(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        Text(text = "$labelDiscount:", fontSize = 11.sp, color = Color.LightGray)
-                                        Text(text = "-${formatMoney(parsedData.discount)} MMK", fontSize = 11.sp, color = Color(0xFFFF6B6B), fontWeight = FontWeight.Bold)
+                                        Text(text = "$labelDiscount:", fontSize = 11.sp, color = discountLabelColor)
+                                        Text(text = "-${formatMoney(parsedData.discount)} MMK", fontSize = 11.sp, color = discountValueColor, fontWeight = FontWeight.Bold)
                                     }
                                 }
 
                                 Spacer(modifier = Modifier.height(4.dp))
-                                HorizontalDivider(color = Color.White.copy(alpha = 0.2f))
+                                HorizontalDivider(color = totalDividerColor)
                                 Spacer(modifier = Modifier.height(4.dp))
 
                                 // Paid and Change (Localized)
@@ -706,17 +794,17 @@ fun CustomerDisplayPreviewDialog(
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(text = "$labelPaid: ", fontSize = 12.sp, color = Color.White)
-                                        Text(text = "${formatMoney(parsedData.paid)} MMK", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                        Text(text = "$labelPaid: ", fontSize = 12.sp, color = paidLabelColor)
+                                        Text(text = "${formatMoney(parsedData.paid)} MMK", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = paidValueColor)
                                     }
 
                                     Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(text = "$labelChange: ", fontSize = 12.sp, color = Color.White)
+                                        Text(text = "$labelChange: ", fontSize = 12.sp, color = changeLabelColor)
                                         Text(
                                             text = "${formatMoney(parsedData.change)} MMK",
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight.Black,
-                                            color = Color(0xFF06D6A0)
+                                            color = changeValueColor
                                         )
                                     }
                                 }

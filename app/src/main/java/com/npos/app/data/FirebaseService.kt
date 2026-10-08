@@ -7,6 +7,7 @@ import com.npos.app.data.model.Product
 import com.npos.app.data.model.SaleRecord
 import com.npos.app.data.model.UserSalesSummary
 import com.npos.app.data.model.UserSession
+import com.npos.app.data.offline.NetworkMonitor
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +39,8 @@ class FirebaseService {
         val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
     }
 
+    private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
     var projectId: String = ""
         private set
     var apiKey: String = ""
@@ -61,8 +64,24 @@ class FirebaseService {
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(20, TimeUnit.SECONDS)
-        .writeTimeout(20, TimeUnit.SECONDS)
+        .readTimeout(15, TimeUnit.SECONDS)
+        .writeTimeout(15, TimeUnit.SECONDS)
+        .addInterceptor { chain ->
+            try {
+                val response = chain.proceed(chain.request())
+                if (response.isSuccessful) {
+                    NetworkMonitor.notifySuccess()
+                }
+                response
+            } catch (e: Exception) {
+                if (e is java.net.UnknownHostException || e is java.net.SocketTimeoutException ||
+                    e is java.net.ConnectException || e is java.net.SocketException
+                ) {
+                    NetworkMonitor.notifyFailure()
+                }
+                throw e
+            }
+        }
         .build()
 
     private val _authState = MutableStateFlow<UserSession?>(null)
@@ -326,6 +345,11 @@ class FirebaseService {
                 ?: 0.0
         }
 
+        // Do not return products with stock <= 0 or no sale price (retail_price <= 0)
+        if (qty <= 0 || price <= 0.0) {
+            return null
+        }
+
         val catField = fields.optJSONObject("category")
         var catName = catField?.optJSONObject("mapValue")?.optJSONObject("fields")?.optJSONObject("cat_name")?.optString("stringValue")
             ?: catField?.optString("stringValue")
@@ -550,7 +574,7 @@ class FirebaseService {
     fun onProductsSnapshot(
         idToken: String,
         limit: Int = 100,
-        intervalMs: Long = 8000L,
+        intervalMs: Long = 60000L, // Optimized default: 60s to minimize Firestore read quota
         scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
         onError: ((Exception) -> Unit)? = null,
         onSnapshot: (List<Product>) -> Unit
@@ -558,6 +582,8 @@ class FirebaseService {
         var lastProductsSignature: String = ""
         val job = scope.launch {
             while (isActive) {
+                delay(intervalMs) // Wait for next sync cycle
+                if (!isActive) break
                 try {
                     val result = fetchProducts(idToken, limit)
                     result.onSuccess { freshProducts ->
@@ -569,7 +595,7 @@ class FirebaseService {
                             }
                         }
                     }.onFailure { err ->
-                        Log.w(TAG, "onProductsSnapshot fetch failure: ${err.message}")
+                        Log.w(TAG, "onProductsSnapshot check notice: ${err.message}")
                         onError?.let { callback ->
                             withContext(Dispatchers.Main) {
                                 callback(err as? Exception ?: Exception(err))
@@ -578,14 +604,13 @@ class FirebaseService {
                     }
                 } catch (e: Exception) {
                     if (e is CancellationException) throw e
-                    Log.w(TAG, "onProductsSnapshot loop error", e)
+                    Log.w(TAG, "onProductsSnapshot check error", e)
                     onError?.let { callback ->
                         withContext(Dispatchers.Main) {
                             callback(e)
                         }
                     }
                 }
-                delay(intervalMs)
             }
         }
 
@@ -1003,18 +1028,24 @@ class FirebaseService {
             val body = response.body?.string().orEmpty()
 
             if (!response.isSuccessful) {
-                Log.e(TAG, "Save sale failed: $body")
-                return@withContext Result.failure(Exception("Failed to save sale (${response.code})"))
+                Log.e(TAG, "Save sale failed (${response.code}): $body")
+                val detailMsg = try {
+                    val errJson = JSONObject(body)
+                    errJson.optJSONObject("error")?.optString("message") ?: body
+                } catch (_: Exception) { body }
+                return@withContext Result.failure(Exception("Failed to save sale (${response.code}): $detailMsg"))
             }
 
             val respJson = JSONObject(body)
             val createdId = respJson.optString("name", "").substringAfterLast("/")
 
-            // Automatically deduct sold quantities from original products in Firestore
-            try {
-                deductSaleProductsStock(idToken, sale.items)
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to deduct product stock after sale", e)
+            // Automatically deduct sold quantities from original products in Firestore asynchronously
+            serviceScope.launch {
+                try {
+                    deductSaleProductsStock(idToken, sale.items)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to deduct product stock after sale", e)
+                }
             }
 
             Result.success(createdId.ifEmpty { sale.voucherNo })

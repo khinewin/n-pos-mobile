@@ -208,23 +208,63 @@ fun SunmiCustomerPresentationLayout(
     )
 
     // Dynamic Color Palette for Light vs Dark Mode
-    val screenBg = if (isDark) Color(0xFF0F1115) else Color(0xFFF1F3F5)
+    val screenBg = if (isDark) Color(0xFF0F1115) else Color(0xFFF8FAFC)
     val leftGradientColors = if (isDark) {
-        listOf(Color(0xFF0B0F19), Color(0xFF151C2C), Color(0xFF0B0F19))
+        listOf(Color(0xFF0F141C), Color(0xFF182030), Color(0xFF0F141C))
     } else {
-        listOf(Color(0xFF0A2540), Color(0xFF13395E), Color(0xFF0A2540))
+        listOf(Color(0xFFF1F6FF), Color(0xFFE2EDFD), Color(0xFFF1F6FF))
     }
-    val leftBorderColor = if (isDark) Color(0xFF263248) else Color.Transparent
+    val leftBorderColor = if (isDark) Color(0xFF263248) else Color(0xFFE2E8F0)
+
+    val shopNameColor = if (isDark) Color(0xFFF8FAFC) else Color(0xFF0F172A)
+    val shopTaglineBg = if (isDark) Color(0xFF1E3A8A).copy(alpha = 0.45f) else Color(0xFFDBEAFE)
+    val shopTaglineBorder = if (isDark) Color(0xFF3B82F6).copy(alpha = 0.5f) else Color(0xFF93C5FD)
+    val shopTaglineTextColor = if (isDark) Color(0xFF93C5FD) else Color(0xFF1D4ED8)
+    val leftDividerColor = if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1)
+
+    val addressCardBg = if (isDark) Color(0xFF1E293B).copy(alpha = 0.7f) else Color.White
+    val addressCardBorder = if (isDark) Color(0xFF334155) else Color(0xFFE2E8F0)
+    val addressIconColor = if (isDark) Color(0xFF60A5FA) else Color(0xFF2563EB)
+    val addressTextColor = if (isDark) Color(0xFFE2E8F0) else Color(0xFF334155)
+
+    val phoneCardBg = if (isDark) Color(0xFF854D0E).copy(alpha = 0.25f) else Color(0xFFFEF3C7)
+    val phoneCardBorder = if (isDark) Color(0xFFEAB308).copy(alpha = 0.35f) else Color(0xFFFDE68A)
+    val phoneIconColor = if (isDark) Color(0xFFFFD166) else Color(0xFFD97706)
+    val phoneTextColor = if (isDark) Color(0xFFFFD166) else Color(0xFF92400E)
+
+    val greetingCardBg = if (isDark) Color(0xFF1E293B).copy(alpha = 0.85f * greetingGlow) else Color.White.copy(alpha = 0.95f * greetingGlow)
+    val greetingCardBorder = if (isDark) Color(0xFF334155) else Color(0xFFE2E8F0)
+    val greetingTextColor = if (isDark) Color(0xFFF8FAFC) else Color(0xFF1E293B)
+    val greetingSubtextColor = if (isDark) Color(0xFFCBD5E1) else Color(0xFF64748B)
+
+    val brandTitleColor = if (isDark) Color(0xFFE2E8F0) else Color(0xFF334155)
+    val brandSubtextColor = if (isDark) Color(0xFF94A3B8) else Color(0xFF64748B)
+
+    // Right Column Table & Total Elements
     val cardSurfaceBg = if (isDark) Color(0xFF171B22) else Color.White
-    val cardSurfaceBorder = if (isDark) Color(0xFF2B303C) else Color(0xFFE9ECEF)
-    val tableHeaderBg = if (isDark) Color(0xFF1E40AF) else Color(0xFF0D6EFD)
-    val totalCardBg = if (isDark) Color(0xFF0D0F14) else Color(0xFF212529)
-    val totalCardBorder = if (isDark) Color(0xFF262C38) else Color.Transparent
-    val itemTextColor = if (isDark) Color(0xFFF1F5F9) else Color(0xFF212529)
-    val itemSubTextColor = if (isDark) Color(0xFF94A3B8) else Color.DarkGray
-    val itemAmountColor = if (isDark) Color(0xFF60A5FA) else Color(0xFF0D6EFD)
+    val cardSurfaceBorder = if (isDark) Color(0xFF2B303C) else Color(0xFFE2E8F0)
+    val tableHeaderBg = if (isDark) Color(0xFF1E40AF) else Color(0xFF1D4ED8)
+    val itemTextColor = if (isDark) Color(0xFFF1F5F9) else Color(0xFF0F172A)
+    val itemSubTextColor = if (isDark) Color(0xFF94A3B8) else Color(0xFF64748B)
+    val itemAmountColor = if (isDark) Color(0xFF60A5FA) else Color(0xFF1D4ED8)
     val zebraBg = if (isDark) Color(0xFF1D222B) else Color(0xFFF8F9FA)
-    val dividerColor = if (isDark) Color(0xFF262C38) else Color(0xFFE9ECEF)
+    val dividerColor = if (isDark) Color(0xFF262C38) else Color(0xFFF1F5F9)
+
+    val emptyCircleBg = if (isDark) Color(0xFF0D47A1).copy(alpha = 0.35f) else Color(0xFFDBEAFE)
+    val emptyIconTint = if (isDark) Color(0xFF64B5F6) else Color(0xFF2563EB)
+
+    val totalCardBg = if (isDark) Color(0xFF0D0F14) else Color.White
+    val totalCardBorder = if (isDark) Color(0xFF262C38) else Color(0xFFCBD5E1)
+    val totalTitleColor = if (isDark) Color(0xFFFFD166) else Color(0xFF1E3A8A)
+    val totalSubtextColor = if (isDark) Color(0xFF94A3B8) else Color(0xFF64748B)
+    val totalAmountColor = if (isDark) Color(0xFFFFD166) else Color(0xFF1D4ED8)
+    val totalDividerColor = if (isDark) Color(0xFF262C38) else Color(0xFFE2E8F0)
+    val discountLabelColor = if (isDark) Color(0xFF94A3B8) else Color(0xFF64748B)
+    val discountValueColor = if (isDark) Color(0xFFFF6B6B) else Color(0xFFDC2626)
+    val paidLabelColor = if (isDark) Color(0xFFCBD5E1) else Color(0xFF475569)
+    val paidValueColor = if (isDark) Color.White else Color(0xFF0F172A)
+    val changeLabelColor = if (isDark) Color(0xFF6EE7B7) else Color(0xFF047857)
+    val changeValueColor = if (isDark) Color(0xFF06D6A0) else Color(0xFF059669)
 
     Row(
         modifier = Modifier
@@ -237,7 +277,7 @@ fun SunmiCustomerPresentationLayout(
                 .weight(0.38f)
                 .fillMaxHeight(),
             color = Color.Transparent,
-            border = if (isDark) BorderStroke(1.dp, leftBorderColor) else null
+            border = BorderStroke(1.dp, leftBorderColor)
         ) {
             Column(
                 modifier = Modifier
@@ -258,7 +298,7 @@ fun SunmiCustomerPresentationLayout(
                         text = shopName,
                         fontWeight = FontWeight.Black,
                         fontSize = 24.sp,
-                        color = Color.White,
+                        color = shopNameColor,
                         textAlign = TextAlign.Center,
                         lineHeight = 30.sp
                     )
@@ -269,8 +309,8 @@ fun SunmiCustomerPresentationLayout(
                     if (shopTagline.isNotBlank()) {
                         Surface(
                             shape = RoundedCornerShape(16.dp),
-                            color = if (isDark) Color(0xFF1E3A8A).copy(alpha = 0.4f) else Color(0xFF0D6EFD).copy(alpha = 0.25f),
-                            border = BorderStroke(1.dp, if (isDark) Color(0xFF3B82F6).copy(alpha = 0.5f) else Color(0xFF0D6EFD).copy(alpha = 0.5f))
+                            color = shopTaglineBg,
+                            border = BorderStroke(1.dp, shopTaglineBorder)
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -279,7 +319,7 @@ fun SunmiCustomerPresentationLayout(
                                 Icon(
                                     imageVector = Icons.Default.Tune,
                                     contentDescription = null,
-                                    tint = if (isDark) Color(0xFF93C5FD) else Color(0xFF90CDF4),
+                                    tint = shopTaglineTextColor,
                                     modifier = Modifier.size(13.dp)
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
@@ -287,7 +327,7 @@ fun SunmiCustomerPresentationLayout(
                                     text = shopTagline,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = if (isDark) Color(0xFF93C5FD) else Color(0xFF90CDF4),
+                                    color = shopTaglineTextColor,
                                     textAlign = TextAlign.Center
                                 )
                             }
@@ -295,14 +335,15 @@ fun SunmiCustomerPresentationLayout(
                     }
 
                     Spacer(modifier = Modifier.height(14.dp))
-                    HorizontalDivider(color = Color.White.copy(alpha = 0.2f))
+                    HorizontalDivider(color = leftDividerColor)
                     Spacer(modifier = Modifier.height(12.dp))
 
                     // လိပ်စာ (Address)
                     if (shopAddress.isNotBlank()) {
                         Surface(
                             shape = RoundedCornerShape(10.dp),
-                            color = if (isDark) Color(0xFF1E293B).copy(alpha = 0.65f) else Color.White.copy(alpha = 0.08f),
+                            color = addressCardBg,
+                            border = BorderStroke(1.dp, addressCardBorder),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Row(
@@ -312,7 +353,7 @@ fun SunmiCustomerPresentationLayout(
                                 Icon(
                                     imageVector = Icons.Default.LocationOn,
                                     contentDescription = "Address",
-                                    tint = if (isDark) Color(0xFF93C5FD) else Color(0xFF90CDF4),
+                                    tint = addressIconColor,
                                     modifier = Modifier
                                         .size(18.dp)
                                         .padding(top = 1.dp)
@@ -321,7 +362,7 @@ fun SunmiCustomerPresentationLayout(
                                 Text(
                                     text = shopAddress,
                                     fontSize = 12.sp,
-                                    color = Color.White.copy(alpha = 0.9f),
+                                    color = addressTextColor,
                                     lineHeight = 18.sp
                                 )
                             }
@@ -334,7 +375,8 @@ fun SunmiCustomerPresentationLayout(
                     if (shopPhone.isNotBlank()) {
                         Surface(
                             shape = RoundedCornerShape(10.dp),
-                            color = Color(0xFFFFD166).copy(alpha = if (isDark) 0.12f else 0.15f),
+                            color = phoneCardBg,
+                            border = BorderStroke(1.dp, phoneCardBorder),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Row(
@@ -344,7 +386,7 @@ fun SunmiCustomerPresentationLayout(
                                 Icon(
                                     imageVector = Icons.Default.Phone,
                                     contentDescription = "Phone",
-                                    tint = Color(0xFFFFD166),
+                                    tint = phoneIconColor,
                                     modifier = Modifier.size(18.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -352,7 +394,7 @@ fun SunmiCustomerPresentationLayout(
                                     text = shopPhone,
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFFFFD166)
+                                    color = phoneTextColor
                                 )
                             }
                         }
@@ -363,8 +405,8 @@ fun SunmiCustomerPresentationLayout(
                     // နှုတ်ဆက်စာသား (Greeting & Note) with Heart Icon
                     Surface(
                         shape = RoundedCornerShape(12.dp),
-                        color = if (isDark) Color(0xFF1E293B).copy(alpha = 0.75f * greetingGlow) else Color.White.copy(alpha = 0.12f * greetingGlow),
-                        border = BorderStroke(1.dp, if (isDark) Color(0xFF334155) else Color.White.copy(alpha = 0.2f)),
+                        color = greetingCardBg,
+                        border = BorderStroke(1.dp, greetingCardBorder),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(
@@ -386,7 +428,7 @@ fun SunmiCustomerPresentationLayout(
                                     text = footerGreeting,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White,
+                                    color = greetingTextColor,
                                     textAlign = TextAlign.Center
                                 )
                             }
@@ -395,7 +437,7 @@ fun SunmiCustomerPresentationLayout(
                                 Text(
                                     text = footerNote,
                                     fontSize = 11.sp,
-                                    color = Color.White.copy(alpha = 0.8f),
+                                    color = greetingSubtextColor,
                                     textAlign = TextAlign.Center
                                 )
                             }
@@ -408,13 +450,13 @@ fun SunmiCustomerPresentationLayout(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    HorizontalDivider(color = Color.White.copy(alpha = 0.2f))
+                    HorizontalDivider(color = leftDividerColor)
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = "New Tech Group",
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 12.sp,
-                        color = if (isDark) Color(0xFFE2E8F0) else Color.White,
+                        color = brandTitleColor,
                         letterSpacing = 0.8.sp,
                         lineHeight = 14.sp
                     )
@@ -422,7 +464,7 @@ fun SunmiCustomerPresentationLayout(
                         text = "Your Trusted Partner",
                         fontWeight = FontWeight.Medium,
                         fontSize = 8.5.sp,
-                        color = if (isDark) Color(0xFF94A3B8) else Color.White.copy(alpha = 0.7f),
+                        color = brandSubtextColor,
                         letterSpacing = 0.8.sp,
                         lineHeight = 11.sp
                     )
@@ -479,7 +521,7 @@ fun SunmiCustomerPresentationLayout(
                         ) {
                             Surface(
                                 shape = CircleShape,
-                                color = if (isDark) Color(0xFF0D47A1).copy(alpha = 0.35f) else Color(0xFFE7F1FF),
+                                color = emptyCircleBg,
                                 modifier = Modifier
                                     .size(90.dp)
                                     .offset { IntOffset(0, cartOffsetY.toInt() * 4) }
@@ -488,7 +530,7 @@ fun SunmiCustomerPresentationLayout(
                                     Icon(
                                         imageVector = Icons.Default.ShoppingCart,
                                         contentDescription = "Cart",
-                                        tint = if (isDark) Color(0xFF64B5F6) else Color(0xFF0D6EFD),
+                                        tint = emptyIconTint,
                                         modifier = Modifier.size(46.dp)
                                     )
                                 }
@@ -584,7 +626,7 @@ fun SunmiCustomerPresentationLayout(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 color = totalCardBg,
-                border = if (isDark) BorderStroke(1.dp, totalCardBorder) else null,
+                border = BorderStroke(1.dp, totalCardBorder),
                 shadowElevation = if (isDark) 4.dp else 8.dp
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -599,12 +641,12 @@ fun SunmiCustomerPresentationLayout(
                                 text = labelTotalMain,
                                 fontWeight = FontWeight.Black,
                                 fontSize = 18.sp,
-                                color = Color(0xFFFFD166)
+                                color = totalTitleColor
                             )
                             Text(
                                 text = labelTotalSub,
                                 fontSize = 13.sp,
-                                color = Color.LightGray
+                                color = totalSubtextColor
                             )
                         }
 
@@ -620,7 +662,7 @@ fun SunmiCustomerPresentationLayout(
                                 text = "${formatMoney(netAmount)} MMK",
                                 fontWeight = FontWeight.Black,
                                 fontSize = 32.sp,
-                                color = Color(0xFFFFD166)
+                                color = totalAmountColor
                             )
                         }
                     }
@@ -631,13 +673,13 @@ fun SunmiCustomerPresentationLayout(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(text = "$labelDiscount:", fontSize = 14.sp, color = Color.LightGray)
-                            Text(text = "-${formatMoney(parsedData.discount)} MMK", fontSize = 14.sp, color = Color(0xFFFF6B6B), fontWeight = FontWeight.Bold)
+                            Text(text = "$labelDiscount:", fontSize = 14.sp, color = discountLabelColor)
+                            Text(text = "-${formatMoney(parsedData.discount)} MMK", fontSize = 14.sp, color = discountValueColor, fontWeight = FontWeight.Bold)
                         }
                     }
 
                     Spacer(modifier = Modifier.height(6.dp))
-                    HorizontalDivider(color = Color.White.copy(alpha = 0.2f))
+                    HorizontalDivider(color = totalDividerColor)
                     Spacer(modifier = Modifier.height(6.dp))
 
                     // Paid and Change (Localized)
@@ -646,17 +688,17 @@ fun SunmiCustomerPresentationLayout(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = "$labelPaid: ", fontSize = 16.sp, color = Color.White)
-                            Text(text = "${formatMoney(parsedData.paid)} MMK", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Text(text = "$labelPaid: ", fontSize = 16.sp, color = paidLabelColor)
+                            Text(text = "${formatMoney(parsedData.paid)} MMK", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = paidValueColor)
                         }
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = "$labelChange: ", fontSize = 16.sp, color = Color.White)
+                            Text(text = "$labelChange: ", fontSize = 16.sp, color = changeLabelColor)
                             Text(
                                 text = "${formatMoney(parsedData.change)} MMK",
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Black,
-                                color = Color(0xFF06D6A0)
+                                color = changeValueColor
                             )
                         }
                     }
