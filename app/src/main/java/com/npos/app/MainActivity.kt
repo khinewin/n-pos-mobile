@@ -316,6 +316,13 @@ fun MainAppHost(
     val isSecondaryScreenActive by customerDisplayManager.isSecondaryDisplayConnected.collectAsState()
     val lastCustomerData by customerDisplayManager.lastData.collectAsState()
     val selectedPrinter by printerManager.selectedDevice.collectAsState()
+    val printerConnectionType by printerManager.connectionType.collectAsState()
+    val printerNetworkIp by printerManager.networkIp.collectAsState()
+    val isPrinterConfigured = if (printerConnectionType == com.npos.app.pos.PrinterConnectionType.BLUETOOTH) {
+        selectedPrinter != null
+    } else {
+        printerNetworkIp.trim().isNotEmpty()
+    }
 
     // Request Bluetooth permissions on launch
     val bluetoothPermissionLauncher = rememberLauncherForActivityResult(
@@ -568,7 +575,7 @@ fun MainAppHost(
     // Direct Silent Print helper
     fun executeSilentPrint(jsonData: String) {
         if (!printerManager.isPrinterConfigured()) {
-            Toast.makeText(context, "Please select Bluetooth printer in settings", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Please configure printer in settings", Toast.LENGTH_SHORT).show()
             showPrinterDialog = true
             return
         }
@@ -651,7 +658,7 @@ fun MainAppHost(
                         currentScreen = currentScreen,
                         user = user,
                         isSecondaryDisplayActive = isSecondaryScreenActive,
-                        isPrinterConnected = selectedPrinter != null,
+                        isPrinterConnected = isPrinterConfigured,
                         printerName = printerManager.getPrinterDisplayName(),
                         currentViewMode = currentViewMode,
                         currentThemeMode = currentThemeMode,

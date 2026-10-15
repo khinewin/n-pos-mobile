@@ -49,6 +49,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -59,6 +60,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,9 +74,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.npos.app.pos.PrinterConnectionType
+import com.npos.app.pos.ReceiptPrintMode
 import com.npos.app.pos.ThermalPrinterManager
 import com.npos.app.ui.theme.AppStrings
 import com.npos.app.ui.theme.LocalStrings
+import kotlinx.coroutines.launch
 
 @SuppressLint("MissingPermission")
 @Composable
@@ -87,6 +92,9 @@ fun PrinterSettingsDialog(
     val s = LocalStrings.current
     val context = LocalContext.current
 
+    val connectionType by printerManager.connectionType.collectAsState()
+    val savedNetworkIp by printerManager.networkIp.collectAsState()
+    val savedNetworkPort by printerManager.networkPort.collectAsState()
     val selectedDevice by printerManager.selectedDevice.collectAsState()
     val printerStatus by printerManager.printerStatus.collectAsState()
     val isPrinting by printerManager.isPrinting.collectAsState()
@@ -101,6 +109,8 @@ fun PrinterSettingsDialog(
     val currentFooterGreeting by printerManager.footerGreeting.collectAsState()
     val currentFooterNote by printerManager.footerNote.collectAsState()
 
+    val scope = rememberCoroutineScope()
+
     // Form editing states
     var shopNameInput by remember(currentShopName) { mutableStateOf(currentShopName) }
     var shopTaglineInput by remember(currentShopTagline) { mutableStateOf(currentShopTagline) }
@@ -109,11 +119,16 @@ fun PrinterSettingsDialog(
     var footerGreetingInput by remember(currentFooterGreeting) { mutableStateOf(currentFooterGreeting) }
     var footerNoteInput by remember(currentFooterNote) { mutableStateOf(currentFooterNote) }
 
+    // Network printer editing states
+    var networkIpInput by remember(savedNetworkIp) { mutableStateOf(savedNetworkIp) }
+    var networkPortInput by remember(savedNetworkPort) { mutableStateOf(savedNetworkPort.toString()) }
+    var isTestingNetwork by remember { mutableStateOf(false) }
+
     // Custom paper size input states
     var customMmInput by remember(customMm) { mutableStateOf(customMm.toString()) }
     var customColumnsInput by remember(customColumns) { mutableStateOf(customColumns.toString()) }
 
-    var selectedTabIndex by remember { mutableIntStateOf(0) } // 0: Receipt Info, 1: Bluetooth Printer
+    var selectedTabIndex by remember { mutableIntStateOf(0) } // 0: Receipt Info, 1: Printer Hardware (Bluetooth / Network)
 
     var pairedDevices by remember {
         mutableStateOf(printerManager.getPairedPrinters())
@@ -207,7 +222,7 @@ fun PrinterSettingsDialog(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text(s.selectBluetoothPrinter, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                Text(s.printerTitle, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     )
@@ -385,34 +400,42 @@ fun PrinterSettingsDialog(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = shopNameInput.ifEmpty { "N-POS" },
+                                    text = shopNameInput.replace("!", "").trim().ifEmpty { "N-POS" },
                                     fontWeight = FontWeight.Black,
-                                    fontSize = 16.sp,
+                                    fontSize = 19.sp,
                                     fontFamily = FontFamily.Monospace,
-                                    color = Color.Black
+                                    color = Color.Black,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                                 if (shopTaglineInput.isNotEmpty()) {
                                     Text(
-                                        text = shopTaglineInput,
+                                        text = shopTaglineInput.replace("!", "").trim(),
                                         fontSize = 11.sp,
                                         fontFamily = FontFamily.Monospace,
-                                        color = Color.DarkGray
+                                        color = Color.DarkGray,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.fillMaxWidth()
                                     )
                                 }
                                 if (shopAddressInput.isNotEmpty()) {
                                     Text(
-                                        text = shopAddressInput,
+                                        text = shopAddressInput.replace("!", "").trim(),
                                         fontSize = 11.sp,
                                         fontFamily = FontFamily.Monospace,
-                                        color = Color.DarkGray
+                                        color = Color.DarkGray,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.fillMaxWidth()
                                     )
                                 }
                                 if (shopPhoneInput.isNotEmpty()) {
                                     Text(
-                                        text = "Ph: $shopPhoneInput",
+                                        text = "Ph: ${shopPhoneInput.replace("!", "").trim()}",
                                         fontSize = 11.sp,
                                         fontFamily = FontFamily.Monospace,
-                                        color = Color.DarkGray
+                                        color = Color.DarkGray,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.fillMaxWidth()
                                     )
                                 }
 
@@ -427,10 +450,10 @@ fun PrinterSettingsDialog(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalAlignment = Alignment.Start
                                 ) {
-                                    Text("Invoice No : V-1001", fontSize = 10.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
-                                    Text("Date       : 01-10-2026 14:30", fontSize = 10.sp, fontFamily = FontFamily.Monospace)
-                                    Text("Customer   : General", fontSize = 10.sp, fontFamily = FontFamily.Monospace)
-                                    Text("Cashier    : Admin", fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                                    Text("Invoice No : n1-261015-131515", fontSize = 10.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                                    Text("Date       : 15-10-2026 13:15", fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                                    Text("Customer   : Default Customer", fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                                    Text("Cashier    : Cashier-1", fontSize = 10.sp, fontFamily = FontFamily.Monospace)
                                 }
 
                                 Text(
@@ -440,12 +463,38 @@ fun PrinterSettingsDialog(
                                     color = Color.Gray
                                 )
 
-                                Text(
-                                    text = "[ Sample Items & Totals ]",
-                                    fontSize = 11.sp,
-                                    fontFamily = FontFamily.Monospace,
-                                    color = Color.Gray
-                                )
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalAlignment = Alignment.Start
+                                ) {
+                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("#   Item", fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                                        Text("Amount", fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                                    }
+                                    Text(text = previewDivider, fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = Color.LightGray)
+                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("1   ဇကာ(1200) (1 x 1,200.00)", fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                                        Text("1,200.00", fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                                    }
+                                    Text("2. Centella Ampoule", fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("   (1 x 47,000.00)", fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                                        Text("47,000.00 MMK", fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                                    }
+                                    Text(text = previewDivider, fontSize = 9.sp, fontFamily = FontFamily.Monospace, color = Color.LightGray)
+                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("Total:", fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                                        Text("48,200.00 MMK", fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                                    }
+                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("Paid:", fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                                        Text("50,000.00 MMK", fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                                    }
+                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text("Change:", fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                                        Text("1,800.00 MMK", fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                                    }
+                                }
 
                                 Text(
                                     text = previewDivider,
@@ -456,7 +505,7 @@ fun PrinterSettingsDialog(
 
                                 if (footerGreetingInput.isNotEmpty()) {
                                     Text(
-                                        text = footerGreetingInput,
+                                        text = footerGreetingInput.replace("!", "").trim(),
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold,
                                         fontFamily = FontFamily.Monospace,
@@ -465,7 +514,7 @@ fun PrinterSettingsDialog(
                                 }
                                 if (footerNoteInput.isNotEmpty()) {
                                     Text(
-                                        text = footerNoteInput,
+                                        text = footerNoteInput.replace("!", "").trim(),
                                         fontSize = 10.sp,
                                         fontFamily = FontFamily.Monospace,
                                         color = Color.DarkGray,
@@ -543,117 +592,340 @@ fun PrinterSettingsDialog(
 
                         Spacer(modifier = Modifier.height(14.dp))
 
-                        // Paired Bluetooth Devices Header
+                        // Connection Type Selector (Bluetooth vs Network)
+                        Text(
+                            text = "${s.printerConnectionType}:",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text(
-                                text = s.selectBluetoothPrinter,
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            IconButton(
-                                onClick = {
-                                    pairedDevices = printerManager.getPairedPrinters()
-                                    onRequestBluetoothPermission()
+                            FilterChip(
+                                selected = connectionType == PrinterConnectionType.BLUETOOTH,
+                                onClick = { printerManager.setConnectionType(PrinterConnectionType.BLUETOOTH) },
+                                label = { Text(s.bluetoothPrinter, fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
+                                leadingIcon = {
+                                    Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(16.dp))
                                 },
-                                modifier = Modifier.size(28.dp)
-                            ) {
-                                Icon(Icons.Default.Refresh, contentDescription = "Refresh Devices", modifier = Modifier.size(18.dp))
-                            }
+                                modifier = Modifier.weight(1f)
+                            )
+                            FilterChip(
+                                selected = connectionType == PrinterConnectionType.NETWORK,
+                                onClick = { printerManager.setConnectionType(PrinterConnectionType.NETWORK) },
+                                label = { Text(s.networkPrinter, fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
+                                leadingIcon = {
+                                    Icon(Icons.Default.Tune, contentDescription = null, modifier = Modifier.size(16.dp))
+                                },
+                                modifier = Modifier.weight(1f)
+                            )
                         }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(14.dp))
 
-                        // Device List
-                        if (pairedDevices.isEmpty()) {
-                            Surface(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                shape = RoundedCornerShape(8.dp),
-                                color = Color(0xFFF1F3F5)
+                        if (connectionType == PrinterConnectionType.BLUETOOTH) {
+                            // Paired Bluetooth Devices Header
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Column(
-                                    modifier = Modifier.padding(16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                                Text(
+                                    text = s.selectBluetoothPrinter,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                IconButton(
+                                    onClick = {
+                                        pairedDevices = printerManager.getPairedPrinters()
+                                        onRequestBluetoothPermission()
+                                    },
+                                    modifier = Modifier.size(28.dp)
                                 ) {
-                                    Text(
-                                        text = "No paired Bluetooth printers found.",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = Color.DarkGray
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = "Please pair your POS printer in Android Bluetooth Settings first.",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Color.Gray,
-                                        textAlign = TextAlign.Center
-                                    )
+                                    Icon(Icons.Default.Refresh, contentDescription = "Refresh Devices", modifier = Modifier.size(18.dp))
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            // Device List
+                            if (pairedDevices.isEmpty()) {
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = Color(0xFFF1F3F5)
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(16.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = "No paired Bluetooth printers found.",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = Color.DarkGray
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "Please pair your POS printer in Android Bluetooth Settings first.",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = Color.Gray,
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
+                            } else {
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .heightIn(max = 200.dp)
+                                ) {
+                                    items(pairedDevices) { device ->
+                                        val isSelected = selectedDevice?.address == device.address
+                                        val deviceName = try {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                                device.name ?: device.address
+                                            } else {
+                                                @Suppress("DEPRECATION")
+                                                device.name ?: device.address
+                                            }
+                                        } catch (_: SecurityException) {
+                                            device.address
+                                        }
+
+                                        Surface(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 4.dp)
+                                                .clickable {
+                                                    printerManager.saveSelectedPrinter(device)
+                                                    printerManager.setConnectionType(PrinterConnectionType.BLUETOOTH)
+                                                },
+                                            shape = RoundedCornerShape(8.dp),
+                                            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color(0xFFF8F9FA),
+                                            border = if (isSelected) androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null
+                                        ) {
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(12.dp),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.SpaceBetween
+                                            ) {
+                                                Column(modifier = Modifier.weight(1f)) {
+                                                    Text(
+                                                        text = deviceName,
+                                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                                        fontSize = 14.sp
+                                                    )
+                                                    Text(
+                                                        text = device.address,
+                                                        fontSize = 11.sp,
+                                                        color = Color.Gray
+                                                    )
+                                                }
+                                                if (isSelected) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Check,
+                                                        contentDescription = "Selected",
+                                                        tint = MaterialTheme.colorScheme.primary,
+                                                        modifier = Modifier.size(20.dp)
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         } else {
-                            LazyColumn(
+                            // NETWORK PRINTER (TCP/IP socket port 9100) Configuration Card
+                            Surface(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .heightIn(max = 200.dp)
+                                    .padding(vertical = 4.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
                             ) {
-                                items(pairedDevices) { device ->
-                                    val isSelected = selectedDevice?.address == device.address
-                                    val deviceName = try {
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                                            device.name ?: device.address
-                                        } else {
-                                            @Suppress("DEPRECATION")
-                                            device.name ?: device.address
-                                        }
-                                    } catch (_: SecurityException) {
-                                        device.address
-                                    }
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(14.dp)
+                                ) {
+                                    Text(
+                                        text = s.networkPrinter,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    Text(
+                                        text = "Direct Raw TCP Socket (Standard Port 9100)",
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
 
-                                    Surface(
+                                    Spacer(modifier = Modifier.height(12.dp))
+
+                                    // IP Address Field
+                                    OutlinedTextField(
+                                        value = networkIpInput,
+                                        onValueChange = { networkIpInput = it.trim() },
+                                        label = { Text(s.printerIpAddress) },
+                                        placeholder = { Text("192.168.1.100") },
+                                        singleLine = true,
+                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(vertical = 4.dp)
-                                            .clickable {
-                                                printerManager.saveSelectedPrinter(device)
-                                            },
-                                        shape = RoundedCornerShape(8.dp),
-                                        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color(0xFFF8F9FA),
-                                        border = if (isSelected) androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null
+                                            .testTag("printer_network_ip_input"),
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    // Port Field
+                                    OutlinedTextField(
+                                        value = networkPortInput,
+                                        onValueChange = { networkPortInput = it.filter { ch -> ch.isDigit() } },
+                                        label = { Text(s.printerPort) },
+                                        placeholder = { Text("9100") },
+                                        singleLine = true,
+                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .testTag("printer_network_port_input"),
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(10.dp))
+
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(12.dp),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        // Save Network Config
+                                        Button(
+                                            onClick = {
+                                                val cleanIp = networkIpInput.trim()
+                                                if (cleanIp.isEmpty()) {
+                                                    Toast.makeText(context, s.invalidIpAddress, Toast.LENGTH_SHORT).show()
+                                                } else {
+                                                    val port = networkPortInput.toIntOrNull() ?: ThermalPrinterManager.DEFAULT_NETWORK_PORT
+                                                    printerManager.saveNetworkPrinter(cleanIp, port)
+                                                    Toast.makeText(context, "${s.networkPrinterConfigured} ($cleanIp:$port)", Toast.LENGTH_SHORT).show()
+                                                }
+                                            },
+                                            modifier = Modifier.weight(1f),
+                                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                                         ) {
-                                            Column(modifier = Modifier.weight(1f)) {
-                                                Text(
-                                                    text = deviceName,
-                                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                                    fontSize = 14.sp
-                                                )
-                                                Text(
-                                                    text = device.address,
-                                                    fontSize = 11.sp,
-                                                    color = Color.Gray
-                                                )
-                                            }
-                                            if (isSelected) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Check,
-                                                    contentDescription = "Selected",
-                                                    tint = MaterialTheme.colorScheme.primary,
-                                                    modifier = Modifier.size(20.dp)
-                                                )
+                                            Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(16.dp))
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(s.save, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                        }
+
+                                        // Test Network Connection
+                                        OutlinedButton(
+                                            onClick = {
+                                                val cleanIp = networkIpInput.trim()
+                                                if (cleanIp.isEmpty()) {
+                                                    Toast.makeText(context, s.invalidIpAddress, Toast.LENGTH_SHORT).show()
+                                                } else {
+                                                    val port = networkPortInput.toIntOrNull() ?: ThermalPrinterManager.DEFAULT_NETWORK_PORT
+                                                    isTestingNetwork = true
+                                                    scope.launch {
+                                                        val res = printerManager.testNetworkConnection(cleanIp, port)
+                                                        isTestingNetwork = false
+                                                        res.onSuccess { msg ->
+                                                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                                                        }.onFailure { err ->
+                                                            Toast.makeText(context, err.message ?: "Connection failed", Toast.LENGTH_LONG).show()
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            enabled = !isTestingNetwork && networkIpInput.trim().isNotEmpty(),
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            if (isTestingNetwork) {
+                                                CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp)
+                                            } else {
+                                                Icon(Icons.Default.Tune, contentDescription = null, modifier = Modifier.size(16.dp))
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text(s.testNetworkConnection, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                                             }
                                         }
                                     }
                                 }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        // Print Output Mode (Graphic/Myanmar Bitmap vs Raw Text)
+                        Text(
+                            text = "${s.receiptPrintMode}:",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        val currentPrintMode by printerManager.printMode.collectAsState()
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Surface(
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (currentPrintMode == ReceiptPrintMode.GRAPHIC_MYANMAR) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { printerManager.setPrintMode(ReceiptPrintMode.GRAPHIC_MYANMAR) }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    RadioButton(
+                                        selected = currentPrintMode == ReceiptPrintMode.GRAPHIC_MYANMAR,
+                                        onClick = { printerManager.setPrintMode(ReceiptPrintMode.GRAPHIC_MYANMAR) }
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = s.printModeGraphic,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (currentPrintMode == ReceiptPrintMode.GRAPHIC_MYANMAR) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Text(
+                                            text = s.myanmarFontSupported,
+                                            fontSize = 11.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            }
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                FilterChip(
+                                    selected = currentPrintMode == ReceiptPrintMode.AUTO,
+                                    onClick = { printerManager.setPrintMode(ReceiptPrintMode.AUTO) },
+                                    label = { Text(s.printModeAuto, fontSize = 11.sp) },
+                                    modifier = Modifier.weight(1f)
+                                )
+                                FilterChip(
+                                    selected = currentPrintMode == ReceiptPrintMode.RAW_TEXT,
+                                    onClick = { printerManager.setPrintMode(ReceiptPrintMode.RAW_TEXT) },
+                                    label = { Text(s.printModeText, fontSize = 11.sp) },
+                                    modifier = Modifier.weight(1f)
+                                )
                             }
                         }
 
@@ -683,9 +955,10 @@ fun PrinterSettingsDialog(
                         Text(s.close)
                     }
 
+                    val isConfigured = printerManager.isPrinterConfigured()
                     Button(
                         onClick = onTestPrint,
-                        enabled = !isPrinting && selectedDevice != null,
+                        enabled = !isPrinting && isConfigured,
                         modifier = Modifier
                             .weight(1f)
                             .testTag("test_print_button"),
