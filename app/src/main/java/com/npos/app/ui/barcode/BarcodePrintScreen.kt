@@ -94,6 +94,7 @@ import com.npos.app.data.model.Product
 import com.npos.app.pos.BarcodeLabelConfig
 import com.npos.app.pos.BarcodeLabelData
 import com.npos.app.pos.BarcodeLabelGenerator
+import com.npos.app.pos.BarcodePriceType
 import com.npos.app.pos.BarcodePrintProtocol
 import com.npos.app.pos.ThermalPrinterManager
 import com.npos.app.ui.theme.LocalAppLanguage
@@ -140,9 +141,18 @@ fun BarcodePrintScreen(
     var editCodeNo by remember { mutableStateOf("10001") }
     var editBarcodeValue by remember { mutableStateOf("10001") }
     var editRetailPrice by remember { mutableStateOf("1200") }
+    var editWholesalePrice by remember { mutableStateOf("1000") }
     var editUnit by remember { mutableStateOf("ခု") }
     var selectedProductId by remember { mutableStateOf<String?>(null) }
     var copiesCount by remember { mutableIntStateOf(1) }
+
+    fun formatEditablePrice(value: Double): String {
+        return if (value % 1.0 == 0.0) {
+            value.toLong().toString()
+        } else {
+            value.toString()
+        }
+    }
 
     // Initialize from first product when products load
     LaunchedEffect(products) {
@@ -152,11 +162,8 @@ fun BarcodePrintScreen(
             editItemName = first.itemName
             editCodeNo = first.codeNo
             editBarcodeValue = first.barcode.ifBlank { first.codeNo }
-            editRetailPrice = if (first.retailPrice % 1.0 == 0.0) {
-                first.retailPrice.toLong().toString()
-            } else {
-                first.retailPrice.toString()
-            }
+            editRetailPrice = formatEditablePrice(first.retailPrice)
+            editWholesalePrice = formatEditablePrice(first.wholesalePrice)
             editUnit = first.unit.ifBlank { "ခု" }
         }
     }
@@ -166,11 +173,8 @@ fun BarcodePrintScreen(
         editItemName = product.itemName
         editCodeNo = product.codeNo
         editBarcodeValue = product.barcode.ifBlank { product.codeNo }
-        editRetailPrice = if (product.retailPrice % 1.0 == 0.0) {
-            product.retailPrice.toLong().toString()
-        } else {
-            product.retailPrice.toString()
-        }
+        editRetailPrice = formatEditablePrice(product.retailPrice)
+        editWholesalePrice = formatEditablePrice(product.wholesalePrice)
         editUnit = product.unit.ifBlank { "ခု" }
     }
 
@@ -220,6 +224,7 @@ fun BarcodePrintScreen(
         editCodeNo,
         editBarcodeValue,
         editRetailPrice,
+        editWholesalePrice,
         editUnit,
         shopName
     ) {
@@ -228,6 +233,7 @@ fun BarcodePrintScreen(
             codeNo = editCodeNo.ifBlank { "00000" },
             barcodeValue = editBarcodeValue.ifBlank { editCodeNo.ifBlank { "00000" } },
             retailPrice = editRetailPrice.toDoubleOrNull() ?: 0.0,
+            wholesalePrice = editWholesalePrice.toDoubleOrNull() ?: 0.0,
             unit = editUnit.ifBlank { "ခု" },
             shopName = shopName.ifBlank { "N-POS" }
         )
@@ -358,6 +364,7 @@ fun BarcodePrintScreen(
                                 codeNo = prod.codeNo,
                                 barcodeValue = prod.barcode.ifBlank { prod.codeNo },
                                 retailPrice = prod.retailPrice,
+                                wholesalePrice = prod.wholesalePrice,
                                 unit = prod.unit.ifBlank { "ခု" },
                                 shopName = shopName
                             )
@@ -369,6 +376,7 @@ fun BarcodePrintScreen(
                                 codeNo = prod.codeNo,
                                 barcodeValue = prod.barcode.ifBlank { prod.codeNo },
                                 retailPrice = prod.retailPrice,
+                                wholesalePrice = prod.wholesalePrice,
                                 unit = prod.unit.ifBlank { "ခု" },
                                 shopName = shopName
                             )
@@ -387,6 +395,7 @@ fun BarcodePrintScreen(
                         BatchQueueCard(
                             isMm = isMm,
                             queue = printQueue,
+                            labelConfig = labelConfig,
                             isPrinting = isPrinting,
                             onIncrement = { idx ->
                                 val item = printQueue[idx]
@@ -407,7 +416,7 @@ fun BarcodePrintScreen(
                     }
                 }
 
-                // Right Pane: Live Barcode Preview + Manage What to Include (`item_name`, `retail_price`, `code_no`, etc.)
+                // Right Pane: Live Barcode Preview + Manage What to Include (`item_name`, `retail_price`, `whole_sale_price`, `code_no`, etc.)
                 Column(
                     modifier = Modifier
                         .weight(0.52f)
@@ -429,6 +438,8 @@ fun BarcodePrintScreen(
                         },
                         editRetailPrice = editRetailPrice,
                         onEditRetailPrice = { editRetailPrice = it },
+                        editWholesalePrice = editWholesalePrice,
+                        onEditWholesalePrice = { editWholesalePrice = it },
                         editUnit = editUnit,
                         onEditUnit = { editUnit = it },
                         copiesCount = copiesCount,
@@ -523,6 +534,7 @@ fun BarcodePrintScreen(
                             BatchQueueCard(
                                 isMm = isMm,
                                 queue = printQueue,
+                                labelConfig = labelConfig,
                                 isPrinting = isPrinting,
                                 onIncrement = { idx ->
                                     val item = printQueue[idx]
@@ -556,6 +568,8 @@ fun BarcodePrintScreen(
                             },
                             editRetailPrice = editRetailPrice,
                             onEditRetailPrice = { editRetailPrice = it },
+                            editWholesalePrice = editWholesalePrice,
+                            onEditWholesalePrice = { editWholesalePrice = it },
                             editUnit = editUnit,
                             onEditUnit = { editUnit = it },
                             copiesCount = copiesCount,
@@ -611,6 +625,7 @@ fun BarcodePrintScreen(
                                     codeNo = prod.codeNo,
                                     barcodeValue = prod.barcode.ifBlank { prod.codeNo },
                                     retailPrice = prod.retailPrice,
+                                    wholesalePrice = prod.wholesalePrice,
                                     unit = prod.unit.ifBlank { "ခု" },
                                     shopName = shopName
                                 )
@@ -622,6 +637,7 @@ fun BarcodePrintScreen(
                                     codeNo = prod.codeNo,
                                     barcodeValue = prod.barcode.ifBlank { prod.codeNo },
                                     retailPrice = prod.retailPrice,
+                                    wholesalePrice = prod.wholesalePrice,
                                     unit = prod.unit.ifBlank { "ခု" },
                                     shopName = shopName
                                 )
@@ -640,6 +656,7 @@ fun BarcodePrintScreen(
                             BatchQueueCard(
                                 isMm = isMm,
                                 queue = printQueue,
+                                labelConfig = labelConfig,
                                 isPrinting = isPrinting,
                                 onIncrement = { idx ->
                                     val item = printQueue[idx]
@@ -677,6 +694,8 @@ private fun BarcodeDesignerAndConfigColumn(
     onEditCodeNo: (String) -> Unit,
     editRetailPrice: String,
     onEditRetailPrice: (String) -> Unit,
+    editWholesalePrice: String,
+    onEditWholesalePrice: (String) -> Unit,
     editUnit: String,
     onEditUnit: (String) -> Unit,
     copiesCount: Int,
@@ -815,8 +834,35 @@ private fun BarcodeDesignerAndConfigColumn(
                 IncludedFieldBadge("item_name", labelConfig.includeItemName) {
                     onUpdateConfig(labelConfig.copy(includeItemName = !labelConfig.includeItemName))
                 }
-                IncludedFieldBadge("retail_price", labelConfig.includeRetailPrice) {
-                    onUpdateConfig(labelConfig.copy(includeRetailPrice = !labelConfig.includeRetailPrice))
+                IncludedFieldBadge(
+                    fieldKey = "retail_price",
+                    included = labelConfig.includeRetailPrice && labelConfig.priceType == BarcodePriceType.RETAIL
+                ) {
+                    if (labelConfig.includeRetailPrice && labelConfig.priceType == BarcodePriceType.RETAIL) {
+                        onUpdateConfig(labelConfig.copy(includeRetailPrice = false))
+                    } else {
+                        onUpdateConfig(
+                            labelConfig.copy(
+                                includeRetailPrice = true,
+                                priceType = BarcodePriceType.RETAIL
+                            )
+                        )
+                    }
+                }
+                IncludedFieldBadge(
+                    fieldKey = "whole_sale_price",
+                    included = labelConfig.includeRetailPrice && labelConfig.priceType == BarcodePriceType.WHOLESALE
+                ) {
+                    if (labelConfig.includeRetailPrice && labelConfig.priceType == BarcodePriceType.WHOLESALE) {
+                        onUpdateConfig(labelConfig.copy(includeRetailPrice = false))
+                    } else {
+                        onUpdateConfig(
+                            labelConfig.copy(
+                                includeRetailPrice = true,
+                                priceType = BarcodePriceType.WHOLESALE
+                            )
+                        )
+                    }
                 }
                 IncludedFieldBadge("code_no", labelConfig.includeCodeNo) {
                     onUpdateConfig(labelConfig.copy(includeCodeNo = !labelConfig.includeCodeNo))
@@ -836,7 +882,7 @@ private fun BarcodeDesignerAndConfigColumn(
             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Copies Counter + Quick Preset Copies + Print Buttons
+            // Copies Counter (- / +) + Quick Preset Copies (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -852,41 +898,78 @@ private fun BarcodeDesignerAndConfigColumn(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    listOf(1, 5, 10, 20).forEach { preset ->
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = if (copiesCount == preset) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(6.dp))
-                                .clickable { onCopiesChange(preset) }
-                        ) {
-                            Text(
-                                text = "${preset}x",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (copiesCount == preset) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                            )
-                        }
-                    }
-
                     IconButton(
                         onClick = { onCopiesChange(copiesCount - 1) },
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier
+                            .size(34.dp)
+                            .testTag("barcode_copies_decrease_button")
                     ) {
                         Icon(Icons.Default.Remove, contentDescription = "Decrease", modifier = Modifier.size(18.dp))
                     }
-                    Text(
-                        text = "$copiesCount",
-                        fontWeight = FontWeight.Black,
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f))
+                    ) {
+                        Text(
+                            text = "$copiesCount",
+                            fontWeight = FontWeight.Black,
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp)
+                        )
+                    }
                     IconButton(
                         onClick = { onCopiesChange(copiesCount + 1) },
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier
+                            .size(34.dp)
+                            .testTag("barcode_copies_increase_button")
                     ) {
                         Icon(Icons.Default.Add, contentDescription = "Increase", modifier = Modifier.size(18.dp))
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 1 to 10 Quick-Select Number Buttons (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                (1..10).forEach { preset ->
+                    val isSelected = copiesCount == preset
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = if (isSelected) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.surfaceVariant
+                        },
+                        border = BorderStroke(
+                            1.dp,
+                            if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
+                        ),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(36.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { onCopiesChange(preset) }
+                            .testTag("barcode_copies_preset_$preset")
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(
+                                text = "$preset",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isSelected) {
+                                    Color.White
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -973,7 +1056,7 @@ private fun BarcodeDesignerAndConfigColumn(
                         fontSize = 14.sp
                     )
                     Text(
-                        text = "item_name, retail_price, code_no, shop_name, unit",
+                        text = "item_name, retail_price, whole_sale_price, code_no",
                         fontSize = 11.sp,
                         fontFamily = FontFamily.Monospace,
                         color = MaterialTheme.colorScheme.primary
@@ -983,7 +1066,7 @@ private fun BarcodeDesignerAndConfigColumn(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Toggle Rows for item_name, retail_price, code_no, shop_name, unit, barcode
+            // Toggle Rows for item_name, price (retail_price / whole_sale_price), code_no, shop_name, unit, barcode
             IncludeToggleRow(
                 fieldKey = "item_name",
                 title = if (isMm) "ပစ္စည်းအမည် (Item Name)" else "Product Name (item_name)",
@@ -993,14 +1076,104 @@ private fun BarcodeDesignerAndConfigColumn(
                 testTag = "toggle_include_item_name"
             )
 
+            val activePriceNumber = if (labelConfig.priceType == BarcodePriceType.WHOLESALE) {
+                editWholesalePrice.toDoubleOrNull() ?: 0.0
+            } else {
+                editRetailPrice.toDoubleOrNull() ?: 0.0
+            }
             IncludeToggleRow(
-                fieldKey = "retail_price",
-                title = if (isMm) "လက်လီဈေးနှုန်း (Retail Price)" else "Retail Price (retail_price)",
-                subtitle = "${BarcodeLabelGenerator.formatPrice(editRetailPrice.toDoubleOrNull() ?: 0.0)} ${labelConfig.currencySuffix}",
+                fieldKey = labelConfig.priceType.fieldKey,
+                title = if (isMm) {
+                    if (labelConfig.priceType == BarcodePriceType.WHOLESALE) {
+                        "လက်ကားဈေးနှုန်း (Wholesale Price)"
+                    } else {
+                        "လက်လီဈေးနှုန်း (Retail Price)"
+                    }
+                } else {
+                    if (labelConfig.priceType == BarcodePriceType.WHOLESALE) {
+                        "Wholesale Price (whole_sale_price)"
+                    } else {
+                        "Retail Price (retail_price)"
+                    }
+                },
+                subtitle = "${BarcodeLabelGenerator.formatPrice(activePriceNumber)} ${labelConfig.currencySuffix}".trim(),
                 checked = labelConfig.includeRetailPrice,
                 onCheckedChange = { onUpdateConfig(labelConfig.copy(includeRetailPrice = it)) },
                 testTag = "toggle_include_retail_price"
             )
+
+            // Single Segmented Switch between Retail Price (retail_price) and Wholesale Price (whole_sale_price)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 2.dp, bottom = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                val retailFormatted = "${BarcodeLabelGenerator.formatPrice(editRetailPrice.toDoubleOrNull() ?: 0.0)} ${labelConfig.currencySuffix}".trim()
+                val wholesaleFormatted = "${BarcodeLabelGenerator.formatPrice(editWholesalePrice.toDoubleOrNull() ?: 0.0)} ${labelConfig.currencySuffix}".trim()
+
+                listOf(
+                    Triple(
+                        BarcodePriceType.RETAIL,
+                        if (isMm) "လက်လီဈေး (retail_price)" else "Retail (retail_price)",
+                        retailFormatted
+                    ),
+                    Triple(
+                        BarcodePriceType.WHOLESALE,
+                        if (isMm) "လက်ကားဈေး (whole_sale_price)" else "Wholesale (whole_sale_price)",
+                        wholesaleFormatted
+                    )
+                ).forEach { (type, labelTitle, pricePreview) ->
+                    val isSelected = labelConfig.includeRetailPrice && labelConfig.priceType == type
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = if (isSelected) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f)
+                        },
+                        border = BorderStroke(
+                            1.dp,
+                            if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                        ),
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(10.dp))
+                            .clickable {
+                                onUpdateConfig(
+                                    labelConfig.copy(
+                                        includeRetailPrice = true,
+                                        priceType = type
+                                    )
+                                )
+                            }
+                            .testTag("select_price_type_${type.name.lowercase()}")
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = labelTitle,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = pricePreview,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Black,
+                                color = if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+            }
 
             IncludeToggleRow(
                 fieldKey = "code_no",
@@ -1102,7 +1275,7 @@ private fun BarcodeDesignerAndConfigColumn(
                 }
             }
 
-            // Printer Protocol Selector (ESC/POS Graphic vs TSPL Sticker)
+            // Printer Protocol Selector (Node Server Text vs Real Printer Graphic vs TSPL)
             Text(
                 text = if (isMm) "ပရင်တာ စနစ် (Printer Mode):" else "Printer Command Protocol:",
                 fontWeight = FontWeight.SemiBold,
@@ -1110,9 +1283,9 @@ private fun BarcodeDesignerAndConfigColumn(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(6.dp))
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 BarcodePrintProtocol.values().forEach { proto ->
                     val isSelected = labelConfig.protocol == proto
@@ -1124,24 +1297,40 @@ private fun BarcodeDesignerAndConfigColumn(
                             if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
                         ),
                         modifier = Modifier
-                            .weight(1f)
+                            .fillMaxWidth()
                             .clip(RoundedCornerShape(10.dp))
                             .clickable { onUpdateConfig(labelConfig.copy(protocol = proto)) }
+                            .testTag("barcode_protocol_${proto.name}")
                     ) {
-                        Column(modifier = Modifier.padding(10.dp)) {
-                            Text(
-                                text = if (isMm) proto.titleMm else proto.titleEn,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 12.sp,
-                                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = if (isMm) proto.descMm else proto.descEn,
-                                fontSize = 10.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 2
-                            )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 9.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = if (isMm) proto.titleMm else proto.titleEn,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp,
+                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = if (isMm) proto.descMm else proto.descEn,
+                                    fontSize = 10.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            if (isSelected) {
+                                Icon(
+                                    imageVector = Icons.Default.CheckCircle,
+                                    contentDescription = "Selected",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -1191,24 +1380,25 @@ private fun BarcodeDesignerAndConfigColumn(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedTextField(
-                    value = editCodeNo,
-                    onValueChange = onEditCodeNo,
-                    label = { Text(if (isMm) "code_no (ကုဒ်နံပါတ်)" else "code_no (Code No)") },
-                    singleLine = true,
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("barcode_input_code_no")
-                )
-
-                OutlinedTextField(
                     value = editRetailPrice,
                     onValueChange = onEditRetailPrice,
-                    label = { Text(if (isMm) "retail_price (ဈေးနှုန်း)" else "retail_price (Price)") },
+                    label = { Text(if (isMm) "retail_price (လက်လီဈေး)" else "retail_price (Retail)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     modifier = Modifier
                         .weight(1f)
                         .testTag("barcode_input_retail_price")
+                )
+
+                OutlinedTextField(
+                    value = editWholesalePrice,
+                    onValueChange = onEditWholesalePrice,
+                    label = { Text(if (isMm) "whole_sale_price (လက်ကားဈေး)" else "whole_sale_price (Wholesale)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("barcode_input_wholesale_price")
                 )
             }
 
@@ -1219,19 +1409,29 @@ private fun BarcodeDesignerAndConfigColumn(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedTextField(
+                    value = editCodeNo,
+                    onValueChange = onEditCodeNo,
+                    label = { Text(if (isMm) "code_no (ကုဒ်နံပါတ်)" else "code_no (Code No)") },
+                    singleLine = true,
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("barcode_input_code_no")
+                )
+
+                OutlinedTextField(
                     value = editUnit,
                     onValueChange = onEditUnit,
                     label = { Text(if (isMm) "unit (ယူနစ်)" else "unit (Unit)") },
                     singleLine = true,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(0.6f)
                 )
 
                 OutlinedTextField(
                     value = labelConfig.currencySuffix,
                     onValueChange = { onUpdateConfig(labelConfig.copy(currencySuffix = it)) },
-                    label = { Text(if (isMm) "ငွေကြေးသင်္ကေတ (Ks/MMK)" else "Currency (Ks/MMK)") },
+                    label = { Text(if (isMm) "ငွေကြေး (Ks)" else "Currency") },
                     singleLine = true,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(0.6f)
                 )
             }
         }
@@ -1569,7 +1769,7 @@ private fun ProductSelectorPane(
                                             color = MaterialTheme.colorScheme.secondaryContainer
                                         ) {
                                             Text(
-                                                text = "code_no: ${product.codeNo}",
+                                                text = product.codeNo,
                                                 fontSize = 11.sp,
                                                 fontFamily = FontFamily.Monospace,
                                                 fontWeight = FontWeight.SemiBold,
@@ -1578,10 +1778,16 @@ private fun ProductSelectorPane(
                                             )
                                         }
                                         Text(
-                                            text = "${BarcodeLabelGenerator.formatPrice(product.retailPrice)} Ks",
-                                            fontSize = 12.sp,
+                                            text = if (isMm) {
+                                                "လက်လီ: ${BarcodeLabelGenerator.formatPrice(product.retailPrice)} • လက်ကား: ${BarcodeLabelGenerator.formatPrice(product.wholesalePrice)} Ks"
+                                            } else {
+                                                "R: ${BarcodeLabelGenerator.formatPrice(product.retailPrice)} • W: ${BarcodeLabelGenerator.formatPrice(product.wholesalePrice)} Ks"
+                                            },
+                                            fontSize = 11.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.primary
+                                            color = MaterialTheme.colorScheme.primary,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
                                         )
                                     }
                                 }
@@ -1660,6 +1866,7 @@ private fun ProductSelectorPane(
 private fun BatchQueueCard(
     isMm: Boolean,
     queue: List<BarcodeQueueItem>,
+    labelConfig: BarcodeLabelConfig,
     isPrinting: Boolean,
     onIncrement: (Int) -> Unit,
     onDecrement: (Int) -> Unit,
@@ -1725,6 +1932,7 @@ private fun BatchQueueCard(
             ) {
                 items(queue.size) { idx ->
                     val qItem = queue[idx]
+                    val activeQueuePrice = BarcodeLabelGenerator.resolvePrice(qItem.data, labelConfig)
                     Surface(
                         shape = RoundedCornerShape(8.dp),
                         color = MaterialTheme.colorScheme.surface
@@ -1745,7 +1953,7 @@ private fun BatchQueueCard(
                                     overflow = TextOverflow.Ellipsis
                                 )
                                 Text(
-                                    text = "${qItem.data.codeNo} • ${BarcodeLabelGenerator.formatPrice(qItem.data.retailPrice)} Ks",
+                                    text = "${qItem.data.codeNo} • ${BarcodeLabelGenerator.formatPrice(activeQueuePrice)} ${labelConfig.currencySuffix}".trim(),
                                     fontSize = 10.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )

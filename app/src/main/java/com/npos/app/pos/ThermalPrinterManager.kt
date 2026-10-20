@@ -568,20 +568,27 @@ class ThermalPrinterManager(private val context: Context) {
         copies: Int = 1
     ): Result<String> = withContext(Dispatchers.IO) {
         val safeCopies = copies.coerceIn(1, 200)
-        val bitmap = BarcodeLabelGenerator.renderLabelBitmap(context, data, config)
         val size = BarcodeLabelGenerator.getSizeById(config.labelSizeId)
 
         val payloadBytes = when (config.protocol) {
-            BarcodePrintProtocol.TSPL_LABEL -> {
-                BarcodeLabelGenerator.generateTsplBytes(bitmap, size, safeCopies)
+            BarcodePrintProtocol.ESC_POS_TEXT -> {
+                BarcodeLabelGenerator.generateEscPosTextBarcodeBytes(data, config, safeCopies)
             }
             BarcodePrintProtocol.ESC_POS_GRAPHIC -> {
+                val bitmap = BarcodeLabelGenerator.renderLabelBitmap(context, data, config)
                 val out = ByteArrayOutputStream()
                 val singleBytes = convertBitmapToEscPos(bitmap)
                 for (i in 0 until safeCopies) {
                     out.write(singleBytes)
                 }
                 out.toByteArray()
+            }
+            BarcodePrintProtocol.TSPL_COMMAND -> {
+                BarcodeLabelGenerator.generateTsplCommandBytes(data, config, size, safeCopies)
+            }
+            BarcodePrintProtocol.TSPL_GRAPHIC -> {
+                val bitmap = BarcodeLabelGenerator.renderLabelBitmap(context, data, config)
+                BarcodeLabelGenerator.generateTsplBytes(bitmap, size, safeCopies)
             }
         }
         sendRawPrinterBytes(payloadBytes)
@@ -602,16 +609,23 @@ class ThermalPrinterManager(private val context: Context) {
 
         for ((data, copies) in batch) {
             val safeCopies = copies.coerceIn(1, 200)
-            val bitmap = BarcodeLabelGenerator.renderLabelBitmap(context, data, config)
             when (config.protocol) {
-                BarcodePrintProtocol.TSPL_LABEL -> {
-                    out.write(BarcodeLabelGenerator.generateTsplBytes(bitmap, size, safeCopies))
+                BarcodePrintProtocol.ESC_POS_TEXT -> {
+                    out.write(BarcodeLabelGenerator.generateEscPosTextBarcodeBytes(data, config, safeCopies))
                 }
                 BarcodePrintProtocol.ESC_POS_GRAPHIC -> {
+                    val bitmap = BarcodeLabelGenerator.renderLabelBitmap(context, data, config)
                     val singleBytes = convertBitmapToEscPos(bitmap)
                     for (i in 0 until safeCopies) {
                         out.write(singleBytes)
                     }
+                }
+                BarcodePrintProtocol.TSPL_COMMAND -> {
+                    out.write(BarcodeLabelGenerator.generateTsplCommandBytes(data, config, size, safeCopies))
+                }
+                BarcodePrintProtocol.TSPL_GRAPHIC -> {
+                    val bitmap = BarcodeLabelGenerator.renderLabelBitmap(context, data, config)
+                    out.write(BarcodeLabelGenerator.generateTsplBytes(bitmap, size, safeCopies))
                 }
             }
         }

@@ -1,0 +1,6 @@
+{
+  "summary": "Implementation plan for removing the code_no: / Code: prefix from both the Select Product to Print Barcode list and the printed barcode sticker while keeping retail/wholesale price labels in the product list.",
+  "updatedAt": "2026-10-20T02:25:29.591101638Z",
+  "requestFeedback": true,
+  "userFacing": true
+}

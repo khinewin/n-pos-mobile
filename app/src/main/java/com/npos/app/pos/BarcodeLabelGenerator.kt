@@ -28,23 +28,53 @@ data class BarcodeLabelSize(
 )
 
 enum class BarcodePrintProtocol(val titleEn: String, val titleMm: String, val descEn: String, val descMm: String) {
-    ESC_POS_GRAPHIC(
-        "ESC/POS Graphic (Myanmar Font)",
-        "ESC/POS ပုံနှိပ်မုဒ် (မြန်မာစာအမှန်)",
-        "Prints high-clarity bitmap on any thermal printer",
-        "မည်သည့် Thermal Printer တွင်မဆို မြန်မာစာနှင့် ဘားကုဒ် အကြည်လင်ဆုံးထုတ်ပေးသည်"
+    ESC_POS_TEXT(
+        "ESC/POS Text + Barcode (Node Server / Raw)",
+        "ESC/POS စာသား + ဘားကုဒ် (Node Server / Raw)",
+        "Sends UTF-8 text & native GS k barcode commands (Best for Node Print Server)",
+        "Node Print Server စမ်းသပ်ရန်နှင့် Raw ESC/POS စာသား + ဘားကုဒ် ထုတ်ရန်"
     ),
-    TSPL_LABEL(
-        "TSPL Sticker Printer",
-        "TSPL စတစ်ကာ ပရင်တာမုဒ်",
-        "For dedicated barcode label sticker printers (GAP sensor)",
-        "ဘားကုဒ် စတစ်ကာသီးသန့် ပရင်တာများအတွက် (Xprinter / Gprinter Label)"
+    ESC_POS_GRAPHIC(
+        "ESC/POS Graphic (Real Printer Myanmar Font)",
+        "ESC/POS ပုံရိပ်မုဒ် (Printer အစစ် - မြန်မာစာအမှန်)",
+        "Renders bitmap image so Myanmar font prints without ??? on real printers",
+        "အပြင် Thermal Printer အစစ်တွင် မြန်မာစာ ??? မဖြစ်ဘဲ ပုံရိပ်ဖြင့် အကြည်လင်ဆုံးထုတ်ရန်"
+    ),
+    TSPL_COMMAND(
+        "TSPL Command (TEXT + BARCODE)",
+        "TSPL စာသား Command (Sticker / Node Server)",
+        "Sends TSPL TEXT & BARCODE 128 commands for label printers & servers",
+        "TSPL BARCODE နှင့် TEXT command ပို့ပေးသည် (Node Server နှင့် English စတစ်ကာအတွက်)"
+    ),
+    TSPL_GRAPHIC(
+        "TSPL Graphic (Real Sticker Printer Myanmar)",
+        "TSPL ပုံရိပ်မုဒ် (Sticker Printer အစစ် - မြန်မာစာ)",
+        "Sends TSPL BITMAP for dedicated barcode sticker printers with Myanmar text",
+        "ဘားကုဒ် စတစ်ကာ Printer အစစ်တွင် မြန်မာစာပုံရိပ်ဖြင့် ထုတ်ရန်"
+    )
+}
+
+enum class BarcodePriceType(
+    val fieldKey: String,
+    val titleEn: String,
+    val titleMm: String
+) {
+    RETAIL(
+        fieldKey = "retail_price",
+        titleEn = "Retail Price (retail_price)",
+        titleMm = "လက်လီဈေး (retail_price)"
+    ),
+    WHOLESALE(
+        fieldKey = "whole_sale_price",
+        titleEn = "Wholesale Price (whole_sale_price)",
+        titleMm = "လက်ကားဈေး (whole_sale_price)"
     )
 }
 
 data class BarcodeLabelConfig(
     val includeItemName: Boolean = true,
     val includeRetailPrice: Boolean = true,
+    val priceType: BarcodePriceType = BarcodePriceType.RETAIL,
     val includeCodeNo: Boolean = true,
     val includeShopName: Boolean = false,
     val includeUnit: Boolean = false,
@@ -52,7 +82,7 @@ data class BarcodeLabelConfig(
     val showFieldLabels: Boolean = false,
     val currencySuffix: String = "Ks",
     val labelSizeId: String = "40x30",
-    val protocol: BarcodePrintProtocol = BarcodePrintProtocol.ESC_POS_GRAPHIC,
+    val protocol: BarcodePrintProtocol = BarcodePrintProtocol.ESC_POS_TEXT,
     val fontSizeScale: Float = 1.0f,
     val barcodeHeightScale: Float = 1.0f
 )
@@ -62,6 +92,7 @@ data class BarcodeLabelData(
     val codeNo: String,
     val barcodeValue: String,
     val retailPrice: Double,
+    val wholesalePrice: Double = 0.0,
     val unit: String = "ခု",
     val shopName: String = "N-POS",
     val categoryName: String = ""
@@ -83,18 +114,33 @@ object BarcodeLabelGenerator {
         return LABEL_SIZES.find { it.id == id } ?: LABEL_SIZES.first()
     }
 
+    fun resolvePrice(data: BarcodeLabelData, config: BarcodeLabelConfig): Double {
+        return when (config.priceType) {
+            BarcodePriceType.RETAIL -> data.retailPrice
+            BarcodePriceType.WHOLESALE -> data.wholesalePrice
+        }
+    }
+
     fun loadConfig(context: Context): BarcodeLabelConfig {
         val prefs: SharedPreferences = context.getSharedPreferences(PREFS_BARCODE, Context.MODE_PRIVATE)
-        val protocolName = prefs.getString("protocol", BarcodePrintProtocol.ESC_POS_GRAPHIC.name)
-            ?: BarcodePrintProtocol.ESC_POS_GRAPHIC.name
+        val protocolName = prefs.getString("protocol_v2", BarcodePrintProtocol.ESC_POS_TEXT.name)
+            ?: BarcodePrintProtocol.ESC_POS_TEXT.name
         val protocol = try {
             BarcodePrintProtocol.valueOf(protocolName)
         } catch (_: Exception) {
-            BarcodePrintProtocol.ESC_POS_GRAPHIC
+            BarcodePrintProtocol.ESC_POS_TEXT
+        }
+        val priceTypeName = prefs.getString("price_type", BarcodePriceType.RETAIL.name)
+            ?: BarcodePriceType.RETAIL.name
+        val priceType = try {
+            BarcodePriceType.valueOf(priceTypeName)
+        } catch (_: Exception) {
+            BarcodePriceType.RETAIL
         }
         return BarcodeLabelConfig(
             includeItemName = prefs.getBoolean("include_item_name", true),
             includeRetailPrice = prefs.getBoolean("include_retail_price", true),
+            priceType = priceType,
             includeCodeNo = prefs.getBoolean("include_code_no", true),
             includeShopName = prefs.getBoolean("include_shop_name", false),
             includeUnit = prefs.getBoolean("include_unit", false),
@@ -113,6 +159,7 @@ object BarcodeLabelGenerator {
         prefs.edit()
             .putBoolean("include_item_name", config.includeItemName)
             .putBoolean("include_retail_price", config.includeRetailPrice)
+            .putString("price_type", config.priceType.name)
             .putBoolean("include_code_no", config.includeCodeNo)
             .putBoolean("include_shop_name", config.includeShopName)
             .putBoolean("include_unit", config.includeUnit)
@@ -120,7 +167,7 @@ object BarcodeLabelGenerator {
             .putBoolean("show_field_labels", config.showFieldLabels)
             .putString("currency_suffix", config.currencySuffix)
             .putString("label_size_id", config.labelSizeId)
-            .putString("protocol", config.protocol.name)
+            .putString("protocol_v2", config.protocol.name)
             .putFloat("font_size_scale", config.fontSizeScale)
             .putFloat("barcode_height_scale", config.barcodeHeightScale)
             .apply()
@@ -134,6 +181,155 @@ object BarcodeLabelGenerator {
             DecimalFormat("#,##0.00", symbols)
         }
         return fmt.format(price)
+    }
+
+    /**
+     * Generates raw ESC/POS UTF-8 text + native GS k Code 128 barcode command bytes.
+     * Ideal for Node Print Server testing, raw console inspection, and standard ESC/POS printers.
+     */
+    fun generateEscPosTextBarcodeBytes(
+        data: BarcodeLabelData,
+        config: BarcodeLabelConfig,
+        copies: Int = 1
+    ): ByteArray {
+        val safeCopies = copies.coerceIn(1, 200)
+        val out = ByteArrayOutputStream()
+
+        val ESC: Byte = 0x1B
+        val GS: Byte = 0x1D
+
+        fun write(bytes: ByteArray) = out.write(bytes)
+        fun writeLine(text: String = "") {
+            out.write("$text\n".toByteArray(Charsets.UTF_8))
+        }
+
+        for (c in 0 until safeCopies) {
+            // Initialize printer: ESC @
+            write(byteArrayOf(ESC, 0x40))
+            // Center alignment: ESC a 1
+            write(byteArrayOf(ESC, 0x61, 0x01))
+
+            // 1. Shop Name
+            if (config.includeShopName && data.shopName.isNotBlank()) {
+                write(byteArrayOf(ESC, 0x45, 0x01)) // Bold ON
+                writeLine(data.shopName.trim())
+                write(byteArrayOf(ESC, 0x45, 0x00)) // Bold OFF
+            }
+
+            // 2. Item Name (item_name)
+            if (config.includeItemName && data.itemName.isNotBlank()) {
+                write(byteArrayOf(ESC, 0x45, 0x01)) // Bold ON
+                val itemLine = if (config.showFieldLabels) "Item: ${data.itemName.trim()}" else data.itemName.trim()
+                writeLine(itemLine)
+                write(byteArrayOf(ESC, 0x45, 0x00)) // Bold OFF
+            }
+
+            // 3. Barcode Graphic (Native ESC/POS Code 128: GS k 73)
+            val rawBarcode = data.barcodeValue.ifBlank { data.codeNo }.trim().ifBlank { "123456" }
+            val asciiBarcode = rawBarcode.filter { it.code in 32..126 }.ifEmpty { "123456" }
+            if (config.includeBarcodeGraphic) {
+                val barHeight = (64 * config.barcodeHeightScale).toInt().coerceIn(40, 120).toByte()
+                // GS h n (Set barcode height)
+                write(byteArrayOf(GS, 0x68, barHeight))
+                // GS w n (Set barcode module width: 2)
+                write(byteArrayOf(GS, 0x77, 0x02))
+                // GS H n (HRI position: 0 = not printed by hardware since we print code_no explicitly below)
+                write(byteArrayOf(GS, 0x48, 0x00))
+                // GS k 73 len {B<data> (Code 128 Subset B)
+                val code128Payload = "{B$asciiBarcode".toByteArray(Charsets.US_ASCII)
+                write(byteArrayOf(GS, 0x6B, 73, code128Payload.size.toByte()))
+                write(code128Payload)
+                writeLine()
+            }
+
+            // 4. Code No (code_no - clean number without prefix)
+            if (config.includeCodeNo) {
+                val codeVal = data.codeNo.ifBlank { data.barcodeValue }.trim().ifBlank { "00000" }
+                writeLine(codeVal)
+            }
+
+            // 5. Price (retail_price or whole_sale_price, clean number without prefix)
+            if (config.includeRetailPrice) {
+                val activePrice = resolvePrice(data, config)
+                val formattedPrice = formatPrice(activePrice)
+                val suffix = config.currencySuffix.trim()
+                val priceWithCurrency = if (suffix.isNotEmpty()) "$formattedPrice $suffix" else formattedPrice
+                val priceLine = if (config.includeUnit && data.unit.isNotBlank()) {
+                    "$priceWithCurrency / ${data.unit.trim()}"
+                } else {
+                    priceWithCurrency
+                }
+                write(byteArrayOf(ESC, 0x45, 0x01)) // Bold ON
+                writeLine(priceLine)
+                write(byteArrayOf(ESC, 0x45, 0x00)) // Bold OFF
+            }
+
+            // Feed and cut between labels
+            writeLine()
+            write(byteArrayOf(GS, 0x56, 0x42, 0x00))
+        }
+
+        return out.toByteArray()
+    }
+
+    /**
+     * Generates readable TSPL TEXT & BARCODE 128 commands for label printers and Node print servers.
+     */
+    fun generateTsplCommandBytes(
+        data: BarcodeLabelData,
+        config: BarcodeLabelConfig,
+        size: BarcodeLabelSize,
+        copies: Int = 1
+    ): ByteArray {
+        val safeCopies = copies.coerceIn(1, 200)
+        val sb = StringBuilder()
+        sb.append("SIZE ${size.widthMm} mm, ${size.heightMm} mm\r\n")
+        sb.append("GAP 2 mm, 0 mm\r\n")
+        sb.append("DIRECTION 1\r\n")
+        sb.append("CLS\r\n")
+
+        var y = 16
+        val x = 20
+        fun sanitizeQuotes(str: String) = str.replace("\"", "'").trim()
+
+        if (config.includeShopName && data.shopName.isNotBlank()) {
+            sb.append("TEXT $x,$y,\"3\",0,1,1,\"${sanitizeQuotes(data.shopName)}\"\r\n")
+            y += 28
+        }
+
+        if (config.includeItemName && data.itemName.isNotBlank()) {
+            val itemStr = if (config.showFieldLabels) "Item: ${data.itemName}" else data.itemName
+            sb.append("TEXT $x,$y,\"3\",0,1,1,\"${sanitizeQuotes(itemStr)}\"\r\n")
+            y += 30
+        }
+
+        if (config.includeBarcodeGraphic) {
+            val rawBarcode = data.barcodeValue.ifBlank { data.codeNo }.trim().ifBlank { "123456" }
+            val barH = (56 * config.barcodeHeightScale).toInt().coerceIn(36, 96)
+            val humanReadable = if (config.includeCodeNo) 1 else 0
+            sb.append("BARCODE $x,$y,\"128\",$barH,$humanReadable,0,2,2,\"${sanitizeQuotes(rawBarcode)}\"\r\n")
+            y += barH + (if (config.includeCodeNo) 28 else 10)
+        } else if (config.includeCodeNo) {
+            val codeVal = data.codeNo.ifBlank { data.barcodeValue }.trim()
+            sb.append("TEXT $x,$y,\"2\",0,1,1,\"${sanitizeQuotes(codeVal)}\"\r\n")
+            y += 26
+        }
+
+        if (config.includeRetailPrice) {
+            val activePrice = resolvePrice(data, config)
+            val formattedPrice = formatPrice(activePrice)
+            val suffix = config.currencySuffix.trim()
+            val priceWithCurrency = if (suffix.isNotEmpty()) "$formattedPrice $suffix" else formattedPrice
+            val priceStr = if (config.includeUnit && data.unit.isNotBlank()) {
+                "$priceWithCurrency / ${data.unit.trim()}"
+            } else {
+                priceWithCurrency
+            }
+            sb.append("TEXT $x,$y,\"3\",0,1,1,\"${sanitizeQuotes(priceStr)}\"\r\n")
+        }
+
+        sb.append("PRINT $safeCopies,1\r\n")
+        return sb.toString().toByteArray(Charsets.UTF_8)
     }
 
     /**
@@ -211,22 +407,22 @@ object BarcodeLabelGenerator {
 
         val rawCode = data.codeNo.ifBlank { data.barcodeValue }.trim().ifBlank { "000000" }
         val codeDisplayText = if (config.includeCodeNo) {
-            if (config.showFieldLabels) "Code: $rawCode" else rawCode
+            rawCode
         } else ""
         val codeLayout = if (codeDisplayText.isNotEmpty()) {
             makeCenteredLayout(codeDisplayText, codePaint, maxLines = 1)
         } else null
 
         val priceText = if (config.includeRetailPrice) {
-            val formattedPrice = formatPrice(data.retailPrice)
+            val activePrice = resolvePrice(data, config)
+            val formattedPrice = formatPrice(activePrice)
             val suffix = config.currencySuffix.trim()
             val priceWithCurrency = if (suffix.isNotEmpty()) "$formattedPrice $suffix" else formattedPrice
-            val withUnit = if (config.includeUnit && data.unit.isNotBlank()) {
+            if (config.includeUnit && data.unit.isNotBlank()) {
                 "$priceWithCurrency / ${data.unit.trim()}"
             } else {
                 priceWithCurrency
             }
-            if (config.showFieldLabels) "Price: $withUnit" else withUnit
         } else ""
         val priceLayout = if (priceText.isNotEmpty()) {
             makeCenteredLayout(priceText, pricePaint, maxLines = 1)
@@ -327,7 +523,7 @@ object BarcodeLabelGenerator {
     }
 
     /**
-     * Generates TSPL command bytes for dedicated barcode sticker printers (e.g. Xprinter XP-365B, Gprinter).
+     * Generates TSPL BITMAP command bytes for dedicated barcode sticker printers (e.g. Xprinter XP-365B, Gprinter).
      * Uses TSPL BITMAP command so Myanmar Unicode product names and Code 128 barcode print accurately.
      */
     fun generateTsplBytes(bitmap: Bitmap, size: BarcodeLabelSize, copies: Int = 1): ByteArray {
