@@ -28,6 +28,7 @@ data class AppStrings(
     // Navigation & Main Menu
     val mainMenu: String,
     val sales: String,
+    val barcodePrint: String,
     val dashboard: String,
     val customers: String,
     val posHardware: String,
@@ -212,6 +213,7 @@ val StringsMm = AppStrings(
 
     mainMenu = "အဓိက မီနူး",
     sales = "အရောင်း",
+    barcodePrint = "ဘားကုဒ် ထုတ်ရန်",
     dashboard = "ပင်မဒိုင်ခွက်",
     customers = "ဖောက်သည်များ",
     posHardware = "POS ပစ္စည်းများ ချိတ်ဆက်မှု",
@@ -388,6 +390,7 @@ val StringsEn = AppStrings(
 
     mainMenu = "MAIN MENU",
     sales = "Sales",
+    barcodePrint = "Print Barcode",
     dashboard = "Dashboard",
     customers = "Customers",
     posHardware = "POS HARDWARE",

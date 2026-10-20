@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.PointOfSale
 import androidx.compose.material.icons.filled.Print
+import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.SettingsBrightness
 import androidx.compose.material.icons.filled.Sync
@@ -64,6 +65,7 @@ import com.npos.app.ui.theme.LocalStrings
 
 enum class PosScreen(val icon: ImageVector) {
     SALES(Icons.Default.PointOfSale),
+    BARCODE(Icons.Default.QrCode2),
     DASHBOARD(Icons.Default.Dashboard),
     VOUCHERS(Icons.Default.ReceiptLong),
     CUSTOMERS(Icons.Default.People);
@@ -73,6 +75,7 @@ enum class PosScreen(val icon: ImageVector) {
         val s = LocalStrings.current
         return when (this) {
             SALES -> s.sales
+            BARCODE -> s.barcodePrint
             DASHBOARD -> s.dashboard
             VOUCHERS -> s.vouchersTitle
             CUSTOMERS -> s.customers

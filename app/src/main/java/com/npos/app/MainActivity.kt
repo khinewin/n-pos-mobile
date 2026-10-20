@@ -102,6 +102,7 @@ import com.npos.app.pos.ThermalPrinterManager
 import androidx.activity.compose.BackHandler
 import com.npos.app.ui.CustomerDisplayPreviewDialog
 import com.npos.app.ui.PrinterSettingsDialog
+import com.npos.app.ui.barcode.BarcodePrintScreen
 import com.npos.app.ui.customers.CustomersScreen
 import com.npos.app.ui.dashboard.DashboardScreen
 import com.npos.app.ui.login.LoginScreen
@@ -936,6 +937,32 @@ fun MainAppHost(
                                     }
                                 },
                                 currentViewMode = currentViewMode
+                            )
+                        }
+
+                        PosScreen.BARCODE -> {
+                            BackHandler { currentScreen = PosScreen.SALES }
+                            BarcodePrintScreen(
+                                products = products,
+                                categories = categories,
+                                isLoadingProducts = isLoadingData,
+                                printerManager = printerManager,
+                                currentViewMode = currentViewMode,
+                                autoScannedBarcodeFlow = barcodeScannerManager.scannedCodeFlow,
+                                onRefreshProducts = { loadFirebaseData(user.idToken, displayLimit, forceRefresh = true) },
+                                onSearchCloud = { query, category, limit ->
+                                    isLoadingData = true
+                                    scope.launch {
+                                        val result = firebaseService.searchProducts(user.idToken, query, category, limit)
+                                        isLoadingData = false
+                                        result.onSuccess {
+                                            products = it
+                                        }.onFailure { err ->
+                                            Toast.makeText(context, "Search failed: ${err.message}", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                },
+                                onOpenPrinterSettings = { showPrinterDialog = true }
                             )
                         }
 

@@ -474,6 +474,151 @@ class ThermalPrinterManager(private val context: Context) {
     }
 
     /**
+     * Sends raw ESC/POS or TSPL bytes to the configured Bluetooth or Network printer.
+     */
+    suspend fun sendRawPrinterBytes(rawBytes: ByteArray): Result<String> = withContext(Dispatchers.IO) {
+        if (!isPrinterConfigured()) {
+            val msg = if (_connectionType.value == PrinterConnectionType.BLUETOOTH) {
+                "No Bluetooth printer selected. Please configure in settings."
+            } else {
+                "No Network printer IP configured. Please configure in settings."
+            }
+            return@withContext Result.failure(Exception(msg))
+        }
+
+        _isPrinting.value = true
+        _printerStatus.value = "Connecting to ${getPrinterDisplayName()}..."
+
+        when (_connectionType.value) {
+            PrinterConnectionType.BLUETOOTH -> {
+                val device = _selectedDevice.value
+                    ?: run {
+                        _isPrinting.value = false
+                        return@withContext Result.failure(Exception("No Bluetooth printer selected"))
+                    }
+
+                var socket: BluetoothSocket? = null
+                try {
+                    try {
+                        bluetoothAdapter?.cancelDiscovery()
+                    } catch (_: Exception) {}
+
+                    socket = device.createRfcommSocketToServiceRecord(SPP_UUID)
+                    socket.connect()
+
+                    _printerStatus.value = "Printing barcode label..."
+                    val outputStream: OutputStream = socket.outputStream
+                    outputStream.write(rawBytes)
+                    outputStream.flush()
+
+                    kotlinx.coroutines.delay(250)
+
+                    _printerStatus.value = "Print successful"
+                    Result.success("Barcode label printed via Bluetooth")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Bluetooth barcode print failed", e)
+                    _printerStatus.value = "Print error: ${e.message}"
+                    Result.failure(e)
+                } finally {
+                    try {
+                        socket?.close()
+                    } catch (_: Exception) {}
+                    _isPrinting.value = false
+                }
+            }
+            PrinterConnectionType.NETWORK -> {
+                val ip = _networkIp.value.trim()
+                val port = _networkPort.value
+                var socket: Socket? = null
+                try {
+                    _printerStatus.value = "Connecting to $ip:$port..."
+                    socket = Socket()
+                    socket.connect(InetSocketAddress(ip, port), 4000)
+                    socket.soTimeout = 5000
+
+                    _printerStatus.value = "Printing barcode label..."
+                    val outputStream: OutputStream = socket.getOutputStream()
+                    outputStream.write(rawBytes)
+                    outputStream.flush()
+
+                    kotlinx.coroutines.delay(250)
+
+                    _printerStatus.value = "Print successful"
+                    Result.success("Barcode label printed via Network ($ip:$port)")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Network barcode print failed", e)
+                    _printerStatus.value = "Network print error: ${e.message}"
+                    Result.failure(e)
+                } finally {
+                    try {
+                        socket?.close()
+                    } catch (_: Exception) {}
+                    _isPrinting.value = false
+                }
+            }
+        }
+    }
+
+    /**
+     * Prints a single product's barcode label (with specified number of copies).
+     */
+    suspend fun printBarcodeLabel(
+        data: BarcodeLabelData,
+        config: BarcodeLabelConfig,
+        copies: Int = 1
+    ): Result<String> = withContext(Dispatchers.IO) {
+        val safeCopies = copies.coerceIn(1, 200)
+        val bitmap = BarcodeLabelGenerator.renderLabelBitmap(context, data, config)
+        val size = BarcodeLabelGenerator.getSizeById(config.labelSizeId)
+
+        val payloadBytes = when (config.protocol) {
+            BarcodePrintProtocol.TSPL_LABEL -> {
+                BarcodeLabelGenerator.generateTsplBytes(bitmap, size, safeCopies)
+            }
+            BarcodePrintProtocol.ESC_POS_GRAPHIC -> {
+                val out = ByteArrayOutputStream()
+                val singleBytes = convertBitmapToEscPos(bitmap)
+                for (i in 0 until safeCopies) {
+                    out.write(singleBytes)
+                }
+                out.toByteArray()
+            }
+        }
+        sendRawPrinterBytes(payloadBytes)
+    }
+
+    /**
+     * Prints a batch queue of barcode labels in one connection.
+     */
+    suspend fun printBarcodeLabelsBatch(
+        batch: List<Pair<BarcodeLabelData, Int>>,
+        config: BarcodeLabelConfig
+    ): Result<String> = withContext(Dispatchers.IO) {
+        if (batch.isEmpty()) {
+            return@withContext Result.failure(Exception("Print queue is empty"))
+        }
+        val size = BarcodeLabelGenerator.getSizeById(config.labelSizeId)
+        val out = ByteArrayOutputStream()
+
+        for ((data, copies) in batch) {
+            val safeCopies = copies.coerceIn(1, 200)
+            val bitmap = BarcodeLabelGenerator.renderLabelBitmap(context, data, config)
+            when (config.protocol) {
+                BarcodePrintProtocol.TSPL_LABEL -> {
+                    out.write(BarcodeLabelGenerator.generateTsplBytes(bitmap, size, safeCopies))
+                }
+                BarcodePrintProtocol.ESC_POS_GRAPHIC -> {
+                    val singleBytes = convertBitmapToEscPos(bitmap)
+                    for (i in 0 until safeCopies) {
+                        out.write(singleBytes)
+                    }
+                }
+            }
+        }
+        sendRawPrinterBytes(out.toByteArray())
+    }
+
+    /**
      * Test print function to verify printer connection, alignment, and Myanmar Unicode font rendering.
      */
     suspend fun printTestReceipt(): Result<String> = withContext(Dispatchers.IO) {
